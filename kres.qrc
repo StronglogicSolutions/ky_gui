@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>kstyleyo_logo.png</file>
+    </qresource>
+</RCC>
