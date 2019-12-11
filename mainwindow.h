@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QProcess>
+#include <QString>
 
 namespace Ui {
 class MainWindow;
@@ -24,7 +25,8 @@ private:
     char** cli_argv;
 
 private slots:
-    void buttonClicked();
+    void connectClient();
+    void updateMessages(const QString& s);
 };
 
 

@@ -5,6 +5,7 @@
 #include <QLineEdit>
 #include <QTimer>
 #include <QLabel>
+#include <QString>
 
 class Client : public QDialog
 {
@@ -16,7 +17,15 @@ public:
     void requestNewFortune();
     int start();
 
+public slots:
+    void sendMessage(const QString& s);
+
+signals:
+    void messageReceived(QString s);
+
 private:
+    void handleMessages();
     int argc;
     char** argv;
+    int m_client_socket_fd;
 };
