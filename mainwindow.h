@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QProcess>
 #include <QString>
 
 namespace Ui {
@@ -18,7 +17,6 @@ public:
     ~MainWindow();
 private:
     Ui::MainWindow *ui;
-    QProcess* process;
     void connectUi();
     void runApp();
     int cli_argc;
