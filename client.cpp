@@ -20,6 +20,8 @@ using namespace KData;
 
 using json = nlohmann::json;
 
+static const int MAX_BUFFER_SIZE = 2048;
+
 flatbuffers::FlatBufferBuilder builder(1024);
 
 /**
@@ -136,17 +138,22 @@ void Client::sendMessage(const QString& s) {
 
         qDebug() << "Size is " << size;
 
-        uint8_t send_buffer[size + 4];
+        uint8_t send_buffer[MAX_BUFFER_SIZE];
+        memset(send_buffer, 0, MAX_BUFFER_SIZE);
         send_buffer[0] = (size & 0xFF) >> 24;
         send_buffer[1] = (size & 0xFF) >> 16;
         send_buffer[2] = (size & 0xFF) >> 8;
         send_buffer[3] = (size & 0xFF);
         std::memcpy(send_buffer + 4, encoded_message_buffer, size);
         qDebug() << "Ready to send:";
+        std::string message_to_send{};
         for (unsigned int i = 0; i < (size + 4); i++) {
-            qDebug() << (char)*(send_buffer + i);
+            message_to_send += (char)*(send_buffer + i);
         }
+        qDebug() << message_to_send.c_str();
         ::send(m_client_socket_fd, send_buffer, size + 4, 0);
+        memset(send_buffer, 0, MAX_BUFFER_SIZE);
+        builder.Clear();
     } else {
         qDebug() << "You must first open a connection";
     }
