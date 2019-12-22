@@ -44,5 +44,4 @@ private:
     int argc;
     char** argv;
     int m_client_socket_fd;
-    std::thread m_message_handling_thread;
 };

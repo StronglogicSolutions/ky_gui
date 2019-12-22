@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QCommandLinkButton>
 #include <QDebug>
@@ -23,6 +23,12 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
     ui->setupUi(this);
     QCommandLinkButton *button = this->findChild<QCommandLinkButton*>("connect");
     connect(button, &QCommandLinkButton::clicked, this, &MainWindow::connectClient);
+
+    QListWidget* appList = ui->appList;
+    new QListWidgetItem(tr("Query"), appList);
+    new QListWidgetItem(tr("Research Rivals"), appList);
+    new QListWidgetItem(tr("Collaborators"), appList);
+
 }
 
 /**
@@ -44,7 +50,9 @@ void MainWindow::connectClient() {
 
     q_client->start();
 
-    QTextEdit* send_message_box = this->findChild<QTextEdit*>("inputText");
+    KTextEdit* send_message_box = reinterpret_cast<KTextEdit*>(ui->inputText);
+    send_message_box->show();
+
     QPushButton* send_message_button = this->findChild<QPushButton*>("sendMessage");
     // Handle mouse
     QObject::connect(send_message_button, &QPushButton::clicked, this, [q_client, send_message_box]() {

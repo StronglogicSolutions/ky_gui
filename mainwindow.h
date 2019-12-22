@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <QString>
+#include <QListWidget>
+#include <QListWidgetItem>
+#include <headers/ktextedit.hpp>
 
 namespace Ui {
 class MainWindow;

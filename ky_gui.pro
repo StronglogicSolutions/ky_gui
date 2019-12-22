@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += designer
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -31,7 +32,10 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
-        client.hpp
+        client.hpp \
+        headers/ktextedit.hpp \
+        headers/kmessage_codec.hpp \
+        headers/json.hpp
 
 FORMS += \
         mainwindow.ui
