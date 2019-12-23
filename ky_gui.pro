@@ -35,7 +35,9 @@ HEADERS += \
         client.hpp \
         headers/ktextedit.hpp \
         headers/kmessage_codec.hpp \
-        headers/json.hpp
+        headers/json.hpp \
+        headers/util.hpp
+
 
 FORMS += \
         mainwindow.ui
