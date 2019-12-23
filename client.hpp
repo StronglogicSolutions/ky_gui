@@ -1,4 +1,4 @@
-#include <QDialog>
+﻿#include <QDialog>
 #include <QComboBox>
 #include <QPushButton>
 #include <QMessageBox>
@@ -8,6 +8,7 @@
 #include <QString>
 #include <QThread>
 #include <thread>
+#include <string>
 
 class Client : public QDialog
 {
@@ -35,6 +36,7 @@ public:
 
 public slots:
     void sendMessage(const QString& s);
+    void sendEncoded(std::string message);
 
 signals:
     void messageReceived(QString s);

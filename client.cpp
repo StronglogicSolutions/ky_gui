@@ -9,7 +9,6 @@
 #include <cstring>
 #include <QDebug>
 #include <QByteArray>
-#include <string>
 #include <iostream>
 #include <vector>
 #include <future>
@@ -98,33 +97,8 @@ void Client::start() {
             if (::connect(m_client_socket_fd, reinterpret_cast<sockaddr*>(&server_socket),
                           sizeof(server_socket)) != -1) {
                 std::string start_operation_string = createOperation("start", {});
-                std::vector<uint8_t> fb_byte_vector{start_operation_string.begin(), start_operation_string.end()};
-                auto byte_vector = builder.CreateVector(fb_byte_vector);
-                auto message = CreateMessage(builder, 69, byte_vector);
-
-                builder.Finish(message);
-
-                uint8_t* encoded_message_buffer = builder.GetBufferPointer();
-                uint32_t size = builder.GetSize();
-
-                qDebug() << "Size is " << size;
-
-                uint8_t send_buffer[MAX_BUFFER_SIZE];
-                memset(send_buffer, 0, MAX_BUFFER_SIZE);
-                send_buffer[0] = (size & 0xFF) >> 24;
-                send_buffer[1] = (size & 0xFF) >> 16;
-                send_buffer[2] = (size & 0xFF) >> 8;
-                send_buffer[3] = (size & 0xFF);
-                std::memcpy(send_buffer + 4, encoded_message_buffer, size);
-                qDebug() << "Ready to send:";
-                std::string message_to_send{};
-                for (unsigned int i = 0; i < (size + 4); i++) {
-                    message_to_send += (char)*(send_buffer + i);
-                }
-                qDebug() << message_to_send.c_str();
-                // Send start operation
-                ::send(m_client_socket_fd, send_buffer, size + 4, 0);
-                builder.Clear();
+                // Send operation as an encoded message
+                sendEncoded(start_operation_string);
                 // Delegate message handling to its own thread
                 std::function<void()> message_send_fn = [this]() {
                     this->handleMessages();
@@ -152,68 +126,48 @@ void Client::start() {
 void Client::sendMessage(const QString& s) {
     if (m_client_socket_fd != -1) {
         std::string json_string = createMessage(s.toUtf8().data());
-        std::vector<uint8_t> fb_byte_vector{json_string.begin(), json_string.end()};
-        auto byte_vector = builder.CreateVector(fb_byte_vector);
-        auto message = CreateMessage(builder, 69, byte_vector);
-
-        builder.Finish(message);
-
-        uint8_t* encoded_message_buffer = builder.GetBufferPointer();
-        uint32_t size = builder.GetSize();
-
-        qDebug() << "Size is " << size;
-
-        uint8_t send_buffer[MAX_BUFFER_SIZE];
-        memset(send_buffer, 0, MAX_BUFFER_SIZE);
-        send_buffer[0] = (size & 0xFF) >> 24;
-        send_buffer[1] = (size & 0xFF) >> 16;
-        send_buffer[2] = (size & 0xFF) >> 8;
-        send_buffer[3] = (size & 0xFF);
-        std::memcpy(send_buffer + 4, encoded_message_buffer, size);
-        qDebug() << "Ready to send:";
-        std::string message_to_send{};
-        for (unsigned int i = 0; i < (size + 4); i++) {
-            message_to_send += (char)*(send_buffer + i);
-        }
-        qDebug() << message_to_send.c_str();
-        ::send(m_client_socket_fd, send_buffer, size + 4, 0);
-        builder.Clear();
+        // Send custom message as an encoded message
+        sendEncoded(json_string);
     } else {
         qDebug() << "You must first open a connection";
     }
 }
 
+void Client::sendEncoded(std::string message) {
+    std::vector<uint8_t> fb_byte_vector{message.begin(), message.end()};
+    auto byte_vector = builder.CreateVector(fb_byte_vector);
+    auto k_message = CreateMessage(builder, 69, byte_vector);
+
+    builder.Finish(k_message);
+
+    uint8_t* encoded_message_buffer = builder.GetBufferPointer();
+    uint32_t size = builder.GetSize();
+
+    qDebug() << "Size is " << size;
+
+    uint8_t send_buffer[MAX_BUFFER_SIZE];
+    memset(send_buffer, 0, MAX_BUFFER_SIZE);
+    send_buffer[0] = (size & 0xFF) >> 24;
+    send_buffer[1] = (size & 0xFF) >> 16;
+    send_buffer[2] = (size & 0xFF) >> 8;
+    send_buffer[3] = (size & 0xFF);
+    std::memcpy(send_buffer + 4, encoded_message_buffer, size);
+    qDebug() << "Ready to send:";
+    std::string message_to_send{};
+    for (unsigned int i = 0; i < (size + 4); i++) {
+        message_to_send += (char)*(send_buffer + i);
+    }
+    qDebug() << message_to_send.c_str();
+    // Send start operation
+    ::send(m_client_socket_fd, send_buffer, size + 4, 0);
+    builder.Clear();
+}
+
 void Client::closeConnection() {
     if (m_client_socket_fd != -1) {
         std::string stop_operation_string = createOperation("stop", {});
-
-        std::vector<uint8_t> fb_byte_vector{stop_operation_string.begin(), stop_operation_string.end()};
-        auto byte_vector = builder.CreateVector(fb_byte_vector);
-        auto message = CreateMessage(builder, 69, byte_vector);
-
-        builder.Finish(message);
-
-        uint8_t* encoded_message_buffer = builder.GetBufferPointer();
-        uint32_t size = builder.GetSize();
-
-        qDebug() << "Size is " << size;
-
-        uint8_t send_buffer[MAX_BUFFER_SIZE];
-        memset(send_buffer, 0, MAX_BUFFER_SIZE);
-        send_buffer[0] = (size & 0xFF) >> 24;
-        send_buffer[1] = (size & 0xFF) >> 16;
-        send_buffer[2] = (size & 0xFF) >> 8;
-        send_buffer[3] = (size & 0xFF);
-        std::memcpy(send_buffer + 4, encoded_message_buffer, size);
-        qDebug() << "Ready to send:";
-        std::string message_to_send{};
-        for (unsigned int i = 0; i < (size + 4); i++) {
-            message_to_send += (char)*(send_buffer + i);
-        }
-        qDebug() << message_to_send.c_str();
-        // Send stop operation
-        ::send(m_client_socket_fd, send_buffer, size + 4, 0);
-        builder.Clear();
+        // Send operation as an encoded message
+        sendEncoded(stop_operation_string);
         // Clean up socket file descriptor
         ::shutdown(m_client_socket_fd, SHUT_RDWR);
         ::close(m_client_socket_fd);
