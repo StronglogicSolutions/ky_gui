@@ -41,7 +41,9 @@ Client::MessageHandler Client::createMessageHandler(
  * @param count
  * @param arguments
  */
-Client::Client(QWidget *parent, int count, char** arguments) : QDialog(parent), argc(count), argv(arguments), m_client_socket_fd(-1) {}
+Client::Client(QWidget *parent, int count, char** arguments) : QDialog(parent), argc(count), argv(arguments), m_client_socket_fd(-1), m_commands({}) {
+    qRegisterMetaType<QVector<QString>>("QVector<QString>");
+}
 
 /**
  * @brief Client::~Client
@@ -55,7 +57,7 @@ Client::~Client() {
  * @brief Client::handleMessages
  */
 void Client::handleMessages() {
-    char receive_buffer[2048];
+    uint8_t receive_buffer[2048];
     for (;;) {
         memset(receive_buffer, 0, 2048);
         ssize_t bytes_received = 0;
@@ -64,7 +66,17 @@ void Client::handleMessages() {
         if (bytes_received == 0) {
             break;
         }
-        emit Client::messageReceived(QString::fromUtf8(receive_buffer, 2048));
+        size_t end_idx = findNullIndex(receive_buffer);
+        std::string data_string{receive_buffer, receive_buffer + end_idx};
+        StringVec s_v{};
+        if (rapidIsNewSession(data_string.c_str())) {
+            m_commands = rapidGetArgMap(data_string.c_str());
+            for (const auto& [k, v] : m_commands) {
+                s_v.push_back(v.data());
+            }
+            emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "", s_v);
+        }
+        emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(data_string.data(), data_string.size()), {});
     }
     memset(receive_buffer, 0, 2048);
     ::close(m_client_socket_fd);
@@ -125,7 +137,9 @@ void Client::start() {
  */
 void Client::sendMessage(const QString& s) {
     if (m_client_socket_fd != -1) {
-        std::string json_string = createMessage(s.toUtf8().data());
+        std::string json_string {"{\"type\":\"custom\", \"message\": \""};
+        json_string += s.toUtf8().data();
+        json_string += "\", \"args\":\"placeholder\"}";
         // Send custom message as an encoded message
         sendEncoded(json_string);
     } else {
@@ -172,5 +186,7 @@ void Client::closeConnection() {
         ::shutdown(m_client_socket_fd, SHUT_RDWR);
         ::close(m_client_socket_fd);
         m_client_socket_fd = -1;
+        return;
     }
+    qDebug() << "There is no active connection to close";
 }

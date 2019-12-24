@@ -1,10 +1,11 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
 #include <QString>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <client.hpp>
 #include <headers/ktextedit.hpp>
 
 namespace Ui {
@@ -27,7 +28,7 @@ private:
 
 private slots:
     void connectClient();
-    void updateMessages(const QString& s);
+    void updateMessages(int t, const QString& s, StringVec v);
 };
 
 

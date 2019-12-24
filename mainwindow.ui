@@ -6,12 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>613</width>
+    <width>618</width>
     <height>618</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">font: 87 10pt &quot;Noto Sans&quot;;
+background-color: rgb(10, 10, 10);</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QLabel" name="label">
@@ -42,6 +46,10 @@
       <height>41</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(16, 16, 16);
+background-color: rgb(255, 0, 153);</string>
+    </property>
     <property name="text">
      <string>Connect</string>
     </property>
@@ -54,6 +62,10 @@
       <width>401</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(203, 0, 239);
+color: rgb(16, 16, 16);</string>
     </property>
     <property name="value">
      <number>0</number>
@@ -68,6 +80,10 @@
       <height>26</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(203, 0, 239);
+color: rgb(16, 16, 16);</string>
+    </property>
     <property name="text">
      <string>Disconnect</string>
     </property>
@@ -80,6 +96,10 @@
       <width>80</width>
       <height>26</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(203, 0, 239);
+color: rgb(16, 16, 16);</string>
     </property>
     <property name="text">
      <string>Send</string>
@@ -94,6 +114,10 @@
       <height>171</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(0, 255, 0);
+color: rgb(16, 16, 16);</string>
+    </property>
     <property name="text">
      <string/>
     </property>
@@ -107,6 +131,10 @@
       <height>81</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(0, 255, 0);
+color: rgb(16, 16, 16);</string>
+    </property>
    </widget>
    <widget class="QListWidget" name="appList">
     <property name="geometry">
@@ -117,6 +145,10 @@
       <height>291</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(0, 255, 0);
+color: rgb(16, 16, 16);</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -124,7 +156,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>613</width>
+     <width>618</width>
      <height>23</height>
     </rect>
    </property>

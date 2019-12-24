@@ -6,9 +6,20 @@
 #include <QTimer>
 #include <QLabel>
 #include <QString>
+#include <QVector>
 #include <QThread>
+#include <QMetaType>
 #include <thread>
 #include <string>
+#include <utility>
+
+static constexpr int MESSAGE_UPDATE_TYPE = 1;
+static constexpr int COMMANDS_UPDATE_TYPE = 2;
+
+typedef std::map<int, std::string> CommandMap;
+
+typedef QVector<QString> StringVec;
+Q_DECLARE_METATYPE(StringVec)
 
 class Client : public QDialog
 {
@@ -39,11 +50,12 @@ public slots:
     void sendEncoded(std::string message);
 
 signals:
-    void messageReceived(QString s);
+    void messageReceived(int t, QString s,QVector<QString> args);
 
 private:
     void handleMessages();
     int argc;
     char** argv;
     int m_client_socket_fd;
+    CommandMap m_commands;
 };
