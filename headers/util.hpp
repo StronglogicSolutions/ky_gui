@@ -7,6 +7,7 @@
 #include <vector>
 #include <QDebug>
 #include "rapidjson/writer.h"
+#include "rapidjson/prettywriter.h"
 #include "rapidjson/pointer.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/document.h"
@@ -23,21 +24,21 @@ typedef std::vector<std::string> StdStringVec;
 typedef std::map<int, std::string> CommandMap;
 
 struct KSession {
-  int id;
-  int fd;
-  int status;
+    int id;
+    int fd;
+    int status;
 };
 
-//std::string createMessage(const char* data, std::string args = "") {
-//  json data_json{};
-//  data_json["type"] = "custom";
-//  data_json["args"] = args;
-//  data_json["message"] = data;
+std::string getJsonString(std::string s) {
+    Document d;
+    d.Parse(s.c_str());
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(buffer);
+    d.Accept(writer);
+    return buffer.GetString();
+}
 
-//  return data_json.dump();
-//}
-
-std::string rapidCreateMessage(const char* data, std::string args = "") {
+std::string createMessage(const char* data, std::string args = "") {
     StringBuffer s;
     Writer<StringBuffer> w(s);
     w.StartObject();
@@ -51,13 +52,42 @@ std::string rapidCreateMessage(const char* data, std::string args = "") {
     return s.GetString();
 }
 
-bool rapidIsOperation(const char* data) {
+bool isOperation(const char* data) {
     Document d;
     d.Parse(data);
-    return strcmp(d["type"].GetString(), "operation");
+    return strcmp(d["type"].GetString(), "operation") == 0;
 }
 
-CommandMap rapidGetArgMap(const char* data) {
+std::string createOperation(const char* op, std::vector<std::string> args) {
+    StringBuffer s;
+    Writer<StringBuffer> w(s);
+    w.StartObject();
+    w.Key("type");
+    w.String("operation");
+    w.Key("command");
+    w.String(op);
+    w.Key("args");
+    w.StartArray();
+    if (!args.empty()) {
+        for (const auto& arg : args) {
+            w.String(arg.c_str());
+        }
+    }
+    w.EndArray();
+    w.EndObject();
+    return s.GetString();
+}
+
+std::string getOperation(const char* data) {
+    Document d;
+    d.Parse(data);
+    if (d.HasMember("command")) {
+        return d["command"].GetString();
+    }
+    return "";
+}
+
+CommandMap getArgMap(const char* data) {
     Document d;
     d.Parse(data);
     CommandMap cm{};
@@ -69,7 +99,7 @@ CommandMap rapidGetArgMap(const char* data) {
     return cm;
 }
 
-std::string rapidCreateMessage(const char* data,
+std::string createMessage(const char* data,
                           std::map<int, std::string> map = {}) {
     StringBuffer s;
     Writer<StringBuffer> w(s);
@@ -91,19 +121,41 @@ std::string rapidCreateMessage(const char* data,
     return s.GetString();
 }
 
-bool rapidIsStartOperation(const char* data) {
-    Document d;
-    d.Parse(data);
-    return strcmp(d["command"].GetString(), "start");
+std::string rapidCreateMessage(const char* data,
+                               std::map<int, std::string> map = {}) {
+    StringBuffer s;
+    Writer<StringBuffer> w(s);
+    w.StartObject();
+    w.Key("type");
+    w.String("custom");
+    w.Key("message");
+    w.String(data);
+    w.Key("args");
+    w.StartObject();
+    if (!map.empty()) {
+        for (const auto& [k, v] : map) {
+            w.Key(std::to_string(k).c_str());
+            w.String(v.c_str());
+        }
+    }
+    w.EndObject();
+    w.EndObject();
+    return s.GetString();
 }
 
-bool rapidIsStopOperation(const char* data) {
+bool isStartOperation(const char* data) {
     Document d;
     d.Parse(data);
-    return strcmp(d["command"].GetString(), "stop");
+    return strcmp(d["command"].GetString(), "start") == 0;
 }
 
-bool rapidIsNewSession(const char* data) {
+bool isStopOperation(const char* data) {
+    Document d;
+    d.Parse(data);
+    return strcmp(d["command"].GetString(), "stop") == 0;
+}
+
+bool isNewSession(const char* data) {
     Document d;
     d.Parse(data);
     if (d.HasMember("message")) {
@@ -112,80 +164,25 @@ bool rapidIsNewSession(const char* data) {
     return false;
 }
 
-//std::string createMessageWithDataMap(const char* data,
-//                          std::map<int, std::string> map = {}) {
-//    json data_json{};
-//    data_json["type"] = "custom";
-//    data_json["message"] = data;
-//    data_json["args"] = nullptr;
-//    if (!map.empty()) {
-//        for (const auto& [k, v] : map) {
-//            data_json["args"][k] = v;
-//        }
-//    }
-//    return data_json;
-//}
-
-//std::string createMessage(const char* data, const char* extra = "") {
-//    json data_json{};
-//    data_json["type"] = "custom";
-//    data_json["message"] = data;
-//    data_json["args"] = extra;
-//    return data_json.dump();
-//}
-
-//std::string createMessage(const char* data, TupVec v = {}) {
-//  json data_json{};
-//  data_json["type"] = "custom";
-//  data_json["message"] = data;
-//  data_json["args"] = nullptr;
-//  if (!v.empty()) {
-//    for (const auto& r : v) {
-//      data_json["args"][r.first] = r.second;
-//    }
-//  }
-//  return data_json.dump();
-//}
-
-std::string createOperation(const char* op, std::vector<std::string> args) {
-  json operation_json{};
-  operation_json["type"] = "operation";
-  operation_json["command"] = op;
-  if (!args.empty()) {
-    operation_json["args"] = args;
-  }
-  return operation_json.dump();
+std::string stringTupleVecToJson(
+    std::vector<std::pair<std::string, std::string>> v) {
+    json j{};
+    for (const auto& row : v) {
+        j[row.first] = row.second;
+    }
+    return j;
 }
 
-//std::string stringTupleVecToJson(
-//    std::vector<std::pair<std::string, std::string>> v) {
-//  json j{};
-//  for (const auto& row : v) {
-//    j[row.first] = row.second;
-//  }
-//  return j;
-//}
-
-//bool isOperation(json data) { return *(data.find("type")) == "operation"; }
-
-//bool isNewSession(json data) {
-//  return *(data.find("message")) == "New Session";
-//}
-
-//bool isStartOperation(std::string operation) { return operation == "start"; }
-
-//bool isStopOperation(std::string operation) { return operation == "stop"; }
-
 inline size_t findNullIndex(uint8_t* data) {
-  size_t index = 0;
-  while (data) {
-    if (strcmp(const_cast<const char*>((char*)data), "\0") == 0) {
-      break;
+    size_t index = 0;
+    while (data) {
+        if (strcmp(const_cast<const char*>((char*)data), "\0") == 0) {
+            break;
+        }
+        index++;
+        data++;
     }
-    index++;
-    data++;
-  }
-  return index;
+    return index;
 }
 
 #endif  // __UTIL_HPP__

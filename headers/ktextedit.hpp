@@ -1,10 +1,10 @@
-#include <QPlainTextEdit>
+﻿#include <QTextEdit>
 #include <QDebug>
 #include <QKeyEvent>
 #include <QtUiPlugin/QDesignerCustomWidgetInterface>
 
 
-class KTextEdit : public QPlainTextEdit, public QDesignerCustomWidgetInterface {
+class KTextEdit : public QTextEdit, public QDesignerCustomWidgetInterface {
     Q_PLUGIN_METADATA(IID "kstyleyo.kygui.ktextedit" FILE "ktextedit.json")
     Q_INTERFACES(QDesignerCustomWidgetInterface)
 
@@ -12,11 +12,11 @@ class KTextEdit : public QPlainTextEdit, public QDesignerCustomWidgetInterface {
 public:
 
     QString toPlainText() {
-        return QPlainTextEdit::toPlainText();
+        return QTextEdit::toPlainText();
     }
 
     void clear() {
-        QPlainTextEdit::clear();
+        QTextEdit::clear();
     }
 
 protected:
@@ -25,7 +25,7 @@ protected:
         if (e->key()==Qt::Key_Enter) {
             qDebug() << "Ouch!";
         }
-        QPlainTextEdit::keyPressEvent(e);
+        QTextEdit::keyPressEvent(e);
     }
 
 };

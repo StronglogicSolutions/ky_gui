@@ -1,0 +1,7 @@
+ui_mainwindow.h
+ky_gui
+moc*
+tags
+*.o
+Makefile
+*.stash

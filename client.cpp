@@ -69,14 +69,15 @@ void Client::handleMessages() {
         size_t end_idx = findNullIndex(receive_buffer);
         std::string data_string{receive_buffer, receive_buffer + end_idx};
         StringVec s_v{};
-        if (rapidIsNewSession(data_string.c_str())) {
-            m_commands = rapidGetArgMap(data_string.c_str());
+        if (isNewSession(data_string.c_str())) {
+            m_commands = getArgMap(data_string.c_str());
             for (const auto& [k, v] : m_commands) {
                 s_v.push_back(v.data());
             }
             emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "", s_v);
         }
-        emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(data_string.data(), data_string.size()), {});
+        std::string formatted_json = getJsonString(data_string);
+        emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(formatted_json.data(), formatted_json.size()), {});
     }
     memset(receive_buffer, 0, 2048);
     ::close(m_client_socket_fd);

@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QCommandLinkButton>
 #include <QDebug>
-#include <QLabel>
+#include <QTextEdit>
 #include <QTextStream>
 #include <QString>
 #include <QLayout>
@@ -50,7 +50,7 @@ void MainWindow::connectClient() {
     // Handle mouse
     QObject::connect(send_message_button, &QPushButton::clicked, this, [q_client, send_message_box]() {
         q_client->sendMessage(send_message_box->toPlainText());
-//        send_message_box->clear();
+        send_message_box->clear();
     });
     // TODO: Handle enter key
 //    QObject::connect(send_message_box, &QTextEdit::keyReleaseEvent, this, [q_client, send_message_box]() {
@@ -69,8 +69,7 @@ void MainWindow::connectClient() {
 void MainWindow::updateMessages(int t, const QString& s, StringVec v) {
     if (t == MESSAGE_UPDATE_TYPE) {
         qDebug() << "Updating message area";
-        QLabel* message_display = this->findChild<QLabel*>("messages");
-        message_display->setText(message_display->text() + "\n" + s);
+        ui->messages->append(s);
     } else if (t == COMMANDS_UPDATE_TYPE) {
         qDebug() << "Updating commands";
         QListWidget* appList = ui->appList;
