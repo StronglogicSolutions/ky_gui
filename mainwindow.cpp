@@ -20,6 +20,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
     cli_argc(argc),
     cli_argv(argv) {
     ui->setupUi(this);
+    this->setWindowTitle("KYGUI");
     QCommandLinkButton *button = this->findChild<QCommandLinkButton*>("connect");
     connect(button, &QCommandLinkButton::clicked, this, &MainWindow::connectClient);
 }
@@ -41,7 +42,12 @@ void MainWindow::connectClient() {
     Client* q_client = new Client(this, cli_argc, cli_argv);
     QObject::connect(q_client, &Client::messageReceived, this, &MainWindow::updateMessages);
 
+    QProgressBar* progressBar = ui->progressBar;
     q_client->start();
+
+    for (int i = 1; i < 101; i++) {
+        progressBar->setValue(i);
+    }
 
     KTextEdit* send_message_box = reinterpret_cast<KTextEdit*>(ui->inputText);
     send_message_box->show();
@@ -57,9 +63,28 @@ void MainWindow::connectClient() {
 //        q_client->sendMessage(send_message_box->toPlainText());
 //        send_message_box->clear();
 //    });
-
+    QListWidget* q_list_widget = ui->appList;
+    QObject::connect(q_list_widget, &QListWidget::itemSelectionChanged, this, [q_client, q_list_widget]() {
+        QList<QListWidgetItem*> items = q_list_widget->selectedItems();
+        if (!items.empty()) {
+            std::vector<QString> app_names{};
+            for (const auto& item : items) {
+                app_names.push_back(item->text());
+            }
+            q_client->setSelectedApp(app_names);
+        }
+    });
     QPushButton* disconnect_button = this->findChild<QPushButton*>("disconnect");
-    QObject::connect(disconnect_button, &QPushButton::clicked, q_client, &Client::closeConnection);
+    QObject::connect(disconnect_button, &QPushButton::clicked, this, [this, q_client, progressBar]() {
+        q_client->closeConnection();
+        progressBar->setValue(0);
+        ui->appList->clear();
+        ui->messages->clear();
+    });
+
+    QObject::connect(ui->execute, &QPushButton::clicked, this, [this, q_client]() {
+        q_client->execute();
+    });
 }
 
 /**
@@ -77,6 +102,8 @@ void MainWindow::updateMessages(int t, const QString& s, StringVec v) {
         for(const auto& s : v) {
             new QListWidgetItem(tr(s.toUtf8()), appList);
         }
+        //TODO: We do this because a CommandLinkButton turns transparent by default, except when hovered or checked
+        ui->connect->setChecked(true);
     } else {
         qDebug() << "Unknown update type. Cannot update UI";
     }

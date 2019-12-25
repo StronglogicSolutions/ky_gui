@@ -43,11 +43,13 @@ public:
     ~Client();
     void start();
     void closeConnection();
+    void execute();
     MessageHandler createMessageHandler(std::function<void()> cb);
 
 public slots:
     void sendMessage(const QString& s);
     void sendEncoded(std::string message);
+    void setSelectedApp(std::vector<QString> app_names);
 
 signals:
     void messageReceived(int t, QString s,QVector<QString> args);
@@ -57,5 +59,7 @@ private:
     int argc;
     char** argv;
     int m_client_socket_fd;
+    bool executing;
     CommandMap m_commands;
+    std::vector<int> selected_commands;
 };

@@ -41,7 +41,7 @@ Client::MessageHandler Client::createMessageHandler(
  * @param count
  * @param arguments
  */
-Client::Client(QWidget *parent, int count, char** arguments) : QDialog(parent), argc(count), argv(arguments), m_client_socket_fd(-1), m_commands({}) {
+Client::Client(QWidget *parent, int count, char** arguments) : QDialog(parent), argc(count), argv(arguments), m_client_socket_fd(-1), m_commands({}), executing(false) {
     qRegisterMetaType<QVector<QString>>("QVector<QString>");
 }
 
@@ -190,4 +190,26 @@ void Client::closeConnection() {
         return;
     }
     qDebug() << "There is no active connection to close";
+}
+
+void Client::setSelectedApp(std::vector<QString> app_names) {
+    selected_commands.clear();
+    for (const auto& name : app_names) {
+        qDebug() << "Matching mask to " << name;
+        for (const auto& command : m_commands) {
+            if (command.second.c_str() == name.toUtf8()) {
+                selected_commands.push_back(command.first);
+            }
+        }
+    }
+}
+
+void Client::execute() {
+    if (!selected_commands.empty()) {
+        executing = true;
+        for (const auto& command : selected_commands) {
+            std::string execute_operation = createOperation("Execute", {std::to_string(command)});
+            sendEncoded(execute_operation);
+        }
+    }
 }

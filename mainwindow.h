@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QString>
+#include <QList>
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <client.hpp>

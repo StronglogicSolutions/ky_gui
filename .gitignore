@@ -3,5 +3,6 @@ ky_gui
 moc*
 tags
 *.o
+**.o
 Makefile
 *.stash
