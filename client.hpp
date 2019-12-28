@@ -17,7 +17,7 @@ static constexpr int MESSAGE_UPDATE_TYPE = 1;
 static constexpr int COMMANDS_UPDATE_TYPE = 2;
 
 typedef std::map<int, std::string> CommandMap;
-
+typedef std::map<int, std::vector<std::string>> CommandArgMap;
 typedef QVector<QString> StringVec;
 Q_DECLARE_METATYPE(StringVec)
 
@@ -61,5 +61,7 @@ private:
     int m_client_socket_fd;
     bool executing;
     CommandMap m_commands;
+    CommandArgMap m_command_arg_map;
     std::vector<int> selected_commands;
+
 };

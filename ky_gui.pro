@@ -26,11 +26,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++17
 
 SOURCES += \
+        argdialog.cpp \
         main.cpp \
         mainwindow.cpp \
         client.cpp
 
 HEADERS += \
+        argdialog.h \
         mainwindow.h \
         client.hpp \
         headers/ktextedit.hpp \
@@ -44,6 +46,7 @@ HEADERS += \
 
 
 FORMS += \
+        argdialog.ui \
         mainwindow.ui
 
 # Default rules for deployment.

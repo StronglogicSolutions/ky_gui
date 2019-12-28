@@ -17,6 +17,7 @@
 MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    arg_ui(new ArgDialog),
     cli_argc(argc),
     cli_argv(argv) {
     ui->setupUi(this);
@@ -84,6 +85,18 @@ void MainWindow::connectClient() {
 
     QObject::connect(ui->execute, &QPushButton::clicked, this, [this, q_client]() {
         q_client->execute();
+    });
+
+    QObject::connect(ui->addArgs, &QPushButton::clicked, this, [this]() {
+        auto items = ui->appList->selectedItems();
+        if (items.size() == 1) {
+            // open dialog to add arguments
+            arg_ui->show();
+        } else if (items.size() == 0) {
+            qDebug() << "You must select an App to add arguments to";
+        } else {
+            qDebug() << "Can only add arguments to one app. Please select just one app before adding arguments";
+        }
     });
 }
 

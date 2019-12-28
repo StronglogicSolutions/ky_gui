@@ -8,6 +8,7 @@
 #include <QListWidgetItem>
 #include <client.hpp>
 #include <headers/ktextedit.hpp>
+#include <argdialog.h>
 
 namespace Ui {
 class MainWindow;
@@ -22,6 +23,7 @@ public:
     ~MainWindow();
 private:
     Ui::MainWindow *ui;
+    ArgDialog *arg_ui;
     void connectUi();
     void runApp();
     int cli_argc;
