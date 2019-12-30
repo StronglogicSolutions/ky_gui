@@ -191,6 +191,15 @@ bool isNewSession(const char* data) {
     return false;
 }
 
+bool serverWaitingForFile(const char* data) {
+    Document d;
+    d.Parse(data);
+    if (d.HasMember("message")) {
+        return strcmp(d["message"].GetString(), "File Ready") == 0;
+    }
+    return false;
+}
+
 std::string stringTupleVecToJson(
     std::vector<std::pair<std::string, std::string>> v) {
     json j{};

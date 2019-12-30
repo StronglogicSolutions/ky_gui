@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QString>
 #include <QList>
-#include <QListWidget>
+#include <QListView>
 #include <QListWidgetItem>
 #include <client.hpp>
 #include <headers/ktextedit.hpp>

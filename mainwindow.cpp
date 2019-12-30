@@ -98,6 +98,10 @@ void MainWindow::connectClient() {
             qDebug() << "Can only add arguments to one app. Please select just one app before adding arguments";
         }
     });
+
+    QObject::connect(arg_ui, &ArgDialog::uploadFile, this, [q_client](QByteArray bytes) {
+        q_client->sendFile(bytes);
+    });
 }
 
 /**

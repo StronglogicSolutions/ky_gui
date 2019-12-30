@@ -6,3 +6,4 @@ tags
 **.o
 Makefile
 *.stash
+qrc_kres.*

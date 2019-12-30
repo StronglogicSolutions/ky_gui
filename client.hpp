@@ -49,13 +49,16 @@ public:
 public slots:
     void sendMessage(const QString& s);
     void sendEncoded(std::string message);
+    void sendFileEncoded(QByteArray bytes);
     void setSelectedApp(std::vector<QString> app_names);
+    void sendFile(QByteArray bytes);
 
 signals:
     void messageReceived(int t, QString s,QVector<QString> args);
 
 private:
     void handleMessages();
+    void sendPackets(uint8_t* data, int size);
     int argc;
     char** argv;
     int m_client_socket_fd;
@@ -63,5 +66,5 @@ private:
     CommandMap m_commands;
     CommandArgMap m_command_arg_map;
     std::vector<int> selected_commands;
-
+    QByteArray outgoing_file;
 };

@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <functional>
+#include <algorithm>
 #include <cstring>
 #include <QDebug>
 #include <QByteArray>
@@ -21,6 +22,8 @@ using namespace KData;
 using json = nlohmann::json;
 
 static const int MAX_BUFFER_SIZE = 2048;
+static const int MAX_PACKET_SIZE = 4096;
+static const int HEADER_SIZE = 4;
 
 flatbuffers::FlatBufferBuilder builder(1024);
 
@@ -75,6 +78,8 @@ void Client::handleMessages() {
                 s_v.push_back(v.data());
             }
             emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "", s_v);
+        } else if(serverWaitingForFile(data_string.c_str())) {
+            sendFileEncoded(outgoing_file);
         }
         std::string formatted_json = getJsonString(data_string);
         emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(formatted_json.data(), formatted_json.size()), {});
@@ -178,6 +183,59 @@ void Client::sendEncoded(std::string message) {
     builder.Clear();
 }
 
+void Client::sendPackets(uint8_t* data, int size) {
+    uint32_t total_size = static_cast<uint32_t>(size + HEADER_SIZE);
+    uint32_t total_packets = static_cast<uint32_t>(ceil(
+        static_cast<double>(
+            total_size / MAX_PACKET_SIZE) // total size / packet
+        )
+    );
+
+    uint32_t idx = 0;
+
+    for (; idx < total_packets; idx++) {
+        bool is_first_packet = (idx == 0);
+        bool is_last_packet = (idx == (total_packets - 1));
+        if (is_first_packet) {
+          uint32_t first_packet_size =
+              std::min(size + HEADER_SIZE, MAX_PACKET_SIZE);
+          uint8_t packet[first_packet_size];
+
+          packet[0] = (total_size >> 24) & 0xFF;
+          packet[1] = (total_size >> 16) & 0xFF;
+          packet[2] = (total_size >> 8) & 0xFF;
+          packet[3] = (total_size) & 0xFF;
+
+          std::memcpy(packet + HEADER_SIZE, data, first_packet_size - HEADER_SIZE);
+          /**
+           * SEND PACKET !!!
+           */
+          ::send(m_client_socket_fd, packet, first_packet_size, 0);
+          if (is_last_packet) {
+            break;
+          }
+          continue;
+        }
+        int offset = (idx * MAX_PACKET_SIZE) - HEADER_SIZE;
+        uint32_t packet_size = std::min(size - offset, MAX_PACKET_SIZE);
+        uint8_t packet[packet_size];
+
+        std::memcpy(packet, data + offset, packet_size);
+        /**
+         * SEND PACKET !!!
+         */
+        ::send(m_client_socket_fd, packet, packet_size, 0);
+        if (is_last_packet) {
+            // cleanup
+            outgoing_file.clear();
+        }
+    }
+}
+
+void Client::sendFileEncoded(QByteArray bytes) {
+    sendPackets(reinterpret_cast<uint8_t*>(bytes.data()), bytes.size());
+}
+
 void Client::closeConnection() {
     if (m_client_socket_fd != -1) {
         std::string stop_operation_string = createOperation("stop", {});
@@ -211,5 +269,17 @@ void Client::execute() {
             std::string execute_operation = createOperation("Execute", {std::to_string(command)});
             sendEncoded(execute_operation);
         }
+    }
+}
+
+void Client::sendFile(QByteArray bytes) {
+    if (outgoing_file.isNull()) {
+        std::string send_file_operation = createOperation("FileUpload", {});
+        int size = bytes.size();
+        qDebug() << size << " bytes to send";
+        sendEncoded(send_file_operation);
+        outgoing_file = bytes;
+    } else {
+        qDebug() << "Outgoing file buffer is not ready";
     }
 }
