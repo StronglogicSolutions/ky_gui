@@ -187,7 +187,7 @@ void Client::sendPackets(uint8_t* data, int size) {
     uint32_t total_size = static_cast<uint32_t>(size + HEADER_SIZE);
     uint32_t total_packets = static_cast<uint32_t>(ceil(
         static_cast<double>(
-            total_size / MAX_PACKET_SIZE) // total size / packet
+            static_cast<double>(total_size) / static_cast<double>(MAX_PACKET_SIZE)) // total size / packet
         )
     );
 

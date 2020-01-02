@@ -59,11 +59,7 @@ void MainWindow::connectClient() {
         q_client->sendMessage(send_message_box->toPlainText());
         send_message_box->clear();
     });
-    // TODO: Handle enter key
-//    QObject::connect(send_message_box, &QTextEdit::keyReleaseEvent, this, [q_client, send_message_box]() {
-//        q_client->sendMessage(send_message_box->toPlainText());
-//        send_message_box->clear();
-//    });
+
     QListWidget* q_list_widget = ui->appList;
     QObject::connect(q_list_widget, &QListWidget::itemSelectionChanged, this, [q_client, q_list_widget]() {
         QList<QListWidgetItem*> items = q_list_widget->selectedItems();
@@ -88,20 +84,18 @@ void MainWindow::connectClient() {
     });
 
     QObject::connect(ui->addArgs, &QPushButton::clicked, this, [this]() {
-        auto items = ui->appList->selectedItems();
-        if (items.size() == 1) {
-            // open dialog to add arguments
-            arg_ui->show();
-        } else if (items.size() == 0) {
-            qDebug() << "You must select an App to add arguments to";
-        } else {
-            qDebug() << "Can only add arguments to one app. Please select just one app before adding arguments";
-        }
+        arg_ui->show();
     });
 
     QObject::connect(arg_ui, &ArgDialog::uploadFile, this, [q_client](QByteArray bytes) {
         q_client->sendFile(bytes);
     });
+
+    // TODO: Handle enter key
+    //    QObject::connect(send_message_box, &QTextEdit::keyReleaseEvent, this, [q_client, send_message_box]() {
+    //        q_client->sendMessage(send_message_box->toPlainText());
+    //        send_message_box->clear();
+    //    });
 }
 
 /**
