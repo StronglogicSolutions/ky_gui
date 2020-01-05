@@ -27,7 +27,7 @@ QT_BEGIN_NAMESPACE
 class Ui_ArgDialog
 {
 public:
-    QDialogButtonBox *argButtonBox;
+    QDialogButtonBox *argCommandButtons;
     QPushButton *addArgument;
     QLabel *argDialogTitle;
     QPushButton *addFile;
@@ -50,16 +50,16 @@ public:
         icon.addFile(QString::fromUtf8("favicon.ico"), QSize(), QIcon::Normal, QIcon::Off);
         ArgDialog->setWindowIcon(icon);
         ArgDialog->setStyleSheet(QString::fromUtf8("background-color: rgb(33, 33, 33);"));
-        argButtonBox = new QDialogButtonBox(ArgDialog);
-        argButtonBox->setObjectName(QString::fromUtf8("argButtonBox"));
-        argButtonBox->setGeometry(QRect(340, 510, 201, 32));
-        argButtonBox->setLayoutDirection(Qt::LeftToRight);
-        argButtonBox->setAutoFillBackground(false);
-        argButtonBox->setStyleSheet(QString::fromUtf8("background-color: rgb(203, 0, 239);\n"
+        argCommandButtons = new QDialogButtonBox(ArgDialog);
+        argCommandButtons->setObjectName(QString::fromUtf8("argCommandButtons"));
+        argCommandButtons->setGeometry(QRect(340, 510, 201, 32));
+        argCommandButtons->setLayoutDirection(Qt::LeftToRight);
+        argCommandButtons->setAutoFillBackground(false);
+        argCommandButtons->setStyleSheet(QString::fromUtf8("background-color: rgb(203, 0, 239);\n"
 "color: rgb(16, 16, 16);"));
-        argButtonBox->setOrientation(Qt::Horizontal);
-        argButtonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Save);
-        argButtonBox->setCenterButtons(true);
+        argCommandButtons->setOrientation(Qt::Horizontal);
+        argCommandButtons->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Save);
+        argCommandButtons->setCenterButtons(true);
         addArgument = new QPushButton(ArgDialog);
         addArgument->setObjectName(QString::fromUtf8("addArgument"));
         addArgument->setGeometry(QRect(380, 190, 80, 26));
@@ -87,9 +87,9 @@ public:
             argList->setColumnCount(2);
         argList->setObjectName(QString::fromUtf8("argList"));
         argList->setGeometry(QRect(60, 320, 481, 171));
-        argList->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);\n"
+        argList->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 255, 255);\n"
 "color: rgb(5, 5, 5);\n"
-"font: 87 12pt \"Noto Sans\";\n"
+"font: 87 10pt \"Noto Sans\";\n"
 "selection-background-color: rgb(255, 0, 174);"));
         argList->setColumnCount(2);
         argList->horizontalHeader()->setCascadingSectionResizes(false);
@@ -100,9 +100,12 @@ public:
         argType = new QListWidget(ArgDialog);
         new QListWidgetItem(argType);
         new QListWidgetItem(argType);
+        new QListWidgetItem(argType);
+        new QListWidgetItem(argType);
+        new QListWidgetItem(argType);
         argType->setObjectName(QString::fromUtf8("argType"));
         argType->setGeometry(QRect(190, 80, 81, 41));
-        argType->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);\n"
+        argType->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 255, 255);\n"
 "color: rgb(5, 5, 5);\n"
 "font: 87 10pt \"Noto Sans\";\n"
 "selection-background-color: rgb(255, 0, 174);"));
@@ -118,10 +121,9 @@ public:
         argInput = new QTextEdit(ArgDialog);
         argInput->setObjectName(QString::fromUtf8("argInput"));
         argInput->setGeometry(QRect(190, 130, 281, 51));
-        argInput->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);\n"
+        argInput->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 255, 255);\n"
 "color: rgb(5, 5, 5);\n"
-"font: 87 12pt \"Noto Sans\";\n"
-"selection-background-color: rgb(255, 0, 174);"));
+"font: 87 10pt \"Noto Sans\";"));
         label_5 = new QLabel(ArgDialog);
         label_5->setObjectName(QString::fromUtf8("label_5"));
         label_5->setGeometry(QRect(130, 260, 31, 20));
@@ -130,8 +132,8 @@ public:
         dateTime->setGeometry(QRect(200, 260, 194, 27));
 
         retranslateUi(ArgDialog);
-        QObject::connect(argButtonBox, SIGNAL(accepted()), ArgDialog, SLOT(accept()));
-        QObject::connect(argButtonBox, SIGNAL(rejected()), ArgDialog, SLOT(reject()));
+        QObject::connect(argCommandButtons, SIGNAL(accepted()), ArgDialog, SLOT(accept()));
+        QObject::connect(argCommandButtons, SIGNAL(rejected()), ArgDialog, SLOT(reject()));
 
         QMetaObject::connectSlotsByName(ArgDialog);
     } // setupUi
@@ -150,6 +152,12 @@ public:
         ___qlistwidgetitem->setText(QCoreApplication::translate("ArgDialog", "description", nullptr));
         QListWidgetItem *___qlistwidgetitem1 = argType->item(1);
         ___qlistwidgetitem1->setText(QCoreApplication::translate("ArgDialog", "hashtag", nullptr));
+        QListWidgetItem *___qlistwidgetitem2 = argType->item(2);
+        ___qlistwidgetitem2->setText(QCoreApplication::translate("ArgDialog", "link/bio", nullptr));
+        QListWidgetItem *___qlistwidgetitem3 = argType->item(3);
+        ___qlistwidgetitem3->setText(QCoreApplication::translate("ArgDialog", "promote/share", nullptr));
+        QListWidgetItem *___qlistwidgetitem4 = argType->item(4);
+        ___qlistwidgetitem4->setText(QCoreApplication::translate("ArgDialog", "requested by", nullptr));
         argType->setSortingEnabled(__sortingEnabled);
 
         label_2->setText(QCoreApplication::translate("ArgDialog", "Type", nullptr));
