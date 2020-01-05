@@ -20,7 +20,7 @@
   <property name="styleSheet">
    <string notr="true">background-color: rgb(33, 33, 33);</string>
   </property>
-  <widget class="QDialogButtonBox" name="argButtonBox">
+  <widget class="QDialogButtonBox" name="argCommandButtons">
    <property name="geometry">
     <rect>
      <x>340</x>
@@ -129,9 +129,9 @@ color: rgb(16, 16, 16);</string>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(0, 255, 0);
+    <string notr="true">background-color: rgb(255, 255, 255);
 color: rgb(5, 5, 5);
-font: 87 12pt &quot;Noto Sans&quot;;
+font: 87 10pt &quot;Noto Sans&quot;;
 selection-background-color: rgb(255, 0, 174);</string>
    </property>
    <property name="columnCount">
@@ -165,7 +165,7 @@ selection-background-color: rgb(255, 0, 174);</string>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(0, 255, 0);
+    <string notr="true">background-color: rgb(255, 255, 255);
 color: rgb(5, 5, 5);
 font: 87 10pt &quot;Noto Sans&quot;;
 selection-background-color: rgb(255, 0, 174);</string>
@@ -178,6 +178,21 @@ selection-background-color: rgb(255, 0, 174);</string>
    <item>
     <property name="text">
      <string>hashtag</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>link/bio</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>promote/share</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>requested by</string>
     </property>
    </item>
   </widget>
@@ -230,10 +245,9 @@ selection-background-color: rgb(255, 0, 174);</string>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(0, 255, 0);
+    <string notr="true">background-color: rgb(255, 255, 255);
 color: rgb(5, 5, 5);
-font: 87 12pt &quot;Noto Sans&quot;;
-selection-background-color: rgb(255, 0, 174);</string>
+font: 87 10pt &quot;Noto Sans&quot;;</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_5">
@@ -263,7 +277,7 @@ selection-background-color: rgb(255, 0, 174);</string>
  <resources/>
  <connections>
   <connection>
-   <sender>argButtonBox</sender>
+   <sender>argCommandButtons</sender>
    <signal>accepted()</signal>
    <receiver>ArgDialog</receiver>
    <slot>accept()</slot>
@@ -279,7 +293,7 @@ selection-background-color: rgb(255, 0, 174);</string>
    </hints>
   </connection>
   <connection>
-   <sender>argButtonBox</sender>
+   <sender>argCommandButtons</sender>
    <signal>rejected()</signal>
    <receiver>ArgDialog</receiver>
    <slot>reject()</slot>

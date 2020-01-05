@@ -28,14 +28,14 @@ ArgDialog::ArgDialog(QWidget *parent) :
 //                QByteArray bytes = file.readAll();
 //                emit ArgDialog::uploadFile(bytes);
 //            }
+            auto slash_index = file_path.lastIndexOf("/") + 1;
+            QString file_name = file_path.right(file_path.size() - slash_index);
+
+            addItem(file_name, "file");
+
+            m_ig_post.video.name = file_name.toUtf8().constData();
+            m_ig_post.video.path = file_path.toUtf8().constData();
         }
-        auto slash_index = file_path.lastIndexOf("/") + 1;
-        QString file_name = file_path.right(file_path.size() - slash_index);
-
-        addItem(file_name, "file");
-
-        m_ig_post.video.name = file_name.toUtf8().constData();
-        m_ig_post.video.path = file_path.toUtf8().constData();
     });
 
     ui->argList->setHorizontalHeaderLabels(QStringList{"Value", "Type"});
@@ -48,11 +48,19 @@ ArgDialog::ArgDialog(QWidget *parent) :
         QList<QListWidgetItem*> types = ui->argType->selectedItems();
         auto type = types.size() > 0 ? types.at(0)->text() : "Unknown type";
         if (text.size() > 0) {
-            addItem(text, type);
             if (type == Args::HASHTAG_TYPE) {
                 addHashtag(text);
             } else if (type == Args::DESCRIPTION_TYPE) {
+                addItem(text, type);
                 m_ig_post.description = text.toUtf8().constData();
+            } else if (type == Args::PROMOTE_TYPE) {
+                addOrReplaceInArgList(text, "promote/share");
+                m_ig_post.promote_share = text.toUtf8().constData();
+            } else if (type == Args::LINK_BIO_TYPE) {
+                addOrReplaceInArgList(text, "link/bio");
+                m_ig_post.link_in_bio = text.toUtf8().constData();
+            } else if (type == Args::REQUESTED_BY_TYPE) {
+                addRequestedBy(text);
             }
             ui->argInput->clear();
         }
@@ -67,6 +75,8 @@ ArgDialog::ArgDialog(QWidget *parent) :
         auto date_time = ui->dateTime->dateTime();
         qDebug() << "Time changed to" << date_time;
     });
+
+//    QObject::connect(ui->ar)
 }
 
 void ArgDialog::addItem(QString value, QString type) {
@@ -95,9 +105,54 @@ void ArgDialog::clearTask() {
     m_task.time = "";
 }
 
+void ArgDialog::addRequestedBy(QString value) {
+    if (std::find(m_ig_post.requested_by.begin(), m_ig_post.requested_by.end(), value.toUtf8().constData()) == m_ig_post.requested_by.end()) {
+        m_ig_post.requested_by.push_back(value.toUtf8().constData());
+        addToArgList(value, "requested_by");
+    } else {
+        const char* message = "You have already inputted this name under \"requested_by\"";
+        qDebug() << message;
+        QMessageBox::warning(
+            this,
+            tr("Requested By"),
+            tr(message)
+            );
+    }
+}
+
+void ArgDialog::addToArgList(QString value, QString type) {
+    for (int i = 0; i < ui->argList->rowCount(); i++) {
+        auto item = ui->argList->item(i, 1);
+        if (item) {
+            if (QString::compare(item->text(), type) == 0) {
+                auto text = ui->argList->item(i, 0)->text();
+                text.append("\n");
+                text += value;
+                ui->argList->item(i, 0)->setText(text);
+                return;
+            }
+        }
+    }
+    addItem(value, type);
+}
+
+void ArgDialog::addOrReplaceInArgList(QString value, QString type) {
+    for (int i = 0; i < ui->argList->rowCount(); i++) {
+        auto item = ui->argList->item(i, 1);
+        if (item) {
+            if (QString::compare(item->text(), type) == 0) {
+                ui->argList->item(i, 0)->setText(value);
+                return;
+            }
+        }
+    }
+    addItem(value, type);
+}
+
 void ArgDialog::addHashtag(QString tag) {
     if (std::find(m_ig_post.hashtags.begin(), m_ig_post.hashtags.end(), tag.toUtf8().constData()) == m_ig_post.hashtags.end()) {
         m_ig_post.hashtags.push_back(tag.toUtf8().constData());
+        addToArgList(tag, "hashtag");
     } else {
         const char* message = "Can't add the same hashtag twice";
         qDebug() << message;
@@ -105,7 +160,7 @@ void ArgDialog::addHashtag(QString tag) {
             this,
             tr("Hashtags"),
             tr(message)
-        );
+            );
     }
 }
 
