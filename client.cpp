@@ -78,8 +78,12 @@ void Client::handleMessages() {
                 s_v.push_back(v.data());
             }
             emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "", s_v);
-        } else if(serverWaitingForFile(data_string.c_str())) {
+        } else if (serverWaitingForFile(data_string.c_str())) {
             sendFileEncoded(outgoing_file);
+//        } else if (isEvent(data_string.c_str())) {
+            // get event
+            // get args
+            // Main window should have an events container
         }
         std::string formatted_json = getJsonString(data_string);
         emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(formatted_json.data(), formatted_json.size()), {});
