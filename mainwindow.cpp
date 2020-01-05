@@ -1,6 +1,5 @@
 ﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QCommandLinkButton>
 #include <QDebug>
 #include <QTextEdit>
 #include <QTextStream>
@@ -22,8 +21,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
     cli_argv(argv) {
     ui->setupUi(this);
     this->setWindowTitle("KYGUI");
-    QCommandLinkButton *button = this->findChild<QCommandLinkButton*>("connect");
-    connect(button, &QCommandLinkButton::clicked, this, &MainWindow::connectClient);
+    QPushButton *button = this->findChild<QPushButton*>("connect");
+    connect(button, &QPushButton::clicked, this, &MainWindow::connectClient);
 }
 
 /**
@@ -60,16 +59,11 @@ void MainWindow::connectClient() {
         send_message_box->clear();
     });
 
-    QListWidget* q_list_widget = ui->appList;
-    QObject::connect(q_list_widget, &QListWidget::itemSelectionChanged, this, [q_client, q_list_widget]() {
-        QList<QListWidgetItem*> items = q_list_widget->selectedItems();
-        if (!items.empty()) {
-            std::vector<QString> app_names{};
-            for (const auto& item : items) {
-                app_names.push_back(item->text());
-            }
-            q_client->setSelectedApp(app_names);
-        }
+    QObject::connect(ui->appList,  static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, [this, q_client]() {
+        QString app_name = ui->appList->currentText();
+        // TODO: I know, it's awful. Fix this
+        q_client->setSelectedApp(std::vector<QString>{{app_name}});
+
     });
     QPushButton* disconnect_button = this->findChild<QPushButton*>("disconnect");
     QObject::connect(disconnect_button, &QPushButton::clicked, this, [this, q_client, progressBar]() {
@@ -84,7 +78,11 @@ void MainWindow::connectClient() {
     });
 
     QObject::connect(ui->addArgs, &QPushButton::clicked, this, [this]() {
-        arg_ui->show();
+        if (ui->appList->count() == 0) {
+            QMessageBox::warning(this, tr("Args"), tr("Please connect to the KServer and retrieve a list of available processes."));
+        } else {
+            arg_ui->show();
+        }
     });
 
     QObject::connect(arg_ui, &ArgDialog::uploadFile, this, [q_client](QByteArray bytes) {
@@ -102,16 +100,16 @@ void MainWindow::connectClient() {
  * @brief MainWindow::updateMessages
  * @param s
  */
-void MainWindow::updateMessages(int t, const QString& s, StringVec v) {
+void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
     if (t == MESSAGE_UPDATE_TYPE) {
         qDebug() << "Updating message area";
-        ui->messages->append(s);
+        ui->messages->append(message);
     } else if (t == COMMANDS_UPDATE_TYPE) {
         qDebug() << "Updating commands";
-        QListWidget* appList = ui->appList;
-        appList->clear();
-        for(const auto& s : v) {
-            new QListWidgetItem(tr(s.toUtf8()), appList);
+        QComboBox* app_list = ui->appList;
+        app_list->clear();
+        for (const auto& s : v) {
+            app_list->addItem(s);
         }
         //TODO: We do this because a CommandLinkButton turns transparent by default, except when hovered or checked
         ui->connect->setChecked(true);

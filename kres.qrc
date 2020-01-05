@@ -2,4 +2,12 @@
     <qresource prefix="/images">
         <file>kstyleyo_logo.png</file>
     </qresource>
+    <qresource prefix="/icons">
+        <file>icons/start.png</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>icons/log.png</file>
+        <file>icons/send-button.png</file>
+        <file>icons/disconnect.png</file>
+    </qresource>
 </RCC>
