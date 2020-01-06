@@ -62,7 +62,7 @@ class ArgDialog : public QDialog {
 
  signals:
   void uploadFile(QByteArray bytes);
-  void taskRequestReady(Task task);
+  void taskRequestReady(Task task, bool file_pending);
 
  private:
   void clearPost();

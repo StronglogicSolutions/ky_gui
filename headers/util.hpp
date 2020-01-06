@@ -59,6 +59,9 @@ bool isOperation(const char* data) {
     return strcmp(d["type"].GetString(), "operation") == 0;
 }
 
+bool isUploadCompleteEvent(const char* event) {
+    return strcmp(event, "File Transfer Complete") == 0;
+}
 
 bool isEvent(const char* data) {
     Document d;

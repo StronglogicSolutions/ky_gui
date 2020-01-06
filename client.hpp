@@ -52,7 +52,7 @@ public:
     QString getAppName(int mask);
     int getSelectedApp();
     // Move this to private after moving responsibilities to Client
-    void scheduleTask(std::vector<std::string> task_args);
+    void scheduleTask(std::vector<std::string> task_args, bool file_pending);
     MessageHandler createMessageHandler(std::function<void()> cb);
 
 public slots:
@@ -72,6 +72,7 @@ private:
     int argc;
     char** argv;
     int m_client_socket_fd;
+    std::vector<std::string> m_task;
     bool executing;
     CommandMap m_commands;
     CommandArgMap m_command_arg_map;

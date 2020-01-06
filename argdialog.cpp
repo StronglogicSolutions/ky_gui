@@ -73,12 +73,11 @@ ArgDialog::ArgDialog(QWidget *parent) :
         if (button->text() == "Save") {
             if (m_ig_post.isReady()) {
                 setTaskArguments();
-                emit ArgDialog::taskRequestReady(m_task);
                 QFile file(m_ig_post.video.path);
                 std::vector<char> byte_array{};
                 if (file.open(QIODevice::ReadOnly)) {
                     QByteArray bytes = file.readAll();
-//                    emit ArgDialog::uploadFile(bytes);
+                    emit ArgDialog::uploadFile(bytes);
                     qDebug() << "Would be sending file..";
                 } else {
                     QMessageBox::warning(
@@ -87,6 +86,7 @@ ArgDialog::ArgDialog(QWidget *parent) :
                         tr("Unable to read file")
                     );
                 }
+                emit ArgDialog::taskRequestReady(m_task, true);
             }
         }
     });

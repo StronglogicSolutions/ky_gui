@@ -84,6 +84,10 @@ void Client::handleMessages() {
             QString event = getEvent(data_string.c_str());
             QVector<QString> args = getArgs(data_string.c_str());
             emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args);
+            if (isUploadCompleteEvent(event.toUtf8().constData())) {
+                std::string operation_string = createOperation("Schedule", m_task);
+                sendEncoded(operation_string);
+            }
         }
         std::string formatted_json = getJsonString(data_string);
         emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(formatted_json.data(), formatted_json.size()), {});
@@ -295,14 +299,14 @@ void Client::execute() {
     }
 }
 
-void Client::scheduleTask(std::vector<std::string> task_args) {
-    qDebug() << "Requesting a task to be scheduled";
-//    auto datetime = task_args.at(1);
-    std::string operation_string = createOperation("Schedule", task_args);
-//    qDebug() << "Operation string: " << operation_string.c_str();
-//    std::string message = createMessage(operation_string.c_str(), "");
-//    auto operation_string = createOperation("blah", {});
-    sendEncoded(operation_string);
+void Client::scheduleTask(std::vector<std::string> task_args, bool file_pending) {
+    if (file_pending) {
+        m_task = task_args;
+    } else {
+        qDebug() << "Requesting a task to be scheduled";
+        std::string operation_string = createOperation("Schedule", task_args);
+        sendEncoded(operation_string);
+    }
 }
 
 void Client::sendFile(QByteArray bytes) {

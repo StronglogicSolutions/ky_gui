@@ -91,7 +91,7 @@ void MainWindow::connectClient() {
         q_client->sendFile(bytes);
     });
 
-    QObject::connect(arg_ui, &ArgDialog::taskRequestReady, this, [this](Task task) {
+    QObject::connect(arg_ui, &ArgDialog::taskRequestReady, this, [this](Task task, bool file_pending) {
         // TODO: Maybe this should be handled by the Client class directly
         auto mask = q_client->getSelectedApp();
         if (mask > -1) {
@@ -103,7 +103,7 @@ void MainWindow::connectClient() {
                 if (seconds_diff > 3600) {
                     qDebug() << "Scheduling a task";
                     task.args.push_back(std::to_string(mask));
-                    q_client->scheduleTask(task.args);
+                    q_client->scheduleTask(task.args, file_pending);
                 }
             }
         }
@@ -134,10 +134,15 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
         //TODO: We do this because a CommandLinkButton turns transparent by default, except when hovered or checked
         ui->connect->setChecked(true);
     } else if(t == EVENT_UPDATE_TYPE) {
-        auto mask = v.at(0);
-        auto event_message = q_client->getAppName(std::stoi(mask.toUtf8().constData()));
-        event_message += ": ";
-        event_message += v.at(1);
+        QString event_message{};
+        if (!v.empty()) {
+            auto mask = v.at(0);
+            auto event_message = q_client->getAppName(std::stoi(mask.toUtf8().constData()));
+            event_message += ": ";
+            event_message += v.at(1);
+        } else {
+            event_message += message;
+        }
         m_events.push_front(event_message);
         ui->eventList->clear();
         for (const auto& i : m_events) {
