@@ -1,11 +1,12 @@
-﻿#ifndef __UTIL_HPP__
-#define __UTIL_HPP__
+﻿#ifndef UTIL_HPP
+#define UTIL_HPP
 
 #include <string>
 #include <charconv>
 #include <utility>
 #include <vector>
 #include <QDebug>
+#include <QVector>
 #include "rapidjson/writer.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/pointer.h"
@@ -58,9 +59,16 @@ bool isOperation(const char* data) {
     return strcmp(d["type"].GetString(), "operation") == 0;
 }
 
+
+bool isEvent(const char* data) {
+    Document d;
+    d.Parse(data);
+    return strcmp(d["type"].GetString(), "event") == 0;
+}
+
 std::string createOperation(const char* op, std::vector<std::string> args) {
     StringBuffer s;
-    Writer<StringBuffer> w(s);
+    Writer<StringBuffer, Document::EncodingType, ASCII<>> w(s);
     w.StartObject();
     w.Key("type");
     w.String("operation");
@@ -86,6 +94,28 @@ std::string getOperation(const char* data) {
     }
     return "";
 }
+
+QString getEvent(const char* data) {
+    Document d;
+    d.Parse(data);
+    if (d.HasMember("event")) {
+        return d["event"].GetString();
+    }
+    return "";
+}
+
+QVector<QString> getArgs(const char* data) {
+    Document d;
+    d.Parse(data);
+    QVector<QString> args{};
+    if (d.HasMember("args")) {
+        for (const auto& m : d["args"].GetArray()) {
+            args.push_back(m.GetString());
+        }
+    }
+    return args;
+}
+
 
 CommandMap getArgMap(const char* data) {
     Document d;

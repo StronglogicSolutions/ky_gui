@@ -12,12 +12,12 @@
 #include <QtCore/QVariant>
 #include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QDateTimeEdit>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QTextEdit>
@@ -33,13 +33,14 @@ public:
     QPushButton *addFile;
     QLabel *label;
     QTableWidget *argList;
-    QListWidget *argType;
     QLabel *label_2;
     QLabel *label_3;
     QLabel *label_4;
     QTextEdit *argInput;
     QLabel *label_5;
     QDateTimeEdit *dateTime;
+    QComboBox *argType;
+    QPushButton *devTestButton;
 
     void setupUi(QDialog *ArgDialog)
     {
@@ -97,18 +98,6 @@ public:
         argList->horizontalHeader()->setDefaultSectionSize(200);
         argList->verticalHeader()->setMinimumSectionSize(100);
         argList->verticalHeader()->setDefaultSectionSize(100);
-        argType = new QListWidget(ArgDialog);
-        new QListWidgetItem(argType);
-        new QListWidgetItem(argType);
-        new QListWidgetItem(argType);
-        new QListWidgetItem(argType);
-        new QListWidgetItem(argType);
-        argType->setObjectName(QString::fromUtf8("argType"));
-        argType->setGeometry(QRect(190, 80, 81, 41));
-        argType->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 255, 255);\n"
-"color: rgb(5, 5, 5);\n"
-"font: 87 10pt \"Noto Sans\";\n"
-"selection-background-color: rgb(255, 0, 174);"));
         label_2 = new QLabel(ArgDialog);
         label_2->setObjectName(QString::fromUtf8("label_2"));
         label_2->setGeometry(QRect(130, 80, 58, 18));
@@ -130,6 +119,23 @@ public:
         dateTime = new QDateTimeEdit(ArgDialog);
         dateTime->setObjectName(QString::fromUtf8("dateTime"));
         dateTime->setGeometry(QRect(200, 260, 194, 27));
+        argType = new QComboBox(ArgDialog);
+        argType->addItem(QString());
+        argType->addItem(QString());
+        argType->addItem(QString());
+        argType->addItem(QString());
+        argType->addItem(QString());
+        argType->setObjectName(QString::fromUtf8("argType"));
+        argType->setGeometry(QRect(190, 80, 141, 31));
+        argType->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 255, 255);\n"
+"color: rgb(5, 5, 5);\n"
+"font: 87 10pt \"Noto Sans\";\n"
+"selection-background-color: rgb(255, 0, 174);"));
+        devTestButton = new QPushButton(ArgDialog);
+        devTestButton->setObjectName(QString::fromUtf8("devTestButton"));
+        devTestButton->setGeometry(QRect(240, 590, 80, 26));
+        devTestButton->setStyleSheet(QString::fromUtf8("background-color: rgb(59, 255, 0);\n"
+"color: rgb(0, 0, 0);"));
 
         retranslateUi(ArgDialog);
         QObject::connect(argCommandButtons, SIGNAL(accepted()), ArgDialog, SLOT(accept()));
@@ -145,25 +151,17 @@ public:
         argDialogTitle->setText(QCoreApplication::translate("ArgDialog", "Add Arguments", nullptr));
         addFile->setText(QCoreApplication::translate("ArgDialog", "File", nullptr));
         label->setText(QCoreApplication::translate("ArgDialog", "Items to send", nullptr));
-
-        const bool __sortingEnabled = argType->isSortingEnabled();
-        argType->setSortingEnabled(false);
-        QListWidgetItem *___qlistwidgetitem = argType->item(0);
-        ___qlistwidgetitem->setText(QCoreApplication::translate("ArgDialog", "description", nullptr));
-        QListWidgetItem *___qlistwidgetitem1 = argType->item(1);
-        ___qlistwidgetitem1->setText(QCoreApplication::translate("ArgDialog", "hashtag", nullptr));
-        QListWidgetItem *___qlistwidgetitem2 = argType->item(2);
-        ___qlistwidgetitem2->setText(QCoreApplication::translate("ArgDialog", "link/bio", nullptr));
-        QListWidgetItem *___qlistwidgetitem3 = argType->item(3);
-        ___qlistwidgetitem3->setText(QCoreApplication::translate("ArgDialog", "promote/share", nullptr));
-        QListWidgetItem *___qlistwidgetitem4 = argType->item(4);
-        ___qlistwidgetitem4->setText(QCoreApplication::translate("ArgDialog", "requested by", nullptr));
-        argType->setSortingEnabled(__sortingEnabled);
-
         label_2->setText(QCoreApplication::translate("ArgDialog", "Type", nullptr));
         label_3->setText(QCoreApplication::translate("ArgDialog", "Input", nullptr));
         label_4->setText(QCoreApplication::translate("ArgDialog", "Attachment", nullptr));
         label_5->setText(QCoreApplication::translate("ArgDialog", "Time", nullptr));
+        argType->setItemText(0, QCoreApplication::translate("ArgDialog", "description", nullptr));
+        argType->setItemText(1, QCoreApplication::translate("ArgDialog", "hashtag", nullptr));
+        argType->setItemText(2, QCoreApplication::translate("ArgDialog", "requested by", nullptr));
+        argType->setItemText(3, QCoreApplication::translate("ArgDialog", "promote/share", nullptr));
+        argType->setItemText(4, QCoreApplication::translate("ArgDialog", "link/bio", nullptr));
+
+        devTestButton->setText(QCoreApplication::translate("ArgDialog", "TEST", nullptr));
     } // retranslateUi
 
 };

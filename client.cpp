@@ -80,10 +80,10 @@ void Client::handleMessages() {
             emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "", s_v);
         } else if (serverWaitingForFile(data_string.c_str())) {
             sendFileEncoded(outgoing_file);
-//        } else if (isEvent(data_string.c_str())) {
-            // get event
-            // get args
-            // Main window should have an events container
+        } else if (isEvent(data_string.c_str())) {
+            QString event = getEvent(data_string.c_str());
+            QVector<QString> args = getArgs(data_string.c_str());
+            emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args);
         }
         std::string formatted_json = getJsonString(data_string);
         emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(formatted_json.data(), formatted_json.size()), {});
@@ -266,6 +266,25 @@ void Client::setSelectedApp(std::vector<QString> app_names) {
     }
 }
 
+int Client::getSelectedApp() {
+    if (selected_commands.size() == 1) {
+        return selected_commands.at(0);
+    } else {
+        QMessageBox::warning(this, tr("App Selection Error"), tr("Unable to retrieve app selection"));
+    }
+    return -1;
+}
+
+QString Client::getAppName(int mask) {
+    auto app = m_commands.find(mask);
+    if (app != m_commands.end()) {
+        return QString{app->second.c_str()};
+    }
+    return QString{""};
+}
+
+
+
 void Client::execute() {
     if (!selected_commands.empty()) {
         executing = true;
@@ -274,6 +293,16 @@ void Client::execute() {
             sendEncoded(execute_operation);
         }
     }
+}
+
+void Client::scheduleTask(std::vector<std::string> task_args) {
+    qDebug() << "Requesting a task to be scheduled";
+//    auto datetime = task_args.at(1);
+    std::string operation_string = createOperation("Schedule", task_args);
+//    qDebug() << "Operation string: " << operation_string.c_str();
+//    std::string message = createMessage(operation_string.c_str(), "");
+//    auto operation_string = createOperation("blah", {});
+    sendEncoded(operation_string);
 }
 
 void Client::sendFile(QByteArray bytes) {

@@ -21,23 +21,22 @@ typedef std::string Str;
 //    Str SmilingFaceEyes{"U+1F60A"};
 //    const char* SmilingFaceEyesBytes = "😊";
 //}
+typedef struct Task {
+    int mask;
+    std::vector<std::string> args;
+} Task;
 
 typedef struct KFile {
-  std::string_view name;
-  std::string_view path;
+  QString name;
+  QString path;
 } KFile;
-
-typedef struct Task {
-  QString time;
-  int mask;
-  std::vector<std::string> args;
-} Task;
 
 typedef struct IGPost {
   std::string description;
   std::string datetime;
-  std::string promote_share = "Share the post through IG story if you enjoy the phrase 🙋‍♀️";
-  std::string link_in_bio = "Download a FREE PDF of basic 245 verbs (link 🔗 in bio 👆)";
+  std::string promote_share = "Promote share";
+//  std::string link_in_bio = u8"Download a FREE PDF of basic 245 verbs (link 🔗 in bio 👆)";
+  std::string link_in_bio = "Link inbio";
   std::vector<std::string> hashtags;
   std::vector<std::string> requested_by;
   const char *requested_by_phrase = "The phrase was requested by ";
@@ -63,6 +62,7 @@ class ArgDialog : public QDialog {
 
  signals:
   void uploadFile(QByteArray bytes);
+  void taskRequestReady(Task task);
 
  private:
   void clearPost();
@@ -71,6 +71,7 @@ class ArgDialog : public QDialog {
   void addOrReplaceInArgList(QString value, QString type);
   void addHashtag(QString tag);
   void addRequestedBy(QString value);
+  void setTaskArguments();
   Ui::ArgDialog *ui;
   void addItem(QString value, QString type);
   Task m_task;

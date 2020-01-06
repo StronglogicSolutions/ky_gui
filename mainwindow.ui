@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>640</width>
-    <height>757</height>
+    <height>837</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,12 +19,13 @@
   </property>
   <property name="styleSheet">
    <string notr="true">font: 87 10pt &quot;Noto Sans&quot;;
-background-color: rgb(56, 56, 0);</string>
+background-color: rgb(255, 85, 0);
+</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="styleSheet">
     <string notr="true">border-color: rgb(0, 0, 0);
-background-color: rgb(77, 77, 0);</string>
+background-color: rgb(255, 255, 255);</string>
    </property>
    <widget class="QLabel" name="label">
     <property name="geometry">
@@ -51,12 +52,12 @@ background-color: rgb(77, 77, 0);</string>
       <x>50</x>
       <y>60</y>
       <width>541</width>
-      <height>621</height>
+      <height>702</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="6,3">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="6,0,0,3,0">
      <item>
-      <layout class="QGridLayout" name="gridLayout_2" rowstretch="5,0,0" columnstretch="0,0">
+      <layout class="QGridLayout" name="gridLayout_2" rowstretch="5" columnstretch="0,0">
        <property name="sizeConstraint">
         <enum>QLayout::SetNoConstraint</enum>
        </property>
@@ -66,66 +67,54 @@ background-color: rgb(77, 77, 0);</string>
        <item row="0" column="0">
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QLabel" name="messagesTitle">
+          <widget class="QPushButton" name="connect">
            <property name="styleSheet">
-            <string notr="true">font: 100 11pt &quot;Noto Sans&quot;;
-color: rgb(251,251, 251);</string>
+            <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);
+background-color: rgb(94, 79, 255);
+</string>
            </property>
            <property name="text">
-            <string>Messages</string>
+            <string>Connect</string>
+           </property>
+           <property name="icon">
+            <iconset resource="kres.qrc">
+             <normaloff>:/icons/icons/start.png</normaloff>:/icons/icons/start.png</iconset>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QTextEdit" name="messages">
-           <property name="toolTip">
-            <string>Messages</string>
+          <widget class="QLabel" name="selectProcessTitle">
+           <property name="styleSheet">
+            <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);</string>
            </property>
-           <property name="toolTipDuration">
-            <number>1</number>
+           <property name="text">
+            <string>Select process to execute</string>
            </property>
-           <property name="autoFillBackground">
+           <property name="scaledContents">
             <bool>false</bool>
            </property>
-           <property name="styleSheet">
-            <string notr="true">background-color: rgb(255, 255, 255);
-color: rgb(5, 5, 5);
-font: 87 10pt &quot;Noto Sans&quot;;</string>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
-           <property name="lineWrapMode">
-            <enum>QTextEdit::WidgetWidth</enum>
+           <property name="margin">
+            <number>0</number>
            </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-           <property name="placeholderText">
-            <string/>
+           <property name="indent">
+            <number>-1</number>
            </property>
           </widget>
          </item>
-        </layout>
-       </item>
-       <item row="0" column="1">
-        <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0,0,0,0,0,0,0">
-         <item row="7" column="0">
-          <widget class="QListWidget" name="eventList">
+         <item>
+          <widget class="QComboBox" name="appList">
            <property name="styleSheet">
-            <string notr="true">background-color: rgb(255, 255, 255);
-color: rgb(5, 5, 5);
-font: 87 10pt &quot;Noto Sans&quot;;</string>
+            <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
-          <widget class="QListWidget" name="processList">
-           <property name="styleSheet">
-            <string notr="true">background-color: rgb(255, 255, 255);
-color: rgb(5, 5, 5);
-font: 87 10pt &quot;Noto Sans&quot;;</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
+         <item>
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <property name="spacing">
             <number>6</number>
@@ -168,34 +157,37 @@ color: rgb(0, 0, 0);</string>
            </item>
           </layout>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="selectProcessTitle">
+         <item>
+          <widget class="QLabel" name="eventListTitle">
            <property name="styleSheet">
-            <string notr="true">font: 100 11pt &quot;Noto Sans&quot;;
-color: rgb(251,251, 251);</string>
+            <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);</string>
            </property>
            <property name="text">
-            <string>Select process to execute</string>
-           </property>
-           <property name="scaledContents">
-            <bool>false</bool>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-           <property name="margin">
-            <number>0</number>
-           </property>
-           <property name="indent">
-            <number>-1</number>
+            <string>Events</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
+         <item>
+          <widget class="QListWidget" name="eventList">
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(177, 177, 177);
+color: rgb(5, 5, 5);
+font: 87 10pt &quot;Noto Sans&quot;;</string>
+           </property>
+           <property name="alternatingRowColors">
+            <bool>true</bool>
+           </property>
+           <property name="isWrapping" stdset="0">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QLabel" name="processListTitle">
            <property name="styleSheet">
-            <string notr="true">font: 100 11pt &quot;Noto Sans&quot;;
-color: rgb(251,251, 251);</string>
+            <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);</string>
            </property>
            <property name="text">
             <string>Processes</string>
@@ -205,69 +197,62 @@ color: rgb(251,251, 251);</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QComboBox" name="appList">
+         <item>
+          <widget class="QListWidget" name="processList">
            <property name="styleSheet">
-            <string notr="true">color: rgb(0, 0, 0);</string>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="0">
-          <widget class="QPushButton" name="connect">
-           <property name="styleSheet">
-            <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-color: rgb(0, 0, 0);
-background-color: rgb(94, 79, 255);
-</string>
-           </property>
-           <property name="text">
-            <string>Connect</string>
-           </property>
-           <property name="icon">
-            <iconset resource="kres.qrc">
-             <normaloff>:/icons/icons/start.png</normaloff>:/icons/icons/start.png</iconset>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="0">
-          <widget class="QPushButton" name="disconnect">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-color: rgb(0, 0, 0);
-background-color: rgb(255, 65, 68);</string>
-           </property>
-           <property name="text">
-            <string>Disconnect</string>
-           </property>
-           <property name="icon">
-            <iconset resource="kres.qrc">
-             <normaloff>:/icons/disconnect.png</normaloff>:/icons/disconnect.png</iconset>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="eventListTitle">
-           <property name="styleSheet">
-            <string notr="true">font: 100 11pt &quot;Noto Sans&quot;;
-color: rgb(251,251, 251);</string>
-           </property>
-           <property name="text">
-            <string>Events</string>
+            <string notr="true">background-color: rgb(177, 177, 177);
+color: rgb(5, 5, 5);
+font: 87 10pt &quot;Noto Sans&quot;;</string>
            </property>
           </widget>
          </item>
         </layout>
        </item>
+       <item row="0" column="1">
+        <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0,0,0,0,0,0,0,0,0"/>
+       </item>
       </layout>
      </item>
      <item>
-      <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,0,0" columnstretch="0,0">
+      <widget class="QLabel" name="messagesTitle">
+       <property name="styleSheet">
+        <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>Messages</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTextEdit" name="messages">
+       <property name="toolTip">
+        <string>Messages</string>
+       </property>
+       <property name="toolTipDuration">
+        <number>1</number>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(255, 255, 255);
+color: rgb(5, 5, 5);
+font: 87 10pt &quot;Noto Sans&quot;;</string>
+       </property>
+       <property name="lineWrapMode">
+        <enum>QTextEdit::WidgetWidth</enum>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,0,0" columnstretch="0">
        <property name="sizeConstraint">
         <enum>QLayout::SetMinimumSize</enum>
        </property>
@@ -358,8 +343,8 @@ font: 87 10pt &quot;Noto Sans&quot;;</string>
        <item row="0" column="0">
         <widget class="QLabel" name="inputTitle">
          <property name="styleSheet">
-          <string notr="true">font: 100 11pt &quot;Noto Sans&quot;;
-color: rgb(251,251, 251);</string>
+          <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);</string>
          </property>
          <property name="text">
           <string>Input</string>
@@ -367,6 +352,28 @@ color: rgb(251,251, 251);</string>
         </widget>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QPushButton" name="disconnect">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);
+background-color: rgb(255, 65, 68);</string>
+       </property>
+       <property name="text">
+        <string>Disconnect</string>
+       </property>
+       <property name="icon">
+        <iconset resource="kres.qrc">
+         <normaloff>:/icons/disconnect.png</normaloff>:/icons/disconnect.png</iconset>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>

@@ -28,6 +28,8 @@ private:
     void runApp();
     int cli_argc;
     char** cli_argv;
+    Client* q_client;
+    QList<QString> m_events;
 
 private slots:
     void connectClient();

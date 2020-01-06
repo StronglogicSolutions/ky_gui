@@ -1,4 +1,7 @@
-﻿#include <QDialog>
+﻿#ifndef __CLIENT_HPP__
+#define __CLIENT_HPP__
+
+#include <QDialog>
 #include <QComboBox>
 #include <QPushButton>
 #include <QMessageBox>
@@ -15,10 +18,12 @@
 
 static constexpr int MESSAGE_UPDATE_TYPE = 1;
 static constexpr int COMMANDS_UPDATE_TYPE = 2;
+static constexpr int EVENT_UPDATE_TYPE = 3;
 
 typedef std::map<int, std::string> CommandMap;
 typedef std::map<int, std::vector<std::string>> CommandArgMap;
 typedef QVector<QString> StringVec;
+
 Q_DECLARE_METATYPE(StringVec)
 
 class Client : public QDialog
@@ -44,6 +49,10 @@ public:
     void start();
     void closeConnection();
     void execute();
+    QString getAppName(int mask);
+    int getSelectedApp();
+    // Move this to private after moving responsibilities to Client
+    void scheduleTask(std::vector<std::string> task_args);
     MessageHandler createMessageHandler(std::function<void()> cb);
 
 public slots:
@@ -54,7 +63,8 @@ public slots:
     void sendFile(QByteArray bytes);
 
 signals:
-    void messageReceived(int t, QString s,QVector<QString> args);
+    void messageReceived(int t, QString s, QVector<QString> args);
+    void eventReceived(int t, std::string event, StringVec args);
 
 private:
     void handleMessages();
@@ -68,3 +78,4 @@ private:
     std::vector<int> selected_commands;
     QByteArray outgoing_file;
 };
+#endif // __CLIENT_HPP__
