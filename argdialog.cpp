@@ -65,7 +65,7 @@ ArgDialog::ArgDialog(QWidget *parent) :
 
     QObject::connect(ui->dateTime, &QDateTimeEdit::dateTimeChanged, this, [this]() {
         auto date_time = ui->dateTime->dateTime();
-        m_ig_post.datetime = std::string{date_time.toString().toUtf8().data()};
+        m_ig_post.datetime = std::string{std::to_string(date_time.toTime_t())};
         qDebug() << "Time changed to" << date_time;
     });
 

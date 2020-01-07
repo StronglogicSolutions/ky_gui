@@ -96,9 +96,9 @@ void MainWindow::connectClient() {
         auto mask = q_client->getSelectedApp();
         if (mask > -1) {
             if (q_client->getAppName(mask) == "Instagram") {
-                auto datetime = QDateTime::fromString(task.args.at(1).c_str());
-                auto current_datetime = QDateTime::currentDateTime();
-                auto seconds_diff = current_datetime.secsTo(datetime);
+                auto datetime = task.args.at(1);
+                auto current_datetime = QDateTime::currentDateTime().toTime_t();
+                auto seconds_diff = std::stoi(datetime) - current_datetime;
                 qDebug() << "Time difference: " << seconds_diff;
                 if (seconds_diff > 3600) {
                     qDebug() << "Scheduling a task";
