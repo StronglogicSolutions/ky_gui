@@ -85,6 +85,7 @@ void Client::handleMessages() {
             QVector<QString> args = getArgs(data_string.c_str());
             emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args);
             if (isUploadCompleteEvent(event.toUtf8().constData())) {
+                outgoing_file.clear();
                 std::string operation_string = createOperation("Schedule", m_task);
                 sendEncoded(operation_string);
             }
