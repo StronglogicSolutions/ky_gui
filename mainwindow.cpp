@@ -109,6 +109,8 @@ void MainWindow::connectClient() {
         }
     });
 
+    ui->processList->addItem("Processes results displayed here");
+
     // TODO: Handle enter key
     //    QObject::connect(send_message_box, &QTextEdit::keyReleaseEvent, this, [q_client, send_message_box]() {
     //        q_client->sendMessage(send_message_box->toPlainText());
@@ -133,13 +135,24 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
         }
         //TODO: We do this because a CommandLinkButton turns transparent by default, except when hovered or checked
         ui->connect->setChecked(true);
-    } else if(t == EVENT_UPDATE_TYPE) {
-        QString event_message{};
+    } else if (t == PROCESS_REQUEST_TYPE) {
+        qDebug() << "Updating process list";
+        ui->processList->addItem(message);
+
+        //TODO: We do this because a CommandLinkButton turns transparent by default, except when hovered or checked
+        ui->connect->setChecked(true);
+    } else if (t == EVENT_UPDATE_TYPE) {
+        QString event_message{QDateTime::currentDateTime().toString("hh:mm:ss") + " - "};
         if (!v.empty()) {
-            auto mask = v.at(0);
-            auto event_message = q_client->getAppName(std::stoi(mask.toUtf8().constData()));
+            auto mask = std::stoi(v.at(0).toUtf8().constData());
+            event_message += message;
+            event_message += "\n";
+            event_message += q_client->getAppName(mask);
             event_message += ": ";
             event_message += v.at(1);
+            if (message == "Process Result") {
+                updateProcessResult(mask);
+            }
         } else {
             event_message += message;
         }
@@ -153,3 +166,12 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
     }
 }
 
+void MainWindow::updateProcessResult(int mask) {
+    auto app_name = q_client->getAppName(mask);
+    for (int i = ui->processList->count() - 1; i >= 0; i--) {
+        if (ui->processList->item(i)->text().contains(app_name)) {
+            ui->processList->item(i)->setText(app_name + " completed");
+            return;
+        }
+    }
+}

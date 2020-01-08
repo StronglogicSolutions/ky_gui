@@ -294,6 +294,8 @@ void Client::execute() {
     if (!selected_commands.empty()) {
         executing = true;
         for (const auto& command : selected_commands) {
+            auto message = getAppName(command) + " pending";
+            emit Client::messageReceived(PROCESS_REQUEST_TYPE, message, {});
             std::string execute_operation = createOperation("Execute", {std::to_string(command)});
             sendEncoded(execute_operation);
         }

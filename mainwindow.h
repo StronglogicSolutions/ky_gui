@@ -26,6 +26,7 @@ private:
     ArgDialog *arg_ui;
     void connectUi();
     void runApp();
+    void updateProcessResult(int mask);
     int cli_argc;
     char** cli_argv;
     Client* q_client;
