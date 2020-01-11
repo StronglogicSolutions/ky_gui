@@ -14,6 +14,7 @@
 #include "rapidjson/document.h"
 #include "json.hpp"
 
+namespace {
 using namespace rapidjson;
 using json = nlohmann::json;
 
@@ -68,6 +69,16 @@ bool isEvent(const char* data) {
     d.Parse(data);
     return strcmp(d["type"].GetString(), "event") == 0;
 }
+// TODO: This should be "message", no?
+bool isMessage(const char* data) {
+    Document d;
+    d.Parse(data);
+    if (d.HasMember("message")) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 std::string createOperation(const char* op, std::vector<std::string> args) {
     StringBuffer s;
@@ -105,6 +116,38 @@ QString getEvent(const char* data) {
         return d["event"].GetString();
     }
     return "";
+}
+
+QString getMessage(const char* data) {
+    Document d;
+    d.Parse(data);
+    if (d.HasMember("message")) {
+        return d["message"].GetString();
+    }
+    return "";
+}
+
+QVector<QString> getShortArgs(const char* data) {
+    Document d;
+    d.Parse(data);
+    QVector<QString> args{};
+    if (d.HasMember("args")) {
+        if (d["args"].IsArray()) {
+            for (const auto& m : d["args"].GetArray()) {
+                if (m.GetStringLength() < 100) {
+                    args.push_back(m.GetString());
+                }
+            }
+        } else {
+            for (const auto& m : d["args"].GetObject()) {
+                QString arg = m.name.GetString();
+                arg +=  ": ";
+                arg += m.value.GetString();
+                args.push_back(arg);
+            }
+        }
+    }
+    return args;
 }
 
 QVector<QString> getArgs(const char* data) {
@@ -253,5 +296,5 @@ inline size_t findNullIndex(uint8_t* data) {
     }
     return index;
 }
-
+}
 #endif  // __UTIL_HPP__

@@ -9,6 +9,7 @@
 #include <client.hpp>
 #include <headers/ktextedit.hpp>
 #include <argdialog.h>
+#include <consoledialog.h>
 
 namespace Ui {
 class MainWindow;
@@ -20,6 +21,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(int argc = 0, char** argv = nullptr, QWidget* parent = nullptr);
+    virtual void keyPressEvent(QKeyEvent* e);
     ~MainWindow();
 private:
     Ui::MainWindow *ui;
@@ -27,14 +29,17 @@ private:
     void connectUi();
     void runApp();
     void updateProcessResult(int mask);
+    QString parseMessage(const QString& s, StringVec v);
     int cli_argc;
     char** cli_argv;
     Client* q_client;
     QList<QString> m_events;
+    ConsoleDialog m_console;
 
 private slots:
     void connectClient();
     void updateMessages(int t, const QString& s, StringVec v);
+    void handleInputEnterKey();
 };
 
 

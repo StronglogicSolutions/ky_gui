@@ -27,12 +27,14 @@ CONFIG += c++17
 
 SOURCES += \
         argdialog.cpp \
+        consoledialog.cpp \
         main.cpp \
         mainwindow.cpp \
         client.cpp
 
 HEADERS += \
         argdialog.h \
+        consoledialog.h \
         mainwindow.h \
         client.hpp \
         headers/ktextedit.hpp \
@@ -47,6 +49,7 @@ HEADERS += \
 
 FORMS += \
         argdialog.ui \
+        consoledialog.ui \
         mainwindow.ui
 
 # Default rules for deployment.

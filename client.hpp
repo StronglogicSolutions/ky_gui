@@ -1,5 +1,5 @@
-﻿#ifndef __CLIENT_HPP__
-#define __CLIENT_HPP__
+﻿#ifndef CLIENT_HPP
+#define CLIENT_HPP
 
 #include <QDialog>
 #include <QComboBox>
@@ -80,4 +80,4 @@ private:
     std::vector<int> selected_commands;
     QByteArray outgoing_file;
 };
-#endif // __CLIENT_HPP__
+#endif // CLIENT_HPP

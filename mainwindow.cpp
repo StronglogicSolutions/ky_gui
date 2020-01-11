@@ -5,8 +5,10 @@
 #include <QTextStream>
 #include <QString>
 #include <QLayout>
+#include <headers/ktextedit.hpp>
 #include <QDateTime>
 #include <vector>
+#include <headers/util.hpp>
 
 /**
  * @brief MainWindow::MainWindow
@@ -19,7 +21,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
     ui(new Ui::MainWindow),
     arg_ui(new ArgDialog),
     cli_argc(argc),
-    cli_argv(argv) {
+    cli_argv(argv),
+    q_client(nullptr) {
+    q_client = new Client(this, cli_argc, cli_argv);
     ui->setupUi(this);
     this->setWindowTitle("KYGUI");
     QPushButton *button = this->findChild<QPushButton*>("connect");
@@ -41,7 +45,6 @@ MainWindow::~MainWindow()
 void MainWindow::connectClient() {
     qDebug() << "Connecting to KServer";
 
-    q_client = new Client(this, cli_argc, cli_argv);
     QObject::connect(q_client, &Client::messageReceived, this, &MainWindow::updateMessages);
 
     QProgressBar* progressBar = ui->progressBar;
@@ -109,13 +112,41 @@ void MainWindow::connectClient() {
         }
     });
 
-    ui->processList->addItem("Processes results displayed here");
+    QObject::connect(ui->viewConsole, &QPushButton::clicked, this, [this]() {
+        m_console.show();
+    });
 
     // TODO: Handle enter key
-    //    QObject::connect(send_message_box, &QTextEdit::keyReleaseEvent, this, [q_client, send_message_box]() {
-    //        q_client->sendMessage(send_message_box->toPlainText());
-    //        send_message_box->clear();
-    //    });
+//    QObject::connect(static_cast<KTextEdit*>(ui->inputText), &KTextEdit::textInputEnter, this, &MainWindow::handleInputEnterKey);
+    QObject::connect(static_cast<KTextEdit*>(ui->inputText), &KTextEdit::textInputEnter, this, &MainWindow::handleInputEnterKey);
+
+}
+
+void MainWindow::handleInputEnterKey() {
+    q_client->sendMessage(ui->inputText->toPlainText());
+    ui->inputText->clear();
+}
+
+QString MainWindow::parseMessage(const QString& message, StringVec v) {
+    QString simplified_message{};
+    if (isMessage(message.toUtf8())) {
+        simplified_message += "Message: " + getMessage(message.toUtf8());
+    } else if (isEvent(message.toUtf8())) {
+        simplified_message += "Event: " + getEvent(message.toUtf8());
+    } else if (isOperation(message.toUtf8())) {
+        simplified_message += "Operation: ";
+        simplified_message += getOperation(message.toUtf8()).c_str();
+    }
+    // TODO: Find out why rapidJson uses GetArray() in place of IsArray()
+//    QVector<QString> short_args = getShortArgs(message.toUtf8());
+//    if (!short_args.empty()) {
+//        simplified_message += "\nArguments:";
+//        for (const auto& arg : short_args) {
+//            simplified_message += " " + arg + ",";
+//        }
+//        simplified_message.chop(simplified_message.size() - 1);
+//    }
+    return simplified_message;
 }
 
 /**
@@ -125,7 +156,9 @@ void MainWindow::connectClient() {
 void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
     if (t == MESSAGE_UPDATE_TYPE) {
         qDebug() << "Updating message area";
-        ui->messages->append(message);
+        auto simple_message = parseMessage(message, v);
+        ui->messages->append(simple_message);
+        m_console.updateText(message);
     } else if (t == COMMANDS_UPDATE_TYPE) {
         qDebug() << "Updating commands";
         QComboBox* app_list = ui->appList;
@@ -144,14 +177,19 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
     } else if (t == EVENT_UPDATE_TYPE) {
         QString event_message{QDateTime::currentDateTime().toString("hh:mm:ss") + " - "};
         if (!v.empty()) {
-            auto mask = std::stoi(v.at(0).toUtf8().constData());
-            event_message += message;
-            event_message += "\n";
-            event_message += q_client->getAppName(mask);
-            event_message += ": ";
-            event_message += v.at(1);
-            if (message == "Process Result") {
-                updateProcessResult(mask);
+            // TODO: extract process result handling from here. This should handle any event
+            if (v.size() == 1) {
+                event_message += message + "\n" + v.at(0);
+            } else {
+                auto mask = std::stoi(v.at(0).toUtf8().constData());
+                event_message += message;
+                event_message += "\n";
+                event_message += q_client->getAppName(mask);
+                event_message += ": ";
+                event_message += v.at(1);
+                if (message == "Process Result") {
+                    updateProcessResult(mask);
+                }
             }
         } else {
             event_message += message;
@@ -173,5 +211,13 @@ void MainWindow::updateProcessResult(int mask) {
             ui->processList->item(i)->setText(app_name + " completed");
             return;
         }
+    }
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *e) {
+    qDebug() << "Key press: " << e->key();
+    if(e->key()==Qt::Key_0)
+    {
+        qDebug() << "Ok";
     }
 }

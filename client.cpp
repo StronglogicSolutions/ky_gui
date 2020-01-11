@@ -95,6 +95,7 @@ void Client::handleMessages() {
     }
     memset(receive_buffer, 0, 2048);
     ::close(m_client_socket_fd);
+//    ::shutdown(m_client_socket_fd, SHUT_RDWR);
 }
 
 /**
