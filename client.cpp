@@ -14,12 +14,9 @@
 #include <vector>
 #include <future>
 #include <headers/kmessage_codec.hpp>
-#include <headers/json.hpp>
 #include <headers/util.hpp>
 
 using namespace KData;
-
-using json = nlohmann::json;
 
 static const int MAX_BUFFER_SIZE = 2048;
 static const int MAX_PACKET_SIZE = 4096;
@@ -77,7 +74,7 @@ void Client::handleMessages() {
             for (const auto& [k, v] : m_commands) {
                 s_v.push_back(v.data());
             }
-            emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "", s_v);
+            emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", s_v);
         } else if (serverWaitingForFile(data_string.c_str())) {
             sendFileEncoded(outgoing_file);
         } else if (isEvent(data_string.c_str())) {

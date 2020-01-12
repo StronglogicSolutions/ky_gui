@@ -30,7 +30,8 @@ SOURCES += \
         consoledialog.cpp \
         main.cpp \
         mainwindow.cpp \
-        client.cpp
+        client.cpp \
+        connection_indicator.cpp
 
 HEADERS += \
         argdialog.h \
@@ -43,7 +44,8 @@ HEADERS += \
         headers/util.hpp \
         headers/rapidjson/writer.h \
         headers/rapidjson/stringbuffer.h \
-        headers/rapidjson/document.h
+        headers/rapidjson/document.h \
+        connection_indicator.h
 
 
 

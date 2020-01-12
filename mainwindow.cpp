@@ -76,6 +76,7 @@ void MainWindow::connectClient() {
         progressBar->setValue(0);
         ui->appList->clear();
         ui->messages->clear();
+        ui->led->setState(false);
     });
 
     QObject::connect(ui->execute, &QPushButton::clicked, this, [this]() {
@@ -110,6 +111,11 @@ void MainWindow::connectClient() {
                 }
             }
         }
+    });
+
+    QObject::connect(ui->tasks, &QPushButton::clicked, this, [this]() {
+        // TODO: Change this to a complete implementation
+        q_client->sendMessage("scheduler");
     });
 
     QObject::connect(ui->viewConsole, &QPushButton::clicked, this, [this]() {
@@ -160,6 +166,9 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
         ui->messages->append(simple_message);
         m_console.updateText(message);
     } else if (t == COMMANDS_UPDATE_TYPE) {
+        if (message == "New Session") {
+            ui->led->setState(true);
+        }
         qDebug() << "Updating commands";
         QComboBox* app_list = ui->appList;
         app_list->clear();
