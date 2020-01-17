@@ -160,9 +160,10 @@ QString MainWindow::parseMessage(const QString& message, StringVec v) {
  * @param s
  */
 void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
+    QString timestamp_prefix = QDateTime::currentDateTime().toString("hh:mm:ss") + " - ";
     if (t == MESSAGE_UPDATE_TYPE) {
         qDebug() << "Updating message area";
-        auto simple_message = parseMessage(message, v);
+        auto simple_message = timestamp_prefix + parseMessage(message, v);
         ui->messages->append(simple_message);
         m_console.updateText(message);
     } else if (t == COMMANDS_UPDATE_TYPE) {
@@ -184,21 +185,21 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
         //TODO: We do this because a CommandLinkButton turns transparent by default, except when hovered or checked
         ui->connect->setChecked(true);
     } else if (t == EVENT_UPDATE_TYPE) {
-        QString event_message{QDateTime::currentDateTime().toString("hh:mm:ss") + " - "};
+        QString event_message{timestamp_prefix};
         if (!v.empty()) {
             // TODO: extract process result handling from here. This should handle any event
             if (v.size() == 1) {
                 event_message += message + "\n" + v.at(0);
             } else {
-                auto mask = std::stoi(v.at(0).toUtf8().constData());
                 event_message += message;
-                event_message += "\n";
-                event_message += q_client->getAppName(mask);
+                if (message == "Process Result") {
+                    event_message += "\n";
+                    auto mask = std::stoi(v.at(0).toUtf8().constData());
+                    updateProcessResult(mask);
+                    event_message += q_client->getAppName(mask);
+                }
                 event_message += ": ";
                 event_message += v.at(1);
-                if (message == "Process Result") {
-                    updateProcessResult(mask);
-                }
             }
         } else {
             event_message += message;
