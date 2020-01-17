@@ -9,6 +9,12 @@
 #include <QDateTime>
 #include <QCalendarWidget>
 
+static QString escapeText(QString s) {
+    if (s.contains("'")) {
+        s.replace("'", "'\"'\"'");
+    }
+    return s;
+}
 
 ArgDialog::ArgDialog(QWidget *parent) :
     QDialog(parent),
@@ -45,7 +51,7 @@ ArgDialog::ArgDialog(QWidget *parent) :
                 addHashtag(text);
             } else if (type == Args::DESCRIPTION_TYPE) {
                 addItem(text, type);
-                m_ig_post.description = text.toUtf8().constData();
+                m_ig_post.description = escapeText(text).toUtf8().constData();
             } else if (type == Args::PROMOTE_TYPE) {
                 addOrReplaceInArgList(text, "promote/share");
                 m_ig_post.promote_share = text.toUtf8().constData();
@@ -202,17 +208,20 @@ void ArgDialog::addOrReplaceInArgList(QString value, QString type) {
 }
 
 void ArgDialog::addHashtag(QString tag) {
-    if (std::find(m_ig_post.hashtags.begin(), m_ig_post.hashtags.end(), tag.toUtf8().constData()) == m_ig_post.hashtags.end()) {
-        m_ig_post.hashtags.push_back(tag.toUtf8().constData());
-        addToArgList(tag, "hashtag");
-    } else {
-        const char* message = "Can't add the same hashtag twice";
-        qDebug() << message;
-        QMessageBox::warning(
-            this,
-            tr("Hashtags"),
-            tr(message)
-            );
+    QStringList tags = tag.split(" ");
+    for (const auto& tag : tags) {
+        if (std::find(m_ig_post.hashtags.begin(), m_ig_post.hashtags.end(), tag.toUtf8().constData()) == m_ig_post.hashtags.end()) {
+            m_ig_post.hashtags.push_back(tag.toUtf8().constData());
+            addToArgList(tag, "hashtag");
+        } else {
+            const char* message = "Can't add the same hashtag twice";
+            qDebug() << message;
+            QMessageBox::warning(
+                this,
+                tr("Hashtags"),
+                tr(message)
+                );
+        }
     }
 }
 
@@ -220,3 +229,4 @@ ArgDialog::~ArgDialog()
 {
     delete ui;
 }
+
