@@ -315,7 +315,7 @@ font-weight: 700;
         <bool>false</bool>
        </property>
        <property name="resizeMode">
-        <enum>QListView::Adjust</enum>
+        <enum>QListView::Fixed</enum>
        </property>
        <property name="spacing">
         <number>2</number>
@@ -509,10 +509,10 @@ color: rgb(0, 0, 0);</string>
    <widget class="QPushButton" name="connect">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>0</y>
+      <x>590</x>
+      <y>10</y>
       <width>111</width>
-      <height>41</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="styleSheet">

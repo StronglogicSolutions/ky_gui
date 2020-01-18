@@ -14,6 +14,18 @@
 #include "rapidjson/document.h"
 #include "json.hpp"
 
+namespace Kontainer {
+/** Reverse Iterator */
+template <class T>
+class ReverseIterator {
+    T& _obj;
+public:
+    ReverseIterator(T &obj) : _obj(obj) {}
+    auto begin() {return _obj.rbegin();}
+    auto end() {return _obj.rend();}
+};
+}
+
 namespace {
 using namespace rapidjson;
 using json = nlohmann::json;

@@ -157,31 +157,11 @@ QString MainWindow::parseMessage(const QString& message, StringVec v) {
         simplified_message += "Operation: ";
         simplified_message += getOperation(message.toUtf8()).c_str();
     }
-    // TODO: Find out why rapidJson uses GetArray() in place of IsArray()
-//    QVector<QString> short_args = getShortArgs(message.toUtf8());
-//    if (!short_args.empty()) {
-//        simplified_message += "\nArguments:";
-//        for (const auto& arg : short_args) {
-//            simplified_message += " " + arg + ",";
-//        }
-//        simplified_message.chop(simplified_message.size() - 1);
-//    }
     return simplified_message;
 }
 
 QStandardItem* createProcessListItem(Process process) {
-//    QString name{""};
-//    if (process.name.size() < 13) {
-//        auto diff = 13 - process.name.size();
-//        name += process.name;
-//        for (int i = 0; i <= diff; i++) {
-//            name += " ";
-//        }
-//    } else if (process.name.size() > 13) {
-//        name += process.name.left(13);
-//    } else {
-//        name += process.name;
-//    }
+
 return new QStandardItem(QString("%0 requested for execution. ID: %1\nStatus: %2\nTime: %3   Done: %4").arg(process.name).arg(process.id).arg(ProcessNames[process.state - 1]).arg(process.start).arg(process.end));
 }
 
@@ -231,15 +211,15 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
                 event_message += message;
                 if (message == "Process Result") {
                     event_message += "\n";
-                    auto mask = std::stoi(v.at(0).toUtf8().constData());
+                    auto app_name = q_client->getAppName(std::stoi(v.at(0).toUtf8().constData()));
                     if (v.at(1).length() > 0) {
                         updateProcessResult(v.at(1));
                     } else { // new process, from scheduled task
-                        Process new_process{ .name=v.at(1), .state=ProcessState::SUCCEEDED, .start=getTime(), .id="Scheduled task" };
+                        Process new_process{ .name=app_name, .state=ProcessState::SUCCEEDED, .start=getTime(), .id="Scheduled task" };
                         m_processes.push_back(new_process);
                         m_process_model->setItem(m_process_model->rowCount(), createProcessListItem(new_process));
                     }
-                    event_message += q_client->getAppName(mask);
+                    event_message += app_name;
                     event_message += ": ";
                     event_message += v.at(2);
                 } else {
@@ -253,7 +233,7 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
         m_events.push_front(event_message);
         ui->eventList->clear();
 
-        for (const auto& i : m_events) {
+        for (const auto& i : Kontainer::ReverseIterator(m_events)) {
             ui->eventList->addItem(i);
         }
     } else {
