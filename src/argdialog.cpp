@@ -1,5 +1,5 @@
-﻿#include "argdialog.h"
-#include "ui_argdialog.h"
+﻿#include <include/argdialog.h>
+#include <ui_argdialog.h>
 #include <algorithm>
 #include <QDebug>
 #include <QStringList>

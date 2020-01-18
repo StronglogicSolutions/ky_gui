@@ -26,18 +26,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++17
 
 SOURCES += \
-        argdialog.cpp \
-        consoledialog.cpp \
-        main.cpp \
-        mainwindow.cpp \
-        client.cpp \
-        connection_indicator.cpp
-
+        src/argdialog.cpp \
+        src/consoledialog.cpp \
+        src/main.cpp \
+        src/mainwindow.cpp \
+        src/client.cpp \
+        src/connection_indicator.cpp
 HEADERS += \
-        argdialog.h \
-        consoledialog.h \
-        mainwindow.h \
-        client.hpp \
+        include/argdialog.h \
+        include/consoledialog.h \
+        include/mainwindow.h \
+        include/client.hpp \
         headers/ktextedit.hpp \
         headers/kmessage_codec.hpp \
         headers/json.hpp \
@@ -45,9 +44,7 @@ HEADERS += \
         headers/rapidjson/writer.h \
         headers/rapidjson/stringbuffer.h \
         headers/rapidjson/document.h \
-        connection_indicator.h
-
-
+        include/connection_indicator.h
 
 FORMS += \
         argdialog.ui \

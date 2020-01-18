@@ -1,4 +1,4 @@
-﻿#include "connection_indicator.h"
+﻿#include <include/connection_indicator.h>
 #include <QDebug>
 
 static const int SIZE = 20;

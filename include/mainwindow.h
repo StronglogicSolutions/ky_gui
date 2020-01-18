@@ -6,10 +6,34 @@
 #include <QList>
 #include <QListView>
 #include <QListWidgetItem>
-#include <client.hpp>
+#include <QStandardItemModel>
+#include <QStandardItem>
+#include <include/client.hpp>
 #include <headers/ktextedit.hpp>
-#include <argdialog.h>
-#include <consoledialog.h>
+#include <include/argdialog.h>
+#include <include/consoledialog.h>
+#include <QTableView>
+
+namespace ProcessState {
+    static constexpr int READY = 1;
+    static constexpr int PENDING = 2;
+    static constexpr int SUCCEEDED = 3;
+    static constexpr int FAILED = 4;
+}
+
+const QString ProcessNames[4] = { "READY", "PENDING", "SUCCEEDED", "FAILED" };
+
+struct Process {
+    QString name;
+    int state;
+    QString start;
+    QString end;
+    QString id;
+
+    bool operator==(const Process &other) const {
+        return name == other.name && state == other.state;
+    }
+};
 
 namespace Ui {
 class MainWindow;
@@ -28,11 +52,13 @@ private:
     ArgDialog *arg_ui;
     void connectUi();
     void runApp();
-    void updateProcessResult(int mask);
+    void updateProcessResult(QString request_id);
     QString parseMessage(const QString& s, StringVec v);
     int cli_argc;
     char** cli_argv;
     Client* q_client;
+    std::vector<Process> m_processes;
+    QStandardItemModel* m_process_model;
     QList<QString> m_events;
     ConsoleDialog m_console;
 

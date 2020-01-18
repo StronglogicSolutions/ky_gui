@@ -1,4 +1,4 @@
-﻿#include <client.hpp>
+﻿#include <include/client.hpp>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <string.h>
@@ -292,9 +292,11 @@ void Client::execute() {
     if (!selected_commands.empty()) {
         executing = true;
         for (const auto& command : selected_commands) {
-            auto message = getAppName(command) + " pending";
-            emit Client::messageReceived(PROCESS_REQUEST_TYPE, message, {});
-            std::string execute_operation = createOperation("Execute", {std::to_string(command)});
+            auto app_name = getAppName(command);
+            auto message = app_name + " pending";
+            auto request_id = QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces);
+            emit Client::messageReceived(PROCESS_REQUEST_TYPE, message, { QString{command}, app_name, request_id });
+            std::string execute_operation = createOperation("Execute", {std::to_string(command), std::string(request_id.toUtf8().constData())});
             sendEncoded(execute_operation);
         }
     }

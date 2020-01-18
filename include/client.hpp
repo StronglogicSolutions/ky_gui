@@ -6,7 +6,7 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QLineEdit>
-#include <QTimer>
+#include <QUuid>
 #include <QLabel>
 #include <QString>
 #include <QVector>
