@@ -40,7 +40,7 @@ background-color: rgb(0, 43, 54);</string>
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap resource="kres.qrc">:/images/kstyleyo_logo.png</pixmap>
+     <pixmap resource="kres.qrc">:/icons/icons/kstyleyo_logo.png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
@@ -130,6 +130,10 @@ padding: 4px;</string>
              <property name="text">
               <string>Args</string>
              </property>
+             <property name="icon">
+              <iconset resource="kres.qrc">
+               <normaloff>:/icons/icons/arguments.png</normaloff>:/icons/icons/arguments.png</iconset>
+             </property>
             </widget>
            </item>
            <item>
@@ -149,6 +153,10 @@ padding: 4px;</string>
              </property>
              <property name="text">
               <string>Execute</string>
+             </property>
+             <property name="icon">
+              <iconset resource="kres.qrc">
+               <normaloff>:/icons/icons/execute.png</normaloff>:/icons/icons/execute.png</iconset>
              </property>
             </widget>
            </item>
@@ -324,7 +332,7 @@ font-weight: 700;
         <number>0</number>
        </property>
        <property name="wordWrap">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="sortingEnabled">
         <bool>false</bool>
@@ -424,6 +432,10 @@ padding: 4px;</string>
          </property>
          <property name="text">
           <string>Tasks</string>
+         </property>
+         <property name="icon">
+          <iconset resource="kres.qrc">
+           <normaloff>:/icons/icons/task.png</normaloff>:/icons/icons/task.png</iconset>
          </property>
         </widget>
        </item>
