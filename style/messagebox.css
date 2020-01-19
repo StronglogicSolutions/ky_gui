@@ -1,0 +1,14 @@
+﻿QMainWindow {
+  font: 87 10pt "Noto Sans";
+  background-color: rgb(255, 85, 0);
+}
+
+QWidget {
+  border-color: rgb(0, 0, 0);
+  background-color: rgb(0, 43, 54);
+}
+
+QMessageBox {
+  background-color: rgb(0, 43, 54);
+  text-align: center;
+}
