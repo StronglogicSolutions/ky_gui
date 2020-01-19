@@ -1,13 +1,16 @@
 <RCC>
-    <qresource prefix="/images">
-        <file>kstyleyo_logo.png</file>
-    </qresource>
     <qresource prefix="/icons">
         <file>icons/start.png</file>
+        <file>icons/kstyleyo_logo.png</file>
+        <file>icons/task.png</file>
+        <file>icons/execute.png</file>
+        <file>icons/arguments.png</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/log.png</file>
         <file>icons/send-button.png</file>
         <file>icons/disconnect.png</file>
+        <file>style/style.qss</file>
+        <file>style/messagebox.css</file>
     </qresource>
 </RCC>
