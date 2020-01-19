@@ -43,6 +43,46 @@ struct KSession {
     int status;
 };
 
+static QString escapeText(QString s) {
+    qDebug() << "Escaping text";
+    if (s.contains("'")) {
+        qDebug() << "Replacing single quote";
+        s.replace("'", "'\"'\"'");
+    }
+    if (s.contains("\t")) {
+        s.replace("\t", "\\t");
+    }
+    if (s.contains("🙋‍♀️")) {
+        qDebug() << "Replacing woman raising hand emoji";
+        s.replace("🙋‍♀️", ":woman raising hand:");
+    }
+    if (s.contains("❤️")) {
+        qDebug() << "Replacing heart";
+        s.replace("❤️", ":heart:");
+    }
+    return s;
+}
+
+static QString escapeTextToRaw(QString s) {
+    qDebug() << "Escaping text";
+    if (s.contains("'")) {
+        qDebug() << "Replacing single quote";
+        s.replace("'", "'\"'\"'");
+    }
+    if (s.contains("\t")) {
+        s.replace("\t", "\\t");
+    }
+    if (s.contains("🙋‍♀️")) {
+        qDebug() << "Replacing woman raising hand emoji";
+        s.replace("🙋‍♀️", ":woman raising hand:");
+    }
+    if (s.contains("❤️")) {
+        qDebug() << "Replacing heart";
+        s.replace("❤️", ":heart:");
+    }
+    return s.toUtf8().constData();
+}
+
 std::string getJsonString(std::string s) {
     Document d;
     d.Parse(s.c_str());
