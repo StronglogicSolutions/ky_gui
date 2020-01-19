@@ -29,6 +29,7 @@ struct Process {
     QString start;
     QString end;
     QString id;
+    QString result;
 
     bool operator==(const Process &other) const {
         return name == other.name && state == other.state;
@@ -52,7 +53,7 @@ private:
     ArgDialog *arg_ui;
     void connectUi();
     void runApp();
-    void updateProcessResult(QString request_id);
+    void updateProcessResult(QString request_id, QString result);
     QString parseMessage(const QString& s, StringVec v);
     int cli_argc;
     char** cli_argv;
