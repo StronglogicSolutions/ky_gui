@@ -10,6 +10,19 @@
 #include <vector>
 #include <headers/util.hpp>
 
+void infoMessageBox(QString text, QString title = "KYGUI") {
+    QMessageBox box;
+    QFile q_style_file(":/style/messagebox.css");
+    q_style_file.open(QFile::ReadOnly | QFile::Text);
+    QString stylesheet = QString::fromUtf8(q_style_file.readAll());
+    box.setStyleSheet(stylesheet);
+    q_style_file.close();
+    box.setWindowTitle(title);
+    box.setText(text);
+    box.setButtonText(0, "Close");
+    box.exec();
+}
+
 QString getTime() {
     return QDateTime::currentDateTime().toString("hh:mm:ss");
 }
@@ -66,7 +79,7 @@ void MainWindow::connectClient() {
     QPushButton* send_message_button = this->findChild<QPushButton*>("sendMessage");
     // Handle mouse
     QObject::connect(send_message_button, &QPushButton::clicked, this, [this, send_message_box]() {
-        q_client->sendMessage(send_message_box->toPlainText());
+        q_client->sendMessage(escapeText(send_message_box->toPlainText()));
         send_message_box->clear();
     });
 
@@ -129,16 +142,18 @@ void MainWindow::connectClient() {
     });
 
     // TODO: Handle enter key
-//    QObject::connect(static_cast<KTextEdit*>(ui->inputText), &KTextEdit::textInputEnter, this, &MainWindow::handleInputEnterKey);
+    //    QObject::connect(static_cast<KTextEdit*>(ui->inputText), &KTextEdit::textInputEnter, this, &MainWindow::handleInputEnterKey);
     QObject::connect(static_cast<KTextEdit*>(ui->inputText), &KTextEdit::textInputEnter, this, &MainWindow::handleInputEnterKey);
 
     QObject::connect(ui->processList, &QListView::clicked, this, [this](const QModelIndex &index) {
-        QMessageBox::information(
-            this, tr("Process"),
-            tr(m_processes.at(index.row()).name.toUtf8() + "\n" +
-               "Execution requested at " + m_processes.at(index.row()).start.toUtf8() + "\n" +
-               "Is currently in a state of: " + ProcessNames[m_processes.at(index.row()).state - 1].toUtf8()),
-            tr("Close"));
+        auto process = m_processes.at(index.row());
+        QString process_info_text = m_processes.at(index.row()).name.toUtf8() + "\n";
+        process_info_text += "Execution requested at " + process.start.toUtf8() + "\n" +
+                             "Is currently in a state of: " + ProcessNames[process.state - 1].toUtf8();
+        if (process.end.size() > 0 || process.id == "Scheduled task") {
+            process_info_text += "\n\nResult: \n" + process.result;
+        }
+        infoMessageBox(process_info_text, "Process");
     });
 }
 
@@ -162,7 +177,7 @@ QString MainWindow::parseMessage(const QString& message, StringVec v) {
 
 QStandardItem* createProcessListItem(Process process) {
 
-return new QStandardItem(QString("%0 requested for execution. ID: %1\nStatus: %2\nTime: %3   Done: %4").arg(process.name).arg(process.id).arg(ProcessNames[process.state - 1]).arg(process.start).arg(process.end));
+    return new QStandardItem(QString("%0 requested for execution. ID: %1\nStatus: %2\nTime: %3   Done: %4").arg(process.name).arg(process.id).arg(ProcessNames[process.state - 1]).arg(process.start).arg(process.end));
 }
 
 
@@ -213,9 +228,13 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
                     event_message += "\n";
                     auto app_name = q_client->getAppName(std::stoi(v.at(0).toUtf8().constData()));
                     if (v.at(1).length() > 0) {
-                        updateProcessResult(v.at(1));
+                        updateProcessResult(v.at(1), v.at(2));
                     } else { // new process, from scheduled task
                         Process new_process{ .name=app_name, .state=ProcessState::SUCCEEDED, .start=getTime(), .id="Scheduled task" };
+                        if (v.count() > 2 && !v.at(2).isEmpty()) {
+                            new_process.result = v.at(2);
+                            new_process.end = new_process.start;
+                        }
                         m_processes.push_back(new_process);
                         m_process_model->setItem(m_process_model->rowCount(), createProcessListItem(new_process));
                     }
@@ -241,11 +260,12 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
     }
 }
 
-void MainWindow::updateProcessResult(QString id) { // We need to start matching processes with a unique identifier
+void MainWindow::updateProcessResult(QString id, QString result) { // We need to start matching processes with a unique identifier
     for (int i = m_processes.size() - 1; i >= 0; i--) {
         if (m_processes.at(i).id == id) {
             m_processes.at(i).end = getTime();
             m_processes.at(i).state = ProcessState::SUCCEEDED;
+            m_processes.at(i).result = result;
             m_process_model->setItem(i, 0, createProcessListItem(m_processes.at(i)));
             return;
         }
