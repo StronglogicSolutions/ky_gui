@@ -8,13 +8,7 @@
 #include <QTableWidgetItem>
 #include <QDateTime>
 #include <QCalendarWidget>
-
-static QString escapeText(QString s) {
-    if (s.contains("'")) {
-        s.replace("'", "'\"'\"'");
-    }
-    return s;
-}
+#include <headers/util.hpp>
 
 ArgDialog::ArgDialog(QWidget *parent) :
     QDialog(parent),
@@ -99,15 +93,13 @@ ArgDialog::ArgDialog(QWidget *parent) :
 
     QObject::connect(ui->devTestButton, &QPushButton::clicked, this, [this]() {
         clearPost();
-        KFile file = KFile{.name="videofile", .path="videopath"};
         m_ig_post = IGPost{
-            .description = "asdasdas",
-            .datetime = "sdasadasd",
-            .promote_share = "dfgdfg",
-            .link_in_bio = "asdasd",
-            .hashtags = {"tag1", "tag2"},
-            .requested_by = {"person"},
-            .video = file
+            .description = escapeText("My description yay!!!").toUtf8().constData(),
+            .datetime = std::to_string(QDateTime::currentDateTime().toTime_t() + 12000),
+            .promote_share = escapeText("Please promote and share ❤️").toUtf8().constData(),
+            .link_in_bio = escapeText("Link in bio!!").toUtf8().constData(),
+            .hashtags = {"love", "life"},
+            .requested_by = {"unwillingagent"}
         };
     });
 }
