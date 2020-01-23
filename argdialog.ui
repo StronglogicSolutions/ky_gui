@@ -18,16 +18,23 @@
     <normaloff>favicon.ico</normaloff>favicon.ico</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(33, 33, 33);</string>
+   <string notr="true">border-color: rgb(0, 0, 0);
+background-color: rgb(0, 43, 54);</string>
   </property>
   <widget class="QDialogButtonBox" name="argCommandButtons">
    <property name="geometry">
     <rect>
-     <x>340</x>
+     <x>330</x>
      <y>510</y>
-     <width>201</width>
+     <width>211</width>
      <height>32</height>
     </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
    </property>
    <property name="layoutDirection">
     <enum>Qt::LeftToRight</enum>
@@ -36,8 +43,11 @@
     <bool>false</bool>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(203, 0, 239);
-color: rgb(16, 16, 16);</string>
+    <string notr="true">background-color: rgb(255, 85, 0);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 43, 54);
+font-weight: 700;
+padding: 4px;</string>
    </property>
    <property name="orientation">
     <enum>Qt::Horizontal</enum>
@@ -59,8 +69,11 @@ color: rgb(16, 16, 16);</string>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(203, 0, 239);
-color: rgb(16, 16, 16);</string>
+    <string notr="true">background-color: rgb(255, 85, 0);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 43, 54);
+font-weight: 700;
+padding: 4px;</string>
    </property>
    <property name="text">
     <string>Add</string>
@@ -99,8 +112,11 @@ color: rgb(16, 16, 16);</string>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(203, 0, 239);
-color: rgb(16, 16, 16);</string>
+    <string notr="true">background-color: rgb(255, 85, 0);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 43, 54);
+font-weight: 700;
+padding: 4px;</string>
    </property>
    <property name="text">
     <string>File</string>
@@ -111,9 +127,14 @@ color: rgb(16, 16, 16);</string>
     <rect>
      <x>60</x>
      <y>290</y>
-     <width>91</width>
+     <width>111</width>
      <height>18</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(131, 148, 150);
+font-weight: 700;</string>
    </property>
    <property name="text">
     <string>Items to send</string>
@@ -129,10 +150,11 @@ color: rgb(16, 16, 16);</string>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(255, 255, 255);
-color: rgb(5, 5, 5);
-font: 87 10pt &quot;Noto Sans&quot;;
-selection-background-color: rgb(255, 0, 174);</string>
+    <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: rgb(7, 54, 66);
+color: rgb(131, 148, 150);
+font-weight: 700;
+</string>
    </property>
    <property name="columnCount">
     <number>2</number>
@@ -164,6 +186,11 @@ selection-background-color: rgb(255, 0, 174);</string>
      <height>18</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(131, 148, 150);
+font-weight: 700;</string>
+   </property>
    <property name="text">
     <string>Type</string>
    </property>
@@ -171,11 +198,16 @@ selection-background-color: rgb(255, 0, 174);</string>
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>120</x>
+     <x>110</x>
      <y>130</y>
-     <width>41</width>
-     <height>18</height>
+     <width>51</width>
+     <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(131, 148, 150);
+font-weight: 700;</string>
    </property>
    <property name="text">
     <string>Input</string>
@@ -184,11 +216,16 @@ selection-background-color: rgb(255, 0, 174);</string>
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>60</x>
      <y>220</y>
-     <width>71</width>
+     <width>101</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(131, 148, 150);
+font-weight: 700;</string>
    </property>
    <property name="text">
     <string>Attachment</string>
@@ -204,19 +241,26 @@ selection-background-color: rgb(255, 0, 174);</string>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(255, 255, 255);
-color: rgb(5, 5, 5);
-font: 87 10pt &quot;Noto Sans&quot;;</string>
+    <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: rgb(7, 54, 66);
+color: rgb(131, 148, 150);
+font-weight: 700;
+</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>120</x>
      <y>260</y>
-     <width>31</width>
+     <width>41</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(131, 148, 150);
+font-weight: 700;</string>
    </property>
    <property name="text">
     <string>Time</string>
@@ -242,10 +286,11 @@ font: 87 10pt &quot;Noto Sans&quot;;</string>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(255, 255, 255);
-color: rgb(5, 5, 5);
-font: 87 10pt &quot;Noto Sans&quot;;
-selection-background-color: rgb(255, 0, 174);</string>
+    <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: rgb(7, 54, 66);
+color: rgb(131, 148, 150);
+font-weight: 700;
+</string>
    </property>
    <item>
     <property name="text">
@@ -278,13 +323,17 @@ selection-background-color: rgb(255, 0, 174);</string>
     <rect>
      <x>240</x>
      <y>590</y>
-     <width>80</width>
-     <height>26</height>
+     <width>81</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(59, 255, 0);
-color: rgb(0, 0, 0);</string>
+    <string notr="true">background-color: rgb(130, 255, 121);
+background-color: rgb(2, 180, 43);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);
+font-weight: 700;
+padding: 4px;</string>
    </property>
    <property name="text">
     <string>TEST</string>

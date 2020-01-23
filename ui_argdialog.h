@@ -50,22 +50,34 @@ public:
         QIcon icon;
         icon.addFile(QString::fromUtf8("favicon.ico"), QSize(), QIcon::Normal, QIcon::Off);
         ArgDialog->setWindowIcon(icon);
-        ArgDialog->setStyleSheet(QString::fromUtf8("background-color: rgb(33, 33, 33);"));
+        ArgDialog->setStyleSheet(QString::fromUtf8("border-color: rgb(0, 0, 0);\n"
+"background-color: rgb(0, 43, 54);"));
         argCommandButtons = new QDialogButtonBox(ArgDialog);
         argCommandButtons->setObjectName(QString::fromUtf8("argCommandButtons"));
-        argCommandButtons->setGeometry(QRect(340, 510, 201, 32));
+        argCommandButtons->setGeometry(QRect(330, 510, 211, 32));
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(argCommandButtons->sizePolicy().hasHeightForWidth());
+        argCommandButtons->setSizePolicy(sizePolicy);
         argCommandButtons->setLayoutDirection(Qt::LeftToRight);
         argCommandButtons->setAutoFillBackground(false);
-        argCommandButtons->setStyleSheet(QString::fromUtf8("background-color: rgb(203, 0, 239);\n"
-"color: rgb(16, 16, 16);"));
+        argCommandButtons->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 85, 0);\n"
+"font: 87 11pt \"Noto Sans\";\n"
+"color: rgb(0, 43, 54);\n"
+"font-weight: 700;\n"
+"padding: 4px;"));
         argCommandButtons->setOrientation(Qt::Horizontal);
         argCommandButtons->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Save);
         argCommandButtons->setCenterButtons(true);
         addArgument = new QPushButton(ArgDialog);
         addArgument->setObjectName(QString::fromUtf8("addArgument"));
         addArgument->setGeometry(QRect(380, 190, 80, 26));
-        addArgument->setStyleSheet(QString::fromUtf8("background-color: rgb(203, 0, 239);\n"
-"color: rgb(16, 16, 16);"));
+        addArgument->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 85, 0);\n"
+"font: 87 11pt \"Noto Sans\";\n"
+"color: rgb(0, 43, 54);\n"
+"font-weight: 700;\n"
+"padding: 4px;"));
         argDialogTitle = new QLabel(ArgDialog);
         argDialogTitle->setObjectName(QString::fromUtf8("argDialogTitle"));
         argDialogTitle->setGeometry(QRect(210, 10, 231, 51));
@@ -78,20 +90,27 @@ public:
         addFile = new QPushButton(ArgDialog);
         addFile->setObjectName(QString::fromUtf8("addFile"));
         addFile->setGeometry(QRect(190, 220, 80, 26));
-        addFile->setStyleSheet(QString::fromUtf8("background-color: rgb(203, 0, 239);\n"
-"color: rgb(16, 16, 16);"));
+        addFile->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 85, 0);\n"
+"font: 87 11pt \"Noto Sans\";\n"
+"color: rgb(0, 43, 54);\n"
+"font-weight: 700;\n"
+"padding: 4px;"));
         label = new QLabel(ArgDialog);
         label->setObjectName(QString::fromUtf8("label"));
-        label->setGeometry(QRect(60, 290, 91, 18));
+        label->setGeometry(QRect(60, 290, 111, 18));
+        label->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
+"color: rgb(131, 148, 150);\n"
+"font-weight: 700;"));
         argList = new QTableWidget(ArgDialog);
         if (argList->columnCount() < 2)
             argList->setColumnCount(2);
         argList->setObjectName(QString::fromUtf8("argList"));
         argList->setGeometry(QRect(60, 320, 481, 171));
-        argList->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 255, 255);\n"
-"color: rgb(5, 5, 5);\n"
-"font: 87 10pt \"Noto Sans\";\n"
-"selection-background-color: rgb(255, 0, 174);"));
+        argList->setStyleSheet(QString::fromUtf8("font: 87 11pt \"Noto Sans\";\n"
+"background-color: rgb(7, 54, 66);\n"
+"color: rgb(131, 148, 150);\n"
+"font-weight: 700;\n"
+""));
         argList->setColumnCount(2);
         argList->horizontalHeader()->setCascadingSectionResizes(false);
         argList->horizontalHeader()->setMinimumSectionSize(100);
@@ -101,21 +120,35 @@ public:
         label_2 = new QLabel(ArgDialog);
         label_2->setObjectName(QString::fromUtf8("label_2"));
         label_2->setGeometry(QRect(130, 80, 58, 18));
+        label_2->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
+"color: rgb(131, 148, 150);\n"
+"font-weight: 700;"));
         label_3 = new QLabel(ArgDialog);
         label_3->setObjectName(QString::fromUtf8("label_3"));
-        label_3->setGeometry(QRect(120, 130, 41, 18));
+        label_3->setGeometry(QRect(110, 130, 51, 20));
+        label_3->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
+"color: rgb(131, 148, 150);\n"
+"font-weight: 700;"));
         label_4 = new QLabel(ArgDialog);
         label_4->setObjectName(QString::fromUtf8("label_4"));
-        label_4->setGeometry(QRect(90, 220, 71, 20));
+        label_4->setGeometry(QRect(60, 220, 101, 20));
+        label_4->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
+"color: rgb(131, 148, 150);\n"
+"font-weight: 700;"));
         argInput = new QTextEdit(ArgDialog);
         argInput->setObjectName(QString::fromUtf8("argInput"));
         argInput->setGeometry(QRect(190, 130, 281, 51));
-        argInput->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 255, 255);\n"
-"color: rgb(5, 5, 5);\n"
-"font: 87 10pt \"Noto Sans\";"));
+        argInput->setStyleSheet(QString::fromUtf8("font: 87 11pt \"Noto Sans\";\n"
+"background-color: rgb(7, 54, 66);\n"
+"color: rgb(131, 148, 150);\n"
+"font-weight: 700;\n"
+""));
         label_5 = new QLabel(ArgDialog);
         label_5->setObjectName(QString::fromUtf8("label_5"));
-        label_5->setGeometry(QRect(130, 260, 31, 20));
+        label_5->setGeometry(QRect(120, 260, 41, 20));
+        label_5->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
+"color: rgb(131, 148, 150);\n"
+"font-weight: 700;"));
         dateTime = new QDateTimeEdit(ArgDialog);
         dateTime->setObjectName(QString::fromUtf8("dateTime"));
         dateTime->setGeometry(QRect(200, 260, 194, 27));
@@ -127,15 +160,20 @@ public:
         argType->addItem(QString());
         argType->setObjectName(QString::fromUtf8("argType"));
         argType->setGeometry(QRect(190, 80, 141, 31));
-        argType->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 255, 255);\n"
-"color: rgb(5, 5, 5);\n"
-"font: 87 10pt \"Noto Sans\";\n"
-"selection-background-color: rgb(255, 0, 174);"));
+        argType->setStyleSheet(QString::fromUtf8("font: 87 11pt \"Noto Sans\";\n"
+"background-color: rgb(7, 54, 66);\n"
+"color: rgb(131, 148, 150);\n"
+"font-weight: 700;\n"
+""));
         devTestButton = new QPushButton(ArgDialog);
         devTestButton->setObjectName(QString::fromUtf8("devTestButton"));
-        devTestButton->setGeometry(QRect(240, 590, 80, 26));
-        devTestButton->setStyleSheet(QString::fromUtf8("background-color: rgb(59, 255, 0);\n"
-"color: rgb(0, 0, 0);"));
+        devTestButton->setGeometry(QRect(240, 590, 81, 31));
+        devTestButton->setStyleSheet(QString::fromUtf8("background-color: rgb(130, 255, 121);\n"
+"background-color: rgb(2, 180, 43);\n"
+"font: 87 11pt \"Noto Sans\";\n"
+"color: rgb(0, 0, 0);\n"
+"font-weight: 700;\n"
+"padding: 4px;"));
 
         retranslateUi(ArgDialog);
         QObject::connect(argCommandButtons, SIGNAL(accepted()), ArgDialog, SLOT(accept()));

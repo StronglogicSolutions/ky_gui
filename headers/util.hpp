@@ -52,35 +52,27 @@ static QString escapeText(QString s) {
     if (s.contains("\t")) {
         s.replace("\t", "\\t");
     }
-    if (s.contains("🙋‍♀️")) {
-        qDebug() << "Replacing woman raising hand emoji";
-        s.replace("🙋‍♀️", ":woman raising hand:");
-    }
-    if (s.contains("❤️")) {
-        qDebug() << "Replacing heart";
-        s.replace("❤️", ":heart:");
-    }
+//    if (s.contains("🙋‍♀️")) {
+//        qDebug() << "Replacing woman raising hand emoji";
+//        s.replace("🙋‍♀️", ":woman raising hand:");
+//    }
+//    if (s.contains("❤️")) {
+//        qDebug() << "Replacing heart";
+//        s.replace("❤️", ":heart:");
+//    }
+//    if (s.contains("🔗")) {
+//        qDebug() << "Replacing link";
+//        s.replace("🔗", ":link:");
+//    }
+//    if (s.contains("⬆️")) {
+//        qDebug() << "Replacing arrow";
+//        s.replace("⬆️", ":arrow_up:");
+//    }
     return s;
 }
 
 static QString escapeTextToRaw(QString s) {
-    qDebug() << "Escaping text";
-    if (s.contains("'")) {
-        qDebug() << "Replacing single quote";
-        s.replace("'", "'\"'\"'");
-    }
-    if (s.contains("\t")) {
-        s.replace("\t", "\\t");
-    }
-    if (s.contains("🙋‍♀️")) {
-        qDebug() << "Replacing woman raising hand emoji";
-        s.replace("🙋‍♀️", ":woman raising hand:");
-    }
-    if (s.contains("❤️")) {
-        qDebug() << "Replacing heart";
-        s.replace("❤️", ":heart:");
-    }
-    return s.toUtf8().constData();
+    return escapeText(s).toUtf8().constData();
 }
 
 std::string getJsonString(std::string s) {

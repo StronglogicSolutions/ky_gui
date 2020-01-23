@@ -21,6 +21,16 @@ static constexpr int COMMANDS_UPDATE_TYPE = 2;
 static constexpr int EVENT_UPDATE_TYPE = 3;
 static constexpr int PROCESS_REQUEST_TYPE = 4;
 
+enum TaskType {
+    INSTAGRAM = 1,
+    OTHER = 2
+};
+
+namespace TaskCode {
+static constexpr int IGTASKBYTE = 0xFF;
+static constexpr int GENMSGBYTE = 0xFE;
+}
+
 typedef std::map<int, std::string> CommandMap;
 typedef std::map<int, std::vector<std::string>> CommandArgMap;
 typedef QVector<QString> StringVec;
@@ -60,6 +70,7 @@ public slots:
     void sendMessage(const QString& s);
     void sendEncoded(std::string message);
     void sendFileEncoded(QByteArray bytes);
+    void sendTaskEncoded(TaskType type, std::vector<std::string> args);
     void setSelectedApp(std::vector<QString> app_names);
     void sendFile(QByteArray bytes);
 

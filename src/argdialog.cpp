@@ -93,13 +93,15 @@ ArgDialog::ArgDialog(QWidget *parent) :
 
     QObject::connect(ui->devTestButton, &QPushButton::clicked, this, [this]() {
         clearPost();
+
         m_ig_post = IGPost{
             .description = escapeText("My description yay!!!").toUtf8().constData(),
             .datetime = std::to_string(QDateTime::currentDateTime().toTime_t() + 12000),
-            .promote_share = escapeText("Please promote and share ❤️").toUtf8().constData(),
-            .link_in_bio = escapeText("Link in bio!!").toUtf8().constData(),
+            .promote_share = escapeText("If you enjoy the phrase, please like and share 🙋‍♀️").toUtf8().constData(),
+            .link_in_bio = escapeText("Download a FREE PDF of 245 basic verbs (link 🔗 in bio 👆").toUtf8().constData(),
             .hashtags = {"love", "life"},
-            .requested_by = {"unwillingagent"}
+            .requested_by = {"unwillingagent"},
+            .video = {.name = "holy.jpg", .path = "/data/c/ky_gui/assets/holy.jpg"}
         };
     });
 }

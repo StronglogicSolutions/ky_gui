@@ -13,10 +13,13 @@
 #include <iostream>
 #include <vector>
 #include <future>
+#define FLATBUFFERS_DEBUG_VERIFICATION_FAILURE
 #include <headers/kmessage_codec.hpp>
+#include <headers/instatask_generated.h>
 #include <headers/util.hpp>
 
 using namespace KData;
+using namespace IGData;
 
 static const int MAX_BUFFER_SIZE = 2048;
 static const int MAX_PACKET_SIZE = 4096;
@@ -83,8 +86,7 @@ void Client::handleMessages() {
             emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args);
             if (isUploadCompleteEvent(event.toUtf8().constData())) {
                 outgoing_file.clear();
-                std::string operation_string = createOperation("Schedule", m_task);
-                sendEncoded(operation_string);
+                sendTaskEncoded(TaskType::INSTAGRAM, m_task);
             }
         }
         std::string formatted_json = getJsonString(data_string);
@@ -170,24 +172,69 @@ void Client::sendEncoded(std::string message) {
     uint8_t* encoded_message_buffer = builder.GetBufferPointer();
     uint32_t size = builder.GetSize();
 
-    qDebug() << "Size is " << size;
-
-    uint8_t send_buffer[MAX_BUFFER_SIZE];
-    memset(send_buffer, 0, MAX_BUFFER_SIZE);
+    uint8_t send_buffer[MAX_PACKET_SIZE];
+    memset(send_buffer, 0, MAX_PACKET_SIZE);
     send_buffer[0] = (size & 0xFF) >> 24;
     send_buffer[1] = (size & 0xFF) >> 16;
     send_buffer[2] = (size & 0xFF) >> 8;
     send_buffer[3] = (size & 0xFF);
-    std::memcpy(send_buffer + 4, encoded_message_buffer, size);
+    send_buffer[4] = (TaskCode::GENMSGBYTE & 0xFF);
+    std::memcpy(send_buffer + 5, encoded_message_buffer, size);
     qDebug() << "Ready to send:";
     std::string message_to_send{};
-    for (unsigned int i = 0; i < (size + 4); i++) {
+    for (unsigned int i = 0; i < (size + 5); i++) {
         message_to_send += (char)*(send_buffer + i);
+        qDebug() << (char)*(send_buffer + i);
     }
-    qDebug() << message_to_send.c_str();
+    qDebug() << "Final size: " << (size + 5);
     // Send start operation
-    ::send(m_client_socket_fd, send_buffer, size + 4, 0);
+    ::send(m_client_socket_fd, send_buffer, size + 5, 0);
     builder.Clear();
+}
+
+void Client::sendTaskEncoded(TaskType type, std::vector<std::string> args) {
+    if (type == TaskType::INSTAGRAM) {
+        if (args.size() < 7) {
+            qDebug() << "Not enough arguments to send an IGTask";
+            return;
+        }
+        auto filename = builder.CreateString(args.at(0).c_str(), args.at(0).size());
+        auto time = builder.CreateString(args.at(1).c_str(), args.at(1).size());
+        auto description = builder.CreateString(args.at(2).c_str(), args.at(2).size());
+        auto hashtags = builder.CreateString(args.at(3).c_str(), args.at(3).size());
+        auto requested_by = builder.CreateString(args.at(4).c_str(), args.at(4).size());
+        auto requested_by_phrase = builder.CreateString(args.at(5).c_str(), args.at(5).size());
+        auto promote_share = builder.CreateString(args.at(6).c_str(), args.at(6).size());
+        auto link_bio = builder.CreateString(args.at(7).c_str(), args.at(7).size());
+//        auto mask = std::stoi(args.at(8));
+
+        flatbuffers::Offset<IGTask> ig_task = CreateIGTask(builder, 96, filename, time, description, hashtags, requested_by, requested_by_phrase, promote_share, link_bio, 16);
+
+        builder.Finish(ig_task);
+
+        uint8_t* encoded_message_buffer = builder.GetBufferPointer();
+        uint32_t size = builder.GetSize();
+
+        uint8_t send_buffer[MAX_PACKET_SIZE];
+        memset(send_buffer, 0, MAX_PACKET_SIZE);
+        send_buffer[0] = (size >> 24) & 0xFF;
+        send_buffer[1] = (size >> 16) & 0xFF;
+        send_buffer[2] = (size >> 8) & 0xFF;
+        send_buffer[3] = size & 0xFF;
+        send_buffer[4] = (TaskCode::IGTASKBYTE & 0xFF);
+
+        std::memcpy(send_buffer + 5, encoded_message_buffer, size);
+        qDebug() << "Ready to send:";
+        std::string message_to_send{};
+        for (unsigned int i = 0; i < (size + 5); i++) {
+            message_to_send += (char)*(send_buffer + i);
+            qDebug() << (char)*(send_buffer + i);
+        }
+        qDebug() << "Final size: " << (size + 5);
+        // Send start operation
+        ::send(m_client_socket_fd, send_buffer, size + 5, 0);
+        builder.Clear();
+    }
 }
 
 void Client::sendPackets(uint8_t* data, int size) {
@@ -307,8 +354,8 @@ void Client::scheduleTask(std::vector<std::string> task_args, bool file_pending)
         m_task = task_args;
     } else {
         qDebug() << "Requesting a task to be scheduled";
-        std::string operation_string = createOperation("Schedule", task_args);
-        sendEncoded(operation_string);
+//        std::string operation_string = createOperation("Schedule", task_args);
+        sendTaskEncoded(TaskType::INSTAGRAM, task_args);
     }
 }
 

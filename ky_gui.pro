@@ -39,6 +39,7 @@ HEADERS += \
         include/client.hpp \
         headers/ktextedit.hpp \
         headers/kmessage_codec.hpp \
+        headers/instatask_generated.h \
         headers/json.hpp \
         headers/util.hpp \
         headers/rapidjson/writer.h \
