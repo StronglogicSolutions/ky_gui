@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <string_view>
 #include <unordered_map>
+#include <headers/util.hpp>
 
 namespace Args {
 const QString DESCRIPTION_TYPE = "description";
@@ -16,11 +17,9 @@ const QString PROMOTE_TYPE = "promote/share";
 const QString LINK_BIO_TYPE = "link/bio";
 const QString REQUESTED_BY_TYPE = "requested by";
 }  // namespace Args
+
 typedef std::string Str;
-//namespace Emoji {
-//    Str SmilingFaceEyes{"U+1F60A"};
-//    const char* SmilingFaceEyesBytes = "😊";
-//}
+
 typedef struct Task {
     int mask;
     std::vector<std::string> args;
@@ -29,6 +28,7 @@ typedef struct Task {
 typedef struct KFile {
   QString name;
   QString path;
+  FileType type;
 } KFile;
 
 typedef struct IGPost {
@@ -40,12 +40,13 @@ typedef struct IGPost {
   std::vector<std::string> hashtags;
   std::vector<std::string> requested_by;
   const char *requested_by_phrase = "The phrase was requested by ";
-  KFile video;
+  std::vector<KFile> files;
+  bool is_video;
   bool isReady() {
     return description.size() > 0 && datetime.size() > 0 &&
            promote_share.size() > 0 && link_in_bio.size() > 0 &&
-           hashtags.size() > 0 && requested_by.size() > 0 &&
-           video.path.size() > 0;
+             hashtags.size() > 0 && requested_by.size() > 0 && !files.empty() &&
+             files.at(0).path.size() > 0;
   }
 } IGPost;
 
@@ -61,7 +62,7 @@ class ArgDialog : public QDialog {
   ~ArgDialog();
 
  signals:
-  void uploadFile(QByteArray bytes);
+  void uploadFiles(QVector<KFileData> files);
   void taskRequestReady(Task task, bool file_pending);
 
  private:

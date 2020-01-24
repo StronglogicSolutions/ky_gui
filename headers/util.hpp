@@ -26,6 +26,17 @@ public:
 };
 }
 
+enum FileType {
+    VIDEO = 1,
+    IMAGE = 2
+};
+
+struct KFileData {
+    FileType type;
+    QString name;
+    QByteArray bytes;
+};
+
 namespace {
 using namespace rapidjson;
 using json = nlohmann::json;

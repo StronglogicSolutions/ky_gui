@@ -8,7 +8,7 @@
 #include <QTableWidgetItem>
 #include <QDateTime>
 #include <QCalendarWidget>
-#include <headers/util.hpp>
+#include <QMimeDatabase>
 
 ArgDialog::ArgDialog(QWidget *parent) :
     QDialog(parent),
@@ -24,11 +24,17 @@ ArgDialog::ArgDialog(QWidget *parent) :
         if (file_path.size() > 0) {
             auto slash_index = file_path.lastIndexOf("/") + 1;
             QString file_name = file_path.right(file_path.size() - slash_index);
-
+            QMimeDatabase db;
+            auto is_video = db.mimeTypeForFile(file_path).name().contains("video");
             addItem(file_name, "file");
+            m_ig_post.files.push_back(KFile{
+                .name=file_name, .path=file_path, .type = is_video ? FileType::VIDEO : FileType::IMAGE
+            });
 
-            m_ig_post.video.name = file_name;
-            m_ig_post.video.path = file_path;
+            if (!m_ig_post.is_video && is_video) {
+                qDebug() << "File discovered to be video";
+                m_ig_post.is_video = true; // rename to "sending_video"
+            }
         }
     });
 
@@ -73,19 +79,29 @@ ArgDialog::ArgDialog(QWidget *parent) :
         if (button->text() == "Save") {
             if (m_ig_post.isReady()) {
                 setTaskArguments();
-                QFile file(m_ig_post.video.path);
-                std::vector<char> byte_array{};
-                if (file.open(QIODevice::ReadOnly)) {
-                    QByteArray bytes = file.readAll();
-                    emit ArgDialog::uploadFile(bytes);
-                    qDebug() << "Would be sending file..";
-                } else {
-                    QMessageBox::warning(
-                        this,
-                        tr("File Error"),
-                        tr("Unable to read file")
-                    );
+                QVector<KFileData> k_file_v{};
+                k_file_v.reserve(m_ig_post.files.size());
+
+                for (const auto& kfile : m_ig_post.files) {
+                    QFile file(kfile.path);
+                    if (file.open(QIODevice::ReadOnly)) {
+                        k_file_v.push_back(KFileData{
+                            .type = kfile.type,
+                            .name = kfile.name,
+                            .bytes = file.readAll()
+                        });
+                    } else {
+                        QMessageBox::warning(
+                            this,
+                            tr("File Error"),
+                            tr("Unable to read file")
+                        );
+                    }
                 }
+                if (!k_file_v.empty()) {
+                    emit ArgDialog::uploadFiles(k_file_v);
+                }
+
                 emit ArgDialog::taskRequestReady(m_task, true);
             }
         }
@@ -101,7 +117,7 @@ ArgDialog::ArgDialog(QWidget *parent) :
             .link_in_bio = escapeText("Download a FREE PDF of 245 basic verbs (link 🔗 in bio 👆").toUtf8().constData(),
             .hashtags = {"love", "life"},
             .requested_by = {"unwillingagent"},
-            .video = {.name = "holy.jpg", .path = "/data/c/ky_gui/assets/holy.jpg"}
+            .files = {{ .name = "holy.jpg", .path = "/data/c/ky_gui/assets/holy.jpg", .type = FileType::IMAGE }}
         };
     });
 }
@@ -122,7 +138,7 @@ void ArgDialog::setTaskArguments() {
     requested_by.pop_back();
     }
 
-    m_task.args.push_back(m_ig_post.video.name.toUtf8().constData());
+//    m_task.args.push_back(m_ig_post.file.name.toUtf8().constData());
     m_task.args.push_back(m_ig_post.datetime);
     m_task.args.push_back(m_ig_post.description);
     m_task.args.push_back(hashtags);
@@ -130,6 +146,7 @@ void ArgDialog::setTaskArguments() {
     m_task.args.push_back(m_ig_post.requested_by_phrase);
     m_task.args.push_back(m_ig_post.promote_share);
     m_task.args.push_back(m_ig_post.link_in_bio);
+    m_task.args.push_back(std::to_string(m_ig_post.is_video));
 }
 
 void ArgDialog::addItem(QString value, QString type) {
@@ -142,7 +159,7 @@ void ArgDialog::addItem(QString value, QString type) {
 }
 
 void ArgDialog::clearPost() {
-    m_ig_post.video = KFile{};
+    m_ig_post.files.clear();
     m_ig_post.datetime = "";
     m_ig_post.hashtags = {};
     m_ig_post.description = "";

@@ -49,24 +49,29 @@ public:
     virtual void keyPressEvent(QKeyEvent* e);
     ~MainWindow();
 private:
-    Ui::MainWindow *ui;
-    ArgDialog *arg_ui;
-    void connectUi();
-    void runApp();
-    void updateProcessResult(QString request_id, QString result);
-    QString parseMessage(const QString& s, StringVec v);
+    /** Process arguments */
     int cli_argc;
     char** cli_argv;
+    /** UI & Messages */
+    void connectUi();
+    QString parseMessage(const QString& s, StringVec v);
+    void updateProcessResult(QString request_id, QString result);
+    /** UI Members */
+    Ui::MainWindow *ui;
+    ArgDialog *arg_ui;
+    ConsoleDialog console_ui;
+    /** Client member */
     Client* q_client;
+    /** Models */
     std::vector<Process> m_processes;
     QStandardItemModel* m_process_model;
     QList<QString> m_events;
-    ConsoleDialog m_console;
 
 private slots:
+    /** Receivers */
     void connectClient();
     void updateMessages(int t, const QString& s, StringVec v);
-    void handleInputEnterKey();
+    void handleKey();
 };
 
 

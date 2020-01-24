@@ -35,10 +35,10 @@ QString getTime() {
  */
 MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    arg_ui(new ArgDialog),
     cli_argc(argc),
     cli_argv(argv),
+    ui(new Ui::MainWindow),
+    arg_ui(new ArgDialog),
     q_client(nullptr) {
     m_process_model = new QStandardItemModel(this);
     q_client = new Client(this, cli_argc, cli_argv);
@@ -110,8 +110,8 @@ void MainWindow::connectClient() {
         }
     });
 
-    QObject::connect(arg_ui, &ArgDialog::uploadFile, this, [this](QByteArray bytes) {
-        q_client->sendFile(bytes);
+    QObject::connect(arg_ui, &ArgDialog::uploadFiles, this, [this](QVector<KFileData> files) {
+        q_client->sendFiles(files);
     });
 
     QObject::connect(arg_ui, &ArgDialog::taskRequestReady, this, [this](Task task, bool file_pending) {
@@ -119,7 +119,7 @@ void MainWindow::connectClient() {
         auto mask = q_client->getSelectedApp();
         if (mask > -1) {
             if (q_client->getAppName(mask) == "Instagram") {
-                auto datetime = task.args.at(1);
+                auto datetime = task.args.at(0);
                 auto current_datetime = QDateTime::currentDateTime().toTime_t();
                 auto seconds_diff = std::stoi(datetime) - current_datetime;
                 qDebug() << "Time difference: " << seconds_diff;
@@ -138,12 +138,12 @@ void MainWindow::connectClient() {
     });
 
     QObject::connect(ui->viewConsole, &QPushButton::clicked, this, [this]() {
-        m_console.show();
+        console_ui.show();
     });
 
     // TODO: Handle enter key
     //    QObject::connect(static_cast<KTextEdit*>(ui->inputText), &KTextEdit::textInputEnter, this, &MainWindow::handleInputEnterKey);
-    QObject::connect(static_cast<KTextEdit*>(ui->inputText), &KTextEdit::textInputEnter, this, &MainWindow::handleInputEnterKey);
+    QObject::connect(static_cast<KTextEdit*>(ui->inputText), &KTextEdit::textInputEnter, this, &MainWindow::handleKey);
 
     QObject::connect(ui->processList, &QListView::clicked, this, [this](const QModelIndex &index) {
         auto process = m_processes.at(index.row());
@@ -157,7 +157,7 @@ void MainWindow::connectClient() {
     });
 }
 
-void MainWindow::handleInputEnterKey() {
+void MainWindow::handleKey() {
     q_client->sendMessage(ui->inputText->toPlainText());
     ui->inputText->clear();
 }
@@ -176,11 +176,8 @@ QString MainWindow::parseMessage(const QString& message, StringVec v) {
 }
 
 QStandardItem* createProcessListItem(Process process) {
-
     return new QStandardItem(QString("%0 requested for execution. ID: %1\nStatus: %2\nTime: %3   Done: %4").arg(process.name).arg(process.id).arg(ProcessNames[process.state - 1]).arg(process.start).arg(process.end));
 }
-
-
 
 /**
  * @brief MainWindow::updateMessages
@@ -192,7 +189,7 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
         qDebug() << "Updating message area";
         auto simple_message = timestamp_prefix + parseMessage(message, v);
         ui->messages->append(simple_message);
-        m_console.updateText(message);
+        console_ui.updateText(message);
     } else if (t == COMMANDS_UPDATE_TYPE) {
         if (message == "New Session") {
             ui->led->setState(true);
@@ -203,8 +200,6 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
         for (const auto& s : v) {
             app_list->addItem(s);
         }
-        //TODO: We do this because a CommandLinkButton turns transparent by default, except when hovered or checked
-        ui->connect->setChecked(true);
     } else if (t == PROCESS_REQUEST_TYPE) {
         qDebug() << "Updating process list";
         m_processes.push_back(Process{ .name=v.at(1), .state=ProcessState::PENDING, .start=getTime(), .id=v.at(2) });
@@ -213,9 +208,6 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
             m_process_model->setItem(row, createProcessListItem(process));
             row++;
         }
-
-        //TODO: We do this because a CommandLinkButton turns transparent by default, except when hovered or checked
-        ui->connect->setChecked(true);
     } else if (t == EVENT_UPDATE_TYPE) {
         QString event_message{timestamp_prefix};
         if (!v.empty()) {
