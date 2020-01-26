@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>723</width>
-    <height>937</height>
+    <width>724</width>
+    <height>948</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
   <property name="styleSheet">
    <string notr="true">font: 87 10pt &quot;Noto Sans&quot;;
 background-color: rgb(255, 85, 0);
-</string>
+background-color: rgb(196, 25, 0);</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="styleSheet">
@@ -52,7 +52,7 @@ background-color: rgb(0, 43, 54);</string>
       <x>20</x>
       <y>50</y>
       <width>681</width>
-      <height>828</height>
+      <height>832</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0,0,0,0">
@@ -100,7 +100,7 @@ font-weight: 700;</string>
           <widget class="QComboBox" name="appList">
            <property name="styleSheet">
             <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-background-color: rgb(7, 54, 66);
+background-color: #2f535f;
 color: rgb(131, 148, 150);
 font-weight: 700;
 </string>
@@ -120,11 +120,20 @@ font-weight: 700;
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="autoFillBackground">
+              <bool>false</bool>
+             </property>
              <property name="styleSheet">
               <string notr="true">background-color: rgb(255, 85, 0);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 43, 54);
 font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
 padding: 4px;</string>
              </property>
              <property name="text">
@@ -133,6 +142,9 @@ padding: 4px;</string>
              <property name="icon">
               <iconset resource="kres.qrc">
                <normaloff>:/icons/icons/arguments.png</normaloff>:/icons/icons/arguments.png</iconset>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -144,11 +156,30 @@ padding: 4px;</string>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="font">
+              <font>
+               <family>Noto Sans</family>
+               <pointsize>11</pointsize>
+               <weight>87</weight>
+               <italic>false</italic>
+               <bold>true</bold>
+               <kerning>true</kerning>
+              </font>
+             </property>
+             <property name="autoFillBackground">
+              <bool>false</bool>
+             </property>
              <property name="styleSheet">
               <string notr="true">background-color: rgb(255, 85, 0);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 43, 54);
 font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
 padding: 4px;</string>
              </property>
              <property name="text">
@@ -157,6 +188,18 @@ padding: 4px;</string>
              <property name="icon">
               <iconset resource="kres.qrc">
                <normaloff>:/icons/icons/execute.png</normaloff>:/icons/icons/execute.png</iconset>
+             </property>
+             <property name="checkable">
+              <bool>false</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+             <property name="default">
+              <bool>false</bool>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -203,7 +246,7 @@ font-weight: 700;</string>
                </property>
                <property name="styleSheet">
                 <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-background-color: rgb(7, 54, 66);
+background-color: #2f535f;
 color: rgb(131, 148, 150);
 font-weight: 700;
 </string>
@@ -229,11 +272,20 @@ font-weight: 700;
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="autoFillBackground">
+              <bool>false</bool>
+             </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(157, 157, 157);
+              <string notr="true">background-color: #c41900;
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
 font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
 padding: 4px;</string>
              </property>
              <property name="text">
@@ -242,6 +294,9 @@ padding: 4px;</string>
              <property name="icon">
               <iconset resource="kres.qrc">
                <normaloff>:/icons/log.png</normaloff>:/icons/log.png</iconset>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -272,7 +327,7 @@ font-weight: 700;</string>
            </property>
            <property name="styleSheet">
             <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-background-color: rgb(7, 54, 66);
+background-color: #2f535f;
 color: rgb(131, 148, 150);
 font-weight: 700;
 </string>
@@ -311,7 +366,7 @@ font-weight: 700;</string>
        </property>
        <property name="styleSheet">
         <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-background-color: rgb(7, 54, 66);
+background-color: #2f535f;
 color: rgb(131, 148, 150);
 font-weight: 700;
 </string>
@@ -364,7 +419,7 @@ font-weight: 700;
          </property>
          <property name="styleSheet">
           <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-background-color: rgb(7, 54, 66);
+background-color: #2f535f;
 color: rgb(131, 148, 150);
 font-weight: 700;
 </string>
@@ -398,12 +453,20 @@ font-weight: 700;</string>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
          <property name="styleSheet">
           <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
-background-color: rgb(255, 65, 68);
 background-color: rgb(255, 0, 4);
 font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
 padding: 4px;</string>
          </property>
          <property name="text">
@@ -412,6 +475,9 @@ padding: 4px;</string>
          <property name="icon">
           <iconset resource="kres.qrc">
            <normaloff>:/icons/disconnect.png</normaloff>:/icons/disconnect.png</iconset>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -423,11 +489,20 @@ padding: 4px;</string>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
          <property name="styleSheet">
           <string notr="true">background-color: rgb(255, 85, 0);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 43, 54);
 font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
 padding: 4px;</string>
          </property>
          <property name="text">
@@ -436,6 +511,9 @@ padding: 4px;</string>
          <property name="icon">
           <iconset resource="kres.qrc">
            <normaloff>:/icons/icons/task.png</normaloff>:/icons/icons/task.png</iconset>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -447,12 +525,21 @@ padding: 4px;</string>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
          <property name="styleSheet">
           <string notr="true">background-color: rgb(130, 255, 121);
 background-color: rgb(2, 180, 43);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
 font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
 padding: 4px;</string>
          </property>
          <property name="text">
@@ -494,7 +581,7 @@ padding: 4px;</string>
         </sizepolicy>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(94, 79, 255);
+        <string notr="true">background-color: #2f535f;
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);</string>
        </property>
@@ -508,9 +595,9 @@ color: rgb(0, 0, 0);</string>
    <widget class="ConnectionIndicator" name="led">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>20</y>
-      <width>41</width>
+      <x>540</x>
+      <y>30</y>
+      <width>40</width>
       <height>20</height>
      </rect>
     </property>
@@ -521,17 +608,27 @@ color: rgb(0, 0, 0);</string>
    <widget class="QPushButton" name="connect">
     <property name="geometry">
      <rect>
-      <x>590</x>
-      <y>10</y>
-      <width>111</width>
-      <height>31</height>
+      <x>600</x>
+      <y>20</y>
+      <width>101</width>
+      <height>41</height>
      </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
     </property>
     <property name="styleSheet">
      <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
 background-color: rgb(2, 180, 43);
 font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 6px;
+border-color: #00000f;
+min-width: 1em;
+min-height: 1em;
 padding: 4px;</string>
     </property>
     <property name="text">
@@ -541,6 +638,9 @@ padding: 4px;</string>
      <iconset resource="kres.qrc">
       <normaloff>:/icons/icons/start.png</normaloff>:/icons/icons/start.png</iconset>
     </property>
+    <property name="flat">
+     <bool>false</bool>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -548,7 +648,7 @@ padding: 4px;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>723</width>
+     <width>724</width>
      <height>23</height>
     </rect>
    </property>
