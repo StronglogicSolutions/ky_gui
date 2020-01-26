@@ -87,8 +87,8 @@ void Client::handleMessages() {
                     sent_files.at(sent_files.size() - 1).timestamp = std::stoi(args.at(0).toUtf8().constData());
                     if (outgoing_files.isEmpty()) {
                         sendTaskEncoded(TaskType::INSTAGRAM, m_task);
-                    } else { // More files to send
-                        processFileQueue();
+                    } else {
+                        sendEncoded(createOperation("FileUpload", {"Subsequent file"}));
                     }
                 }
             }

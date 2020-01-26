@@ -12,11 +12,6 @@
 
 void infoMessageBox(QString text, QString title = "KYGUI") {
     QMessageBox box;
-    QFile q_style_file(":/style/messagebox.css");
-    q_style_file.open(QFile::ReadOnly | QFile::Text);
-    QString stylesheet = QString::fromUtf8(q_style_file.readAll());
-    box.setStyleSheet(stylesheet);
-    q_style_file.close();
     box.setWindowTitle(title);
     box.setText(text);
     box.setButtonText(0, "Close");
@@ -44,6 +39,13 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
     q_client = new Client(this, cli_argc, cli_argv);
     ui->setupUi(this);
     this->setWindowTitle("KYGUI");
+
+//    QFile q_style_file(":/style/style.qss");
+//    q_style_file.open(QFile::ReadOnly | QFile::Text);
+//    QString stylesheet = QString::fromUtf8(q_style_file.readAll());
+//    q_style_file.close();
+//    this->setStyleSheet(this->styleSheet().append(stylesheet));
+
     QPushButton *button = this->findChild<QPushButton*>("connect");
     connect(button, &QPushButton::clicked, this, &MainWindow::connectClient);
     ui->processList->setModel(m_process_model);
@@ -79,7 +81,7 @@ void MainWindow::connectClient() {
     QPushButton* send_message_button = this->findChild<QPushButton*>("sendMessage");
     // Handle mouse
     QObject::connect(send_message_button, &QPushButton::clicked, this, [this, send_message_box]() {
-        q_client->sendMessage(escapeText(send_message_box->toPlainText()));
+        q_client->sendMessage(send_message_box->toPlainText());
         send_message_box->clear();
     });
 
