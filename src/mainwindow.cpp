@@ -40,15 +40,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
     ui->setupUi(this);
     this->setWindowTitle("KYGUI");
 
-//    QFile q_style_file(":/style/style.qss");
-//    q_style_file.open(QFile::ReadOnly | QFile::Text);
-//    QString stylesheet = QString::fromUtf8(q_style_file.readAll());
-//    q_style_file.close();
-//    this->setStyleSheet(this->styleSheet().append(stylesheet));
-
     QPushButton *button = this->findChild<QPushButton*>("connect");
     connect(button, &QPushButton::clicked, this, &MainWindow::connectClient);
-    ui->processList->setModel(m_process_model);
+    ui->processList->setModel(m_process_model);   
 }
 
 /**
@@ -64,6 +58,7 @@ MainWindow::~MainWindow()
  * @brief MainWindow::buttonClicked
  */
 void MainWindow::connectClient() {
+    ui->connect->hide();
     qDebug() << "Connecting to KServer";
 
     QObject::connect(q_client, &Client::messageReceived, this, &MainWindow::updateMessages);
@@ -94,11 +89,9 @@ void MainWindow::connectClient() {
     QPushButton* disconnect_button = this->findChild<QPushButton*>("disconnect");
     QObject::connect(disconnect_button, &QPushButton::clicked, this, [this, progressBar]() {
         q_client->closeConnection();
-        progressBar->setValue(0);
-        ui->appList->clear();
-        ui->messages->clear();
-        ui->led->setState(false);
+        QApplication::exit(9);
     });
+
 
     QObject::connect(ui->execute, &QPushButton::clicked, this, [this]() {
         q_client->execute();

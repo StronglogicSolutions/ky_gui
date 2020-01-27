@@ -7,12 +7,14 @@
 #include <vector>
 #include <QDebug>
 #include <QVector>
+#include <QString>
 #include "rapidjson/writer.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/pointer.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/document.h"
 #include "json.hpp"
+
 
 namespace Kontainer {
 /** Reverse Iterator */
@@ -63,22 +65,6 @@ static QString escapeText(QString s) {
     if (s.contains("\t")) {
         s.replace("\t", "\\t");
     }
-//    if (s.contains("🙋‍♀️")) {
-//        qDebug() << "Replacing woman raising hand emoji";
-//        s.replace("🙋‍♀️", ":woman raising hand:");
-//    }
-//    if (s.contains("❤️")) {
-//        qDebug() << "Replacing heart";
-//        s.replace("❤️", ":heart:");
-//    }
-//    if (s.contains("🔗")) {
-//        qDebug() << "Replacing link";
-//        s.replace("🔗", ":link:");
-//    }
-//    if (s.contains("⬆️")) {
-//        qDebug() << "Replacing arrow";
-//        s.replace("⬆️", ":arrow_up:");
-//    }
     return s;
 }
 
@@ -351,5 +337,17 @@ inline size_t findNullIndex(uint8_t* data) {
     }
     return index;
 }
+
+namespace FileUtils {
+QString generatePreview(QString video_path, QString video_name) {
+    QString preview_name = video_name.left(video_name.size() - 4) + "-preview.jpg";
+    QString command{
+        "ffmpeg -ss 0 -i " + video_path + " -vf select=\"eq(pict_type\\,I)\" -vframes 1 ./assets/previews/" + preview_name};
+
+    std::system(command.toUtf8());
+
+    return preview_name;
 }
-#endif  // __UTIL_HPP__
+}; // namespace FileUtils
+}
+#endif  // UTIL_HPP

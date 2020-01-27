@@ -24,6 +24,8 @@ ArgDialog::ArgDialog(QWidget *parent) :
         if (file_path.size() > 0) {
             auto slash_index = file_path.lastIndexOf("/") + 1;
             QString file_name = file_path.right(file_path.size() - slash_index);
+            QString dir = file_path.left(slash_index);
+            qDebug() << "Dir is " << dir;
             QMimeDatabase db;
             auto is_video = db.mimeTypeForFile(file_path).name().contains("video");
             addItem(file_name, "file");
@@ -34,6 +36,12 @@ ArgDialog::ArgDialog(QWidget *parent) :
             if (!m_ig_post.is_video && is_video) {
                 qDebug() << "File discovered to be video";
                 m_ig_post.is_video = true; // rename to "sending_video"
+                QString preview_filename = FileUtils::generatePreview(file_path, file_name);
+                // TODO: create some way of verifying preview generation was successful
+                addItem(preview_filename, "file");
+                m_ig_post.files.push_back(KFile{
+                    .name=preview_filename, .path=QCoreApplication::applicationDirPath() + "/assets/previews/" + preview_filename, .type = is_video ? FileType::VIDEO : FileType::IMAGE
+                });
             }
         }
     });

@@ -6,3 +6,8 @@
       min-width: 10em;
       padding: 6px;
 }
+
+QPushButton:hover
+{
+   opacity: 0.7;
+}
