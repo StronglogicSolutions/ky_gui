@@ -76,7 +76,7 @@ void MainWindow::connectClient() {
     QPushButton* send_message_button = this->findChild<QPushButton*>("sendMessage");
     // Handle mouse
     QObject::connect(send_message_button, &QPushButton::clicked, this, [this, send_message_box]() {
-        q_client->sendMessage(send_message_box->toPlainText());
+        q_client->sendMessage(escapeText(send_message_box->toPlainText()));
         send_message_box->clear();
     });
 
