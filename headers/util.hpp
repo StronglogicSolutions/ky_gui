@@ -1,6 +1,6 @@
 ﻿#ifndef UTIL_HPP
 #define UTIL_HPP
-
+#pragma GCC system_header
 #include <string>
 #include <charconv>
 #include <utility>
@@ -64,6 +64,9 @@ static QString escapeText(QString s) {
     }
     if (s.contains("\t")) {
         s.replace("\t", "\\t");
+    }
+    if (s.contains('"')) {
+        s.replace('"', "\\\"");
     }
     return s;
 }
