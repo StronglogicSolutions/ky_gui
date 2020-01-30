@@ -58,17 +58,17 @@ Client::~Client() {
  * @brief Client::handleMessages
  */
 void Client::handleMessages() {
-    uint8_t receive_buffer[2048];
+    uint8_t receive_buffer[MAX_PACKET_SIZE];
     for (;;) {
-        memset(receive_buffer, 0, 2048);
+        memset(receive_buffer, 0, MAX_PACKET_SIZE);
         ssize_t bytes_received = 0;
-        bytes_received = recv(m_client_socket_fd, receive_buffer, 2048 - 2, 0);
-        receive_buffer[2047] = 0;
+        bytes_received = recv(m_client_socket_fd, receive_buffer, MAX_PACKET_SIZE, 0);
         if (bytes_received == 0) { // Finish message loop
             break;
         }
         size_t end_idx = findNullIndex(receive_buffer);
         std::string data_string{receive_buffer, receive_buffer + end_idx};
+        qDebug() << "Received data from KServer: \n" << data_string.c_str();
         StringVec s_v{};
         if (isNewSession(data_string.c_str())) { // Session Start
             m_commands = getArgMap(data_string.c_str());
