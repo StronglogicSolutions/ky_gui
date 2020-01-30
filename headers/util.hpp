@@ -305,7 +305,7 @@ bool isStopOperation(const char* data) {
 bool isNewSession(const char* data) {
     Document d;
     d.Parse(data);
-    if (d.HasMember("message")) {
+    if (d.IsObject() && d.HasMember("message")) {
         return strcmp(d["message"].GetString(), "New Session") == 0;
     }
     return false;
@@ -314,7 +314,7 @@ bool isNewSession(const char* data) {
 bool serverWaitingForFile(const char* data) {
     Document d;
     d.Parse(data);
-    if (d.HasMember("message")) {
+    if (d.IsObject() && d.HasMember("message")) {
         return strcmp(d["message"].GetString(), "File Ready") == 0;
     }
     return false;
