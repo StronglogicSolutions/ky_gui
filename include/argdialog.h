@@ -75,6 +75,7 @@ class ArgDialog : public QDialog {
   void setTaskArguments();
   Ui::ArgDialog *ui;
   void addItem(QString value, QString type);
+  void addFile(QString path);
   Task m_task;
   IGPost m_ig_post;
 };

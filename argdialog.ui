@@ -30,7 +30,7 @@ background-color: rgb(0, 43, 54);</string>
      <height>921</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,2,0,0,1,0,8,1">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0,0,0,3,0">
     <item>
      <widget class="QLabel" name="argDialogTitle">
       <property name="font">
@@ -288,35 +288,75 @@ padding-left: 8px;</string>
      </widget>
     </item>
     <item>
-     <widget class="QTableWidget" name="argList">
-      <property name="styleSheet">
-       <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+     <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,0">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Maximum</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="argList">
+        <property name="styleSheet">
+         <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
 background-color: #2f535f;
 color: rgb(131, 148, 150);
 font-weight: 700;
-</string>
-      </property>
-      <property name="columnCount">
-       <number>2</number>
-      </property>
-      <attribute name="horizontalHeaderCascadingSectionResizes">
-       <bool>false</bool>
-      </attribute>
-      <attribute name="horizontalHeaderMinimumSectionSize">
-       <number>100</number>
-      </attribute>
-      <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>200</number>
-      </attribute>
-      <attribute name="verticalHeaderMinimumSectionSize">
-       <number>100</number>
-      </attribute>
-      <attribute name="verticalHeaderDefaultSectionSize">
-       <number>100</number>
-      </attribute>
-      <column/>
-      <column/>
-     </widget>
+padding-left: 2px;</string>
+        </property>
+        <property name="showGrid">
+         <bool>true</bool>
+        </property>
+        <property name="columnCount">
+         <number>3</number>
+        </property>
+        <attribute name="horizontalHeaderCascadingSectionResizes">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderMinimumSectionSize">
+         <number>100</number>
+        </attribute>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>200</number>
+        </attribute>
+        <attribute name="verticalHeaderMinimumSectionSize">
+         <number>100</number>
+        </attribute>
+        <attribute name="verticalHeaderDefaultSectionSize">
+         <number>100</number>
+        </attribute>
+        <column/>
+        <column/>
+        <column/>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Maximum</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_5">

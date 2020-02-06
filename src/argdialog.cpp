@@ -38,10 +38,14 @@ ArgDialog::ArgDialog(QWidget *parent) :
                 m_ig_post.is_video = true; // rename to "sending_video"
                 QString preview_filename = FileUtils::generatePreview(file_path, file_name);
                 // TODO: create some way of verifying preview generation was successful
+                addFile("assets/previews/" + preview_filename);
                 addItem(preview_filename, "file");
+                addFile("assets/previews/" + preview_filename);
                 m_ig_post.files.push_back(KFile{
                     .name=preview_filename, .path=QCoreApplication::applicationDirPath() + "/assets/previews/" + preview_filename, .type = is_video ? FileType::VIDEO : FileType::IMAGE
                 });
+            } else {
+                addFile(file_path);
             }
         }
     });
@@ -143,7 +147,7 @@ void ArgDialog::setTaskArguments() {
         requested_by += "@" + name + "";
     }
     if (m_ig_post.requested_by.size() > 1) {
-    requested_by.pop_back();
+        requested_by.pop_back();
     }
 
 //    m_task.args.push_back(m_ig_post.file.name.toUtf8().constData());
@@ -164,6 +168,19 @@ void ArgDialog::addItem(QString value, QString type) {
     ui->argList->insertRow(row);
     ui->argList->setItem(row, 0, item);
     ui->argList->setItem(row, 1, item2);
+}
+
+void ArgDialog::addFile(QString path) {
+    auto row_count = ui->argList->rowCount();
+
+    QTableWidgetItem* file_item = new QTableWidgetItem();
+    QPixmap pm{path};
+    file_item->setData(
+        Qt::DecorationRole,
+        pm.scaledToHeight(ui->argList->rowHeight(0), Qt::TransformationMode::SmoothTransformation)
+    );
+    ui->argList->setItem(row_count - 1, 2, file_item);
+
 }
 
 void ArgDialog::clearPost() {
