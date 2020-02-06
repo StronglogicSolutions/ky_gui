@@ -20,6 +20,7 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QVBoxLayout>
@@ -47,7 +48,10 @@ public:
     QLabel *label_5;
     QDateTimeEdit *dateTime;
     QLabel *label;
+    QHBoxLayout *horizontalLayout_6;
+    QSpacerItem *horizontalSpacer;
     QTableWidget *argList;
+    QSpacerItem *horizontalSpacer_2;
     QHBoxLayout *horizontalLayout_5;
     QPushButton *devTestButton;
     QDialogButtonBox *argCommandButtons;
@@ -235,23 +239,37 @@ public:
 
         verticalLayout->addWidget(label, 0, Qt::AlignLeft);
 
+        horizontalLayout_6 = new QHBoxLayout();
+        horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Maximum, QSizePolicy::Minimum);
+
+        horizontalLayout_6->addItem(horizontalSpacer);
+
         argList = new QTableWidget(verticalLayoutWidget);
-        if (argList->columnCount() < 2)
-            argList->setColumnCount(2);
+        if (argList->columnCount() < 3)
+            argList->setColumnCount(3);
         argList->setObjectName(QString::fromUtf8("argList"));
         argList->setStyleSheet(QString::fromUtf8("font: 87 11pt \"Noto Sans\";\n"
 "background-color: #2f535f;\n"
 "color: rgb(131, 148, 150);\n"
 "font-weight: 700;\n"
-""));
-        argList->setColumnCount(2);
+"padding-left: 2px;"));
+        argList->setShowGrid(true);
+        argList->setColumnCount(3);
         argList->horizontalHeader()->setCascadingSectionResizes(false);
         argList->horizontalHeader()->setMinimumSectionSize(100);
         argList->horizontalHeader()->setDefaultSectionSize(200);
         argList->verticalHeader()->setMinimumSectionSize(100);
         argList->verticalHeader()->setDefaultSectionSize(100);
 
-        verticalLayout->addWidget(argList);
+        horizontalLayout_6->addWidget(argList);
+
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Maximum, QSizePolicy::Minimum);
+
+        horizontalLayout_6->addItem(horizontalSpacer_2);
+
+
+        verticalLayout->addLayout(horizontalLayout_6);
 
         horizontalLayout_5 = new QHBoxLayout();
         horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
@@ -301,10 +319,8 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_5);
 
-        verticalLayout->setStretch(2, 2);
-        verticalLayout->setStretch(5, 1);
-        verticalLayout->setStretch(7, 8);
-        verticalLayout->setStretch(8, 1);
+        verticalLayout->setStretch(2, 1);
+        verticalLayout->setStretch(7, 3);
 
         retranslateUi(ArgDialog);
         QObject::connect(argCommandButtons, SIGNAL(accepted()), ArgDialog, SLOT(accept()));

@@ -362,7 +362,7 @@ font-weight: 700;</string>
       </widget>
      </item>
      <item>
-      <widget class="QListWidget" name="eventList">
+      <widget class="QListView" name="eventList">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -393,9 +393,6 @@ font-weight: 700;
        </property>
        <property name="wordWrap">
         <bool>true</bool>
-       </property>
-       <property name="sortingEnabled">
-        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -615,9 +612,21 @@ color: rgb(0, 0, 0);</string>
      <rect>
       <x>10</x>
       <y>50</y>
-      <width>691</width>
-      <height>841</height>
+      <width>0</width>
+      <height>0</height>
      </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
     </property>
     <property name="font">
      <font>
