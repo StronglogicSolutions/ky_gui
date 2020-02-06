@@ -113,6 +113,11 @@ bool isEvent(const char* data) {
     d.Parse(data);
     return strcmp(d["type"].GetString(), "event") == 0;
 }
+
+bool isPong(const char* data) {
+    return strcmp(data, "PONG") == 0;
+}
+
 // TODO: This should be "message", no?
 bool isMessage(const char* data) {
     Document d;
@@ -344,8 +349,11 @@ inline size_t findNullIndex(uint8_t* data) {
 namespace FileUtils {
 QString generatePreview(QString video_path, QString video_name) {
     QString preview_name = video_name.left(video_name.size() - 4) + "-preview.jpg";
-    QString command{
-        "ffmpeg -ss 0 -i " + video_path + " -vf select=\"eq(pict_type\\,I)\" -vframes 1 ./assets/previews/" + preview_name};
+//    QString command{
+//        "ffmpeg -ss 0 -i " + video_path + " -vf select=\"eq(pict_type\\,I)\" -vframes 1 ./assets/previews/" + preview_name};
+    QString command {
+        "ffmpeg -ss 0 -i " + video_path + " -vf \"scale=w=640:h=640:force_original_aspect_ratio=decrease,pad=w=640:h=640:x=(iw-ow)/2:y=(ih-oh/2):color=white\" -vframes 1 ./assets/previews/" + preview_name
+    };
 
     std::system(command.toUtf8());
 
