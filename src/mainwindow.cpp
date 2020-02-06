@@ -36,13 +36,17 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
     arg_ui(new ArgDialog),
     q_client(nullptr) {
     m_process_model = new QStandardItemModel(this);
+    m_event_model = new QStandardItemModel(this);
     q_client = new Client(this, cli_argc, cli_argv);
     ui->setupUi(this);
     this->setWindowTitle("KYGUI");
 
     QPushButton *button = this->findChild<QPushButton*>("connect");
+    button->setMaximumSize(700, 900);
+    button->setMinimumSize(700, 900);
     connect(button, &QPushButton::clicked, this, &MainWindow::connectClient);
-    ui->processList->setModel(m_process_model);   
+    ui->processList->setModel(m_process_model);
+    ui->eventList->setModel(m_event_model);
 }
 
 /**
@@ -117,12 +121,12 @@ void MainWindow::connectClient() {
                 auto datetime = task.args.at(0);
                 auto current_datetime = QDateTime::currentDateTime().toTime_t();
                 auto seconds_diff = std::stoi(datetime) - current_datetime;
-                qDebug() << "Time difference: " << seconds_diff;
-                if (seconds_diff > 3600) {
+//                qDebug() << "Time difference: " << seconds_diff;
+//                if (seconds_diff > 3600) {
                     qDebug() << "Scheduling a task";
                     task.args.push_back(std::to_string(mask));
                     q_client->scheduleTask(task.args, file_pending);
-                }
+//                }
             }
         }
     });
@@ -150,6 +154,15 @@ void MainWindow::connectClient() {
         }
         infoMessageBox(process_info_text, "Process");
     });
+
+    QObject::connect(ui->eventList, &QListView::clicked, this, [this](const QModelIndex &index) {
+        auto event = m_events.at(index.row());
+        infoMessageBox(event, "Event");
+    });
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, q_client, &Client::ping);
+    timer->start(30000);
 }
 
 void MainWindow::handleKey() {
@@ -172,6 +185,10 @@ QString MainWindow::parseMessage(const QString& message, StringVec v) {
 
 QStandardItem* createProcessListItem(Process process) {
     return new QStandardItem(QString("%0 requested for execution. ID: %1\nStatus: %2\nTime: %3   Done: %4").arg(process.name).arg(process.id).arg(ProcessNames[process.state - 1]).arg(process.start).arg(process.end));
+}
+
+QStandardItem* createEventListItem(QString event) {
+    return new QStandardItem(event);
 }
 
 /**
@@ -237,11 +254,7 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
             event_message += message;
         }
         m_events.push_front(event_message);
-        ui->eventList->clear();
-
-        for (const auto& i : Kontainer::ReverseIterator(m_events)) {
-            ui->eventList->addItem(i);
-        }
+        m_event_model->setItem(m_event_model->rowCount(), createEventListItem(event_message));
     } else {
         qDebug() << "Unknown update type. Cannot update UI";
     }

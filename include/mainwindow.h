@@ -13,6 +13,7 @@
 #include <include/argdialog.h>
 #include <include/consoledialog.h>
 #include <QTableView>
+#include <QTimer>
 
 namespace ProcessState {
     static constexpr int READY = 1;
@@ -35,6 +36,8 @@ struct Process {
         return name == other.name && state == other.state;
     }
 };
+
+struct Event {};
 
 namespace Ui {
 class MainWindow;
@@ -64,8 +67,9 @@ private:
     Client* q_client;
     /** Models */
     std::vector<Process> m_processes;
-    QStandardItemModel* m_process_model;
     QList<QString> m_events;
+    QStandardItemModel* m_process_model;
+    QStandardItemModel* m_event_model;
 
 private slots:
     /** Receivers */
