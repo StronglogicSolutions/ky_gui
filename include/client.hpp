@@ -31,6 +31,7 @@ enum TaskType {
 namespace TaskCode {
 static constexpr int IGTASKBYTE = 0xFF;
 static constexpr int GENMSGBYTE = 0xFE;
+static constexpr int PINGBYTE = 0xFD;
 }
 
 typedef std::map<int, std::string> CommandMap;
@@ -79,6 +80,7 @@ public slots:
     void sendMessage(const QString& s);
     void setSelectedApp(std::vector<QString> app_names);
     void sendFiles(QVector<KFileData> files);
+    void ping();
 
 signals:
     void messageReceived(int t, QString s, QVector<QString> args);

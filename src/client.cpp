@@ -69,6 +69,10 @@ void Client::handleMessages() {
         size_t end_idx = findNullIndex(receive_buffer);
         std::string data_string{receive_buffer, receive_buffer + end_idx};
         qDebug() << "Received data from KServer: \n" << data_string.c_str();
+        if (isPong(data_string.c_str())) {
+            qDebug() << "Server returned pong";
+            continue;
+        }
         StringVec s_v{};
         if (isNewSession(data_string.c_str())) { // Session Start
             m_commands = getArgMap(data_string.c_str());
@@ -323,6 +327,16 @@ void Client::sendPackets(uint8_t* data, int size) {
             // cleanup
             qDebug() << "Last packet of file sent";
         }
+    }
+}
+
+void Client::ping() {
+    if (m_client_socket_fd != -1) {
+        uint8_t send_buffer[5];
+        memset(send_buffer, 0, 5);
+        send_buffer[4] = (TaskCode::PINGBYTE & 0xFF);
+        qDebug() << "Pinging server";
+        ::send(m_client_socket_fd, send_buffer, 5, 0);
     }
 }
 
