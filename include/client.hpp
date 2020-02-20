@@ -85,6 +85,7 @@ public slots:
 signals:
     void messageReceived(int t, QString s, QVector<QString> args);
     void eventReceived(int t, std::string event, StringVec args);
+    void startTimer();
 
 private:
     void sendEncoded(std::string message);

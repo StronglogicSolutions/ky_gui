@@ -66,6 +66,10 @@ void Client::handleMessages() {
         if (bytes_received == 0) { // Finish message loop
             break;
         }
+        if (receive_buffer == NULL || receive_buffer[0] == '\0') {
+            qDebug() << "Received null buffer";
+            continue;
+        }
         size_t end_idx = findNullIndex(receive_buffer);
         std::string data_string{receive_buffer, receive_buffer + end_idx};
         qDebug() << "Received data from KServer: \n" << data_string.c_str();
@@ -91,6 +95,7 @@ void Client::handleMessages() {
                     sent_files.at(sent_files.size() - 1).timestamp = std::stoi(args.at(0).toUtf8().constData());
                     if (outgoing_files.isEmpty()) {
                         sendTaskEncoded(TaskType::INSTAGRAM, m_task);
+                        emit Client::startTimer();
                     } else {
                         sendEncoded(createOperation("FileUpload", {"Subsequent file"}));
                     }
@@ -163,9 +168,7 @@ void Client::start() {
  */
 void Client::sendMessage(const QString& s) {
     if (m_client_socket_fd != -1) {
-        std::string json_string {"{\"type\":\"custom\", \"message\": \""};
-        json_string += s.toUtf8().data();
-        json_string += "\", \"args\":\"placeholder\"}";
+        std::string json_string = createMessage(s.toUtf8(), "");
         // Send custom message as an encoded message
         sendEncoded(json_string);
     } else {
@@ -178,7 +181,9 @@ void Client::sendMessage(const QString& s) {
  * @param [in] {std::string message} The message to send
  */
 void Client::sendEncoded(std::string message) {
-    std::vector<uint8_t> fb_byte_vector{message.begin(), message.end()};
+    uint8_t* message_bytes = reinterpret_cast<uint8_t *>(
+        const_cast<char *>(message.c_str()));
+    std::vector<uint8_t> fb_byte_vector{message_bytes, message_bytes + message.size()};
     auto byte_vector = builder.CreateVector(fb_byte_vector);
     auto k_message = CreateMessage(builder, 69, byte_vector);
 
@@ -447,6 +452,7 @@ void Client::sendFiles(QVector<KFileData> files) {
         for (const auto & file : files) {
             outgoing_files.enqueue(file);
         }
+
         std::string send_file_operation = createOperation("FileUpload", {});
         sendEncoded(send_file_operation);
     } else {

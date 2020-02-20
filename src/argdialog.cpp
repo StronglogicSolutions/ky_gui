@@ -33,7 +33,7 @@ ArgDialog::ArgDialog(QWidget *parent) :
                 .name=file_name, .path=file_path, .type = is_video ? FileType::VIDEO : FileType::IMAGE
             });
 
-            if (!m_ig_post.is_video && is_video) {
+            if (is_video) {
                 qDebug() << "File discovered to be video";
                 m_ig_post.is_video = true; // rename to "sending_video"
                 QString preview_filename = FileUtils::generatePreview(file_path, file_name);
@@ -50,9 +50,11 @@ ArgDialog::ArgDialog(QWidget *parent) :
         }
     });
 
-    ui->argList->setHorizontalHeaderLabels(QStringList{"Value", "Type"});
-    ui->argList->setColumnWidth(0, 400);
+    ui->argList->setHorizontalHeaderLabels(QStringList{"Value", "Type", "Preview", "Remove"});
+    ui->argList->setColumnWidth(0, 275);
     ui->argList->setColumnWidth(1, 40);
+    ui->argList->setColumnWidth(2, 30);
+    ui->argList->setColumnWidth(3, 10);
     ui->argList->verticalHeader()->setDefaultSectionSize(100);
 
     QObject::connect(ui->addArgument, &QPushButton::clicked, this, [this]() {
@@ -75,6 +77,21 @@ ArgDialog::ArgDialog(QWidget *parent) :
             }
             ui->argInput->clear();
         }
+    });
+
+    QObject::connect(ui->clear, &QPushButton::clicked, this, [this]() {
+        for (int i = ui->argList->rowCount(); i >= 0; i--) {
+            ui->argList->removeRow(i);
+        }
+        m_task.args.clear();
+        m_task.mask = -1;
+        m_ig_post.files.clear();
+        m_ig_post.datetime = -1;
+        m_ig_post.description = "";
+        m_ig_post.requested_by_phrase= "";
+        m_ig_post.link_in_bio = "";
+        m_ig_post.requested_by.clear();
+        m_ig_post.hashtags.clear();
     });
 
     QDateTime date_time = QDateTime::currentDateTime();
@@ -164,10 +181,30 @@ void ArgDialog::setTaskArguments() {
 void ArgDialog::addItem(QString value, QString type) {
     QTableWidgetItem* item = new QTableWidgetItem(value);
     QTableWidgetItem* item2 = new QTableWidgetItem(type);
+    QPushButton* delete_button = new QPushButton();
+    delete_button->setStyleSheet("QPushButton{ color: transparent}");
+    delete_button->setText(QString{arg_index});
+    QIcon* delete_icon = new QIcon(":/icons/trash.svg");
+    delete_button->setIcon(*delete_icon);
     auto row = ui->argList->rowCount();
     ui->argList->insertRow(row);
     ui->argList->setItem(row, 0, item);
     ui->argList->setItem(row, 1, item2);
+    ui->argList->setCellWidget(row, 3, delete_button);
+    arg_index++;
+
+    QObject::connect(delete_button, &QPushButton::clicked, this, [this, delete_button]() {
+        for (int i = ui->argList->rowCount(); i >= 0; i--) {
+            auto item = ui->argList->item(i, 3);
+            auto text = item->text();
+            qDebug() << "Item has text: " << text;
+//            if (ui->argList->item(i, 3)->text() == delete_button->text()) {
+//                qDebug() << "Deleting arg item: " << delete_button->text();
+//                ui->argList->removeRow(i);
+//                break;
+//            }
+        }
+    });
 }
 
 void ArgDialog::addFile(QString path) {

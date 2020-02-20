@@ -36,7 +36,7 @@ public:
         consoleText->setReadOnly(false);
         consoleTitle = new QLabel(ConsoleDialog);
         consoleTitle->setObjectName(QString::fromUtf8("consoleTitle"));
-        consoleTitle->setGeometry(QRect(300, 20, 51, 18));
+        consoleTitle->setGeometry(QRect(290, 20, 91, 20));
         closeConsole = new QPushButton(ConsoleDialog);
         closeConsole->setObjectName(QString::fromUtf8("closeConsole"));
         closeConsole->setGeometry(QRect(600, 800, 80, 26));

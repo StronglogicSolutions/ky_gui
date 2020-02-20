@@ -66,6 +66,7 @@ void MainWindow::connectClient() {
     qDebug() << "Connecting to KServer";
 
     QObject::connect(q_client, &Client::messageReceived, this, &MainWindow::updateMessages);
+    QObject::connect(q_client, &Client::startTimer, this, &MainWindow::startTimer);
 
     QProgressBar* progressBar = ui->progressBar;
     q_client->start();
@@ -80,6 +81,8 @@ void MainWindow::connectClient() {
     QPushButton* send_message_button = this->findChild<QPushButton*>("sendMessage");
     // Handle mouse
     QObject::connect(send_message_button, &QPushButton::clicked, this, [this, send_message_box]() {
+        QString msg = escapeText(send_message_box->toPlainText());
+        qDebug() << "Sending message: " << msg;
         q_client->sendMessage(escapeText(send_message_box->toPlainText()));
         send_message_box->clear();
     });
@@ -110,6 +113,7 @@ void MainWindow::connectClient() {
     });
 
     QObject::connect(arg_ui, &ArgDialog::uploadFiles, this, [this](QVector<KFileData> files) {
+        m_timer->stop();
         q_client->sendFiles(files);
     });
 
@@ -160,9 +164,9 @@ void MainWindow::connectClient() {
         infoMessageBox(event, "Event");
     });
 
-    QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, q_client, &Client::ping);
-    timer->start(30000);
+    m_timer = new QTimer(this);
+    connect(m_timer, &QTimer::timeout, q_client, &Client::ping);
+    m_timer->start(30000);
 }
 
 void MainWindow::handleKey() {
@@ -253,10 +257,16 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
         } else {
             event_message += message;
         }
-        m_events.push_front(event_message);
+        m_events.push_back(event_message);
         m_event_model->setItem(m_event_model->rowCount(), createEventListItem(event_message));
     } else {
         qDebug() << "Unknown update type. Cannot update UI";
+    }
+}
+
+void MainWindow::startTimer() {
+    if (m_timer != nullptr) {
+        m_timer->start(30000);
     }
 }
 

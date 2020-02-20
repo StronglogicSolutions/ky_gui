@@ -318,7 +318,7 @@ padding-left: 2px;</string>
          <bool>true</bool>
         </property>
         <property name="columnCount">
-         <number>3</number>
+         <number>4</number>
         </property>
         <attribute name="horizontalHeaderCascadingSectionResizes">
          <bool>false</bool>
@@ -338,23 +338,28 @@ padding-left: 2px;</string>
         <column/>
         <column/>
         <column/>
+        <column/>
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Maximum</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Maximum</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -378,6 +383,30 @@ padding: 4px;</string>
         </property>
         <property name="text">
          <string>DEV TEST</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="clear">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(255, 85, 0);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 43, 54);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+        </property>
+        <property name="text">
+         <string>Clear</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/erase.png</normaloff>icons/erase.png</iconset>
         </property>
        </widget>
       </item>

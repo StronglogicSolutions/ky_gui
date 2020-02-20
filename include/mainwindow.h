@@ -70,12 +70,15 @@ private:
     QList<QString> m_events;
     QStandardItemModel* m_process_model;
     QStandardItemModel* m_event_model;
+    /** Utilities */
+    QTimer* m_timer;
 
 private slots:
     /** Receivers */
     void connectClient();
     void updateMessages(int t, const QString& s, StringVec v);
     void handleKey();
+    void startTimer();
 };
 
 
