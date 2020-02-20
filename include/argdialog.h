@@ -3,7 +3,6 @@
 
 #include <QDialog>
 #include <QFile>
-#include <QIcon>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPushButton>
@@ -79,7 +78,6 @@ class ArgDialog : public QDialog {
   void addFile(QString path);
   Task m_task;
   IGPost m_ig_post;
-  int arg_index;
 };
 
 #endif  // ARGDIALOG_H

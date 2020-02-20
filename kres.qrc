@@ -12,6 +12,5 @@
         <file>icons/disconnect.png</file>
         <file>style/style.css</file>
         <file>style/messagebox.css</file>
-        <file>icons/trash.svg</file>
     </qresource>
 </RCC>

@@ -51,11 +51,9 @@ public:
     QHBoxLayout *horizontalLayout_6;
     QSpacerItem *horizontalSpacer;
     QTableWidget *argList;
-    QVBoxLayout *verticalLayout_2;
     QSpacerItem *horizontalSpacer_2;
     QHBoxLayout *horizontalLayout_5;
     QPushButton *devTestButton;
-    QPushButton *clear;
     QDialogButtonBox *argCommandButtons;
 
     void setupUi(QDialog *ArgDialog)
@@ -248,8 +246,8 @@ public:
         horizontalLayout_6->addItem(horizontalSpacer);
 
         argList = new QTableWidget(verticalLayoutWidget);
-        if (argList->columnCount() < 4)
-            argList->setColumnCount(4);
+        if (argList->columnCount() < 3)
+            argList->setColumnCount(3);
         argList->setObjectName(QString::fromUtf8("argList"));
         argList->setStyleSheet(QString::fromUtf8("font: 87 11pt \"Noto Sans\";\n"
 "background-color: #2f535f;\n"
@@ -257,7 +255,7 @@ public:
 "font-weight: 700;\n"
 "padding-left: 2px;"));
         argList->setShowGrid(true);
-        argList->setColumnCount(4);
+        argList->setColumnCount(3);
         argList->horizontalHeader()->setCascadingSectionResizes(false);
         argList->horizontalHeader()->setMinimumSectionSize(100);
         argList->horizontalHeader()->setDefaultSectionSize(200);
@@ -266,14 +264,9 @@ public:
 
         horizontalLayout_6->addWidget(argList);
 
-        verticalLayout_2 = new QVBoxLayout();
-        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Maximum, QSizePolicy::Minimum);
 
-        verticalLayout_2->addItem(horizontalSpacer_2);
-
-
-        horizontalLayout_6->addLayout(verticalLayout_2);
+        horizontalLayout_6->addItem(horizontalSpacer_2);
 
 
         verticalLayout->addLayout(horizontalLayout_6);
@@ -296,25 +289,6 @@ public:
 "padding: 4px;"));
 
         horizontalLayout_5->addWidget(devTestButton);
-
-        clear = new QPushButton(verticalLayoutWidget);
-        clear->setObjectName(QString::fromUtf8("clear"));
-        clear->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 85, 0);\n"
-"font: 87 11pt \"Noto Sans\";\n"
-"color: rgb(0, 43, 54);\n"
-"font-weight: 700;\n"
-"padding: 4px;\n"
-"border-style: outset;\n"
-"border-width: 2px;\n"
-"border-radius: 4px;\n"
-"border-color: #00000f;\n"
-"min-width: 4em;\n"
-"padding: 4px;"));
-        QIcon icon1;
-        icon1.addFile(QString::fromUtf8("icons/erase.png"), QSize(), QIcon::Normal, QIcon::Off);
-        clear->setIcon(icon1);
-
-        horizontalLayout_5->addWidget(clear);
 
         argCommandButtons = new QDialogButtonBox(verticalLayoutWidget);
         argCommandButtons->setObjectName(QString::fromUtf8("argCommandButtons"));
@@ -373,7 +347,6 @@ public:
         label_5->setText(QCoreApplication::translate("ArgDialog", "Time", nullptr));
         label->setText(QCoreApplication::translate("ArgDialog", "Items to send", nullptr));
         devTestButton->setText(QCoreApplication::translate("ArgDialog", "DEV TEST", nullptr));
-        clear->setText(QCoreApplication::translate("ArgDialog", "Clear", nullptr));
     } // retranslateUi
 
 };

@@ -57,7 +57,7 @@ struct KSession {
 };
 
 static QString escapeText(QString s) {
-    qDebug() << "Escaping text: " << s;
+    qDebug() << "Escaping text";
     if (s.contains("'")) {
         qDebug() << "Replacing single quote";
         s.replace("'", "'\"'\"'");
@@ -68,7 +68,6 @@ static QString escapeText(QString s) {
     if (s.contains('"')) {
         s.replace('"', "\\\"");
     }
-    qDebug() << "Result escaped text: " << s;
     return s;
 }
 
@@ -110,13 +109,9 @@ bool isUploadCompleteEvent(const char* event) {
 }
 
 bool isEvent(const char* data) {
-    if (data != NULL && data[0] != '\0') {
-        Document d;
-        d.Parse(data);
-        if (d.HasMember("type")) {
-            return strcmp(d["type"].GetString(), "event") == 0;
-        }
-    }
+    Document d;
+    d.Parse(data);
+    return strcmp(d["type"].GetString(), "event") == 0;
 }
 
 bool isPong(const char* data) {
@@ -357,7 +352,7 @@ QString generatePreview(QString video_path, QString video_name) {
 //    QString command{
 //        "ffmpeg -ss 0 -i " + video_path + " -vf select=\"eq(pict_type\\,I)\" -vframes 1 ./assets/previews/" + preview_name};
     QString command {
-        "ffmpeg -y -ss 0 -i " + video_path + " -vf \"scale=w=640:h=640:force_original_aspect_ratio=decrease,pad=w=640:h=640:x=(iw-ow)/2:y=(ih-oh/2):color=white\" -vframes 1 ./assets/previews/" + preview_name
+        "ffmpeg -ss 0 -i " + video_path + " -vf \"scale=w=640:h=640:force_original_aspect_ratio=decrease,pad=w=640:h=640:x=(iw-ow)/2:y=(ih-oh/2):color=white\" -vframes 1 ./assets/previews/" + preview_name
     };
 
     std::system(command.toUtf8());
