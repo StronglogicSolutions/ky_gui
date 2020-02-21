@@ -27,7 +27,7 @@ background-color: rgb(0, 43, 54);</string>
      <x>10</x>
      <y>10</y>
      <width>701</width>
-     <height>651</height>
+     <height>591</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0,0,0">
@@ -261,7 +261,7 @@ font-weight: 700;
         <property name="minimumSize">
          <size>
           <width>380</width>
-          <height>0</height>
+          <height>38</height>
          </size>
         </property>
         <property name="styleSheet">
@@ -345,7 +345,7 @@ padding: 4px;</string>
      <x>710</x>
      <y>10</y>
      <width>641</width>
-     <height>651</height>
+     <height>591</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">

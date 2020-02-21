@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'argdialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.13.0
+** Created by: Qt User Interface Compiler version 5.14.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -70,7 +70,7 @@ public:
 "background-color: rgb(0, 43, 54);"));
         verticalLayoutWidget = new QWidget(ArgDialog);
         verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
-        verticalLayoutWidget->setGeometry(QRect(10, 10, 701, 651));
+        verticalLayoutWidget->setGeometry(QRect(10, 10, 701, 591));
         verticalLayout = new QVBoxLayout(verticalLayoutWidget);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
@@ -221,7 +221,7 @@ public:
         dateTime->setObjectName(QString::fromUtf8("dateTime"));
         sizePolicy1.setHeightForWidth(dateTime->sizePolicy().hasHeightForWidth());
         dateTime->setSizePolicy(sizePolicy1);
-        dateTime->setMinimumSize(QSize(380, 0));
+        dateTime->setMinimumSize(QSize(380, 38));
         dateTime->setStyleSheet(QString::fromUtf8("background-color: #00000f;\n"
 "color: #2f535f;\n"
 "font-weight: 700;\n"
@@ -283,7 +283,7 @@ public:
         verticalLayout->setStretch(2, 1);
         verticalLayoutWidget_2 = new QWidget(ArgDialog);
         verticalLayoutWidget_2->setObjectName(QString::fromUtf8("verticalLayoutWidget_2"));
-        verticalLayoutWidget_2->setGeometry(QRect(710, 10, 641, 651));
+        verticalLayoutWidget_2->setGeometry(QRect(710, 10, 641, 591));
         verticalLayout_2 = new QVBoxLayout(verticalLayoutWidget_2);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
