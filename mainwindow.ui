@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>724</width>
-    <height>948</height>
+    <width>1366</width>
+    <height>810</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -35,7 +35,7 @@ QPushButton::hover:
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>280</x>
+      <x>450</x>
       <y>10</y>
       <width>161</width>
       <height>31</height>
@@ -54,13 +54,13 @@ QPushButton::hover:
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>10</x>
       <y>50</y>
-      <width>681</width>
-      <height>870</height>
+      <width>721</width>
+      <height>691</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0,0,0,0">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0,0">
      <property name="spacing">
       <number>4</number>
      </property>
@@ -73,7 +73,7 @@ QPushButton::hover:
         <number>0</number>
        </property>
        <item row="0" column="0">
-        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="2,2,1,0,2,0">
+        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,2">
          <property name="spacing">
           <number>4</number>
          </property>
@@ -211,103 +211,6 @@ padding: 4px;</string>
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0">
-           <property name="spacing">
-            <number>4</number>
-           </property>
-           <item>
-            <layout class="QVBoxLayout" name="verticalLayout_3">
-             <property name="spacing">
-              <number>4</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="messagesTitle">
-               <property name="styleSheet">
-                <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
-color: rgb(131, 148, 150);
-font-weight: 700;</string>
-               </property>
-               <property name="text">
-                <string>History</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QTextEdit" name="messages">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="toolTip">
-                <string>Messages</string>
-               </property>
-               <property name="toolTipDuration">
-                <number>1</number>
-               </property>
-               <property name="autoFillBackground">
-                <bool>false</bool>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-background-color: #2f535f;
-color: rgb(131, 148, 150);
-font-weight: 700;
-</string>
-               </property>
-               <property name="lineWrapMode">
-                <enum>QTextEdit::WidgetWidth</enum>
-               </property>
-               <property name="readOnly">
-                <bool>true</bool>
-               </property>
-               <property name="placeholderText">
-                <string notr="true"/>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <widget class="QPushButton" name="viewConsole">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="autoFillBackground">
-              <bool>false</bool>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">background-color: #c41900;
-font: 87 11pt &quot;Noto Sans&quot;;
-color: rgb(0, 0, 0);
-font-weight: 700;
-padding: 4px;
-border-style: outset;
-border-width: 2px;
-border-radius: 4px;
-border-color: #00000f;
-min-width: 4em;
-padding: 4px;</string>
-             </property>
-             <property name="text">
-              <string>Console</string>
-             </property>
-             <property name="icon">
-              <iconset resource="kres.qrc">
-               <normaloff>:/icons/log.png</normaloff>:/icons/log.png</iconset>
-             </property>
-             <property name="flat">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
           <widget class="QLabel" name="processListTitle">
            <property name="styleSheet">
             <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
@@ -397,177 +300,6 @@ font-weight: 700;
       </widget>
      </item>
      <item>
-      <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,0" columnstretch="0">
-       <property name="sizeConstraint">
-        <enum>QLayout::SetMinimumSize</enum>
-       </property>
-       <property name="spacing">
-        <number>4</number>
-       </property>
-       <item row="2" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="spacing">
-          <number>4</number>
-         </property>
-        </layout>
-       </item>
-       <item row="1" column="0">
-        <widget class="QTextEdit" name="inputText">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-background-color: #2f535f;
-color: rgb(131, 148, 150);
-font-weight: 700;
-</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="inputTitle">
-         <property name="styleSheet">
-          <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
-color: rgb(131, 148, 150);
-font-weight: 700;</string>
-         </property>
-         <property name="text">
-          <string>Input</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <property name="spacing">
-        <number>4</number>
-       </property>
-       <item>
-        <widget class="QPushButton" name="disconnect">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-color: rgb(0, 0, 0);
-background-color: rgb(255, 0, 4);
-font-weight: 700;
-padding: 4px;
-border-style: outset;
-border-width: 2px;
-border-radius: 4px;
-border-color: #00000f;
-min-width: 4em;
-padding: 4px;</string>
-         </property>
-         <property name="text">
-          <string>Disconnect</string>
-         </property>
-         <property name="icon">
-          <iconset resource="kres.qrc">
-           <normaloff>:/icons/disconnect.png</normaloff>:/icons/disconnect.png</iconset>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="tasks">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">background-color: rgb(255, 85, 0);
-font: 87 11pt &quot;Noto Sans&quot;;
-color: rgb(0, 43, 54);
-font-weight: 700;
-padding: 4px;
-border-style: outset;
-border-width: 2px;
-border-radius: 4px;
-border-color: #00000f;
-min-width: 4em;
-padding: 4px;</string>
-         </property>
-         <property name="text">
-          <string>Tasks</string>
-         </property>
-         <property name="icon">
-          <iconset resource="kres.qrc">
-           <normaloff>:/icons/icons/task.png</normaloff>:/icons/icons/task.png</iconset>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="sendMessage">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">background-color: rgb(130, 255, 121);
-background-color: rgb(2, 180, 43);
-font: 87 11pt &quot;Noto Sans&quot;;
-color: rgb(0, 0, 0);
-font-weight: 700;
-padding: 4px;
-border-style: outset;
-border-width: 2px;
-border-radius: 4px;
-border-color: #00000f;
-min-width: 4em;
-padding: 4px;</string>
-         </property>
-         <property name="text">
-          <string>Send</string>
-         </property>
-         <property name="icon">
-          <iconset resource="kres.qrc">
-           <normaloff>:/icons/send-button.png</normaloff>:/icons/send-button.png</iconset>
-         </property>
-         <property name="checkable">
-          <bool>false</bool>
-         </property>
-         <property name="autoDefault">
-          <bool>false</bool>
-         </property>
-         <property name="default">
-          <bool>false</bool>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
       <layout class="QHBoxLayout" name="horizontalLayout_5">
        <property name="spacing">
         <number>4</number>
@@ -597,8 +329,8 @@ color: rgb(0, 0, 0);</string>
    <widget class="ConnectionIndicator" name="led">
     <property name="geometry">
      <rect>
-      <x>540</x>
-      <y>30</y>
+      <x>830</x>
+      <y>110</y>
       <width>40</width>
       <height>20</height>
      </rect>
@@ -610,16 +342,16 @@ color: rgb(0, 0, 0);</string>
    <widget class="QPushButton" name="connect">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>50</y>
-      <width>0</width>
-      <height>0</height>
+      <x>0</x>
+      <y>0</y>
+      <width>79</width>
+      <height>79</height>
      </rect>
     </property>
     <property name="minimumSize">
      <size>
-      <width>0</width>
-      <height>0</height>
+      <width>79</width>
+      <height>79</height>
      </size>
     </property>
     <property name="maximumSize">
@@ -672,13 +404,307 @@ opacity: 0.3;</string>
      <bool>false</bool>
     </property>
    </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>730</x>
+      <y>50</y>
+      <width>621</width>
+      <height>691</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0">
+       <property name="spacing">
+        <number>4</number>
+       </property>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,3">
+         <property name="spacing">
+          <number>3</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="messagesTitle">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(131, 148, 150);
+font-weight: 700;</string>
+           </property>
+           <property name="text">
+            <string>History</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QTextEdit" name="messages">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>Messages</string>
+           </property>
+           <property name="toolTipDuration">
+            <number>1</number>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: #2f535f;
+color: rgb(131, 148, 150);
+font-weight: 700;
+</string>
+           </property>
+           <property name="lineWrapMode">
+            <enum>QTextEdit::WidgetWidth</enum>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="placeholderText">
+            <string notr="true"/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,0,0" columnstretch="0">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMinimumSize</enum>
+       </property>
+       <property name="spacing">
+        <number>4</number>
+       </property>
+       <item row="2" column="0">
+        <widget class="QTextEdit" name="inputText">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: #2f535f;
+color: rgb(131, 148, 150);
+font-weight: 700;
+</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>4</number>
+         </property>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <property name="spacing">
+            <number>4</number>
+           </property>
+           <item>
+            <widget class="QPushButton" name="disconnect">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="autoFillBackground">
+              <bool>false</bool>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);
+background-color: rgb(255, 0, 4);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+             </property>
+             <property name="text">
+              <string>Disconnect</string>
+             </property>
+             <property name="icon">
+              <iconset resource="kres.qrc">
+               <normaloff>:/icons/disconnect.png</normaloff>:/icons/disconnect.png</iconset>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="viewConsole">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="autoFillBackground">
+              <bool>false</bool>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: #c41900;
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+             </property>
+             <property name="text">
+              <string>Console</string>
+             </property>
+             <property name="icon">
+              <iconset resource="kres.qrc">
+               <normaloff>:/icons/log.png</normaloff>:/icons/log.png</iconset>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="tasks">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="autoFillBackground">
+              <bool>false</bool>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(255, 85, 0);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 43, 54);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+             </property>
+             <property name="text">
+              <string>Tasks</string>
+             </property>
+             <property name="icon">
+              <iconset resource="kres.qrc">
+               <normaloff>:/icons/icons/task.png</normaloff>:/icons/icons/task.png</iconset>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="sendMessage">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="autoFillBackground">
+              <bool>false</bool>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(130, 255, 121);
+background-color: rgb(2, 180, 43);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+             </property>
+             <property name="text">
+              <string>Send</string>
+             </property>
+             <property name="icon">
+              <iconset resource="kres.qrc">
+               <normaloff>:/icons/send-button.png</normaloff>:/icons/send-button.png</iconset>
+             </property>
+             <property name="checkable">
+              <bool>false</bool>
+             </property>
+             <property name="autoDefault">
+              <bool>false</bool>
+             </property>
+             <property name="default">
+              <bool>false</bool>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="inputTitle">
+         <property name="styleSheet">
+          <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(131, 148, 150);
+font-weight: 700;</string>
+         </property>
+         <property name="text">
+          <string>Input</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <zorder>label</zorder>
+   <zorder>verticalLayoutWidget</zorder>
+   <zorder>led</zorder>
+   <zorder>verticalLayoutWidget_2</zorder>
+   <zorder>connect</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>724</width>
+     <width>1366</width>
      <height>23</height>
     </rect>
    </property>

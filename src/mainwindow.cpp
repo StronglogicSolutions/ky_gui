@@ -42,8 +42,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
     this->setWindowTitle("KYGUI");
 
     QPushButton *button = this->findChild<QPushButton*>("connect");
-    button->setMaximumSize(700, 900);
-    button->setMinimumSize(700, 900);
+    button->setMaximumSize(1366, 768);
+    button->setMinimumSize(1366, 768);
     connect(button, &QPushButton::clicked, this, &MainWindow::connectClient);
     ui->processList->setModel(m_process_model);
     ui->eventList->setModel(m_event_model);

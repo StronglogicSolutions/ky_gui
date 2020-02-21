@@ -51,7 +51,7 @@ ArgDialog::ArgDialog(QWidget *parent) :
     });
 
     ui->argList->setHorizontalHeaderLabels(QStringList{"Value", "Type"});
-    ui->argList->setColumnWidth(0, 400);
+    ui->argList->setColumnWidth(0, 300);
     ui->argList->setColumnWidth(1, 40);
     ui->argList->verticalHeader()->setDefaultSectionSize(100);
 
