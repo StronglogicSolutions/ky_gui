@@ -275,6 +275,7 @@ void Client::sendTaskEncoded(TaskType type, std::vector<std::string> args) {
         // Send start operation
         ::send(m_client_socket_fd, send_buffer, size + 5, 0);
         builder.Clear();
+        sent_files.clear();
     }
 }
 
