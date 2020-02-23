@@ -8,9 +8,11 @@
 #include <QPushButton>
 #include <string_view>
 #include <unordered_map>
+#include <QKeyEvent>
 #include <headers/util.hpp>
 
 namespace Args {
+const QString HEADER_TYPE = "header";
 const QString DESCRIPTION_TYPE = "description";
 const QString HASHTAG_TYPE = "hashtag";
 const QString PROMOTE_TYPE = "promote/share";
@@ -32,18 +34,18 @@ typedef struct KFile {
 } KFile;
 
 typedef struct IGPost {
+  std::string header = "Learn to speak like native Korean speakers 🙆‍♀️🇰🇷";
   std::string description;
   std::string datetime;
-  std::string promote_share = "Promote share";
-//  std::string link_in_bio = u8"Download a FREE PDF of basic 245 verbs (link 🔗 in bio 👆)";
-  std::string link_in_bio = "Link inbio";
+  std::string promote_share = "Share the post through IG story if you enjoy the phrase 🙋‍♀️";
+  std::string link_in_bio = "Subscribe to my YouTube channel (link 🔗in bio) to learn more about Korean language and culture ❤";
   std::vector<std::string> hashtags;
   std::vector<std::string> requested_by;
   const char *requested_by_phrase = "The phrase was requested by ";
   std::vector<KFile> files;
   bool is_video;
   bool isReady() {
-    return description.size() > 0 && datetime.size() > 0 &&
+      return header.size() > 0 && description.size() > 0 && datetime.size() > 0 &&
            promote_share.size() > 0 && link_in_bio.size() > 0 &&
              hashtags.size() > 0 && requested_by.size() > 0 && !files.empty() &&
              files.at(0).path.size() > 0;
@@ -59,6 +61,7 @@ class ArgDialog : public QDialog {
 
  public:
   explicit ArgDialog(QWidget *parent = nullptr);
+  virtual void keyPressEvent(QKeyEvent* e);
   ~ArgDialog();
 
  signals:
@@ -67,6 +70,7 @@ class ArgDialog : public QDialog {
 
  private:
   void clearPost();
+  void defaultPost();
   void clearTask();
   void addToArgList(QString value, QString type);
   void addOrReplaceInArgList(QString value, QString type);

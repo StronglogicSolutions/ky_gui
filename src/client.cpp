@@ -235,7 +235,7 @@ std::string getTaskFileInfo(std::vector<SentFile> files) {
  */
 void Client::sendTaskEncoded(TaskType type, std::vector<std::string> args) {
     if (type == TaskType::INSTAGRAM) {
-        if (args.size() < 6) {
+        if (args.size() < 7) {
             qDebug() << "Not enough arguments to send an IGTask";
             return;
         }
@@ -248,8 +248,9 @@ void Client::sendTaskEncoded(TaskType type, std::vector<std::string> args) {
         auto promote_share = builder.CreateString(args.at(5).c_str(), args.at(5).size());
         auto link_bio = builder.CreateString(args.at(6).c_str(), args.at(6).size());
         auto is_video = args.at(7) == "1";
+        auto header = builder.CreateString(args.at(8).c_str(), args.at(8).size());
 
-        flatbuffers::Offset<IGTask> ig_task = CreateIGTask(builder, 96, file_info, time, description, hashtags, requested_by, requested_by_phrase, promote_share, link_bio, is_video, 16);
+        flatbuffers::Offset<IGTask> ig_task = CreateIGTask(builder, 96, file_info, time, description, hashtags, requested_by, requested_by_phrase, promote_share, link_bio, is_video, 16, header);
 
         builder.Finish(ig_task);
 
