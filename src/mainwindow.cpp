@@ -231,7 +231,10 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
                 if (message == "Process Result") {
                     event_message += "\n";
                     auto app_name = q_client->getAppName(std::stoi(v.at(0).toUtf8().constData()));
-                    if (v.at(1).length() > 0) {
+                    auto process_it = std::find_if(m_processes.begin(), m_processes.end(), [v](const Process& process) {
+                        return process.id == v.at(1);
+                    });
+                    if (process_it != m_processes.end()) {
                         updateProcessResult(v.at(1), v.at(2));
                     } else { // new process, from scheduled task
                         Process new_process{ .name=app_name, .state=ProcessState::SUCCEEDED, .start=getTime(), .id="Scheduled task" };
@@ -270,6 +273,7 @@ void MainWindow::updateProcessResult(QString id, QString result) { // We need to
             return;
         }
     }
+    // If we didn't return, it's a new process:
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *e) {
