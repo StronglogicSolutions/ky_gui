@@ -10,7 +10,6 @@ int main(int argc, char **argv)
 
     int code = 0;
 
-
     do {
         MainWindow w(argc, argv);
         w.show();
