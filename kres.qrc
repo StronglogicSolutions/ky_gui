@@ -5,12 +5,13 @@
         <file>icons/task.png</file>
         <file>icons/execute.png</file>
         <file>icons/arguments.png</file>
+        <file>icons/quit.png</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/log.png</file>
         <file>icons/send-button.png</file>
         <file>icons/disconnect.png</file>
-        <file>style/style.qss</file>
+        <file>style/style.css</file>
         <file>style/messagebox.css</file>
     </qresource>
 </RCC>

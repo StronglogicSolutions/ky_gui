@@ -1,18 +1,20 @@
 ﻿#ifndef UTIL_HPP
 #define UTIL_HPP
-
+#pragma GCC system_header
 #include <string>
 #include <charconv>
 #include <utility>
 #include <vector>
 #include <QDebug>
 #include <QVector>
+#include <QString>
 #include "rapidjson/writer.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/pointer.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/document.h"
 #include "json.hpp"
+
 
 namespace Kontainer {
 /** Reverse Iterator */
@@ -25,6 +27,17 @@ public:
     auto end() {return _obj.rend();}
 };
 }
+
+enum FileType {
+    VIDEO = 1,
+    IMAGE = 2
+};
+
+struct KFileData {
+    FileType type;
+    QString name;
+    QByteArray bytes;
+};
 
 namespace {
 using namespace rapidjson;
@@ -52,22 +65,9 @@ static QString escapeText(QString s) {
     if (s.contains("\t")) {
         s.replace("\t", "\\t");
     }
-//    if (s.contains("🙋‍♀️")) {
-//        qDebug() << "Replacing woman raising hand emoji";
-//        s.replace("🙋‍♀️", ":woman raising hand:");
-//    }
-//    if (s.contains("❤️")) {
-//        qDebug() << "Replacing heart";
-//        s.replace("❤️", ":heart:");
-//    }
-//    if (s.contains("🔗")) {
-//        qDebug() << "Replacing link";
-//        s.replace("🔗", ":link:");
-//    }
-//    if (s.contains("⬆️")) {
-//        qDebug() << "Replacing arrow";
-//        s.replace("⬆️", ":arrow_up:");
-//    }
+    if (s.contains('"')) {
+        s.replace('"', "\\\"");
+    }
     return s;
 }
 
@@ -113,6 +113,11 @@ bool isEvent(const char* data) {
     d.Parse(data);
     return strcmp(d["type"].GetString(), "event") == 0;
 }
+
+bool isPong(const char* data) {
+    return strcmp(data, "PONG") == 0;
+}
+
 // TODO: This should be "message", no?
 bool isMessage(const char* data) {
     Document d;
@@ -305,7 +310,7 @@ bool isStopOperation(const char* data) {
 bool isNewSession(const char* data) {
     Document d;
     d.Parse(data);
-    if (d.HasMember("message")) {
+    if (d.IsObject() && d.HasMember("message")) {
         return strcmp(d["message"].GetString(), "New Session") == 0;
     }
     return false;
@@ -314,7 +319,7 @@ bool isNewSession(const char* data) {
 bool serverWaitingForFile(const char* data) {
     Document d;
     d.Parse(data);
-    if (d.HasMember("message")) {
+    if (d.IsObject() && d.HasMember("message")) {
         return strcmp(d["message"].GetString(), "File Ready") == 0;
     }
     return false;
@@ -340,5 +345,20 @@ inline size_t findNullIndex(uint8_t* data) {
     }
     return index;
 }
+
+namespace FileUtils {
+QString generatePreview(QString video_path, QString video_name) {
+    QString preview_name = video_name.left(video_name.size() - 4) + "-preview.jpg";
+//    QString command{
+//        "ffmpeg -ss 0 -i " + video_path + " -vf select=\"eq(pict_type\\,I)\" -vframes 1 ./assets/previews/" + preview_name};
+    QString command {
+        "ffmpeg -y -ss 0 -i " + video_path + " -vf \"scale=w=640:h=640:force_original_aspect_ratio=decrease,pad=w=640:h=640:x=(iw-ow)/2:y=(ih-oh/2):color=white\" -vframes 1 ./assets/previews/" + preview_name
+    };
+
+    std::system(command.toUtf8());
+
+    return preview_name;
 }
-#endif  // __UTIL_HPP__
+}; // namespace FileUtils
+}
+#endif  // UTIL_HPP

@@ -16,12 +16,10 @@
 #define FLATBUFFERS_DEBUG_VERIFICATION_FAILURE
 #include <headers/kmessage_codec.hpp>
 #include <headers/instatask_generated.h>
-#include <headers/util.hpp>
 
 using namespace KData;
 using namespace IGData;
 
-static const int MAX_BUFFER_SIZE = 2048;
 static const int MAX_PACKET_SIZE = 4096;
 static const int HEADER_SIZE = 4;
 
@@ -29,8 +27,8 @@ flatbuffers::FlatBufferBuilder builder(1024);
 
 /**
  * @brief Client::createMessageHandler
- * @param cb
- * @return
+ * @param [in] {std::function<void()>} cb A non-returning function to be called without parameter
+ * @returns {MessageHandler} A message loop handler
  */
 Client::MessageHandler Client::createMessageHandler(
     std::function<void()> cb) {
@@ -40,9 +38,9 @@ Client::MessageHandler Client::createMessageHandler(
 /**
  * @brief Client::Client
  * @constructor
- * @param parent
- * @param count
- * @param arguments
+ * @param [in] {QWidget*} parent
+ * @param [in] {int} count
+ * @param [in] {char**} arguments
  */
 Client::Client(QWidget *parent, int count, char** arguments) : QDialog(parent), argc(count), argv(arguments), m_client_socket_fd(-1), m_commands({}), executing(false) {
     qRegisterMetaType<QVector<QString>>("QVector<QString>");
@@ -60,33 +58,43 @@ Client::~Client() {
  * @brief Client::handleMessages
  */
 void Client::handleMessages() {
-    uint8_t receive_buffer[2048];
+    uint8_t receive_buffer[MAX_PACKET_SIZE];
     for (;;) {
-        memset(receive_buffer, 0, 2048);
+        memset(receive_buffer, 0, MAX_PACKET_SIZE);
         ssize_t bytes_received = 0;
-        bytes_received = recv(m_client_socket_fd, receive_buffer, 2048 - 2, 0);
-        receive_buffer[2047] = 0;
-        if (bytes_received == 0) {
+        bytes_received = recv(m_client_socket_fd, receive_buffer, MAX_PACKET_SIZE, 0);
+        if (bytes_received == 0) { // Finish message loop
             break;
         }
         size_t end_idx = findNullIndex(receive_buffer);
         std::string data_string{receive_buffer, receive_buffer + end_idx};
+        qDebug() << "Received data from KServer: \n" << data_string.c_str();
+        if (isPong(data_string.c_str())) {
+            qDebug() << "Server returned pong";
+            continue;
+        }
         StringVec s_v{};
-        if (isNewSession(data_string.c_str())) {
+        if (isNewSession(data_string.c_str())) { // Session Start
             m_commands = getArgMap(data_string.c_str());
-            for (const auto& [k, v] : m_commands) {
+            for (const auto& [k, v] : m_commands) { // Receive available commands
                 s_v.push_back(v.data());
             }
-            emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", s_v);
-        } else if (serverWaitingForFile(data_string.c_str())) {
-            sendFileEncoded(outgoing_file);
-        } else if (isEvent(data_string.c_str())) {
+            emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", s_v); // Update UI
+        } else if (serverWaitingForFile(data_string.c_str())) { // Server expects a file
+            processFileQueue();
+        } else if (isEvent(data_string.c_str())) { // Receiving event
             QString event = getEvent(data_string.c_str());
             QVector<QString> args = getArgs(data_string.c_str());
-            emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args);
-            if (isUploadCompleteEvent(event.toUtf8().constData())) {
-                outgoing_file.clear();
-                sendTaskEncoded(TaskType::INSTAGRAM, m_task);
+            emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args); // Update UI (event)
+            if (isUploadCompleteEvent(event.toUtf8().constData())) { // Upload complete
+                if (!args.isEmpty()) {
+                    sent_files.at(sent_files.size() - 1).timestamp = std::stoi(args.at(0).toUtf8().constData());
+                    if (outgoing_files.isEmpty()) {
+                        sendTaskEncoded(TaskType::INSTAGRAM, m_task);
+                    } else {
+                        sendEncoded(createOperation("FileUpload", {"Subsequent file"}));
+                    }
+                }
             }
         }
         std::string formatted_json = getJsonString(data_string);
@@ -97,9 +105,13 @@ void Client::handleMessages() {
 //    ::shutdown(m_client_socket_fd, SHUT_RDWR);
 }
 
+void Client::processFileQueue() {
+    KFileData outgoing_file = outgoing_files.dequeue();
+    sendFileEncoded(outgoing_file.bytes);
+    sent_files.push_back(SentFile{.name = outgoing_file.name, .type = outgoing_file.type });
+}
 /**
  * @brief Client::start
- * @return A meaningless integer
  */
 void Client::start() {
     if (m_client_socket_fd == -1) {
@@ -112,7 +124,6 @@ void Client::start() {
             if (port_value < 0 || end == argv[2]) {
                 return;
             }
-
             int socket_option = 1;
             // Free up the port to begin listening again
             setsockopt(m_client_socket_fd, SOL_SOCKET, SO_REUSEADDR, &socket_option,
@@ -148,7 +159,7 @@ void Client::start() {
 
 /**
  * @brief Client::sendMessage
- * @param s[in] <const QString&> The message to send
+ * @param [in] {const QString&} The message to send
  */
 void Client::sendMessage(const QString& s) {
     if (m_client_socket_fd != -1) {
@@ -162,6 +173,10 @@ void Client::sendMessage(const QString& s) {
     }
 }
 
+/**
+ * @brief Client::sendEncoded
+ * @param [in] {std::string message} The message to send
+ */
 void Client::sendEncoded(std::string message) {
     std::vector<uint8_t> fb_byte_vector{message.begin(), message.end()};
     auto byte_vector = builder.CreateVector(fb_byte_vector);
@@ -180,35 +195,62 @@ void Client::sendEncoded(std::string message) {
     send_buffer[3] = (size & 0xFF);
     send_buffer[4] = (TaskCode::GENMSGBYTE & 0xFF);
     std::memcpy(send_buffer + 5, encoded_message_buffer, size);
-    qDebug() << "Ready to send:";
+    qDebug() << "Sending encoded message";
     std::string message_to_send{};
     for (unsigned int i = 0; i < (size + 5); i++) {
         message_to_send += (char)*(send_buffer + i);
-        qDebug() << (char)*(send_buffer + i);
     }
-    qDebug() << "Final size: " << (size + 5);
+    qDebug() << "Encoded message size: " << (size + 5);
     // Send start operation
     ::send(m_client_socket_fd, send_buffer, size + 5, 0);
     builder.Clear();
 }
+/**
+ * @brief getTaskFileInfo
+ * @param [in] {std::vector<SentFile>} files The files to produce an information string from
+ * @return std::string A string with the following format denoting each file:
+ * `1580057341filename|image::`
+ */
+std::string getTaskFileInfo(std::vector<SentFile> files) {
+    std::string info{};
+    for (const auto& f : files) {
+        info += std::to_string(f.timestamp);
+        info += f.name.toUtf8().constData();
+        info += "|";
+        if (f.type == FileType::VIDEO) {
+            info += "video";
+        } else {
+            info += "image";
+        }
+        info += "::";
+    }
+    qDebug() << "File Info: " << info.c_str();
+    return info;
+}
 
+/**
+ * @brief Client::sendTaskEncoded
+ * @param [in] {TaskType}                 type The type of task
+ * @param [in] {std::vector<std::string>} args The task arguments
+ */
 void Client::sendTaskEncoded(TaskType type, std::vector<std::string> args) {
     if (type == TaskType::INSTAGRAM) {
         if (args.size() < 7) {
             qDebug() << "Not enough arguments to send an IGTask";
             return;
         }
-        auto filename = builder.CreateString(args.at(0).c_str(), args.at(0).size());
-        auto time = builder.CreateString(args.at(1).c_str(), args.at(1).size());
-        auto description = builder.CreateString(args.at(2).c_str(), args.at(2).size());
-        auto hashtags = builder.CreateString(args.at(3).c_str(), args.at(3).size());
-        auto requested_by = builder.CreateString(args.at(4).c_str(), args.at(4).size());
-        auto requested_by_phrase = builder.CreateString(args.at(5).c_str(), args.at(5).size());
-        auto promote_share = builder.CreateString(args.at(6).c_str(), args.at(6).size());
-        auto link_bio = builder.CreateString(args.at(7).c_str(), args.at(7).size());
-//        auto mask = std::stoi(args.at(8));
+        auto file_info = builder.CreateString(getTaskFileInfo(sent_files));
+        auto time = builder.CreateString(args.at(0).c_str(), args.at(0).size());
+        auto description = builder.CreateString(args.at(1).c_str(), args.at(1).size());
+        auto hashtags = builder.CreateString(args.at(2).c_str(), args.at(2).size());
+        auto requested_by = builder.CreateString(args.at(3).c_str(), args.at(3).size());
+        auto requested_by_phrase = builder.CreateString(args.at(4).c_str(), args.at(4).size());
+        auto promote_share = builder.CreateString(args.at(5).c_str(), args.at(5).size());
+        auto link_bio = builder.CreateString(args.at(6).c_str(), args.at(6).size());
+        auto is_video = args.at(7) == "1";
+        auto header = builder.CreateString(args.at(8).c_str(), args.at(8).size());
 
-        flatbuffers::Offset<IGTask> ig_task = CreateIGTask(builder, 96, filename, time, description, hashtags, requested_by, requested_by_phrase, promote_share, link_bio, 16);
+        flatbuffers::Offset<IGTask> ig_task = CreateIGTask(builder, 96, file_info, time, description, hashtags, requested_by, requested_by_phrase, promote_share, link_bio, is_video, 16, header);
 
         builder.Finish(ig_task);
 
@@ -234,9 +276,15 @@ void Client::sendTaskEncoded(TaskType type, std::vector<std::string> args) {
         // Send start operation
         ::send(m_client_socket_fd, send_buffer, size + 5, 0);
         builder.Clear();
+        sent_files.clear();
     }
 }
 
+/**
+ * @brief Client::sendPackets
+ * @param [in] {uint8_t*} data A pointer to a buffer of bytes
+ * @param [in] {int}      size The size of the buffer to be packetized and sent
+ */
 void Client::sendPackets(uint8_t* data, int size) {
     uint32_t total_size = static_cast<uint32_t>(size + HEADER_SIZE);
     uint32_t total_packets = static_cast<uint32_t>(ceil(
@@ -244,9 +292,7 @@ void Client::sendPackets(uint8_t* data, int size) {
             static_cast<double>(total_size) / static_cast<double>(MAX_PACKET_SIZE)) // total size / packet
         )
     );
-
     uint32_t idx = 0;
-
     for (; idx < total_packets; idx++) {
         bool is_first_packet = (idx == 0);
         bool is_last_packet = (idx == (total_packets - 1));
@@ -281,15 +327,32 @@ void Client::sendPackets(uint8_t* data, int size) {
         ::send(m_client_socket_fd, packet, packet_size, 0);
         if (is_last_packet) {
             // cleanup
-            outgoing_file.clear();
+            qDebug() << "Last packet of file sent";
         }
     }
 }
 
+void Client::ping() {
+    if (m_client_socket_fd != -1) {
+        uint8_t send_buffer[5];
+        memset(send_buffer, 0, 5);
+        send_buffer[4] = (TaskCode::PINGBYTE & 0xFF);
+        qDebug() << "Pinging server";
+        ::send(m_client_socket_fd, send_buffer, 5, 0);
+    }
+}
+
+/**
+ * @brief Client::sendFileEncoded
+ * @param [in] {QByteArray} bytes An array of bytes to send
+ */
 void Client::sendFileEncoded(QByteArray bytes) {
     sendPackets(reinterpret_cast<uint8_t*>(bytes.data()), bytes.size());
 }
 
+/**
+ * @brief Client::closeConnection
+ */
 void Client::closeConnection() {
     if (m_client_socket_fd != -1) {
         std::string stop_operation_string = createOperation("stop", {});
@@ -304,6 +367,10 @@ void Client::closeConnection() {
     qDebug() << "There is no active connection to close";
 }
 
+/**
+ * @brief Client::setSelectedApp
+ * @param [in] TYPE SHOULD CHANGE app_names
+ */
 void Client::setSelectedApp(std::vector<QString> app_names) {
     selected_commands.clear();
     for (const auto& name : app_names) {
@@ -316,6 +383,10 @@ void Client::setSelectedApp(std::vector<QString> app_names) {
     }
 }
 
+/**
+ * @brief Client::getSelectedApp
+ * @returns {int} The mask representing the selected application
+ */
 int Client::getSelectedApp() {
     if (selected_commands.size() == 1) {
         return selected_commands.at(0);
@@ -325,6 +396,11 @@ int Client::getSelectedApp() {
     return -1;
 }
 
+/**
+ * @brief Client::getAppName
+ * @param [in] {int} mask The mask representing the application
+ * @returns {QString} The application name
+ */
 QString Client::getAppName(int mask) {
     auto app = m_commands.find(mask);
     if (app != m_commands.end()) {
@@ -333,8 +409,9 @@ QString Client::getAppName(int mask) {
     return QString{""};
 }
 
-
-
+/**
+ * @brief Client::execute
+ */
 void Client::execute() {
     if (!selected_commands.empty()) {
         executing = true;
@@ -349,24 +426,32 @@ void Client::execute() {
     }
 }
 
+/**
+ * @brief Client::scheduleTask
+ * @param [in] {std::vector<std::string>} task_args The task arguments
+ * @param [in] {bool}                     file_pending A boolean indicating whether there are files being sent for this task
+ */
 void Client::scheduleTask(std::vector<std::string> task_args, bool file_pending) {
     if (file_pending) {
         m_task = task_args;
     } else {
         qDebug() << "Requesting a task to be scheduled";
-//        std::string operation_string = createOperation("Schedule", task_args);
         sendTaskEncoded(TaskType::INSTAGRAM, task_args);
     }
 }
 
-void Client::sendFile(QByteArray bytes) {
-    if (outgoing_file.isNull()) {
+/**
+ * @brief Client::sendFiles
+ * @param [in] {QVector<const QByteArray} files The files to be sent
+ */
+void Client::sendFiles(QVector<KFileData> files) {
+    if (outgoing_files.isEmpty()) {
+        for (const auto & file : files) {
+            outgoing_files.enqueue(file);
+        }
         std::string send_file_operation = createOperation("FileUpload", {});
-        int size = bytes.size();
-        qDebug() << size << " bytes to send";
         sendEncoded(send_file_operation);
-        outgoing_file = bytes;
     } else {
-        qDebug() << "Outgoing file buffer is not ready";
+        qDebug() << "Still attempting to send a different file";
     }
 }

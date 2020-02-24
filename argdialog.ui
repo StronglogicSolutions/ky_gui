@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>608</width>
-    <height>710</height>
+    <width>1366</width>
+    <height>671</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,323 +21,463 @@
    <string notr="true">border-color: rgb(0, 0, 0);
 background-color: rgb(0, 43, 54);</string>
   </property>
-  <widget class="QDialogButtonBox" name="argCommandButtons">
+  <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>510</y>
-     <width>211</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="layoutDirection">
-    <enum>Qt::LeftToRight</enum>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(255, 85, 0);
-font: 87 11pt &quot;Noto Sans&quot;;
-color: rgb(0, 43, 54);
-font-weight: 700;
-padding: 4px;</string>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
-   </property>
-   <property name="centerButtons">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="addArgument">
-   <property name="geometry">
-    <rect>
-     <x>380</x>
-     <y>190</y>
-     <width>80</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(255, 85, 0);
-font: 87 11pt &quot;Noto Sans&quot;;
-color: rgb(0, 43, 54);
-font-weight: 700;
-padding: 4px;</string>
-   </property>
-   <property name="text">
-    <string>Add</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="argDialogTitle">
-   <property name="geometry">
-    <rect>
-     <x>210</x>
+     <x>10</x>
      <y>10</y>
-     <width>231</width>
-     <height>51</height>
+     <width>701</width>
+     <height>591</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <pointsize>22</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color: rgb(170, 0, 255);</string>
-   </property>
-   <property name="text">
-    <string>Add Arguments</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="addFile">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>220</y>
-     <width>80</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(255, 85, 0);
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0,0,0">
+    <item>
+     <widget class="QLabel" name="argDialogTitle">
+      <property name="font">
+       <font>
+        <pointsize>22</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(170, 0, 255);
+color:  rgb(255, 85, 0);
+ qproperty-alignment: 'AlignHCenter';
+</string>
+      </property>
+      <property name="text">
+       <string>Add Arguments</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>2</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>108</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(131, 148, 150);
+font-weight: 700;</string>
+        </property>
+        <property name="text">
+         <string>Type</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="argType">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: #2f535f;
+color: rgb(131, 148, 150);
+font-weight: 700;
+</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>description</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>hashtag</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>requested by</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>promote/share</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>link/bio</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="minimumSize">
+         <size>
+          <width>108</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(131, 148, 150);
+font-weight: 700;
+ qproperty-alignment: 'AlignVLeft';</string>
+        </property>
+        <property name="text">
+         <string>Input</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTextEdit" name="argInput">
+        <property name="styleSheet">
+         <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: #2f535f;
+color: rgb(131, 148, 150);
+font-weight: 700;
+</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QPushButton" name="addArgument">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 85, 0);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 43, 54);
 font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
 padding: 4px;</string>
-   </property>
-   <property name="text">
-    <string>File</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>290</y>
-     <width>111</width>
-     <height>18</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+      </property>
+      <property name="text">
+       <string>Add</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item alignment="Qt::AlignVCenter">
+       <widget class="QLabel" name="label_4">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>196</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
 color: rgb(131, 148, 150);
 font-weight: 700;</string>
-   </property>
-   <property name="text">
-    <string>Items to send</string>
-   </property>
-  </widget>
-  <widget class="QTableWidget" name="argList">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>320</y>
-     <width>481</width>
-     <height>171</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-background-color: rgb(7, 54, 66);
+        </property>
+        <property name="text">
+         <string>Add file attachment</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="addFile">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(255, 85, 0);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 43, 54);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+        </property>
+        <property name="text">
+         <string>Choose</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item alignment="Qt::AlignVCenter">
+       <widget class="QLabel" name="label_5">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>52</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
 color: rgb(131, 148, 150);
 font-weight: 700;
-</string>
-   </property>
-   <property name="columnCount">
-    <number>2</number>
-   </property>
-   <attribute name="horizontalHeaderCascadingSectionResizes">
-    <bool>false</bool>
-   </attribute>
-   <attribute name="horizontalHeaderMinimumSectionSize">
-    <number>100</number>
-   </attribute>
-   <attribute name="horizontalHeaderDefaultSectionSize">
-    <number>200</number>
-   </attribute>
-   <attribute name="verticalHeaderMinimumSectionSize">
-    <number>100</number>
-   </attribute>
-   <attribute name="verticalHeaderDefaultSectionSize">
-    <number>100</number>
-   </attribute>
-   <column/>
-   <column/>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>80</y>
-     <width>58</width>
-     <height>18</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
-color: rgb(131, 148, 150);
-font-weight: 700;</string>
-   </property>
-   <property name="text">
-    <string>Type</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>130</y>
-     <width>51</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
-color: rgb(131, 148, 150);
-font-weight: 700;</string>
-   </property>
-   <property name="text">
-    <string>Input</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_4">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>220</y>
-     <width>101</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
-color: rgb(131, 148, 150);
-font-weight: 700;</string>
-   </property>
-   <property name="text">
-    <string>Attachment</string>
-   </property>
-  </widget>
-  <widget class="QTextEdit" name="argInput">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>130</y>
-     <width>281</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-background-color: rgb(7, 54, 66);
-color: rgb(131, 148, 150);
+ qproperty-alignment: 'AlignHCenter';</string>
+        </property>
+        <property name="text">
+         <string>Time</string>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignRight">
+       <widget class="QDateTimeEdit" name="dateTime">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>380</width>
+          <height>38</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: #00000f;
+color: #2f535f;
 font-weight: 700;
-</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_5">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>260</y>
-     <width>41</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
-color: rgb(131, 148, 150);
-font-weight: 700;</string>
-   </property>
-   <property name="text">
-    <string>Time</string>
-   </property>
-  </widget>
-  <widget class="QDateTimeEdit" name="dateTime">
-   <property name="geometry">
-    <rect>
-     <x>200</x>
-     <y>260</y>
-     <width>194</width>
-     <height>27</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="argType">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>80</y>
-     <width>141</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-background-color: rgb(7, 54, 66);
-color: rgb(131, 148, 150);
-font-weight: 700;
-</string>
-   </property>
-   <item>
-    <property name="text">
-     <string>description</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>hashtag</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>requested by</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>promote/share</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>link/bio</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QPushButton" name="devTestButton">
-   <property name="geometry">
-    <rect>
-     <x>240</x>
-     <y>590</y>
-     <width>81</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(130, 255, 121);
+font-size: 16pt;</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <item>
+       <widget class="QPushButton" name="devTestButton">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(130, 255, 121);
 background-color: rgb(2, 180, 43);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
 font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
 padding: 4px;</string>
+        </property>
+        <property name="text">
+         <string>DEV TEST</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDialogButtonBox" name="argCommandButtons">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(255, 85, 0);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 43, 54);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="standardButtons">
+         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
+        </property>
+        <property name="centerButtons">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="verticalLayoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>710</x>
+     <y>10</y>
+     <width>641</width>
+     <height>591</height>
+    </rect>
    </property>
-   <property name="text">
-    <string>TEST</string>
-   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QLabel" name="label">
+      <property name="styleSheet">
+       <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(131, 148, 150);
+font-weight: 700;
+padding-left: 8px;</string>
+      </property>
+      <property name="text">
+       <string>Items to send</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,0">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Maximum</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="argList">
+        <property name="styleSheet">
+         <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: #2f535f;
+color: rgb(131, 148, 150);
+font-weight: 700;
+padding-left: 2px;</string>
+        </property>
+        <property name="showGrid">
+         <bool>true</bool>
+        </property>
+        <property name="columnCount">
+         <number>3</number>
+        </property>
+        <attribute name="horizontalHeaderCascadingSectionResizes">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderMinimumSectionSize">
+         <number>100</number>
+        </attribute>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>200</number>
+        </attribute>
+        <attribute name="verticalHeaderMinimumSectionSize">
+         <number>100</number>
+        </attribute>
+        <attribute name="verticalHeaderDefaultSectionSize">
+         <number>100</number>
+        </attribute>
+        <column/>
+        <column/>
+        <column/>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Maximum</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <item>
+       <widget class="QPushButton" name="default_args">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(255, 85, 0);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 43, 54);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+        </property>
+        <property name="text">
+         <string>Default</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="clear">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(255, 85, 0);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 43, 54);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+        </property>
+        <property name="text">
+         <string>Clear</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>

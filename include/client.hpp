@@ -10,11 +10,13 @@
 #include <QLabel>
 #include <QString>
 #include <QVector>
+#include <QQueue>
 #include <QThread>
 #include <QMetaType>
 #include <thread>
 #include <string>
 #include <utility>
+#include <headers/util.hpp>
 
 static constexpr int MESSAGE_UPDATE_TYPE = 1;
 static constexpr int COMMANDS_UPDATE_TYPE = 2;
@@ -29,13 +31,21 @@ enum TaskType {
 namespace TaskCode {
 static constexpr int IGTASKBYTE = 0xFF;
 static constexpr int GENMSGBYTE = 0xFE;
+static constexpr int PINGBYTE = 0xFD;
 }
 
 typedef std::map<int, std::string> CommandMap;
 typedef std::map<int, std::vector<std::string>> CommandArgMap;
 typedef QVector<QString> StringVec;
 
+struct SentFile {
+    int timestamp;
+    QString name;
+    FileType type;
+};
+
 Q_DECLARE_METATYPE(StringVec)
+Q_DECLARE_METATYPE(QVector<QByteArray>);
 
 class Client : public QDialog
 {
@@ -68,17 +78,19 @@ public:
 
 public slots:
     void sendMessage(const QString& s);
-    void sendEncoded(std::string message);
-    void sendFileEncoded(QByteArray bytes);
-    void sendTaskEncoded(TaskType type, std::vector<std::string> args);
     void setSelectedApp(std::vector<QString> app_names);
-    void sendFile(QByteArray bytes);
+    void sendFiles(QVector<KFileData> files);
+    void ping();
 
 signals:
     void messageReceived(int t, QString s, QVector<QString> args);
     void eventReceived(int t, std::string event, StringVec args);
 
 private:
+    void sendEncoded(std::string message);
+    void sendFileEncoded(QByteArray bytes);
+    void sendTaskEncoded(TaskType type, std::vector<std::string> args);
+    void processFileQueue();
     void handleMessages();
     void sendPackets(uint8_t* data, int size);
     int argc;
@@ -89,6 +101,7 @@ private:
     CommandMap m_commands;
     CommandArgMap m_command_arg_map;
     std::vector<int> selected_commands;
-    QByteArray outgoing_file;
+    QQueue<KFileData> outgoing_files;
+    std::vector<SentFile> sent_files;
 };
 #endif // CLIENT_HPP

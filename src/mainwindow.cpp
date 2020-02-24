@@ -12,11 +12,6 @@
 
 void infoMessageBox(QString text, QString title = "KYGUI") {
     QMessageBox box;
-    QFile q_style_file(":/style/messagebox.css");
-    q_style_file.open(QFile::ReadOnly | QFile::Text);
-    QString stylesheet = QString::fromUtf8(q_style_file.readAll());
-    box.setStyleSheet(stylesheet);
-    q_style_file.close();
     box.setWindowTitle(title);
     box.setText(text);
     box.setButtonText(0, "Close");
@@ -35,18 +30,23 @@ QString getTime() {
  */
 MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    arg_ui(new ArgDialog),
     cli_argc(argc),
     cli_argv(argv),
+    ui(new Ui::MainWindow),
+    arg_ui(new ArgDialog),
     q_client(nullptr) {
     m_process_model = new QStandardItemModel(this);
+    m_event_model = new QStandardItemModel(this);
     q_client = new Client(this, cli_argc, cli_argv);
     ui->setupUi(this);
     this->setWindowTitle("KYGUI");
+
     QPushButton *button = this->findChild<QPushButton*>("connect");
+    button->setMaximumSize(1366, 768);
+    button->setMinimumSize(1366, 768);
     connect(button, &QPushButton::clicked, this, &MainWindow::connectClient);
     ui->processList->setModel(m_process_model);
+    ui->eventList->setModel(m_event_model);
 }
 
 /**
@@ -62,6 +62,7 @@ MainWindow::~MainWindow()
  * @brief MainWindow::buttonClicked
  */
 void MainWindow::connectClient() {
+    ui->connect->hide();
     qDebug() << "Connecting to KServer";
 
     QObject::connect(q_client, &Client::messageReceived, this, &MainWindow::updateMessages);
@@ -92,11 +93,9 @@ void MainWindow::connectClient() {
     QPushButton* disconnect_button = this->findChild<QPushButton*>("disconnect");
     QObject::connect(disconnect_button, &QPushButton::clicked, this, [this, progressBar]() {
         q_client->closeConnection();
-        progressBar->setValue(0);
-        ui->appList->clear();
-        ui->messages->clear();
-        ui->led->setState(false);
+        QApplication::exit(9);
     });
+
 
     QObject::connect(ui->execute, &QPushButton::clicked, this, [this]() {
         q_client->execute();
@@ -110,8 +109,8 @@ void MainWindow::connectClient() {
         }
     });
 
-    QObject::connect(arg_ui, &ArgDialog::uploadFile, this, [this](QByteArray bytes) {
-        q_client->sendFile(bytes);
+    QObject::connect(arg_ui, &ArgDialog::uploadFiles, this, [this](QVector<KFileData> files) {
+        q_client->sendFiles(files);
     });
 
     QObject::connect(arg_ui, &ArgDialog::taskRequestReady, this, [this](Task task, bool file_pending) {
@@ -119,15 +118,15 @@ void MainWindow::connectClient() {
         auto mask = q_client->getSelectedApp();
         if (mask > -1) {
             if (q_client->getAppName(mask) == "Instagram") {
-                auto datetime = task.args.at(1);
+                auto datetime = task.args.at(0);
                 auto current_datetime = QDateTime::currentDateTime().toTime_t();
                 auto seconds_diff = std::stoi(datetime) - current_datetime;
-                qDebug() << "Time difference: " << seconds_diff;
-                if (seconds_diff > 3600) {
+//                qDebug() << "Time difference: " << seconds_diff;
+//                if (seconds_diff > 3600) {
                     qDebug() << "Scheduling a task";
                     task.args.push_back(std::to_string(mask));
                     q_client->scheduleTask(task.args, file_pending);
-                }
+//                }
             }
         }
     });
@@ -138,12 +137,12 @@ void MainWindow::connectClient() {
     });
 
     QObject::connect(ui->viewConsole, &QPushButton::clicked, this, [this]() {
-        m_console.show();
+        console_ui.show();
     });
 
     // TODO: Handle enter key
     //    QObject::connect(static_cast<KTextEdit*>(ui->inputText), &KTextEdit::textInputEnter, this, &MainWindow::handleInputEnterKey);
-    QObject::connect(static_cast<KTextEdit*>(ui->inputText), &KTextEdit::textInputEnter, this, &MainWindow::handleInputEnterKey);
+    QObject::connect(static_cast<KTextEdit*>(ui->inputText), &KTextEdit::textInputEnter, this, &MainWindow::handleKey);
 
     QObject::connect(ui->processList, &QListView::clicked, this, [this](const QModelIndex &index) {
         auto process = m_processes.at(index.row());
@@ -155,9 +154,18 @@ void MainWindow::connectClient() {
         }
         infoMessageBox(process_info_text, "Process");
     });
+
+    QObject::connect(ui->eventList, &QListView::clicked, this, [this](const QModelIndex &index) {
+        auto event = m_events.at(index.row());
+        infoMessageBox(event, "Event");
+    });
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, q_client, &Client::ping);
+    timer->start(30000);
 }
 
-void MainWindow::handleInputEnterKey() {
+void MainWindow::handleKey() {
     q_client->sendMessage(ui->inputText->toPlainText());
     ui->inputText->clear();
 }
@@ -176,11 +184,12 @@ QString MainWindow::parseMessage(const QString& message, StringVec v) {
 }
 
 QStandardItem* createProcessListItem(Process process) {
-
     return new QStandardItem(QString("%0 requested for execution. ID: %1\nStatus: %2\nTime: %3   Done: %4").arg(process.name).arg(process.id).arg(ProcessNames[process.state - 1]).arg(process.start).arg(process.end));
 }
 
-
+QStandardItem* createEventListItem(QString event) {
+    return new QStandardItem(event);
+}
 
 /**
  * @brief MainWindow::updateMessages
@@ -192,7 +201,7 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
         qDebug() << "Updating message area";
         auto simple_message = timestamp_prefix + parseMessage(message, v);
         ui->messages->append(simple_message);
-        m_console.updateText(message);
+        console_ui.updateText(message);
     } else if (t == COMMANDS_UPDATE_TYPE) {
         if (message == "New Session") {
             ui->led->setState(true);
@@ -203,8 +212,6 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
         for (const auto& s : v) {
             app_list->addItem(s);
         }
-        //TODO: We do this because a CommandLinkButton turns transparent by default, except when hovered or checked
-        ui->connect->setChecked(true);
     } else if (t == PROCESS_REQUEST_TYPE) {
         qDebug() << "Updating process list";
         m_processes.push_back(Process{ .name=v.at(1), .state=ProcessState::PENDING, .start=getTime(), .id=v.at(2) });
@@ -213,9 +220,6 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
             m_process_model->setItem(row, createProcessListItem(process));
             row++;
         }
-
-        //TODO: We do this because a CommandLinkButton turns transparent by default, except when hovered or checked
-        ui->connect->setChecked(true);
     } else if (t == EVENT_UPDATE_TYPE) {
         QString event_message{timestamp_prefix};
         if (!v.empty()) {
@@ -227,7 +231,10 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
                 if (message == "Process Result") {
                     event_message += "\n";
                     auto app_name = q_client->getAppName(std::stoi(v.at(0).toUtf8().constData()));
-                    if (v.at(1).length() > 0) {
+                    auto process_it = std::find_if(m_processes.begin(), m_processes.end(), [v](const Process& process) {
+                        return process.id == v.at(1);
+                    });
+                    if (process_it != m_processes.end()) {
                         updateProcessResult(v.at(1), v.at(2));
                     } else { // new process, from scheduled task
                         Process new_process{ .name=app_name, .state=ProcessState::SUCCEEDED, .start=getTime(), .id="Scheduled task" };
@@ -250,11 +257,7 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
             event_message += message;
         }
         m_events.push_front(event_message);
-        ui->eventList->clear();
-
-        for (const auto& i : Kontainer::ReverseIterator(m_events)) {
-            ui->eventList->addItem(i);
-        }
+        m_event_model->setItem(m_event_model->rowCount(), createEventListItem(event_message));
     } else {
         qDebug() << "Unknown update type. Cannot update UI";
     }
@@ -270,6 +273,7 @@ void MainWindow::updateProcessResult(QString id, QString result) { // We need to
             return;
         }
     }
+    // If we didn't return, it's a new process:
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *e) {

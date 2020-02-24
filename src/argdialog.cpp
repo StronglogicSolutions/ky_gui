@@ -8,7 +8,7 @@
 #include <QTableWidgetItem>
 #include <QDateTime>
 #include <QCalendarWidget>
-#include <headers/util.hpp>
+#include <QMimeDatabase>
 
 ArgDialog::ArgDialog(QWidget *parent) :
     QDialog(parent),
@@ -24,16 +24,34 @@ ArgDialog::ArgDialog(QWidget *parent) :
         if (file_path.size() > 0) {
             auto slash_index = file_path.lastIndexOf("/") + 1;
             QString file_name = file_path.right(file_path.size() - slash_index);
-
+            QString dir = file_path.left(slash_index);
+            qDebug() << "Dir is " << dir;
+            QMimeDatabase db;
+            auto is_video = db.mimeTypeForFile(file_path).name().contains("video");
             addItem(file_name, "file");
+            m_ig_post.files.push_back(KFile{
+                .name=file_name, .path=file_path, .type = is_video ? FileType::VIDEO : FileType::IMAGE
+            });
 
-            m_ig_post.video.name = file_name;
-            m_ig_post.video.path = file_path;
+            if (!m_ig_post.is_video && is_video) {
+                qDebug() << "File discovered to be video";
+                m_ig_post.is_video = true; // rename to "sending_video"
+                QString preview_filename = FileUtils::generatePreview(file_path, file_name);
+                // TODO: create some way of verifying preview generation was successful
+                addFile("assets/previews/" + preview_filename);
+                addItem(preview_filename, "file");
+                addFile("assets/previews/" + preview_filename);
+                m_ig_post.files.push_back(KFile{
+                    .name=preview_filename, .path=QCoreApplication::applicationDirPath() + "/assets/previews/" + preview_filename, .type = is_video ? FileType::VIDEO : FileType::IMAGE
+                });
+            } else {
+                addFile(file_path);
+            }
         }
     });
 
     ui->argList->setHorizontalHeaderLabels(QStringList{"Value", "Type"});
-    ui->argList->setColumnWidth(0, 400);
+    ui->argList->setColumnWidth(0, 300);
     ui->argList->setColumnWidth(1, 40);
     ui->argList->verticalHeader()->setDefaultSectionSize(100);
 
@@ -73,21 +91,32 @@ ArgDialog::ArgDialog(QWidget *parent) :
         if (button->text() == "Save") {
             if (m_ig_post.isReady()) {
                 setTaskArguments();
-                QFile file(m_ig_post.video.path);
-                std::vector<char> byte_array{};
-                if (file.open(QIODevice::ReadOnly)) {
-                    QByteArray bytes = file.readAll();
-                    emit ArgDialog::uploadFile(bytes);
-                    qDebug() << "Would be sending file..";
-                } else {
-                    QMessageBox::warning(
-                        this,
-                        tr("File Error"),
-                        tr("Unable to read file")
-                    );
+                QVector<KFileData> k_file_v{};
+                k_file_v.reserve(m_ig_post.files.size());
+
+                for (const auto& kfile : m_ig_post.files) {
+                    QFile file(kfile.path);
+                    if (file.open(QIODevice::ReadOnly)) {
+                        k_file_v.push_back(KFileData{
+                            .type = kfile.type,
+                            .name = kfile.name,
+                            .bytes = file.readAll()
+                        });
+                    } else {
+                        QMessageBox::warning(
+                            this,
+                            tr("File Error"),
+                            tr("Unable to read file")
+                        );
+                    }
                 }
+                if (!k_file_v.empty()) {
+                    emit ArgDialog::uploadFiles(k_file_v);
+                }
+
                 emit ArgDialog::taskRequestReady(m_task, true);
             }
+            defaultPost(); // reset m_ig_post to default values
         }
     });
 
@@ -101,8 +130,20 @@ ArgDialog::ArgDialog(QWidget *parent) :
             .link_in_bio = escapeText("Download a FREE PDF of 245 basic verbs (link 🔗 in bio 👆").toUtf8().constData(),
             .hashtags = {"love", "life"},
             .requested_by = {"unwillingagent"},
-            .video = {.name = "holy.jpg", .path = "/data/c/ky_gui/assets/holy.jpg"}
+            .files = {{ .name = "holy.jpg", .path = "/data/c/ky_gui/assets/holy.jpg", .type = FileType::IMAGE }}
         };
+    });
+
+    QObject::connect(ui->clear, &QPushButton::clicked, this, [this]() {
+        clearPost();
+        ui->argList->setRowCount(0);
+        qDebug() << "Task cleared";
+    });
+
+    QObject::connect(ui->default_args, &QPushButton::clicked, this, [this]() {
+        defaultPost();
+        ui->argList->setRowCount(0);
+        qDebug() << "Task set to default values";
     });
 }
 
@@ -119,10 +160,10 @@ void ArgDialog::setTaskArguments() {
         requested_by += "@" + name + "";
     }
     if (m_ig_post.requested_by.size() > 1) {
-    requested_by.pop_back();
+        requested_by.pop_back();
     }
 
-    m_task.args.push_back(m_ig_post.video.name.toUtf8().constData());
+//    m_task.args.push_back(m_ig_post.file.name.toUtf8().constData());
     m_task.args.push_back(m_ig_post.datetime);
     m_task.args.push_back(m_ig_post.description);
     m_task.args.push_back(hashtags);
@@ -130,6 +171,8 @@ void ArgDialog::setTaskArguments() {
     m_task.args.push_back(m_ig_post.requested_by_phrase);
     m_task.args.push_back(m_ig_post.promote_share);
     m_task.args.push_back(m_ig_post.link_in_bio);
+    m_task.args.push_back(std::to_string(m_ig_post.is_video));
+    m_task.args.push_back(m_ig_post.header);
 }
 
 void ArgDialog::addItem(QString value, QString type) {
@@ -137,12 +180,33 @@ void ArgDialog::addItem(QString value, QString type) {
     QTableWidgetItem* item2 = new QTableWidgetItem(type);
     auto row = ui->argList->rowCount();
     ui->argList->insertRow(row);
+    QPushButton* q_pb = new QPushButton();
+    q_pb->setText("Delete");
+    q_pb->setIcon(std::move(QIcon(":/icons/icons/quit.png")));
+    QObject::connect(q_pb, &QPushButton::clicked, this, [this, row]() {
+        ui->argList->removeRow(row);
+    });
     ui->argList->setItem(row, 0, item);
     ui->argList->setItem(row, 1, item2);
+    ui->argList->setCellWidget(row, 2, q_pb);
+}
+
+void ArgDialog::addFile(QString path) {
+    auto row_count = ui->argList->rowCount();
+
+    QTableWidgetItem* file_item = new QTableWidgetItem();
+    QPixmap pm{path};
+    file_item->setData(
+        Qt::DecorationRole,
+        pm.scaledToHeight(ui->argList->rowHeight(0), Qt::TransformationMode::SmoothTransformation)
+    );
+    ui->argList->setItem(row_count - 1, 2, file_item);
+
 }
 
 void ArgDialog::clearPost() {
-    m_ig_post.video = KFile{};
+    m_ig_post.files.clear();
+    m_ig_post.header = "";
     m_ig_post.datetime = "";
     m_ig_post.hashtags = {};
     m_ig_post.description = "";
@@ -150,6 +214,18 @@ void ArgDialog::clearPost() {
     m_ig_post.requested_by = {};
     m_ig_post.promote_share = "";
     m_ig_post.requested_by_phrase = "";
+}
+
+void ArgDialog::defaultPost() {
+    m_ig_post.files.clear();
+    m_ig_post.header = "Learn to speak like native Korean speakers 🙆‍♀️🇰🇷";
+    m_ig_post.datetime = "";
+    m_ig_post.hashtags.clear();
+    m_ig_post.description = "";
+    m_ig_post.link_in_bio = "Subscribe to my YouTube channel (link 🔗in bio) to learn more about Korean language and culture ❤";
+    m_ig_post.requested_by.clear();
+    m_ig_post.promote_share = "Share the post through IG story if you enjoy the phrase 🙋‍♀️";
+    m_ig_post.requested_by_phrase = "The phrase was requested by ";
 }
 
 void ArgDialog::clearTask() {
@@ -215,6 +291,18 @@ void ArgDialog::addHashtag(QString tag) {
                 tr("Hashtags"),
                 tr(message)
                 );
+        }
+    }
+}
+
+void ArgDialog::keyPressEvent(QKeyEvent *e) {
+    if (Qt::ControlModifier) {
+        if(e->key()==Qt::Key_Return || e->key()==Qt::Key_Enter) {
+            ui->addArgument->clicked();
+            auto idx = ui->argType->currentIndex();
+            if (idx != (ui->argType->count() - 1)) {
+                ui->argType->setCurrentIndex(idx + 1);
+            }
         }
     }
 }
