@@ -57,6 +57,7 @@ public:
     QSpacerItem *horizontalSpacer;
     QTableWidget *argList;
     QSpacerItem *horizontalSpacer_2;
+    QPushButton *clear;
 
     void setupUi(QDialog *ArgDialog)
     {
@@ -328,6 +329,22 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout_6);
 
+        clear = new QPushButton(verticalLayoutWidget_2);
+        clear->setObjectName(QString::fromUtf8("clear"));
+        clear->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 85, 0);\n"
+"font: 87 11pt \"Noto Sans\";\n"
+"color: rgb(0, 43, 54);\n"
+"font-weight: 700;\n"
+"padding: 4px;\n"
+"border-style: outset;\n"
+"border-width: 2px;\n"
+"border-radius: 4px;\n"
+"border-color: #00000f;\n"
+"min-width: 4em;\n"
+"padding: 4px;"));
+
+        verticalLayout_2->addWidget(clear);
+
 
         retranslateUi(ArgDialog);
         QObject::connect(argCommandButtons, SIGNAL(accepted()), ArgDialog, SLOT(accept()));
@@ -354,6 +371,7 @@ public:
         label_5->setText(QCoreApplication::translate("ArgDialog", "Time", nullptr));
         devTestButton->setText(QCoreApplication::translate("ArgDialog", "DEV TEST", nullptr));
         label->setText(QCoreApplication::translate("ArgDialog", "Items to send", nullptr));
+        clear->setText(QCoreApplication::translate("ArgDialog", "Clear", nullptr));
     } // retranslateUi
 
 };

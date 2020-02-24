@@ -132,6 +132,21 @@ ArgDialog::ArgDialog(QWidget *parent) :
             .files = {{ .name = "holy.jpg", .path = "/data/c/ky_gui/assets/holy.jpg", .type = FileType::IMAGE }}
         };
     });
+
+    QObject::connect(ui->clear, &QPushButton::clicked, this, [this]() {
+        m_task.args.clear();
+        m_ig_post.files.clear();
+        m_ig_post.datetime = "";
+        m_ig_post.hashtags.clear();
+        m_ig_post.description = "";
+        m_ig_post.link_in_bio = "";
+        m_ig_post.requested_by.clear();
+        m_ig_post.promote_share = "";
+        m_ig_post.is_video = false;
+        ui->argList->clear();
+        ui->argList->setRowCount(0);
+        qDebug() << "Task cleared";
+    });
 }
 
 void ArgDialog::setTaskArguments() {
