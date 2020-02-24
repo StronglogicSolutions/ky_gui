@@ -116,6 +116,7 @@ ArgDialog::ArgDialog(QWidget *parent) :
 
                 emit ArgDialog::taskRequestReady(m_task, true);
             }
+            defaultPost(); // reset m_ig_post to default values
         }
     });
 
@@ -174,6 +175,7 @@ void ArgDialog::setTaskArguments() {
     m_task.args.push_back(m_ig_post.promote_share);
     m_task.args.push_back(m_ig_post.link_in_bio);
     m_task.args.push_back(std::to_string(m_ig_post.is_video));
+    m_task.args.push_back(m_ig_post.header);
 }
 
 void ArgDialog::addItem(QString value, QString type) {
@@ -200,6 +202,7 @@ void ArgDialog::addFile(QString path) {
 
 void ArgDialog::clearPost() {
     m_ig_post.files.clear();
+    m_ig_post.header = "";
     m_ig_post.datetime = "";
     m_ig_post.hashtags = {};
     m_ig_post.description = "";
@@ -207,6 +210,18 @@ void ArgDialog::clearPost() {
     m_ig_post.requested_by = {};
     m_ig_post.promote_share = "";
     m_ig_post.requested_by_phrase = "";
+}
+
+void ArgDialog::defaultPost() {
+    m_ig_post.files.clear();
+    m_ig_post.header = "Learn to speak like native Korean speakers 🙆‍♀️🇰🇷";
+    m_ig_post.datetime = "";
+    m_ig_post.hashtags.clear();
+    m_ig_post.description = "";
+    m_ig_post.link_in_bio = "Subscribe to my YouTube channel (link 🔗in bio) to learn more about Korean language and culture ❤";
+    m_ig_post.requested_by.clear();
+    m_ig_post.promote_share = "Share the post through IG story if you enjoy the phrase 🙋‍♀️";
+    m_ig_post.requested_by_phrase = "The phrase was requested by ";
 }
 
 void ArgDialog::clearTask() {
@@ -272,6 +287,18 @@ void ArgDialog::addHashtag(QString tag) {
                 tr("Hashtags"),
                 tr(message)
                 );
+        }
+    }
+}
+
+void ArgDialog::keyPressEvent(QKeyEvent *e) {
+    if (Qt::ControlModifier) {
+        if(e->key()==Qt::Key_Return || e->key()==Qt::Key_Enter) {
+            ui->addArgument->clicked();
+            auto idx = ui->argType->currentIndex();
+            if (idx != (ui->argType->count() - 1)) {
+                ui->argType->setCurrentIndex(idx + 1);
+            }
         }
     }
 }
