@@ -434,9 +434,11 @@ padding-left: 2px;</string>
      </layout>
     </item>
     <item>
-     <widget class="QPushButton" name="clear">
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 85, 0);
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <item>
+       <widget class="QPushButton" name="default_args">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(255, 85, 0);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 43, 54);
 font-weight: 700;
@@ -447,11 +449,33 @@ border-radius: 4px;
 border-color: #00000f;
 min-width: 4em;
 padding: 4px;</string>
-      </property>
-      <property name="text">
-       <string>Clear</string>
-      </property>
-     </widget>
+        </property>
+        <property name="text">
+         <string>Default</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="clear">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(255, 85, 0);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 43, 54);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+        </property>
+        <property name="text">
+         <string>Clear</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

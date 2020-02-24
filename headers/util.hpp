@@ -352,7 +352,7 @@ QString generatePreview(QString video_path, QString video_name) {
 //    QString command{
 //        "ffmpeg -ss 0 -i " + video_path + " -vf select=\"eq(pict_type\\,I)\" -vframes 1 ./assets/previews/" + preview_name};
     QString command {
-        "ffmpeg -ss 0 -i " + video_path + " -vf \"scale=w=640:h=640:force_original_aspect_ratio=decrease,pad=w=640:h=640:x=(iw-ow)/2:y=(ih-oh/2):color=white\" -vframes 1 ./assets/previews/" + preview_name
+        "ffmpeg -y -ss 0 -i " + video_path + " -vf \"scale=w=640:h=640:force_original_aspect_ratio=decrease,pad=w=640:h=640:x=(iw-ow)/2:y=(ih-oh/2):color=white\" -vframes 1 ./assets/previews/" + preview_name
     };
 
     std::system(command.toUtf8());

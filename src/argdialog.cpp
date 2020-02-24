@@ -135,18 +135,15 @@ ArgDialog::ArgDialog(QWidget *parent) :
     });
 
     QObject::connect(ui->clear, &QPushButton::clicked, this, [this]() {
-        m_task.args.clear();
-        m_ig_post.files.clear();
-        m_ig_post.datetime = "";
-        m_ig_post.hashtags.clear();
-        m_ig_post.description = "";
-        m_ig_post.link_in_bio = "";
-        m_ig_post.requested_by.clear();
-        m_ig_post.promote_share = "";
-        m_ig_post.is_video = false;
-        ui->argList->clear();
+        clearPost();
         ui->argList->setRowCount(0);
         qDebug() << "Task cleared";
+    });
+
+    QObject::connect(ui->default_args, &QPushButton::clicked, this, [this]() {
+        defaultPost();
+        ui->argList->setRowCount(0);
+        qDebug() << "Task set to default values";
     });
 }
 
@@ -183,8 +180,15 @@ void ArgDialog::addItem(QString value, QString type) {
     QTableWidgetItem* item2 = new QTableWidgetItem(type);
     auto row = ui->argList->rowCount();
     ui->argList->insertRow(row);
+    QPushButton* q_pb = new QPushButton();
+    q_pb->setText("Delete");
+    q_pb->setIcon(std::move(QIcon(":/icons/icons/quit.png")));
+    QObject::connect(q_pb, &QPushButton::clicked, this, [this, row]() {
+        ui->argList->removeRow(row);
+    });
     ui->argList->setItem(row, 0, item);
     ui->argList->setItem(row, 1, item2);
+    ui->argList->setCellWidget(row, 2, q_pb);
 }
 
 void ArgDialog::addFile(QString path) {

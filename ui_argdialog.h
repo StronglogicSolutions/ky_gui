@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'argdialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.14.1
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -57,6 +57,8 @@ public:
     QSpacerItem *horizontalSpacer;
     QTableWidget *argList;
     QSpacerItem *horizontalSpacer_2;
+    QHBoxLayout *horizontalLayout_7;
+    QPushButton *default_args;
     QPushButton *clear;
 
     void setupUi(QDialog *ArgDialog)
@@ -329,6 +331,24 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout_6);
 
+        horizontalLayout_7 = new QHBoxLayout();
+        horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
+        default_args = new QPushButton(verticalLayoutWidget_2);
+        default_args->setObjectName(QString::fromUtf8("default_args"));
+        default_args->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 85, 0);\n"
+"font: 87 11pt \"Noto Sans\";\n"
+"color: rgb(0, 43, 54);\n"
+"font-weight: 700;\n"
+"padding: 4px;\n"
+"border-style: outset;\n"
+"border-width: 2px;\n"
+"border-radius: 4px;\n"
+"border-color: #00000f;\n"
+"min-width: 4em;\n"
+"padding: 4px;"));
+
+        horizontalLayout_7->addWidget(default_args);
+
         clear = new QPushButton(verticalLayoutWidget_2);
         clear->setObjectName(QString::fromUtf8("clear"));
         clear->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 85, 0);\n"
@@ -343,7 +363,10 @@ public:
 "min-width: 4em;\n"
 "padding: 4px;"));
 
-        verticalLayout_2->addWidget(clear);
+        horizontalLayout_7->addWidget(clear);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_7);
 
 
         retranslateUi(ArgDialog);
@@ -371,6 +394,7 @@ public:
         label_5->setText(QCoreApplication::translate("ArgDialog", "Time", nullptr));
         devTestButton->setText(QCoreApplication::translate("ArgDialog", "DEV TEST", nullptr));
         label->setText(QCoreApplication::translate("ArgDialog", "Items to send", nullptr));
+        default_args->setText(QCoreApplication::translate("ArgDialog", "Default", nullptr));
         clear->setText(QCoreApplication::translate("ArgDialog", "Clear", nullptr));
     } // retranslateUi
 
