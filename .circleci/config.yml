@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   compile:
     docker:
-      - image: vookimedlo/ubuntu-qt:latestDistroOfficial_gcc_bionic
+      - image: logicp/ky_gui:1.0.0
     steps:
       - checkout
       - run:
