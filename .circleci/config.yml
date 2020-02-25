@@ -8,7 +8,7 @@ jobs:
       - run:
           name: compile
           command: |
-            qmake ky_gui.pro -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug
+            qmake ky_gui.pro -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug && make -j8
       - store_artifacts:
           path: ky_gui
           destination: ky_gui
