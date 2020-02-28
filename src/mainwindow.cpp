@@ -5,7 +5,6 @@
 #include <QTextStream>
 #include <QString>
 #include <QLayout>
-#include <headers/ktextedit.hpp>
 #include <QDateTime>
 #include <vector>
 #include <headers/util.hpp>
@@ -74,14 +73,11 @@ void MainWindow::connectClient() {
         progressBar->setValue(i);
     }
 
-    KTextEdit* send_message_box = reinterpret_cast<KTextEdit*>(ui->inputText);
-    send_message_box->show();
-
     QPushButton* send_message_button = this->findChild<QPushButton*>("sendMessage");
     // Handle mouse
-    QObject::connect(send_message_button, &QPushButton::clicked, this, [this, send_message_box]() {
-        q_client->sendMessage(escapeText(send_message_box->toPlainText()));
-        send_message_box->clear();
+    QObject::connect(send_message_button, &QPushButton::clicked, this, [this]() {
+        q_client->sendMessage(escapeText(ui->inputText->toPlainText()));
+        ui->inputText->clear();
     });
 
     QObject::connect(ui->appList,  static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, [this]() {
@@ -139,10 +135,6 @@ void MainWindow::connectClient() {
     QObject::connect(ui->viewConsole, &QPushButton::clicked, this, [this]() {
         console_ui.show();
     });
-
-    // TODO: Handle enter key
-    //    QObject::connect(static_cast<KTextEdit*>(ui->inputText), &KTextEdit::textInputEnter, this, &MainWindow::handleInputEnterKey);
-    QObject::connect(static_cast<KTextEdit*>(ui->inputText), &KTextEdit::textInputEnter, this, &MainWindow::handleKey);
 
     QObject::connect(ui->processList, &QListView::clicked, this, [this](const QModelIndex &index) {
         auto process = m_processes.at(index.row());

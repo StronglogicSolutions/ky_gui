@@ -5,7 +5,6 @@
 #-------------------------------------------------
 
 QT       += core gui
-QT       += designer
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -24,6 +23,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 CONFIG += c++17
+CONFIG += static
+
+QMAKE_CXXFLAGS += "-fno-sized-deallocation"
 
 SOURCES += \
         src/argdialog.cpp \
@@ -37,7 +39,6 @@ HEADERS += \
         include/consoledialog.h \
         include/mainwindow.h \
         include/client.hpp \
-        headers/ktextedit.hpp \
         headers/kmessage_codec.hpp \
         headers/instatask_generated.h \
         headers/json.hpp \

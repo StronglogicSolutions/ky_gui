@@ -9,7 +9,6 @@
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <include/client.hpp>
-#include <headers/ktextedit.hpp>
 #include <include/argdialog.h>
 #include <include/consoledialog.h>
 #include <QTableView>
