@@ -60,7 +60,7 @@ static QString escapeText(QString s) {
     qDebug() << "Escaping text";
     if (s.contains("'")) {
         qDebug() << "Replacing single quote";
-        s.replace("'", "'\"'\"'");
+        s.replace("'", "\'");
     }
     if (s.contains("\t")) {
         s.replace("\t", "\\t");
