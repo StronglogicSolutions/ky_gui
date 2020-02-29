@@ -58,12 +58,16 @@ struct KSession {
 
 static QString escapeText(QString s) {
     qDebug() << "Escaping text";
-    if (s.contains("'")) {
-        qDebug() << "Replacing single quote";
-        s.replace("'", "\'");
-    }
     if (s.contains("\t")) {
         s.replace("\t", "\\t");
+    }
+    if (s.contains("'")) {
+        qDebug() << "Replacing single quote";
+        if (s.contains('"')) {
+            s.replace('"', "\\\"");
+        }
+        s.replace("'", "'\"\'\"'");
+        return s;
     }
     if (s.contains('"')) {
         s.replace('"', "\\\"");
