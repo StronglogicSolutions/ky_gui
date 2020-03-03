@@ -49,6 +49,7 @@ typedef std::vector<std::pair<std::string, std::string>> TupVec;
 typedef std::vector<std::map<int, std::string>> MapVec;
 typedef std::vector<std::string> StdStringVec;
 typedef std::map<int, std::string> CommandMap;
+typedef std::map<QString, QString> ConfigJson;
 
 struct KSession {
     int id;
@@ -226,6 +227,18 @@ CommandMap getArgMap(const char* data) {
         }
     }
     return cm;
+}
+
+ConfigJson getConfigObject(QString json_string) {
+    Document d;
+    d.Parse(json_string.toUtf8());
+    std::map<QString, QString> config_map{};
+    if (d.IsObject()) {
+        for (const auto& m : d.GetObject()) {
+            config_map.emplace(m.name.GetString(), m.value.GetString());
+        }
+    }
+    return config_map;
 }
 
 std::string createMessage(const char* data,
