@@ -56,6 +56,7 @@ private:
     char** cli_argv;
     /** UI & Messages */
     void connectUi();
+    void setConnectScreen(bool visible = true);
     QString parseMessage(const QString& s, StringVec v);
     void updateProcessResult(QString request_id, QString result);
     /** UI Members */
