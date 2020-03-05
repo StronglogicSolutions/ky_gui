@@ -10,3 +10,5 @@ Makefile
 qrc_kres.*
 **/*.jpg
 assets
+config
+ky_gui_plugin_import.cpp
