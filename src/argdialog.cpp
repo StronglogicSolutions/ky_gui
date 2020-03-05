@@ -33,7 +33,7 @@ ArgDialog::ArgDialog(QWidget *parent) :
                 .name=file_name, .path=file_path, .type = is_video ? FileType::VIDEO : FileType::IMAGE
             });
 
-            if (!m_ig_post.is_video && is_video) {
+            if (is_video) {
                 qDebug() << "File discovered to be video";
                 m_ig_post.is_video = true; // rename to "sending_video"
                 QString preview_filename = FileUtils::generatePreview(file_path, file_name);
@@ -53,6 +53,8 @@ ArgDialog::ArgDialog(QWidget *parent) :
     ui->argList->setHorizontalHeaderLabels(QStringList{"Value", "Type"});
     ui->argList->setColumnWidth(0, 300);
     ui->argList->setColumnWidth(1, 40);
+    ui->argList->setColumnWidth(2, 100);
+    ui->argList->setColumnWidth(3, 30);
     ui->argList->verticalHeader()->setDefaultSectionSize(100);
 
     QObject::connect(ui->addArgument, &QPushButton::clicked, this, [this]() {
