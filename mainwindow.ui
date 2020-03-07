@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1366</width>
-    <height>810</height>
+    <height>825</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -339,71 +339,6 @@ color: rgb(0, 0, 0);</string>
      <string/>
     </property>
    </widget>
-   <widget class="QPushButton" name="connect">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>79</width>
-      <height>79</height>
-     </rect>
-    </property>
-    <property name="minimumSize">
-     <size>
-      <width>79</width>
-      <height>79</height>
-     </size>
-    </property>
-    <property name="maximumSize">
-     <size>
-      <width>0</width>
-      <height>0</height>
-     </size>
-    </property>
-    <property name="font">
-     <font>
-      <family>Noto Sans</family>
-      <pointsize>36</pointsize>
-      <weight>87</weight>
-      <italic>false</italic>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">font: 87 36pt &quot;Noto Sans&quot;;
-color: rgb(0, 0, 0);
-background-color: rgb(2, 180, 43);
-font-weight: 700;
-padding: 4px;
-border-style: outset;
-border-width: 2px;
-border-radius: 6px;
-border-color: #00000f;
-min-width: 1em;
-min-height: 1em;
-padding: 4px;
-opacity: 0.3;</string>
-    </property>
-    <property name="text">
-     <string>Connect</string>
-    </property>
-    <property name="icon">
-     <iconset resource="kres.qrc">
-      <normaloff>:/icons/icons/start.png</normaloff>:/icons/icons/start.png</iconset>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>64</width>
-      <height>64</height>
-     </size>
-    </property>
-    <property name="flat">
-     <bool>false</bool>
-    </property>
-   </widget>
    <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
      <rect>
@@ -693,11 +628,128 @@ font-weight: 700;</string>
      </item>
     </layout>
    </widget>
-   <zorder>label</zorder>
-   <zorder>verticalLayoutWidget</zorder>
-   <zorder>led</zorder>
-   <zorder>verticalLayoutWidget_2</zorder>
-   <zorder>connect</zorder>
+   <widget class="QWidget" name="startScreen" native="true">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>-40</y>
+      <width>0</width>
+      <height>0</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <layout class="QVBoxLayout" name="connectScreen" stretch="0">
+     <property name="spacing">
+      <number>4</number>
+     </property>
+     <item>
+      <layout class="QVBoxLayout" name="connectLayout" stretch="0,0">
+       <property name="spacing">
+        <number>4</number>
+       </property>
+       <item>
+        <widget class="QPushButton" name="connect">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>79</width>
+           <height>79</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>Noto Sans</family>
+           <pointsize>36</pointsize>
+           <weight>87</weight>
+           <italic>false</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 87 36pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);
+background-color: rgb(2, 180, 43);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 6px;
+border-color: #00000f;
+min-width: 1em;
+min-height: 1em;
+padding: 4px;
+opacity: 0.3;</string>
+         </property>
+         <property name="text">
+          <string>Connect</string>
+         </property>
+         <property name="icon">
+          <iconset resource="kres.qrc">
+           <normaloff>:/icons/icons/start.png</normaloff>:/icons/icons/start.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>64</width>
+           <height>64</height>
+          </size>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTextEdit" name="kyConfig">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: #FFFFFF;
+font-weight: 700;</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

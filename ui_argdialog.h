@@ -306,8 +306,8 @@ public:
         horizontalLayout_6->addItem(horizontalSpacer);
 
         argList = new QTableWidget(verticalLayoutWidget_2);
-        if (argList->columnCount() < 3)
-            argList->setColumnCount(3);
+        if (argList->columnCount() < 4)
+            argList->setColumnCount(4);
         argList->setObjectName(QString::fromUtf8("argList"));
         argList->setStyleSheet(QString::fromUtf8("font: 87 11pt \"Noto Sans\";\n"
 "background-color: #2f535f;\n"
@@ -315,7 +315,7 @@ public:
 "font-weight: 700;\n"
 "padding-left: 2px;"));
         argList->setShowGrid(true);
-        argList->setColumnCount(3);
+        argList->setColumnCount(4);
         argList->horizontalHeader()->setCascadingSectionResizes(false);
         argList->horizontalHeader()->setMinimumSectionSize(100);
         argList->horizontalHeader()->setDefaultSectionSize(200);

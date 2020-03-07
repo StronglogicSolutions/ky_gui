@@ -9,7 +9,6 @@
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <include/client.hpp>
-#include <headers/ktextedit.hpp>
 #include <include/argdialog.h>
 #include <include/consoledialog.h>
 #include <QTableView>
@@ -57,6 +56,7 @@ private:
     char** cli_argv;
     /** UI & Messages */
     void connectUi();
+    void setConnectScreen(bool visible = true);
     QString parseMessage(const QString& s, StringVec v);
     void updateProcessResult(QString request_id, QString result);
     /** UI Members */

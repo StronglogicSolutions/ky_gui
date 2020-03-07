@@ -18,8 +18,8 @@ ArgDialog::ArgDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     QObject::connect(ui->addFile, &QPushButton::clicked, this, [this]() {
-        auto file_path = QFileDialog::getOpenFileName(this,
-                                                tr("Open File"), "~", tr("All Files (*.*)"));
+        KFileDialog file_dialog{};
+        auto file_path = file_dialog.openFileDialog();
         qDebug() << "Selected file:" << file_path;
         if (file_path.size() > 0) {
             auto slash_index = file_path.lastIndexOf("/") + 1;
@@ -33,7 +33,7 @@ ArgDialog::ArgDialog(QWidget *parent) :
                 .name=file_name, .path=file_path, .type = is_video ? FileType::VIDEO : FileType::IMAGE
             });
 
-            if (!m_ig_post.is_video && is_video) {
+            if (is_video) {
                 qDebug() << "File discovered to be video";
                 m_ig_post.is_video = true; // rename to "sending_video"
                 QString preview_filename = FileUtils::generatePreview(file_path, file_name);
@@ -53,6 +53,8 @@ ArgDialog::ArgDialog(QWidget *parent) :
     ui->argList->setHorizontalHeaderLabels(QStringList{"Value", "Type"});
     ui->argList->setColumnWidth(0, 300);
     ui->argList->setColumnWidth(1, 40);
+    ui->argList->setColumnWidth(2, 100);
+    ui->argList->setColumnWidth(3, 30);
     ui->argList->verticalHeader()->setDefaultSectionSize(100);
 
     QObject::connect(ui->addArgument, &QPushButton::clicked, this, [this]() {

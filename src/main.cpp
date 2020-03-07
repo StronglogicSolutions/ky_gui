@@ -16,5 +16,5 @@ int main(int argc, char **argv)
         code = a.exec();
     } while (code == 9);
 
-    return a.exec();
+    return code;
 }

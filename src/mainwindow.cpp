@@ -5,7 +5,6 @@
 #include <QTextStream>
 #include <QString>
 #include <QLayout>
-#include <headers/ktextedit.hpp>
 #include <QDateTime>
 #include <vector>
 #include <headers/util.hpp>
@@ -40,11 +39,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
     q_client = new Client(this, cli_argc, cli_argv);
     ui->setupUi(this);
     this->setWindowTitle("KYGUI");
-
-    QPushButton *button = this->findChild<QPushButton*>("connect");
-    button->setMaximumSize(1366, 768);
-    button->setMinimumSize(1366, 768);
-    connect(button, &QPushButton::clicked, this, &MainWindow::connectClient);
+    setConnectScreen();
+    connect(ui->connect, &QPushButton::clicked, this, &MainWindow::connectClient);
     ui->processList->setModel(m_process_model);
     ui->eventList->setModel(m_event_model);
 }
@@ -58,13 +54,33 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::setConnectScreen(bool visible) {
+    if (visible) {
+        ui->startScreen->setMaximumSize(1366, 825);
+        ui->startScreen->setMinimumSize(1366, 825);
+        ui->connect->setMaximumSize(1366, 725);
+        ui->connect->setMinimumSize(1366, 725);
+        ui->kyConfig->setMaximumSize(1366, 75);
+        ui->kyConfig->setMinimumSize(1366, 75);
+        QFile file(QCoreApplication::applicationDirPath() + "/config/config.json");
+        file.open(QIODevice::ReadOnly | QFile::ReadOnly);
+        QString config_json = QString::fromUtf8(file.readAll());
+        ui->kyConfig->setText(config_json);
+        qDebug() << "Set config json: \n" << ui->kyConfig->toPlainText();
+        file.close();
+    } else {
+        ui->connect->hide();
+        ui->kyConfig->hide();
+        ui->startScreen->setVisible(false);
+    }
+}
+
 /**
  * @brief MainWindow::buttonClicked
  */
 void MainWindow::connectClient() {
-    ui->connect->hide();
+    setConnectScreen(false);
     qDebug() << "Connecting to KServer";
-
     QObject::connect(q_client, &Client::messageReceived, this, &MainWindow::updateMessages);
 
     QProgressBar* progressBar = ui->progressBar;
@@ -74,14 +90,11 @@ void MainWindow::connectClient() {
         progressBar->setValue(i);
     }
 
-    KTextEdit* send_message_box = reinterpret_cast<KTextEdit*>(ui->inputText);
-    send_message_box->show();
-
     QPushButton* send_message_button = this->findChild<QPushButton*>("sendMessage");
     // Handle mouse
-    QObject::connect(send_message_button, &QPushButton::clicked, this, [this, send_message_box]() {
-        q_client->sendMessage(escapeText(send_message_box->toPlainText()));
-        send_message_box->clear();
+    QObject::connect(send_message_button, &QPushButton::clicked, this, [this]() {
+        q_client->sendMessage(escapeText(ui->inputText->toPlainText()));
+        ui->inputText->clear();
     });
 
     QObject::connect(ui->appList,  static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, [this]() {
@@ -139,10 +152,6 @@ void MainWindow::connectClient() {
     QObject::connect(ui->viewConsole, &QPushButton::clicked, this, [this]() {
         console_ui.show();
     });
-
-    // TODO: Handle enter key
-    //    QObject::connect(static_cast<KTextEdit*>(ui->inputText), &KTextEdit::textInputEnter, this, &MainWindow::handleInputEnterKey);
-    QObject::connect(static_cast<KTextEdit*>(ui->inputText), &KTextEdit::textInputEnter, this, &MainWindow::handleKey);
 
     QObject::connect(ui->processList, &QListView::clicked, this, [this](const QModelIndex &index) {
         auto process = m_processes.at(index.row());
@@ -209,8 +218,16 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
         qDebug() << "Updating commands";
         QComboBox* app_list = ui->appList;
         app_list->clear();
+        ConfigJson config = getConfigObject(ui->kyConfig->toPlainText());
+        QString default_app = config.at("defaultApp");
+        int app_index = 0;
         for (const auto& s : v) {
             app_list->addItem(s);
+            if (s.toLower() == default_app.toLower()) {
+                q_client->setSelectedApp(std::vector<QString>{{default_app}});
+                ui->appList->setCurrentIndex(app_index);
+            }
+            app_index++;
         }
     } else if (t == PROCESS_REQUEST_TYPE) {
         qDebug() << "Updating process list";

@@ -1,3 +1,4 @@
+ky_gui.pro.user*
 ui_mainwindow.h
 ky_gui
 moc*
@@ -9,3 +10,5 @@ Makefile
 qrc_kres.*
 **/*.jpg
 assets
+config
+ky_gui_plugin_import.cpp
