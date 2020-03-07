@@ -665,8 +665,8 @@ font-weight: 700;</string>
          </property>
          <property name="minimumSize">
           <size>
-           <width>0</width>
-           <height>0</height>
+           <width>79</width>
+           <height>79</height>
           </size>
          </property>
          <property name="maximumSize">
@@ -739,6 +739,10 @@ opacity: 0.3;</string>
            <width>0</width>
            <height>0</height>
           </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: #FFFFFF;
+font-weight: 700;</string>
          </property>
         </widget>
        </item>
