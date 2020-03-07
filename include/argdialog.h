@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <QKeyEvent>
 #include <headers/util.hpp>
+#include <include/kfiledialog.h>
 
 namespace Args {
 const QString HEADER_TYPE = "header";

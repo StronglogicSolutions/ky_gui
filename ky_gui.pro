@@ -30,6 +30,7 @@ QMAKE_CXXFLAGS += "-fno-sized-deallocation"
 SOURCES += \
         src/argdialog.cpp \
         src/consoledialog.cpp \
+        src/kfiledialog.cpp \
         src/main.cpp \
         src/mainwindow.cpp \
         src/client.cpp \
@@ -46,7 +47,8 @@ HEADERS += \
         headers/rapidjson/writer.h \
         headers/rapidjson/stringbuffer.h \
         headers/rapidjson/document.h \
-        include/connection_indicator.h
+        include/connection_indicator.h \
+        include/kfiledialog.h
 
 FORMS += \
         argdialog.ui \
