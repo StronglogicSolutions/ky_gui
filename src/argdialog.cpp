@@ -21,7 +21,7 @@ ArgDialog::ArgDialog(QWidget *parent) :
         QFileDialog file_dialog;
         file_dialog.setStyleSheet("QFileDialog QWidget { color: white; font-weight: 700}");
         auto file_path = file_dialog.getOpenFileName(this,
-                                                tr("Open File"), "~", tr("All Files (*.*)"));
+                                                     tr("Open File"), "~", tr("All Files (*.*)"), nullptr, QFileDialog::DontUseNativeDialog);
         qDebug() << "Selected file:" << file_path;
         if (file_path.size() > 0) {
             auto slash_index = file_path.lastIndexOf("/") + 1;
