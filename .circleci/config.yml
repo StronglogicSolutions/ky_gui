@@ -2,13 +2,13 @@ version: 2.1
 jobs:
   compile:
     docker:
-      - image: vookimedlo/ubuntu-qt:latestDistroOfficial_gcc_bionic
+      - image: logicp/ky_gui:1.0.0
     steps:
       - checkout
       - run:
           name: compile
           command: |
-            /opt/qt/5.13.2/gcc_64/bin/qmake /data/c/ky_gui/ky_gui.pro -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug && /usr/bin/make qmake_all
+            qmake ky_gui.pro -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug && make -j8
       - store_artifacts:
           path: ky_gui
           destination: ky_gui
