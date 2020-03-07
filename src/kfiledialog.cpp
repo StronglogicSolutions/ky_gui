@@ -2,7 +2,7 @@
 
 KFileDialog::KFileDialog()
 {
-    this->setStyleSheet("QFileDialog QWidget { background-color: #2f535f; color: rgb(131, 148, 150); font-weight: 700;}");
+    this->setStyleSheet("QFileDialog QWidget { background-color: rgb(196, 25, 0); color: rgb(131, 148, 150); font-weight: 700;}");
 }
 
 QString KFileDialog::openFileDialog() {
