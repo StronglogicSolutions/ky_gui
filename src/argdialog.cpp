@@ -18,7 +18,7 @@ ArgDialog::ArgDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     QObject::connect(ui->addFile, &QPushButton::clicked, this, [this]() {
-        QFileDialog file_dialog = QFileDialog(this);
+        QFileDialog file_dialog;
         file_dialog.setStyleSheet("QFileDialog QWidget { color: white; font-weight: 700}");
         auto file_path = file_dialog.getOpenFileName(this,
                                                 tr("Open File"), "~", tr("All Files (*.*)"));
