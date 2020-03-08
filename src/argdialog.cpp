@@ -198,6 +198,7 @@ void ArgDialog::clearPost() {
     m_ig_post.requested_by.clear();
     m_ig_post.promote_share = "Share the post through IG story if you enjoy the phrase 🙋‍♀️";
     m_ig_post.requested_by_phrase = "The phrase was requested by ";
+    ui->argType->setCurrentIndex(0);
 }
 
 void ArgDialog::clearTask() {
