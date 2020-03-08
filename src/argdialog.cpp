@@ -17,6 +17,8 @@ ArgDialog::ArgDialog(QWidget *parent) :
     m_ig_post(IGPost{})
 {
     ui->setupUi(this);
+
+    ui->argCommandButtons->button(QDialogButtonBox::Cancel)->setStyleSheet(QString("background:%1").arg("#2f535f"));
     QObject::connect(ui->addFile, &QPushButton::clicked, this, [this]() {
         KFileDialog file_dialog{};
         auto file_path = file_dialog.openFileDialog();
@@ -50,7 +52,7 @@ ArgDialog::ArgDialog(QWidget *parent) :
         }
     });
 
-    ui->argList->setHorizontalHeaderLabels(QStringList{"Value", "Type"});
+    ui->argList->setHorizontalHeaderLabels(QStringList{"Value", "Type", "Preview", "Delete"});
     ui->argList->setColumnWidth(0, 300);
     ui->argList->setColumnWidth(1, 40);
     ui->argList->setColumnWidth(2, 100);
@@ -79,8 +81,6 @@ ArgDialog::ArgDialog(QWidget *parent) :
         }
     });
 
-    QDateTime date_time = QDateTime::currentDateTime();
-//    date_time.
     ui->dateTime->setDateTime(QDateTime::currentDateTime());
 
     QObject::connect(ui->dateTime, &QDateTimeEdit::dateTimeChanged, this, [this]() {
@@ -118,34 +118,14 @@ ArgDialog::ArgDialog(QWidget *parent) :
 
                 emit ArgDialog::taskRequestReady(m_task, true);
             }
-            defaultPost(); // reset m_ig_post to default values
+            clearPost(); // reset m_ig_post to default values
         }
-    });
-
-    QObject::connect(ui->devTestButton, &QPushButton::clicked, this, [this]() {
-        clearPost();
-
-        m_ig_post = IGPost{
-            .description = escapeText("My description yay!!!").toUtf8().constData(),
-            .datetime = std::to_string(QDateTime::currentDateTime().toTime_t() + 12000),
-            .promote_share = escapeText("If you enjoy the phrase, please like and share 🙋‍♀️").toUtf8().constData(),
-            .link_in_bio = escapeText("Download a FREE PDF of 245 basic verbs (link 🔗 in bio 👆").toUtf8().constData(),
-            .hashtags = {"love", "life"},
-            .requested_by = {"unwillingagent"},
-            .files = {{ .name = "holy.jpg", .path = "/data/c/ky_gui/assets/holy.jpg", .type = FileType::IMAGE }}
-        };
     });
 
     QObject::connect(ui->clear, &QPushButton::clicked, this, [this]() {
         clearPost();
         ui->argList->setRowCount(0);
-        qDebug() << "Task cleared";
-    });
-
-    QObject::connect(ui->default_args, &QPushButton::clicked, this, [this]() {
-        defaultPost();
-        ui->argList->setRowCount(0);
-        qDebug() << "Task set to default values";
+        qDebug() << "Task cleared and restored to default values";
     });
 }
 
@@ -190,7 +170,7 @@ void ArgDialog::addItem(QString value, QString type) {
     });
     ui->argList->setItem(row, 0, item);
     ui->argList->setItem(row, 1, item2);
-    ui->argList->setCellWidget(row, 2, q_pb);
+    ui->argList->setCellWidget(row, 3, q_pb);
 }
 
 void ArgDialog::addFile(QString path) {
@@ -208,20 +188,10 @@ void ArgDialog::addFile(QString path) {
 
 void ArgDialog::clearPost() {
     m_ig_post.files.clear();
-    m_ig_post.header = "";
-    m_ig_post.datetime = "";
-    m_ig_post.hashtags = {};
-    m_ig_post.description = "";
-    m_ig_post.link_in_bio = "";
-    m_ig_post.requested_by = {};
-    m_ig_post.promote_share = "";
-    m_ig_post.requested_by_phrase = "";
-}
-
-void ArgDialog::defaultPost() {
-    m_ig_post.files.clear();
     m_ig_post.header = "Learn to speak like native Korean speakers 🙆‍♀️🇰🇷";
-    m_ig_post.datetime = "";
+    QDateTime date_time = QDateTime::currentDateTime();
+    ui->dateTime->setDateTime(date_time);
+    m_ig_post.datetime = date_time.toTime_t();
     m_ig_post.hashtags.clear();
     m_ig_post.description = "";
     m_ig_post.link_in_bio = "Subscribe to my YouTube channel (link 🔗in bio) to learn more about Korean language and culture ❤";

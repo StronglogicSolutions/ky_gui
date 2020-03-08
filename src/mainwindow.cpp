@@ -273,7 +273,7 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
         } else {
             event_message += message;
         }
-        m_events.push_front(event_message);
+        m_events.push_back(event_message);
         m_event_model->setItem(m_event_model->rowCount(), createEventListItem(event_message));
     } else {
         qDebug() << "Unknown update type. Cannot update UI";

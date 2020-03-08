@@ -48,7 +48,6 @@ public:
     QLabel *label_5;
     QDateTimeEdit *dateTime;
     QHBoxLayout *horizontalLayout_5;
-    QPushButton *devTestButton;
     QDialogButtonBox *argCommandButtons;
     QWidget *verticalLayoutWidget_2;
     QVBoxLayout *verticalLayout_2;
@@ -58,7 +57,6 @@ public:
     QTableWidget *argList;
     QSpacerItem *horizontalSpacer_2;
     QHBoxLayout *horizontalLayout_7;
-    QPushButton *default_args;
     QPushButton *clear;
 
     void setupUi(QDialog *ArgDialog)
@@ -157,7 +155,7 @@ public:
 
         addArgument = new QPushButton(verticalLayoutWidget);
         addArgument->setObjectName(QString::fromUtf8("addArgument"));
-        addArgument->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 85, 0);\n"
+        addArgument->setStyleSheet(QString::fromUtf8("background-color: #2f535f;\n"
 "font: 87 11pt \"Noto Sans\";\n"
 "color: rgb(0, 43, 54);\n"
 "font-weight: 700;\n"
@@ -189,7 +187,7 @@ public:
 
         addFile = new QPushButton(verticalLayoutWidget);
         addFile->setObjectName(QString::fromUtf8("addFile"));
-        addFile->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 85, 0);\n"
+        addFile->setStyleSheet(QString::fromUtf8("background-color: #2f535f;\n"
 "font: 87 11pt \"Noto Sans\";\n"
 "color: rgb(0, 43, 54);\n"
 "font-weight: 700;\n"
@@ -237,23 +235,6 @@ public:
 
         horizontalLayout_5 = new QHBoxLayout();
         horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
-        devTestButton = new QPushButton(verticalLayoutWidget);
-        devTestButton->setObjectName(QString::fromUtf8("devTestButton"));
-        devTestButton->setStyleSheet(QString::fromUtf8("background-color: rgb(130, 255, 121);\n"
-"background-color: rgb(2, 180, 43);\n"
-"font: 87 11pt \"Noto Sans\";\n"
-"color: rgb(0, 0, 0);\n"
-"font-weight: 700;\n"
-"padding: 4px;\n"
-"border-style: outset;\n"
-"border-width: 2px;\n"
-"border-radius: 4px;\n"
-"border-color: #00000f;\n"
-"min-width: 4em;\n"
-"padding: 4px;"));
-
-        horizontalLayout_5->addWidget(devTestButton);
-
         argCommandButtons = new QDialogButtonBox(verticalLayoutWidget);
         argCommandButtons->setObjectName(QString::fromUtf8("argCommandButtons"));
         QSizePolicy sizePolicy3(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -333,25 +314,9 @@ public:
 
         horizontalLayout_7 = new QHBoxLayout();
         horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
-        default_args = new QPushButton(verticalLayoutWidget_2);
-        default_args->setObjectName(QString::fromUtf8("default_args"));
-        default_args->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 85, 0);\n"
-"font: 87 11pt \"Noto Sans\";\n"
-"color: rgb(0, 43, 54);\n"
-"font-weight: 700;\n"
-"padding: 4px;\n"
-"border-style: outset;\n"
-"border-width: 2px;\n"
-"border-radius: 4px;\n"
-"border-color: #00000f;\n"
-"min-width: 4em;\n"
-"padding: 4px;"));
-
-        horizontalLayout_7->addWidget(default_args);
-
         clear = new QPushButton(verticalLayoutWidget_2);
         clear->setObjectName(QString::fromUtf8("clear"));
-        clear->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 85, 0);\n"
+        clear->setStyleSheet(QString::fromUtf8("background-color: #2f535f;\n"
 "font: 87 11pt \"Noto Sans\";\n"
 "color: rgb(0, 43, 54);\n"
 "font-weight: 700;\n"
@@ -392,9 +357,7 @@ public:
         label_4->setText(QCoreApplication::translate("ArgDialog", "Add file attachment", nullptr));
         addFile->setText(QCoreApplication::translate("ArgDialog", "Choose", nullptr));
         label_5->setText(QCoreApplication::translate("ArgDialog", "Time", nullptr));
-        devTestButton->setText(QCoreApplication::translate("ArgDialog", "DEV TEST", nullptr));
         label->setText(QCoreApplication::translate("ArgDialog", "Items to send", nullptr));
-        default_args->setText(QCoreApplication::translate("ArgDialog", "Default", nullptr));
         clear->setText(QCoreApplication::translate("ArgDialog", "Clear", nullptr));
     } // retranslateUi
 
