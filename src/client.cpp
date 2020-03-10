@@ -26,12 +26,10 @@ static const int HEADER_SIZE = 4;
 flatbuffers::FlatBufferBuilder builder(1024);
 
 /**
- * @brief Client::createMessageHandler
  * @param [in] {std::function<void()>} cb A non-returning function to be called without parameter
  * @returns {MessageHandler} A message loop handler
  */
-Client::MessageHandler Client::createMessageHandler(
-    std::function<void()> cb) {
+Client::MessageHandler Client::createMessageHandler(std::function<void()> cb) {
   return MessageHandler(cb);
 }
 
