@@ -275,6 +275,7 @@ void Client::sendTaskEncoded(TaskType type, std::vector<std::string> args) {
         ::send(m_client_socket_fd, send_buffer, size + 5, 0);
         builder.Clear();
         sent_files.clear();
+        m_task.clear();
     }
 }
 
@@ -331,13 +332,14 @@ void Client::sendPackets(uint8_t* data, int size) {
 }
 
 void Client::ping() {
-    if (m_client_socket_fd != -1) {
-        uint8_t send_buffer[5];
-        memset(send_buffer, 0, 5);
-        send_buffer[4] = (TaskCode::PINGBYTE & 0xFF);
-        qDebug() << "Pinging server";
-        ::send(m_client_socket_fd, send_buffer, 5, 0);
-    }
+  if (m_client_socket_fd != -1 && outgoing_files.isEmpty() &&
+      sent_files.empty()) {
+    uint8_t send_buffer[5];
+    memset(send_buffer, 0, 5);
+    send_buffer[4] = (TaskCode::PINGBYTE & 0xFF);
+    qDebug() << "Pinging server";
+    ::send(m_client_socket_fd, send_buffer, 5, 0);
+  }
 }
 
 /**
