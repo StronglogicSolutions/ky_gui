@@ -85,13 +85,17 @@ void Client::handleMessages() {
             QVector<QString> args = getArgs(data_string.c_str());
             emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args); // Update UI (event)
             if (isUploadCompleteEvent(event.toUtf8().constData())) { // Upload complete
-                if (!args.isEmpty()) {
-                    sent_files.at(sent_files.size() - 1).timestamp = std::stoi(args.at(0).toUtf8().constData());
-                    if (outgoing_files.isEmpty()) {
-                        sendTaskEncoded(TaskType::INSTAGRAM, m_task);
-                    } else {
-                        sendEncoded(createOperation("FileUpload", {"Subsequent file"}));
-                    }
+              file_was_sent = true;
+              if (!args.isEmpty()) {
+                sent_files.at(sent_files.size() - 1).timestamp =
+                    std::stoi(args.at(0).toUtf8().constData());
+                if (outgoing_files.isEmpty()) {
+                  sendTaskEncoded(TaskType::INSTAGRAM, m_task);
+                  file_was_sent = false;
+                } else {
+                  sendEncoded(
+                      createOperation("FileUpload", {"Subsequent file"}));
+                }
                 }
             }
         }
@@ -332,12 +336,17 @@ void Client::sendPackets(uint8_t* data, int size) {
 }
 
 void Client::ping() {
-  if (m_client_socket_fd != -1 && sent_files.empty()) {
-    uint8_t send_buffer[5];
-    memset(send_buffer, 0, 5);
-    send_buffer[4] = (TaskCode::PINGBYTE & 0xFF);
-    qDebug() << "Pinging server";
-    ::send(m_client_socket_fd, send_buffer, 5, 0);
+  if (m_client_socket_fd != -1) {  // if we have active connection
+    if (outgoing_files.size() == 0 || file_was_sent) {
+      // 1st condition: we aren't sending file packets
+      // 2nd condition: we're sending packets, but one file has sent and we want
+      // to ping in case the server is unresponsive
+      uint8_t send_buffer[5];
+      memset(send_buffer, 0, 5);
+      send_buffer[4] = (TaskCode::PINGBYTE & 0xFF);
+      qDebug() << "Pinging server";
+      ::send(m_client_socket_fd, send_buffer, 5, 0);
+    }
   }
 }
 
@@ -445,8 +454,9 @@ void Client::scheduleTask(std::vector<std::string> task_args, bool file_pending)
  */
 void Client::sendFiles(QVector<KFileData> files) {
     if (outgoing_files.isEmpty()) {
-        for (const auto & file : files) {
-            outgoing_files.enqueue(file);
+      file_was_sent = false;
+      for (const auto& file : files) {
+        outgoing_files.enqueue(file);
         }
         std::string send_file_operation = createOperation("FileUpload", {});
         sendEncoded(send_file_operation);
