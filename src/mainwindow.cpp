@@ -183,7 +183,7 @@ void MainWindow::connectClient() {
 
   QTimer* timer = new QTimer(this);
   connect(timer, &QTimer::timeout, q_client, &Client::ping);
-  timer->start(30000);
+  timer->start(10000);
 }
 
 void MainWindow::handleKey() {

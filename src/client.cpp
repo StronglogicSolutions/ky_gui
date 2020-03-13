@@ -85,7 +85,6 @@ void Client::handleMessages() {
             QVector<QString> args = getArgs(data_string.c_str());
             emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args); // Update UI (event)
             if (isUploadCompleteEvent(event.toUtf8().constData())) { // Upload complete
-              file_was_sent = true;
               if (!args.isEmpty()) {
                 sent_files.at(sent_files.size() - 1).timestamp =
                     std::stoi(args.at(0).toUtf8().constData());
@@ -331,6 +330,7 @@ void Client::sendPackets(uint8_t* data, int size) {
         if (is_last_packet) {
             // cleanup
             qDebug() << "Last packet of file sent";
+            file_was_sent = true;
         }
     }
 }
