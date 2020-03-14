@@ -1,14 +1,14 @@
 ﻿#include <include/argdialog.h>
 #include <ui_argdialog.h>
-#include <algorithm>
-#include <QDebug>
-#include <QStringList>
-#include <QIODevice>
-#include <vector>
-#include <QTableWidgetItem>
-#include <QDateTime>
 #include <QCalendarWidget>
+#include <QDateTime>
+#include <QDebug>
+#include <QIODevice>
 #include <QMimeDatabase>
+#include <QStringList>
+#include <QTableWidgetItem>
+#include <algorithm>
+#include <vector>
 
 ArgDialog::ArgDialog(QWidget *parent)
     : QDialog(parent),
@@ -164,8 +164,9 @@ void ArgDialog::addItem(QString value, QString type) {
   QPushButton *q_pb = new QPushButton();
   q_pb->setText("Delete");
   q_pb->setIcon(std::move(QIcon(":/icons/icons/quit.png")));
-  QObject::connect(q_pb, &QPushButton::clicked, this,
-                   [this, row]() { ui->argList->removeRow(row); });
+  QObject::connect(q_pb, &QPushButton::clicked, this, [this, row]() {
+    ui->argList->removeRow(ui->argList->currentRow());
+  });
   ui->argList->setItem(row, 0, item);
   ui->argList->setItem(row, 1, item2);
   ui->argList->setCellWidget(row, 3, q_pb);
