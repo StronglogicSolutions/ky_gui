@@ -41,6 +41,11 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   ui->setupUi(this);
   this->setWindowTitle("KYGUI");
   setConnectScreen();
+  m_config = getConfigObject(ui->kyConfig->toPlainText());
+  QString file_path = m_config.at("fileDirectory");
+  if (file_path != NULL) {
+    arg_ui->setFilePath(file_path);
+  }
   connect(ui->connect, &QPushButton::clicked, this, &MainWindow::connectClient);
   ui->processList->setModel(m_process_model);
   ui->eventList->setModel(m_event_model);
@@ -238,8 +243,7 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
     qDebug() << "Updating commands";
     QComboBox* app_list = ui->appList;
     app_list->clear();
-    ConfigJson config = getConfigObject(ui->kyConfig->toPlainText());
-    QString default_app = config.at("defaultApp");
+    QString default_app = m_config.at("defaultApp");
     int app_index = 0;
     for (const auto& s : v) {
       app_list->addItem(s);

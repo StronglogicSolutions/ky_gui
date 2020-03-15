@@ -63,6 +63,7 @@ class ArgDialog : public QDialog {
  public:
   explicit ArgDialog(QWidget *parent = nullptr);
   virtual void keyPressEvent(QKeyEvent* e);
+  void setFilePath(QString path);
   ~ArgDialog();
 
  signals:
@@ -83,6 +84,7 @@ class ArgDialog : public QDialog {
   void addFile(QString path);
   Task m_task;
   IGPost m_ig_post;
+  QString m_file_path;
 };
 
 #endif  // ARGDIALOG_H

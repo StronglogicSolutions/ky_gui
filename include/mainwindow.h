@@ -70,8 +70,10 @@ private:
     QList<QString> m_events;
     QStandardItemModel* m_process_model;
     QStandardItemModel* m_event_model;
+    /** Misc */
+    ConfigJson m_config;
 
-private slots:
+   private slots:
     /** Receivers */
     void connectClient();
     void updateMessages(int t, const QString& s, StringVec v);

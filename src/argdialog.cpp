@@ -21,7 +21,7 @@ ArgDialog::ArgDialog(QWidget *parent)
     ->setStyleSheet(QString("background:%1").arg("#2f535f"));
   QObject::connect(ui->addFile, &QPushButton::clicked, this, [this]() {
     KFileDialog file_dialog{};
-    auto file_path = file_dialog.openFileDialog();
+    auto file_path = file_dialog.openFileDialog(m_file_path);
     qDebug() << "Selected file:" << file_path;
     if (file_path.size() > 0) {
       auto slash_index = file_path.lastIndexOf("/") + 1;
@@ -278,6 +278,8 @@ void ArgDialog::keyPressEvent(QKeyEvent *e) {
         }
     }
 }
+
+void ArgDialog::setFilePath(QString path) { m_file_path = path; }
 
 ArgDialog::~ArgDialog()
 {

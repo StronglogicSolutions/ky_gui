@@ -7,7 +7,7 @@ class KFileDialog : QFileDialog {
 Q_OBJECT
 public:
     KFileDialog();
-    QString openFileDialog();
+    QString openFileDialog(QString file_path = "");
 };
 
 #endif // KFILEDIALOG_H
