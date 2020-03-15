@@ -41,11 +41,6 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   ui->setupUi(this);
   this->setWindowTitle("KYGUI");
   setConnectScreen();
-  m_config = getConfigObject(ui->kyConfig->toPlainText());
-  QString file_path = m_config.at("fileDirectory");
-  if (file_path != NULL) {
-    arg_ui->setFilePath(file_path);
-  }
   connect(ui->connect, &QPushButton::clicked, this, &MainWindow::connectClient);
   ui->processList->setModel(m_process_model);
   ui->eventList->setModel(m_event_model);
@@ -84,6 +79,11 @@ void MainWindow::setConnectScreen(bool visible) {
  * @brief MainWindow::buttonClicked
  */
 void MainWindow::connectClient() {
+  m_config = getConfigObject(ui->kyConfig->toPlainText());
+  QString file_path = m_config.at("fileDirectory");
+  if (file_path != NULL) {
+    arg_ui->setFilePath(file_path);
+  }
   setConnectScreen(false);
   qDebug() << "Connecting to KServer";
   QObject::connect(q_client, &Client::messageReceived, this,

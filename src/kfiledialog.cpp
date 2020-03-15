@@ -9,7 +9,13 @@ QString KFileDialog::openFileDialog(QString file_path) {
   if (!file_path.isEmpty()) {
     this->setDirectory(file_path);
   }
-  return this->getOpenFileName(this, tr("Open File"), "~",
-                               tr("All Files (*.*)"), nullptr,
-                               QFileDialog::DontUseNativeDialog);
+  this->exec();
+  QStringList filenames = this->selectedFiles();
+  if (!filenames.empty()) {
+    return filenames.at(0);
+  }
+  //  return this->getOpenFileName(this, tr("Open File"), "~",
+  //                               tr("All Files (*.*)"), nullptr,
+  //                               QFileDialog::DontUseNativeDialog);
+  return "";
 }
