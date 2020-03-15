@@ -47,25 +47,20 @@ public:
     QHBoxLayout *horizontalLayout_4;
     QLabel *label_5;
     QDateTimeEdit *dateTime;
-    QHBoxLayout *horizontalLayout_5;
-    QPushButton *devTestButton;
-    QDialogButtonBox *argCommandButtons;
-    QWidget *verticalLayoutWidget_2;
-    QVBoxLayout *verticalLayout_2;
     QLabel *label;
     QHBoxLayout *horizontalLayout_6;
     QSpacerItem *horizontalSpacer;
     QTableWidget *argList;
     QSpacerItem *horizontalSpacer_2;
-    QHBoxLayout *horizontalLayout_7;
-    QPushButton *default_args;
     QPushButton *clear;
+    QHBoxLayout *horizontalLayout_5;
+    QDialogButtonBox *argCommandButtons;
 
     void setupUi(QDialog *ArgDialog)
     {
         if (ArgDialog->objectName().isEmpty())
             ArgDialog->setObjectName(QString::fromUtf8("ArgDialog"));
-        ArgDialog->resize(1366, 671);
+        ArgDialog->resize(940, 864);
         QIcon icon;
         icon.addFile(QString::fromUtf8("favicon.ico"), QSize(), QIcon::Normal, QIcon::Off);
         ArgDialog->setWindowIcon(icon);
@@ -73,7 +68,7 @@ public:
 "background-color: rgb(0, 43, 54);"));
         verticalLayoutWidget = new QWidget(ArgDialog);
         verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
-        verticalLayoutWidget->setGeometry(QRect(10, 10, 701, 591));
+        verticalLayoutWidget->setGeometry(QRect(10, 10, 921, 851));
         verticalLayout = new QVBoxLayout(verticalLayoutWidget);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
@@ -134,7 +129,12 @@ public:
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         label_3 = new QLabel(verticalLayoutWidget);
         label_3->setObjectName(QString::fromUtf8("label_3"));
-        label_3->setMinimumSize(QSize(108, 0));
+        QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(label_3->sizePolicy().hasHeightForWidth());
+        label_3->setSizePolicy(sizePolicy2);
+        label_3->setMinimumSize(QSize(0, 0));
         label_3->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
 "color: rgb(131, 148, 150);\n"
 "font-weight: 700;\n"
@@ -152,14 +152,17 @@ public:
 
         horizontalLayout_2->addWidget(argInput);
 
-
-        verticalLayout->addLayout(horizontalLayout_2);
-
         addArgument = new QPushButton(verticalLayoutWidget);
         addArgument->setObjectName(QString::fromUtf8("addArgument"));
-        addArgument->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 85, 0);\n"
+        QSizePolicy sizePolicy3(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(addArgument->sizePolicy().hasHeightForWidth());
+        addArgument->setSizePolicy(sizePolicy3);
+        addArgument->setMinimumSize(QSize(100, 0));
+        addArgument->setStyleSheet(QString::fromUtf8("background-color: #2f535f;\n"
 "font: 87 11pt \"Noto Sans\";\n"
-"color: rgb(0, 43, 54);\n"
+"color: rgb(149, 155, 156);\n"
 "font-weight: 700;\n"
 "padding: 4px;\n"
 "border-style: outset;\n"
@@ -168,18 +171,25 @@ public:
 "border-color: #00000f;\n"
 "min-width: 4em;\n"
 "padding: 4px;"));
+        QIcon icon1;
+        icon1.addFile(QString::fromUtf8("icons/right-arrow.png"), QSize(), QIcon::Normal, QIcon::Off);
+        addArgument->setIcon(icon1);
+        addArgument->setFlat(false);
 
-        verticalLayout->addWidget(addArgument);
+        horizontalLayout_2->addWidget(addArgument);
+
+
+        verticalLayout->addLayout(horizontalLayout_2);
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         label_4 = new QLabel(verticalLayoutWidget);
         label_4->setObjectName(QString::fromUtf8("label_4"));
-        QSizePolicy sizePolicy2(QSizePolicy::Fixed, QSizePolicy::Preferred);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(label_4->sizePolicy().hasHeightForWidth());
-        label_4->setSizePolicy(sizePolicy2);
+        QSizePolicy sizePolicy4(QSizePolicy::Fixed, QSizePolicy::Preferred);
+        sizePolicy4.setHorizontalStretch(0);
+        sizePolicy4.setVerticalStretch(0);
+        sizePolicy4.setHeightForWidth(label_4->sizePolicy().hasHeightForWidth());
+        label_4->setSizePolicy(sizePolicy4);
         label_4->setMinimumSize(QSize(196, 0));
         label_4->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
 "color: rgb(131, 148, 150);\n"
@@ -189,9 +199,9 @@ public:
 
         addFile = new QPushButton(verticalLayoutWidget);
         addFile->setObjectName(QString::fromUtf8("addFile"));
-        addFile->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 85, 0);\n"
+        addFile->setStyleSheet(QString::fromUtf8("background-color: #2f535f;\n"
 "font: 87 11pt \"Noto Sans\";\n"
-"color: rgb(0, 43, 54);\n"
+"color: rgb(149, 155, 156);\n"
 "font-weight: 700;\n"
 "padding: 4px;\n"
 "border-style: outset;\n"
@@ -210,8 +220,8 @@ public:
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
         label_5 = new QLabel(verticalLayoutWidget);
         label_5->setObjectName(QString::fromUtf8("label_5"));
-        sizePolicy2.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
-        label_5->setSizePolicy(sizePolicy2);
+        sizePolicy4.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
+        label_5->setSizePolicy(sizePolicy4);
         label_5->setMinimumSize(QSize(52, 0));
         label_5->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
 "color: rgb(131, 148, 150);\n"
@@ -235,14 +245,52 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_4);
 
-        horizontalLayout_5 = new QHBoxLayout();
-        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
-        devTestButton = new QPushButton(verticalLayoutWidget);
-        devTestButton->setObjectName(QString::fromUtf8("devTestButton"));
-        devTestButton->setStyleSheet(QString::fromUtf8("background-color: rgb(130, 255, 121);\n"
-"background-color: rgb(2, 180, 43);\n"
+        label = new QLabel(verticalLayoutWidget);
+        label->setObjectName(QString::fromUtf8("label"));
+        label->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
+"color: rgb(131, 148, 150);\n"
+"font-weight: 700;\n"
+"padding-left: 8px;"));
+
+        verticalLayout->addWidget(label);
+
+        horizontalLayout_6 = new QHBoxLayout();
+        horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
+        horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Maximum, QSizePolicy::Minimum);
+
+        horizontalLayout_6->addItem(horizontalSpacer);
+
+        argList = new QTableWidget(verticalLayoutWidget);
+        if (argList->columnCount() < 4)
+            argList->setColumnCount(4);
+        argList->setObjectName(QString::fromUtf8("argList"));
+        argList->setStyleSheet(QString::fromUtf8("font: 87 11pt \"Noto Sans\";\n"
+"background-color: #2f535f;\n"
+"color: rgb(131, 148, 150);\n"
+"font-weight: 700;\n"
+"padding-left: 2px;"));
+        argList->setShowGrid(true);
+        argList->setColumnCount(4);
+        argList->horizontalHeader()->setCascadingSectionResizes(false);
+        argList->horizontalHeader()->setMinimumSectionSize(100);
+        argList->horizontalHeader()->setDefaultSectionSize(200);
+        argList->verticalHeader()->setMinimumSectionSize(100);
+        argList->verticalHeader()->setDefaultSectionSize(100);
+
+        horizontalLayout_6->addWidget(argList);
+
+        horizontalSpacer_2 = new QSpacerItem(20, 20, QSizePolicy::Maximum, QSizePolicy::Minimum);
+
+        horizontalLayout_6->addItem(horizontalSpacer_2);
+
+
+        verticalLayout->addLayout(horizontalLayout_6);
+
+        clear = new QPushButton(verticalLayoutWidget);
+        clear->setObjectName(QString::fromUtf8("clear"));
+        clear->setStyleSheet(QString::fromUtf8("background-color: #2f535f;\n"
 "font: 87 11pt \"Noto Sans\";\n"
-"color: rgb(0, 0, 0);\n"
+"color: rgb(149, 155, 156);\n"
 "font-weight: 700;\n"
 "padding: 4px;\n"
 "border-style: outset;\n"
@@ -252,13 +300,12 @@ public:
 "min-width: 4em;\n"
 "padding: 4px;"));
 
-        horizontalLayout_5->addWidget(devTestButton);
+        verticalLayout->addWidget(clear);
 
+        horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
         argCommandButtons = new QDialogButtonBox(verticalLayoutWidget);
         argCommandButtons->setObjectName(QString::fromUtf8("argCommandButtons"));
-        QSizePolicy sizePolicy3(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
         sizePolicy3.setHeightForWidth(argCommandButtons->sizePolicy().hasHeightForWidth());
         argCommandButtons->setSizePolicy(sizePolicy3);
         argCommandButtons->setLayoutDirection(Qt::LeftToRight);
@@ -284,90 +331,7 @@ public:
         verticalLayout->addLayout(horizontalLayout_5);
 
         verticalLayout->setStretch(2, 1);
-        verticalLayoutWidget_2 = new QWidget(ArgDialog);
-        verticalLayoutWidget_2->setObjectName(QString::fromUtf8("verticalLayoutWidget_2"));
-        verticalLayoutWidget_2->setGeometry(QRect(710, 10, 641, 591));
-        verticalLayout_2 = new QVBoxLayout(verticalLayoutWidget_2);
-        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
-        label = new QLabel(verticalLayoutWidget_2);
-        label->setObjectName(QString::fromUtf8("label"));
-        label->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
-"color: rgb(131, 148, 150);\n"
-"font-weight: 700;\n"
-"padding-left: 8px;"));
-
-        verticalLayout_2->addWidget(label);
-
-        horizontalLayout_6 = new QHBoxLayout();
-        horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
-        horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Maximum, QSizePolicy::Minimum);
-
-        horizontalLayout_6->addItem(horizontalSpacer);
-
-        argList = new QTableWidget(verticalLayoutWidget_2);
-        if (argList->columnCount() < 4)
-            argList->setColumnCount(4);
-        argList->setObjectName(QString::fromUtf8("argList"));
-        argList->setStyleSheet(QString::fromUtf8("font: 87 11pt \"Noto Sans\";\n"
-"background-color: #2f535f;\n"
-"color: rgb(131, 148, 150);\n"
-"font-weight: 700;\n"
-"padding-left: 2px;"));
-        argList->setShowGrid(true);
-        argList->setColumnCount(4);
-        argList->horizontalHeader()->setCascadingSectionResizes(false);
-        argList->horizontalHeader()->setMinimumSectionSize(100);
-        argList->horizontalHeader()->setDefaultSectionSize(200);
-        argList->verticalHeader()->setMinimumSectionSize(100);
-        argList->verticalHeader()->setDefaultSectionSize(100);
-
-        horizontalLayout_6->addWidget(argList);
-
-        horizontalSpacer_2 = new QSpacerItem(20, 20, QSizePolicy::Maximum, QSizePolicy::Minimum);
-
-        horizontalLayout_6->addItem(horizontalSpacer_2);
-
-
-        verticalLayout_2->addLayout(horizontalLayout_6);
-
-        horizontalLayout_7 = new QHBoxLayout();
-        horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
-        default_args = new QPushButton(verticalLayoutWidget_2);
-        default_args->setObjectName(QString::fromUtf8("default_args"));
-        default_args->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 85, 0);\n"
-"font: 87 11pt \"Noto Sans\";\n"
-"color: rgb(0, 43, 54);\n"
-"font-weight: 700;\n"
-"padding: 4px;\n"
-"border-style: outset;\n"
-"border-width: 2px;\n"
-"border-radius: 4px;\n"
-"border-color: #00000f;\n"
-"min-width: 4em;\n"
-"padding: 4px;"));
-
-        horizontalLayout_7->addWidget(default_args);
-
-        clear = new QPushButton(verticalLayoutWidget_2);
-        clear->setObjectName(QString::fromUtf8("clear"));
-        clear->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 85, 0);\n"
-"font: 87 11pt \"Noto Sans\";\n"
-"color: rgb(0, 43, 54);\n"
-"font-weight: 700;\n"
-"padding: 4px;\n"
-"border-style: outset;\n"
-"border-width: 2px;\n"
-"border-radius: 4px;\n"
-"border-color: #00000f;\n"
-"min-width: 4em;\n"
-"padding: 4px;"));
-
-        horizontalLayout_7->addWidget(clear);
-
-
-        verticalLayout_2->addLayout(horizontalLayout_7);
-
+        verticalLayout->setStretch(6, 3);
 
         retranslateUi(ArgDialog);
         QObject::connect(argCommandButtons, SIGNAL(accepted()), ArgDialog, SLOT(accept()));
@@ -392,9 +356,7 @@ public:
         label_4->setText(QCoreApplication::translate("ArgDialog", "Add file attachment", nullptr));
         addFile->setText(QCoreApplication::translate("ArgDialog", "Choose", nullptr));
         label_5->setText(QCoreApplication::translate("ArgDialog", "Time", nullptr));
-        devTestButton->setText(QCoreApplication::translate("ArgDialog", "DEV TEST", nullptr));
         label->setText(QCoreApplication::translate("ArgDialog", "Items to send", nullptr));
-        default_args->setText(QCoreApplication::translate("ArgDialog", "Default", nullptr));
         clear->setText(QCoreApplication::translate("ArgDialog", "Clear", nullptr));
     } // retranslateUi
 

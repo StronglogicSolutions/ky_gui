@@ -98,6 +98,7 @@ private:
     int m_client_socket_fd;
     std::vector<std::string> m_task;
     bool executing;
+    bool file_was_sent;
     CommandMap m_commands;
     CommandArgMap m_command_arg_map;
     std::vector<int> selected_commands;

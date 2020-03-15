@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1366</width>
-    <height>671</height>
+    <width>940</width>
+    <height>864</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,11 +26,11 @@ background-color: rgb(0, 43, 54);</string>
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>701</width>
-     <height>591</height>
+     <width>921</width>
+     <height>851</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0,0,0">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0,0,3,0,0">
     <item>
      <widget class="QLabel" name="argDialogTitle">
       <property name="font">
@@ -125,9 +125,15 @@ font-weight: 700;
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
        <widget class="QLabel" name="label_3">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
-          <width>108</width>
+          <width>0</width>
           <height>0</height>
          </size>
         </property>
@@ -153,14 +159,24 @@ font-weight: 700;
         </property>
        </widget>
       </item>
-     </layout>
-    </item>
-    <item>
-     <widget class="QPushButton" name="addArgument">
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 85, 0);
+      <item>
+       <widget class="QPushButton" name="addArgument">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: #2f535f;
 font: 87 11pt &quot;Noto Sans&quot;;
-color: rgb(0, 43, 54);
+color: rgb(149, 155, 156);
 font-weight: 700;
 padding: 4px;
 border-style: outset;
@@ -169,11 +185,20 @@ border-radius: 4px;
 border-color: #00000f;
 min-width: 4em;
 padding: 4px;</string>
-      </property>
-      <property name="text">
-       <string>Add</string>
-      </property>
-     </widget>
+        </property>
+        <property name="text">
+         <string>Add</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/right-arrow.png</normaloff>icons/right-arrow.png</iconset>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -204,9 +229,9 @@ font-weight: 700;</string>
       <item>
        <widget class="QPushButton" name="addFile">
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 85, 0);
+         <string notr="true">background-color: #2f535f;
 font: 87 11pt &quot;Noto Sans&quot;;
-color: rgb(0, 43, 54);
+color: rgb(149, 155, 156);
 font-weight: 700;
 padding: 4px;
 border-style: outset;
@@ -274,81 +299,6 @@ font-size: 16pt;</string>
       </item>
      </layout>
     </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_5">
-      <item>
-       <widget class="QPushButton" name="devTestButton">
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(130, 255, 121);
-background-color: rgb(2, 180, 43);
-font: 87 11pt &quot;Noto Sans&quot;;
-color: rgb(0, 0, 0);
-font-weight: 700;
-padding: 4px;
-border-style: outset;
-border-width: 2px;
-border-radius: 4px;
-border-color: #00000f;
-min-width: 4em;
-padding: 4px;</string>
-        </property>
-        <property name="text">
-         <string>DEV TEST</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QDialogButtonBox" name="argCommandButtons">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="autoFillBackground">
-         <bool>false</bool>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 85, 0);
-font: 87 11pt &quot;Noto Sans&quot;;
-color: rgb(0, 43, 54);
-font-weight: 700;
-padding: 4px;
-border-style: outset;
-border-width: 2px;
-border-radius: 4px;
-border-color: #00000f;
-min-width: 4em;
-padding: 4px;</string>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="standardButtons">
-         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
-        </property>
-        <property name="centerButtons">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="verticalLayoutWidget_2">
-   <property name="geometry">
-    <rect>
-     <x>710</x>
-     <y>10</y>
-     <width>641</width>
-     <height>591</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QLabel" name="label">
       <property name="styleSheet">
@@ -435,9 +385,41 @@ padding-left: 2px;</string>
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <widget class="QPushButton" name="clear">
+      <property name="styleSheet">
+       <string notr="true">background-color: #2f535f;
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(149, 155, 156);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+      </property>
+      <property name="text">
+       <string>Clear</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
       <item>
-       <widget class="QPushButton" name="default_args">
+       <widget class="QDialogButtonBox" name="argCommandButtons">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
         <property name="styleSheet">
          <string notr="true">background-color: rgb(255, 85, 0);
 font: 87 11pt &quot;Noto Sans&quot;;
@@ -451,28 +433,14 @@ border-color: #00000f;
 min-width: 4em;
 padding: 4px;</string>
         </property>
-        <property name="text">
-         <string>Default</string>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="clear">
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 85, 0);
-font: 87 11pt &quot;Noto Sans&quot;;
-color: rgb(0, 43, 54);
-font-weight: 700;
-padding: 4px;
-border-style: outset;
-border-width: 2px;
-border-radius: 4px;
-border-color: #00000f;
-min-width: 4em;
-padding: 4px;</string>
+        <property name="standardButtons">
+         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
         </property>
-        <property name="text">
-         <string>Clear</string>
+        <property name="centerButtons">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
