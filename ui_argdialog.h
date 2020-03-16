@@ -20,7 +20,6 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QVBoxLayout>
@@ -49,18 +48,16 @@ public:
     QDateTimeEdit *dateTime;
     QLabel *label;
     QHBoxLayout *horizontalLayout_6;
-    QSpacerItem *horizontalSpacer;
     QTableWidget *argList;
-    QSpacerItem *horizontalSpacer_2;
-    QPushButton *clear;
     QHBoxLayout *horizontalLayout_5;
+    QPushButton *clear;
     QDialogButtonBox *argCommandButtons;
 
     void setupUi(QDialog *ArgDialog)
     {
         if (ArgDialog->objectName().isEmpty())
             ArgDialog->setObjectName(QString::fromUtf8("ArgDialog"));
-        ArgDialog->resize(940, 864);
+        ArgDialog->resize(970, 864);
         QIcon icon;
         icon.addFile(QString::fromUtf8("favicon.ico"), QSize(), QIcon::Normal, QIcon::Off);
         ArgDialog->setWindowIcon(icon);
@@ -68,7 +65,7 @@ public:
 "background-color: rgb(0, 43, 54);"));
         verticalLayoutWidget = new QWidget(ArgDialog);
         verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
-        verticalLayoutWidget->setGeometry(QRect(10, 10, 921, 851));
+        verticalLayoutWidget->setGeometry(QRect(10, 10, 948, 851));
         verticalLayout = new QVBoxLayout(verticalLayoutWidget);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
@@ -95,10 +92,12 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
         label_2->setSizePolicy(sizePolicy);
-        label_2->setMinimumSize(QSize(108, 0));
+        label_2->setMinimumSize(QSize(196, 0));
+        label_2->setMaximumSize(QSize(196, 16777215));
         label_2->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
 "color: rgb(131, 148, 150);\n"
 "font-weight: 700;"));
+        label_2->setAlignment(Qt::AlignCenter);
 
         horizontalLayout->addWidget(label_2);
 
@@ -134,11 +133,13 @@ public:
         sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(label_3->sizePolicy().hasHeightForWidth());
         label_3->setSizePolicy(sizePolicy2);
-        label_3->setMinimumSize(QSize(0, 0));
+        label_3->setMinimumSize(QSize(196, 0));
+        label_3->setMaximumSize(QSize(196, 16777215));
         label_3->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
 "color: rgb(131, 148, 150);\n"
 "font-weight: 700;\n"
 " qproperty-alignment: 'AlignVLeft';"));
+        label_3->setAlignment(Qt::AlignCenter);
 
         horizontalLayout_2->addWidget(label_3);
 
@@ -152,6 +153,9 @@ public:
 
         horizontalLayout_2->addWidget(argInput);
 
+
+        verticalLayout->addLayout(horizontalLayout_2);
+
         addArgument = new QPushButton(verticalLayoutWidget);
         addArgument->setObjectName(QString::fromUtf8("addArgument"));
         QSizePolicy sizePolicy3(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -160,6 +164,7 @@ public:
         sizePolicy3.setHeightForWidth(addArgument->sizePolicy().hasHeightForWidth());
         addArgument->setSizePolicy(sizePolicy3);
         addArgument->setMinimumSize(QSize(100, 0));
+        addArgument->setLayoutDirection(Qt::LeftToRight);
         addArgument->setStyleSheet(QString::fromUtf8("background-color: #2f535f;\n"
 "font: 87 11pt \"Noto Sans\";\n"
 "color: rgb(149, 155, 156);\n"
@@ -171,15 +176,9 @@ public:
 "border-color: #00000f;\n"
 "min-width: 4em;\n"
 "padding: 4px;"));
-        QIcon icon1;
-        icon1.addFile(QString::fromUtf8("icons/right-arrow.png"), QSize(), QIcon::Normal, QIcon::Off);
-        addArgument->setIcon(icon1);
         addArgument->setFlat(false);
 
-        horizontalLayout_2->addWidget(addArgument);
-
-
-        verticalLayout->addLayout(horizontalLayout_2);
+        verticalLayout->addWidget(addArgument);
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
@@ -194,6 +193,7 @@ public:
         label_4->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
 "color: rgb(131, 148, 150);\n"
 "font-weight: 700;"));
+        label_4->setAlignment(Qt::AlignCenter);
 
         horizontalLayout_3->addWidget(label_4, 0, Qt::AlignVCenter);
 
@@ -220,21 +220,29 @@ public:
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
         label_5 = new QLabel(verticalLayoutWidget);
         label_5->setObjectName(QString::fromUtf8("label_5"));
-        sizePolicy4.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
-        label_5->setSizePolicy(sizePolicy4);
-        label_5->setMinimumSize(QSize(52, 0));
+        QSizePolicy sizePolicy5(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+        sizePolicy5.setHorizontalStretch(0);
+        sizePolicy5.setVerticalStretch(0);
+        sizePolicy5.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
+        label_5->setSizePolicy(sizePolicy5);
+        label_5->setMinimumSize(QSize(196, 0));
+        label_5->setMaximumSize(QSize(196, 16777215));
         label_5->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
 "color: rgb(131, 148, 150);\n"
 "font-weight: 700;\n"
 " qproperty-alignment: 'AlignHCenter';"));
+        label_5->setAlignment(Qt::AlignCenter);
 
         horizontalLayout_4->addWidget(label_5, 0, Qt::AlignVCenter);
 
         dateTime = new QDateTimeEdit(verticalLayoutWidget);
         dateTime->setObjectName(QString::fromUtf8("dateTime"));
-        sizePolicy1.setHeightForWidth(dateTime->sizePolicy().hasHeightForWidth());
-        dateTime->setSizePolicy(sizePolicy1);
-        dateTime->setMinimumSize(QSize(380, 38));
+        QSizePolicy sizePolicy6(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        sizePolicy6.setHorizontalStretch(0);
+        sizePolicy6.setVerticalStretch(0);
+        sizePolicy6.setHeightForWidth(dateTime->sizePolicy().hasHeightForWidth());
+        dateTime->setSizePolicy(sizePolicy6);
+        dateTime->setMinimumSize(QSize(740, 38));
         dateTime->setStyleSheet(QString::fromUtf8("background-color: #00000f;\n"
 "color: #2f535f;\n"
 "font-weight: 700;\n"
@@ -256,10 +264,6 @@ public:
 
         horizontalLayout_6 = new QHBoxLayout();
         horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
-        horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Maximum, QSizePolicy::Minimum);
-
-        horizontalLayout_6->addItem(horizontalSpacer);
-
         argList = new QTableWidget(verticalLayoutWidget);
         if (argList->columnCount() < 4)
             argList->setColumnCount(4);
@@ -279,15 +283,19 @@ public:
 
         horizontalLayout_6->addWidget(argList);
 
-        horizontalSpacer_2 = new QSpacerItem(20, 20, QSizePolicy::Maximum, QSizePolicy::Minimum);
-
-        horizontalLayout_6->addItem(horizontalSpacer_2);
-
 
         verticalLayout->addLayout(horizontalLayout_6);
 
+        horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setSpacing(4);
+        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
         clear = new QPushButton(verticalLayoutWidget);
         clear->setObjectName(QString::fromUtf8("clear"));
+        QSizePolicy sizePolicy7(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        sizePolicy7.setHorizontalStretch(0);
+        sizePolicy7.setVerticalStretch(0);
+        sizePolicy7.setHeightForWidth(clear->sizePolicy().hasHeightForWidth());
+        clear->setSizePolicy(sizePolicy7);
         clear->setStyleSheet(QString::fromUtf8("background-color: #2f535f;\n"
 "font: 87 11pt \"Noto Sans\";\n"
 "color: rgb(149, 155, 156);\n"
@@ -300,10 +308,8 @@ public:
 "min-width: 4em;\n"
 "padding: 4px;"));
 
-        verticalLayout->addWidget(clear);
+        horizontalLayout_5->addWidget(clear);
 
-        horizontalLayout_5 = new QHBoxLayout();
-        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
         argCommandButtons = new QDialogButtonBox(verticalLayoutWidget);
         argCommandButtons->setObjectName(QString::fromUtf8("argCommandButtons"));
         sizePolicy3.setHeightForWidth(argCommandButtons->sizePolicy().hasHeightForWidth());
@@ -331,7 +337,7 @@ public:
         verticalLayout->addLayout(horizontalLayout_5);
 
         verticalLayout->setStretch(2, 1);
-        verticalLayout->setStretch(6, 3);
+        verticalLayout->setStretch(7, 3);
 
         retranslateUi(ArgDialog);
         QObject::connect(argCommandButtons, SIGNAL(accepted()), ArgDialog, SLOT(accept()));
