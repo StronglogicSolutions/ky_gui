@@ -76,6 +76,24 @@ static QString escapeText(QString s) {
     return s;
 }
 
+static QString escapeMessage(QString s) {
+  if (s.contains("\t")) {
+    s.replace("\t", "\\t");
+  }
+  if (s.contains("'")) {
+    qDebug() << "Replacing single quote";
+    if (s.contains('"')) {
+      s.replace('"', "\\\"");
+    }
+    s.replace("'", "\'");
+    return s;
+  }
+  if (s.contains('"')) {
+    s.replace('"', "\\\"");
+  }
+  return s;
+}
+
 static QString escapeTextToRaw(QString s) {
     return escapeText(s).toUtf8().constData();
 }
@@ -365,16 +383,29 @@ inline size_t findNullIndex(uint8_t* data) {
 
 namespace FileUtils {
 QString generatePreview(QString video_path, QString video_name) {
-    QString preview_name = video_name.left(video_name.size() - 4) + "-preview.jpg";
-//    QString command{
-//        "ffmpeg -ss 0 -i " + video_path + " -vf select=\"eq(pict_type\\,I)\" -vframes 1 ./assets/previews/" + preview_name};
-    QString command {
-        "ffmpeg -y -ss 0 -i '" + video_path + "' -vf \"scale=w=640:h=640:force_original_aspect_ratio=decrease,pad=w=640:h=640:x=(iw-ow)/2:y=(ih-oh/2):color=white\" -vframes 1 './assets/previews/" + preview_name + "'"
-    };
+  QString preview_name =
+      video_name.left(video_name.size() - 4) + "-preview.jpg";
+  //    QString command{"ffmpeg -y -ss 0 -i '" + video_path +
+  //                    "' -vf "
+  //                    "\"scale=w=1080:h=1080:force_original_aspect_ratio="
+  //                    "decrease,pad=w=1080:h=1080:x=(iw-ow)/2:y=(ih-oh/"
+  //                    "2):color=white\" -vframes 1 './assets/previews/" +
+  //                    preview_name + "'"};
 
-    std::system(command.toUtf8());
+  //    QString command{"ffmpeg -y -ss 0 -i '" + video_path +
+  //                    "' -vf "
+  //                    "\"scale=w=1080:h=1080:force_original_aspect_ratio="
+  //                    "decrease\" -vframes 1 './assets/previews/" +
+  //                    preview_name + "'"};
+  QString command{
+      "ffmpeg -y -ss 0 -i '" + video_path +
+      "' -vf \"scale=w=640:h=640:force_original_aspect_ratio=decrease\" "
+      "-vframes 1 './assets/previews/" +
+      preview_name + "'"};
 
-    return preview_name;
+  std::system(command.toUtf8());
+
+  return preview_name;
 }
 }; // namespace FileUtils
 }
