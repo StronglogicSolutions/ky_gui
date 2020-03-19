@@ -100,7 +100,7 @@ void MainWindow::connectClient() {
       this->findChild<QPushButton*>("sendMessage");
   // Handle mouse
   QObject::connect(send_message_button, &QPushButton::clicked, this, [this]() {
-    q_client->sendMessage(escapeText(ui->inputText->toPlainText()));
+    q_client->sendMessage(escapeMessage(ui->inputText->toPlainText()));
     ui->inputText->clear();
   });
 
@@ -298,9 +298,8 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
           event_message += app_name;
           event_message += ": ";
           event_message += v.at(2);
-        } else {
-          event_message += ": ";
-          event_message += v.at(1);
+        } else if (QString::compare(message, "Message Received") == 0) {
+          event_message += "\n" + v.at(1) + ": " + v.at(2);
         }
       }
     } else {

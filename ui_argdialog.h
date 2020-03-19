@@ -210,6 +210,14 @@ public:
 "border-color: #00000f;\n"
 "min-width: 4em;\n"
 "padding: 4px;"));
+        QIcon icon1;
+        QString iconThemeName = QString::fromUtf8("clip.png");
+        if (QIcon::hasThemeIcon(iconThemeName)) {
+            icon1 = QIcon::fromTheme(iconThemeName);
+        } else {
+            icon1.addFile(QString::fromUtf8(":/icons/icons/clip.png"), QSize(), QIcon::Normal, QIcon::On);
+        }
+        addFile->setIcon(icon1);
 
         horizontalLayout_3->addWidget(addFile);
 
@@ -231,7 +239,7 @@ public:
 "color: rgb(131, 148, 150);\n"
 "font-weight: 700;\n"
 " qproperty-alignment: 'AlignHCenter';"));
-        label_5->setAlignment(Qt::AlignCenter);
+        label_5->setAlignment(Qt::AlignHCenter);
 
         horizontalLayout_4->addWidget(label_5, 0, Qt::AlignVCenter);
 
@@ -307,6 +315,9 @@ public:
 "border-color: #00000f;\n"
 "min-width: 4em;\n"
 "padding: 4px;"));
+        QIcon icon2;
+        icon2.addFile(QString::fromUtf8(":/icons/icons/trash.png"), QSize(), QIcon::Normal, QIcon::On);
+        clear->setIcon(icon2);
 
         horizontalLayout_5->addWidget(clear);
 
