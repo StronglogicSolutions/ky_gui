@@ -237,21 +237,27 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
     ui->messages->append(simple_message);
     console_ui.updateText(message);
   } else if (t == COMMANDS_UPDATE_TYPE) {
-    if (message == "New Session") {
-      ui->led->setState(true);
-    }
     qDebug() << "Updating commands";
     QComboBox* app_list = ui->appList;
     app_list->clear();
-    QString default_app = m_config.at("defaultApp");
     int app_index = 0;
+    QString default_app = configValue("defaultApp", m_config);
     for (const auto& s : v) {
       app_list->addItem(s);
       if (s.toLower() == default_app.toLower()) {
-        q_client->setSelectedApp(std::vector<QString>{{default_app}});
+        q_client->setSelectedApp(std::vector<QString>{default_app});
         ui->appList->setCurrentIndex(app_index);
       }
       app_index++;
+    }
+    if (message == "New Session") {
+      ui->led->setState(true);
+      if (auto it{m_config.find("schedulerMode")}; it != std::end(m_config)) {
+        bool scheduler_mode = bool{it->second == "true"};
+        if (configBoolValue("true", std::ref(m_config))) {
+          arg_ui->show();
+        }
+      }
     }
   } else if (t == PROCESS_REQUEST_TYPE) {
     qDebug() << "Updating process list";

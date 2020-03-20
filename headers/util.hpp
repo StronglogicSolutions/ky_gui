@@ -98,6 +98,19 @@ static QString escapeTextToRaw(QString s) {
     return escapeText(s).toUtf8().constData();
 }
 
+QString configValue(QString s, ConfigJson config) {
+  if (auto it{config.find(s)}; it != std::end(config)) {
+    return it->second;
+  }
+  return "";
+}
+
+bool configBoolValue(QString s, ConfigJson config) {
+  if (auto it{config.find(s)}; it != std::end(config)) {
+    return bool{it->second == s};
+  }
+}
+
 std::string getJsonString(std::string s) {
     Document d;
     d.Parse(s.c_str());
