@@ -64,6 +64,8 @@ class ArgDialog : public QDialog {
   explicit ArgDialog(QWidget *parent = nullptr);
   virtual void keyPressEvent(QKeyEvent* e);
   void setFilePath(QString path);
+  virtual void accept() override;
+
   ~ArgDialog();
 
  signals:

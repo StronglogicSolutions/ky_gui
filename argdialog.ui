@@ -453,7 +453,7 @@ padding: 4px;</string>
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="standardButtons">
-         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
+         <set>QDialogButtonBox::Close|QDialogButtonBox::Save</set>
         </property>
         <property name="centerButtons">
          <bool>true</bool>

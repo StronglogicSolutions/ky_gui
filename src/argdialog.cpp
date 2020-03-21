@@ -17,8 +17,8 @@ ArgDialog::ArgDialog(QWidget *parent)
       m_ig_post(IGPost{}) {
   ui->setupUi(this);
 
-  ui->argCommandButtons->button(QDialogButtonBox::Cancel)
-    ->setStyleSheet(QString("background:%1").arg("#2f535f"));
+  ui->argCommandButtons->button(QDialogButtonBox::Close)
+      ->setStyleSheet(QString("background:%1").arg("#2f535f"));
   QObject::connect(ui->addFile, &QPushButton::clicked, this, [this]() {
     KFileDialog file_dialog{};
     auto file_path = file_dialog.openFileDialog(m_file_path);
@@ -290,3 +290,4 @@ ArgDialog::~ArgDialog()
     delete ui;
 }
 
+void ArgDialog::accept() { qDebug() << "Sending request to schedule a task.."; }

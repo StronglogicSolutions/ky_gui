@@ -107,7 +107,7 @@ QString configValue(QString s, ConfigJson config) {
 
 bool configBoolValue(QString s, ConfigJson config) {
   if (auto it{config.find(s)}; it != std::end(config)) {
-    return bool{it->second == s};
+    return bool{it->second == "true"};
   }
 }
 
