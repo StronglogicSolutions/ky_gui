@@ -252,11 +252,8 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
     }
     if (message == "New Session") {
       ui->led->setState(true);
-      if (auto it{m_config.find("schedulerMode")}; it != std::end(m_config)) {
-        bool scheduler_mode = bool{it->second == "true"};
-        if (configBoolValue("true", std::ref(m_config))) {
-          arg_ui->show();
-        }
+      if (configBoolValue("schedulerMode", std::ref(m_config))) {
+        arg_ui->show();
       }
     }
   } else if (t == PROCESS_REQUEST_TYPE) {
