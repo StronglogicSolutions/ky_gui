@@ -339,7 +339,7 @@ public:
 "min-width: 4em;\n"
 "padding: 4px;"));
         argCommandButtons->setOrientation(Qt::Horizontal);
-        argCommandButtons->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Save);
+        argCommandButtons->setStandardButtons(QDialogButtonBox::Close|QDialogButtonBox::Save);
         argCommandButtons->setCenterButtons(true);
 
         horizontalLayout_5->addWidget(argCommandButtons);
