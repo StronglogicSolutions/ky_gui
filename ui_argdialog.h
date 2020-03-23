@@ -59,7 +59,7 @@ public:
             ArgDialog->setObjectName(QString::fromUtf8("ArgDialog"));
         ArgDialog->resize(970, 864);
         QIcon icon;
-        icon.addFile(QString::fromUtf8("favicon.ico"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8(":/icons/favicon.ico"), QSize(), QIcon::Normal, QIcon::Off);
         ArgDialog->setWindowIcon(icon);
         ArgDialog->setStyleSheet(QString::fromUtf8("border-color: rgb(0, 0, 0);\n"
 "background-color: rgb(0, 43, 54);"));

@@ -10,6 +10,7 @@
 #define UI_CONSOLEDIALOG_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QLabel>
@@ -30,13 +31,17 @@ public:
         if (ConsoleDialog->objectName().isEmpty())
             ConsoleDialog->setObjectName(QString::fromUtf8("ConsoleDialog"));
         ConsoleDialog->resize(721, 836);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/icons/log.png"), QSize(), QIcon::Normal, QIcon::Off);
+        ConsoleDialog->setWindowIcon(icon);
         consoleText = new QTextEdit(ConsoleDialog);
         consoleText->setObjectName(QString::fromUtf8("consoleText"));
         consoleText->setGeometry(QRect(30, 60, 661, 721));
+        consoleText->setStyleSheet(QString::fromUtf8("color: rgb(38, 255, 0);"));
         consoleText->setReadOnly(false);
         consoleTitle = new QLabel(ConsoleDialog);
         consoleTitle->setObjectName(QString::fromUtf8("consoleTitle"));
-        consoleTitle->setGeometry(QRect(300, 20, 51, 18));
+        consoleTitle->setGeometry(QRect(300, 20, 71, 18));
         closeConsole = new QPushButton(ConsoleDialog);
         closeConsole->setObjectName(QString::fromUtf8("closeConsole"));
         closeConsole->setGeometry(QRect(600, 800, 80, 26));

@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="kres.qrc">
+    <normaloff>:/icons/log.png</normaloff>:/icons/log.png</iconset>
+  </property>
   <widget class="QTextEdit" name="consoleText">
    <property name="geometry">
     <rect>
@@ -21,6 +25,9 @@
      <width>661</width>
      <height>721</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(38, 255, 0);</string>
    </property>
    <property name="readOnly">
     <bool>false</bool>
@@ -31,7 +38,7 @@
     <rect>
      <x>300</x>
      <y>20</y>
-     <width>51</width>
+     <width>71</width>
      <height>18</height>
     </rect>
    </property>
@@ -53,6 +60,8 @@
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="kres.qrc"/>
+ </resources>
  <connections/>
 </ui>

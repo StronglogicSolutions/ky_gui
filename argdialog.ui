@@ -14,8 +14,8 @@
    <string>Dialog</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>favicon.ico</normaloff>favicon.ico</iconset>
+   <iconset resource="kres.qrc">
+    <normaloff>:/icons/favicon.ico</normaloff>:/icons/favicon.ico</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">border-color: rgb(0, 0, 0);
@@ -465,7 +465,9 @@ padding: 4px;</string>
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="kres.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>argCommandButtons</sender>

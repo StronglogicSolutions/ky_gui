@@ -14,8 +14,8 @@
    <string>MainWindow</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>favicon.ico</normaloff>favicon.ico</iconset>
+   <iconset resource="kres.qrc">
+    <normaloff>:/icons/favicon.ico</normaloff>:/icons/favicon.ico</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">font: 87 10pt &quot;Noto Sans&quot;;

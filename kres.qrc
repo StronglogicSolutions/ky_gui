@@ -9,6 +9,8 @@
         <file>icons/erase.png</file>
         <file>icons/trash.png</file>
         <file>icons/clip.png</file>
+        <file>favicon.ico</file>
+        <file>icons/log.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/log.png</file>
