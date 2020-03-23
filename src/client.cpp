@@ -441,7 +441,15 @@ void Client::execute() {
  */
 void Client::scheduleTask(std::vector<std::string> task_args, bool file_pending) {
     if (file_pending) {
+      if (m_task.empty()) {
         m_task = task_args;
+      } else {
+        if (!m_task_queue.empty() && m_task_queue.front().args.empty()) {
+          m_task_queue.front().args.assign(task_args.begin(), task_args.end());
+        } else {
+          qDebug() << "Could not identify the queued task for updating";
+        }
+      }
     } else {
         qDebug() << "Requesting a task to be scheduled";
         sendTaskEncoded(TaskType::INSTAGRAM, task_args);
@@ -461,6 +469,9 @@ void Client::sendFiles(QVector<KFileData> files) {
         std::string send_file_operation = createOperation("FileUpload", {});
         sendEncoded(send_file_operation);
     } else {
-        qDebug() << "Still attempting to send a different file";
+      // TODO: place in queue and check queue after we finish scheduling the
+      // task associated with the outgoing files
+      m_task_queue.enqueue(Task{.files = files});
+      qDebug() << "Still attempting to send a different file";
     }
 }
