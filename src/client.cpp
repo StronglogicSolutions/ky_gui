@@ -279,6 +279,20 @@ void Client::sendTaskEncoded(TaskType type, std::vector<std::string> args) {
         builder.Clear();
         sent_files.clear();
         m_task.clear();
+        if (!m_task_queue.isEmpty()) {
+          auto task = m_task_queue.dequeue();
+          if (!task.files.empty()) {
+            if (!outgoing_files.empty()) {
+              qDebug() << "There are still outgoing files left over from last "
+                          "task which were never sent. They are being deleted";
+              outgoing_files.clear();
+            }
+          }
+          // We simply need to send files. Once the last file is sent, Client
+          // will check the value of m_task and send it to Server.
+          m_task = task.args;
+          sendFiles(task.files);
+        }
     }
 }
 
@@ -464,7 +478,7 @@ void Client::sendFiles(QVector<KFileData> files) {
     if (outgoing_files.isEmpty()) {
       file_was_sent = false;
       for (const auto& file : files) {
-        outgoing_files.enqueue(file);
+        outgoing_files.enqueue(std::move(file));
         }
         std::string send_file_operation = createOperation("FileUpload", {});
         sendEncoded(send_file_operation);

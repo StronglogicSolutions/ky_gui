@@ -1,20 +1,20 @@
 ﻿#ifndef UTIL_HPP
 #define UTIL_HPP
 #pragma GCC system_header
-#include <string>
+#include <QDebug>
+#include <QQueue>
+#include <QString>
+#include <QVector>
 #include <charconv>
+#include <string>
 #include <utility>
 #include <vector>
-#include <QDebug>
-#include <QVector>
-#include <QString>
-#include "rapidjson/writer.h"
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/pointer.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/document.h"
 #include "json.hpp"
-
+#include "rapidjson/document.h"
+#include "rapidjson/pointer.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 
 namespace Kontainer {
 /** Reverse Iterator */
@@ -38,6 +38,13 @@ struct KFileData {
     QString name;
     QByteArray bytes;
 };
+
+struct Task {
+  QVector<KFileData> files;
+  std::vector<std::string> args;
+};
+
+typedef QQueue<Task> TaskQueue;
 
 namespace {
 using namespace rapidjson;
