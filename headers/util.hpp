@@ -26,7 +26,7 @@ public:
     auto begin() {return _obj.rbegin();}
     auto end() {return _obj.rend();}
 };
-}
+}  // namespace Kontainer
 
 enum FileType {
     VIDEO = 1,
@@ -42,6 +42,7 @@ struct KFileData {
 struct Task {
   QVector<KFileData> files;
   std::vector<std::string> args;
+  int mask;
 };
 
 typedef QQueue<Task> TaskQueue;
@@ -428,5 +429,5 @@ QString generatePreview(QString video_path, QString video_name) {
   return preview_name;
 }
 }; // namespace FileUtils
-}
+}  // namespace
 #endif  // UTIL_HPP

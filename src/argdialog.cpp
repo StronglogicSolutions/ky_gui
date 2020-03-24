@@ -203,8 +203,8 @@ void ArgDialog::clearPost() {
 }
 
 void ArgDialog::clearTask() {
-    m_task.args = {};
-    m_task.mask = -1;
+  m_task.args.clear();
+  m_task.mask = -1;
 }
 
 void ArgDialog::addRequestedBy(QString value) {

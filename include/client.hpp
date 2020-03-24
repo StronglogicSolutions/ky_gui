@@ -104,5 +104,6 @@ private:
     std::vector<int> selected_commands;
     QQueue<KFileData> outgoing_files;
     std::vector<SentFile> sent_files;
+    TaskQueue m_task_queue;
 };
 #endif // CLIENT_HPP
