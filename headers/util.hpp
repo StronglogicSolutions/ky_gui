@@ -398,18 +398,6 @@ namespace FileUtils {
 QString generatePreview(QString video_path, QString video_name) {
   QString preview_name =
       video_name.left(video_name.size() - 4) + "-preview.jpg";
-  //    QString command{"ffmpeg -y -ss 0 -i '" + video_path +
-  //                    "' -vf "
-  //                    "\"scale=w=1080:h=1080:force_original_aspect_ratio="
-  //                    "decrease,pad=w=1080:h=1080:x=(iw-ow)/2:y=(ih-oh/"
-  //                    "2):color=white\" -vframes 1 './assets/previews/" +
-  //                    preview_name + "'"};
-
-  //    QString command{"ffmpeg -y -ss 0 -i '" + video_path +
-  //                    "' -vf "
-  //                    "\"scale=w=1080:h=1080:force_original_aspect_ratio="
-  //                    "decrease\" -vframes 1 './assets/previews/" +
-  //                    preview_name + "'"};
   QString command{
       "ffmpeg -y -ss 0 -i '" + video_path +
       "' -vf \"scale=w=640:h=640:force_original_aspect_ratio=decrease\" "
