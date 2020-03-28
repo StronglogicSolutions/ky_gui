@@ -337,12 +337,8 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
         auto count = getLikeEventNum(event_message, m_events);
         QString clean_event_message =
             event_message + " (" + QString::number(count) + ")";
-        auto row_count2 = m_consecutive_events > 1
-                              ? m_event_model->rowCount() - 1
-                              : m_event_model->rowCount();
-        auto row_count = m_event_model->rowCount() - 1;
         m_events.push_back(event_message);
-        m_event_model->setItem(row_count,
+        m_event_model->setItem(m_event_model->rowCount() - 1,
                                createEventListItem(clean_event_message));
         return;
       }
