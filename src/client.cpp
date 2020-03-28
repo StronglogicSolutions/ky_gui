@@ -163,15 +163,11 @@ void Client::start() {
  * @param [in] {const QString&} The message to send
  */
 void Client::sendMessage(const QString& s) {
-    if (m_client_socket_fd != -1) {
-        std::string json_string {"{\"type\":\"custom\", \"message\": \""};
-        json_string += s.toUtf8().data();
-        json_string += "\", \"args\":\"placeholder\"}";
-        // Send custom message as an encoded message
-        sendEncoded(json_string);
-    } else {
-        qDebug() << "You must first open a connection";
-    }
+  if (m_client_socket_fd != -1) {
+    sendEncoded(createMessage(s.toUtf8(), ""));
+  } else {
+    qDebug() << "You must first open a connection";
+  }
 }
 
 /**
