@@ -58,39 +58,16 @@ struct KSession {
 };
 
 static QString escapeText(QString s) {
-    qDebug() << "Escaping text";
-    if (s.contains("\t")) {
-        s.replace("\t", "\\t");
-    }
-    if (s.contains("'")) {
-        qDebug() << "Replacing single quote";
-        if (s.contains('"')) {
-            s.replace('"', "\\\"");
-        }
-        s.replace("'", "'\"\'\"'");
-        return s;
-    }
-    if (s.contains('"')) {
-        s.replace('"', "\\\"");
-    }
-    return s;
+  s.replace("\t", "\\t");
+  s.replace('"', "\\\"");
+  s.replace("'", "'\"\'\"'");
+  return s;
 }
 
 static QString escapeMessage(QString s) {
-  if (s.contains("\t")) {
-    s.replace("\t", "\\t");
-  }
-  if (s.contains("'")) {
-    qDebug() << "Replacing single quote";
-    if (s.contains('"')) {
-      s.replace('"', "\\\"");
-    }
-    s.replace("'", "\'");
-    return s;
-  }
-  if (s.contains('"')) {
-    s.replace('"', "\\\"");
-  }
+  s.replace("\t", "\\t");
+  s.replace('"', "\\\"");
+  s.replace("'", "\'");
   return s;
 }
 
