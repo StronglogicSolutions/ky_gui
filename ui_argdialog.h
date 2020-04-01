@@ -36,6 +36,8 @@ public:
     QHBoxLayout *horizontalLayout;
     QLabel *label_2;
     QComboBox *argType;
+    QLabel *label_6;
+    QComboBox *user;
     QHBoxLayout *horizontalLayout_2;
     QLabel *label_3;
     QTextEdit *argInput;
@@ -120,6 +122,31 @@ public:
 ""));
 
         horizontalLayout->addWidget(argType);
+
+        label_6 = new QLabel(verticalLayoutWidget);
+        label_6->setObjectName(QString::fromUtf8("label_6"));
+        sizePolicy.setHeightForWidth(label_6->sizePolicy().hasHeightForWidth());
+        label_6->setSizePolicy(sizePolicy);
+        label_6->setMinimumSize(QSize(196, 0));
+        label_6->setMaximumSize(QSize(196, 16777215));
+        label_6->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
+"color: rgb(131, 148, 150);\n"
+"font-weight: 700;"));
+        label_6->setAlignment(Qt::AlignCenter);
+
+        horizontalLayout->addWidget(label_6);
+
+        user = new QComboBox(verticalLayoutWidget);
+        user->setObjectName(QString::fromUtf8("user"));
+        sizePolicy1.setHeightForWidth(user->sizePolicy().hasHeightForWidth());
+        user->setSizePolicy(sizePolicy1);
+        user->setStyleSheet(QString::fromUtf8("font: 87 11pt \"Noto Sans\";\n"
+"background-color: #2f535f;\n"
+"color: rgb(131, 148, 150);\n"
+"font-weight: 700;\n"
+""));
+
+        horizontalLayout->addWidget(user);
 
 
         verticalLayout->addLayout(horizontalLayout);
@@ -368,6 +395,7 @@ public:
         argType->setItemText(3, QCoreApplication::translate("ArgDialog", "promote/share", nullptr));
         argType->setItemText(4, QCoreApplication::translate("ArgDialog", "link/bio", nullptr));
 
+        label_6->setText(QCoreApplication::translate("ArgDialog", "User", nullptr));
         label_3->setText(QCoreApplication::translate("ArgDialog", "Input", nullptr));
         addArgument->setText(QCoreApplication::translate("ArgDialog", "Add", nullptr));
         label_4->setText(QCoreApplication::translate("ArgDialog", "Add file attachment", nullptr));

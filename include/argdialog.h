@@ -60,6 +60,7 @@ class ArgDialog : public QDialog {
   virtual void keyPressEvent(QKeyEvent* e);
   void setFilePath(QString path);
   virtual void accept() override;
+  void setConfig(QString config_string);
 
   ~ArgDialog();
 
@@ -82,6 +83,7 @@ class ArgDialog : public QDialog {
   Task m_task;
   IGPost m_ig_post;
   QString m_file_path;
+  QString m_config_string;
 };
 
 #endif  // ARGDIALOG_H

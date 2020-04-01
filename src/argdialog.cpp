@@ -286,6 +286,11 @@ void ArgDialog::keyPressEvent(QKeyEvent *e) {
 
 void ArgDialog::setFilePath(QString path) { m_file_path = path; }
 
+void ArgDialog::setConfig(QString config_string) {
+  m_config_string = config_string;
+  ui->user->addItems(getValueArgs(m_config_string.toUtf8(), "users"));
+}
+
 ArgDialog::~ArgDialog()
 {
     delete ui;
