@@ -53,6 +53,11 @@ ArgDialog::ArgDialog(QWidget *parent)
     }
   });
 
+  QObject::connect(ui->user, &QComboBox::currentTextChanged, this,
+                   [this](const QString &text) {
+                     m_ig_post.user = text.toUtf8().constData();
+                   });
+
   ui->argList->setHorizontalHeaderLabels(
       QStringList{"Type", "Value", "Preview", "Delete"});
   ui->argList->setColumnWidth(0, 40);
@@ -145,7 +150,6 @@ void ArgDialog::setTaskArguments() {
         requested_by.pop_back();
     }
 
-//    m_task.args.push_back(m_ig_post.file.name.toUtf8().constData());
     m_task.args.push_back(m_ig_post.datetime);
     m_task.args.push_back(m_ig_post.description);
     m_task.args.push_back(hashtags);
@@ -155,6 +159,7 @@ void ArgDialog::setTaskArguments() {
     m_task.args.push_back(m_ig_post.link_in_bio);
     m_task.args.push_back(std::to_string(m_ig_post.is_video));
     m_task.args.push_back(m_ig_post.header);
+    m_task.args.push_back(m_ig_post.user);
 }
 
 void ArgDialog::addItem(QString value, QString type) {
@@ -198,6 +203,7 @@ void ArgDialog::clearPost() {
   m_ig_post.requested_by.clear();
   m_ig_post.promote_share = "Share the post through IG story if you enjoy the phrase 🙋‍♀️";
   m_ig_post.requested_by_phrase = "The phrase was requested by ";
+  m_ig_post.user = ui->user->currentText().toUtf8().constData();
   ui->argType->setCurrentIndex(0);
   ui->argList->setRowCount(0);
 }

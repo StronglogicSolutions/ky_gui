@@ -39,12 +39,13 @@ typedef struct IGPost {
   std::vector<std::string> requested_by;
   const char *requested_by_phrase = "The phrase was requested by ";
   std::vector<KFile> files;
+  std::string user;
   bool is_video;
   bool isReady() {
-      return header.size() > 0 && description.size() > 0 && datetime.size() > 0 &&
+    return header.size() > 0 && description.size() > 0 && datetime.size() > 0 &&
            promote_share.size() > 0 && link_in_bio.size() > 0 &&
-             hashtags.size() > 0 && requested_by.size() > 0 && !files.empty() &&
-             files.at(0).path.size() > 0;
+           hashtags.size() > 0 && requested_by.size() > 0 && !files.empty() &&
+           files.at(0).path.size() > 0 && user.size() > 0;
   }
 } IGPost;
 
