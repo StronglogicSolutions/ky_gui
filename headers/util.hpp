@@ -156,6 +156,17 @@ bool isEvent(const char* data) {
     return strcmp(d["type"].GetString(), "event") == 0;
 }
 
+template <typename T>
+bool isKEvent(T event, const char* kEvent) {
+  if constexpr (std::is_same_v<T, std::string>) {
+    return strcmp(event.c_str(), kEvent) == 0;
+  } else if constexpr (std::is_same_v<T, QString>) {
+    return strcmp(event.toUtf8(), kEvent) == 0;
+  } else {
+    return strcmp(event, kEvent) == 0;
+  }
+}
+
 bool isPong(const char* data) {
     return strcmp(data, "PONG") == 0;
 }

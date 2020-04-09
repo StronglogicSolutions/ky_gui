@@ -1,18 +1,19 @@
 ﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QString>
+#include <include/argdialog.h>
+#include <include/consoledialog.h>
 #include <QList>
 #include <QListView>
 #include <QListWidgetItem>
-#include <QStandardItemModel>
+#include <QMainWindow>
 #include <QStandardItem>
-#include <include/client.hpp>
-#include <include/argdialog.h>
-#include <include/consoledialog.h>
+#include <QStandardItemModel>
+#include <QString>
 #include <QTableView>
 #include <QTimer>
+#include <headers/kiq_types.hpp>
+#include <include/client.hpp>
 
 namespace ProcessState {
     static constexpr int READY = 1;
@@ -36,7 +37,7 @@ struct Process {
     }
 };
 
-struct Event {};
+// struct Event {};
 
 namespace Ui {
 class MainWindow;
@@ -58,6 +59,7 @@ private:
     void connectUi();
     void setConnectScreen(bool visible = true);
     QString parseMessage(const QString& s, StringVec v);
+    QString parseTaskInfo(StringVec v);
     void updateProcessResult(QString request_id, QString result);
     /** UI Members */
     Ui::MainWindow *ui;

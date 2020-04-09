@@ -345,11 +345,31 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
       }
       m_consecutive_events = 0;
     }
+
+    if (isKEvent<QString>(message, Event::TASK_SCHEDULED)) {
+      event_message += ". Details:\n" + parseTaskInfo(v);
+    }
+
     m_events.push_back(event_message);
     m_event_model->setItem(m_event_model->rowCount(),
                            createEventListItem(event_message));
   } else {
     qDebug() << "Unknown update type. Cannot update UI";
+  }
+}
+
+QString MainWindow::parseTaskInfo(StringVec v) {
+  if (q_client == nullptr) {
+    qDebug() << "Can't parse when not connected";
+    return "";
+  }
+  if (v.size() < 3) {
+    qDebug() << "Not enough arguments to parse task information";
+    return "";
+  } else {
+    return QString{
+        "  UUID - " + v.at(0) + "\n  ID - " + v.at(1) + "\n  APP - " +
+        q_client->getAppName(std::stoi(v.at(2).toUtf8().constData()))};
   }
 }
 

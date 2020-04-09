@@ -44,6 +44,7 @@ HEADERS += \
         headers/instatask_generated.h \
         headers/json.hpp \
         headers/util.hpp \
+        headers/kiq_types.hpp \
         headers/rapidjson/writer.h \
         headers/rapidjson/stringbuffer.h \
         headers/rapidjson/document.h \
