@@ -238,7 +238,8 @@ font-weight: 700;</string>
 background-color: #2f535f;
 color: rgb(131, 148, 150);
 font-weight: 700;
-</string>
+background-color: rgb(29, 51, 59);
+color: rgb(223, 252, 255);</string>
            </property>
            <property name="spacing">
             <number>2</number>
@@ -277,7 +278,8 @@ font-weight: 700;</string>
 background-color: #2f535f;
 color: rgb(131, 148, 150);
 font-weight: 700;
-</string>
+background-color: rgb(29, 51, 59);
+color: rgb(223, 252, 255);</string>
        </property>
        <property name="alternatingRowColors">
         <bool>false</bool>
@@ -402,7 +404,8 @@ font-weight: 700;</string>
 background-color: #2f535f;
 color: rgb(131, 148, 150);
 font-weight: 700;
-</string>
+background-color: rgb(29, 51, 59);
+color: rgb(223, 252, 255);</string>
            </property>
            <property name="lineWrapMode">
             <enum>QTextEdit::WidgetWidth</enum>
@@ -440,7 +443,8 @@ font-weight: 700;
 background-color: #2f535f;
 color: rgb(131, 148, 150);
 font-weight: 700;
-</string>
+background-color: rgb(29, 51, 59);
+color: rgb(223, 252, 255);</string>
          </property>
         </widget>
        </item>
