@@ -369,7 +369,8 @@ QString MainWindow::parseTaskInfo(StringVec v) {
   } else {
     return QString{
         "  UUID - " + v.at(0) + "\n  ID - " + v.at(1) + "\n  APP - " +
-        q_client->getAppName(std::stoi(v.at(2).toUtf8().constData()))};
+        q_client->getAppName(std::stoi(v.at(2).toUtf8().constData())) +
+        "\n ENV - " + v.at(3)};
   }
 }
 
