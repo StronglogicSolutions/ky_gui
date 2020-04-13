@@ -60,7 +60,7 @@ QPushButton::hover:
       <height>691</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0,0">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,1,0,0">
      <property name="spacing">
       <number>4</number>
      </property>
@@ -279,10 +279,15 @@ background-color: #2f535f;
 color: rgb(131, 148, 150);
 font-weight: 700;
 background-color: rgb(29, 51, 59);
-color: rgb(223, 252, 255);</string>
+color: rgb(223, 252, 255);
+padding: 4px;
+item { border-bottom: 1px solid black; padding: 16px;} </string>
        </property>
        <property name="alternatingRowColors">
-        <bool>false</bool>
+        <bool>true</bool>
+       </property>
+       <property name="flow">
+        <enum>QListView::TopToBottom</enum>
        </property>
        <property name="isWrapping" stdset="0">
         <bool>false</bool>
