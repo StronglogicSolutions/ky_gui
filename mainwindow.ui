@@ -791,7 +791,7 @@ font-weight: 700;</string>
   <customwidget>
    <class>ConnectionIndicator</class>
    <extends>QLabel</extends>
-   <header>include/connection_indicator.h</header>
+   <header>include/ui/connection_indicator.h</header>
   </customwidget>
  </customwidgets>
  <resources>

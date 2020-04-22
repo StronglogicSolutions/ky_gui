@@ -6,6 +6,7 @@ namespace Task {
 class Task {
  public:
   virtual bool isReady() = 0;
+  virtual ~Task() = 0;
 };
 }  // namespace Task
 

@@ -1,4 +1,4 @@
-﻿#include <include/argdialog.h>
+﻿#include <include/ui/argdialog.h>
 #include <ui_argdialog.h>
 #include <QCalendarWidget>
 #include <QDateTime>
@@ -120,10 +120,10 @@ ArgDialog::ArgDialog(QWidget *parent)
                              QMessageBox::warning(this, tr("File Error"), tr("Unable to read file"));
                            }
                          }
+
                          if (!k_file_v.empty()) {
                            emit ArgDialog::uploadFiles(k_file_v);
                          }
-
                          emit ArgDialog::taskRequestReady(m_task, true);
                        }
                        clearPost(); // reset m_ig_post to default values

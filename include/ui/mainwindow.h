@@ -1,8 +1,8 @@
 ﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <include/argdialog.h>
-#include <include/consoledialog.h>
+#include <include/ui/argdialog.h>
+#include <include/ui/consoledialog.h>
 #include <QList>
 #include <QListView>
 #include <QListWidgetItem>
@@ -13,7 +13,7 @@
 #include <QTableView>
 #include <QTimer>
 #include <headers/kiq_types.hpp>
-#include <include/client.hpp>
+#include <include/client/client.hpp>
 
 namespace ProcessState {
     static constexpr int READY = 1;
@@ -61,16 +61,17 @@ public:
      public:
       void init(MainWindow* window);
       void handleCommands(StringVec commands, QString default_app);
-      void handleMessage(QString message, StringVec v);
-      QString handleEventMessage(QString message, StringVec v);
-      void updateProcessResult(QString id, QString result, bool error);
-      QString parseMessage(const QString& s, StringVec v);
-
-     private:
-      MainWindow* window;
     };
 
-private:
+   private:
+    void handleMessage(QString message, StringVec v);
+    QString handleEventMessage(QString message, StringVec v);
+    void updateProcessResult(QString id, QString result, bool error);
+    QString parseMessage(const QString& s, StringVec v);
+
+   private:
+    MainWindow* window;
+
     /** Process arguments */
     int cli_argc;
     char** cli_argv;

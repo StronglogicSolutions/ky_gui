@@ -11,7 +11,7 @@
 #include <cstring>
 #include <functional>
 #include <future>
-#include <include/client.hpp>
+#include <include/client/client.hpp>
 #include <iostream>
 #include <vector>
 #define FLATBUFFERS_DEBUG_VERIFICATION_FAILURE
