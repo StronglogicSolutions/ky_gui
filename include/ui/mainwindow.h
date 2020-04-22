@@ -57,20 +57,19 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(int argc = 0, char** argv = nullptr, QWidget* parent = nullptr);
     ~MainWindow();
+
     class MessageParser {
      public:
       void init(MainWindow* window);
       void handleCommands(StringVec commands, QString default_app);
+      void handleMessage(QString message, StringVec v);
+      QString handleEventMessage(QString message, StringVec v);
+
+     private:
+      QString parseMessage(const QString& s, StringVec v);
+      void updateProcessResult(QString id, QString result, bool error);
+      MainWindow* window;
     };
-
-   private:
-    void handleMessage(QString message, StringVec v);
-    QString handleEventMessage(QString message, StringVec v);
-    void updateProcessResult(QString id, QString result, bool error);
-    QString parseMessage(const QString& s, StringVec v);
-
-   private:
-    MainWindow* window;
 
     /** Process arguments */
     int cli_argc;

@@ -34,6 +34,7 @@ SOURCES += \
         src/instagram_task.cpp\
         src/argdialog.cpp \
         src/consoledialog.cpp \
+        src/connection_indicator.cpp \
         src/kfiledialog.cpp \
 
         src/connection_indicator.cpp
