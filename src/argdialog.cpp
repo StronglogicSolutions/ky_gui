@@ -68,6 +68,10 @@ ArgDialog::ArgDialog(QWidget *parent)
 
   QObject::connect(ui->addArgument, &QPushButton::clicked, this, [this]() {
     QString text = ui->argInput->toPlainText();
+    // TODO: argType values need to be set by configuration
+    // Can this somehow be known via the flatbuffer schema? I think not
+    // handling of type needs to be abstracted by a class which can be
+    // subclassed for various types of task: Instagram, etc
     auto type = ui->argType->currentText();
     if (text.size() > 0) {
       if (type == Args::HASHTAG_TYPE) {
@@ -98,9 +102,8 @@ ArgDialog::ArgDialog(QWidget *parent)
 
   QObject::connect(ui->argCommandButtons,
                    static_cast<void (QDialogButtonBox::*)(QAbstractButton *)>(
-                     &QDialogButtonBox::clicked),
-                   this,
-                   [this](QAbstractButton *button) {
+                       &QDialogButtonBox::clicked),
+                   this, [this](QAbstractButton *button) {
                      if (button->text() == "Save") {
                        if (m_ig_post.isReady()) {
                          setTaskArguments();

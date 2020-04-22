@@ -14,3 +14,5 @@ config
 ky_gui_plugin_import.cpp
 html
 qdoc.conf
+**/*/.autosave
+**.autosave

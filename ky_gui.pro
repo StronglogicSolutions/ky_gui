@@ -28,18 +28,24 @@ CONFIG += static
 QMAKE_CXXFLAGS += "-fno-sized-deallocation"
 
 SOURCES += \
-        src/argdialog.cpp \
-        src/consoledialog.cpp \
-        src/kfiledialog.cpp \
         src/main.cpp \
         src/mainwindow.cpp \
         src/client.cpp \
+        src/instagram_task.cpp\
+        src/argdialog.cpp \
+        src/consoledialog.cpp \
+        src/kfiledialog.cpp \
+
         src/connection_indicator.cpp
 HEADERS += \
-        include/argdialog.h \
-        include/consoledialog.h \
-        include/mainwindow.h \
-        include/client.hpp \
+        include/ui/argdialog.h \
+        include/ui/consoledialog.h \
+        include/ui/mainwindow.h \
+        include/ui/connection_indicator.h \
+        include/ui/kfiledialog.h \
+        include/client/client.hpp \
+        include/task/task.hpp \
+        include/task/instagram_task.hpp\
         headers/kmessage_codec.hpp \
         headers/instatask_generated.h \
         headers/json.hpp \
@@ -48,8 +54,7 @@ HEADERS += \
         headers/rapidjson/writer.h \
         headers/rapidjson/stringbuffer.h \
         headers/rapidjson/document.h \
-        include/connection_indicator.h \
-        include/kfiledialog.h
+
 
 FORMS += \
         argdialog.ui \
