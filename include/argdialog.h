@@ -23,11 +23,6 @@ const QString REQUESTED_BY_TYPE = "requested by";
 
 typedef std::string Str;
 
-typedef struct Task {
-    int mask;
-    std::vector<std::string> args;
-} Task;
-
 typedef struct KFile {
   QString name;
   QString path;

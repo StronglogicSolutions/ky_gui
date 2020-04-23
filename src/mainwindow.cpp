@@ -139,19 +139,12 @@ void MainWindow::connectClient() {
   QObject::connect(
       arg_ui, &ArgDialog::taskRequestReady, this,
       [this](Task task, bool file_pending) {
-        // TODO: Maybe this should be handled by the Client class directly
         auto mask = q_client->getSelectedApp();
         if (mask > -1) {
           if (q_client->getAppName(mask) == "Instagram") {
-            auto datetime = task.args.at(0);
-            auto current_datetime = QDateTime::currentDateTime().toTime_t();
-            auto seconds_diff = std::stoi(datetime) - current_datetime;
-            //                qDebug() << "Time difference: " << seconds_diff;
-            //                if (seconds_diff > 3600) {
             qDebug() << "Scheduling a task";
             task.args.push_back(std::to_string(mask));
             q_client->scheduleTask(task.args, file_pending);
-            //                }
           }
         }
       });

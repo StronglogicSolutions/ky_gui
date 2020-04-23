@@ -279,6 +279,18 @@ void Client::sendTaskEncoded(TaskType type, std::vector<std::string> args) {
         builder.Clear();
         sent_files.clear();
         m_task.clear();
+        if (!m_task_queue.isEmpty()) {
+          auto task = m_task_queue.dequeue();
+          if (!task.files.empty() && !outgoing_files.empty()) {
+            qDebug() << "There are still outgoing files left over from last "
+                        "task which were never sent. They are being deleted";
+            outgoing_files.clear();
+          }
+          // We simply need to send files. Once the last file is sent, Client
+          // will check the value of m_task and send it to Server.
+          m_task = task.args;
+          sendFiles(task.files);
+        }
     }
 }
 
@@ -441,7 +453,15 @@ void Client::execute() {
  */
 void Client::scheduleTask(std::vector<std::string> task_args, bool file_pending) {
     if (file_pending) {
+      if (m_task.empty()) {
         m_task = task_args;
+      } else {
+        if (!m_task_queue.empty() && m_task_queue.front().args.empty()) {
+          m_task_queue.front().args.assign(task_args.begin(), task_args.end());
+        } else {
+          qDebug() << "Could not identify the queued task for updating";
+        }
+      }
     } else {
         qDebug() << "Requesting a task to be scheduled";
         sendTaskEncoded(TaskType::INSTAGRAM, task_args);
@@ -456,11 +476,14 @@ void Client::sendFiles(QVector<KFileData> files) {
     if (outgoing_files.isEmpty()) {
       file_was_sent = false;
       for (const auto& file : files) {
-        outgoing_files.enqueue(file);
+        outgoing_files.enqueue(std::move(file));
         }
         std::string send_file_operation = createOperation("FileUpload", {});
         sendEncoded(send_file_operation);
     } else {
-        qDebug() << "Still attempting to send a different file";
+      // TODO: place in queue and check queue after we finish scheduling the
+      // task associated with the outgoing files
+      m_task_queue.enqueue(Task{.files = files});
+      qDebug() << "Still attempting to send a different file";
     }
 }

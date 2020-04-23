@@ -1,20 +1,20 @@
 ﻿#ifndef UTIL_HPP
 #define UTIL_HPP
 #pragma GCC system_header
-#include <string>
+#include <QDebug>
+#include <QQueue>
+#include <QString>
+#include <QVector>
 #include <charconv>
+#include <string>
 #include <utility>
 #include <vector>
-#include <QDebug>
-#include <QVector>
-#include <QString>
-#include "rapidjson/writer.h"
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/pointer.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/document.h"
 #include "json.hpp"
-
+#include "rapidjson/document.h"
+#include "rapidjson/pointer.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 
 namespace Kontainer {
 /** Reverse Iterator */
@@ -26,7 +26,7 @@ public:
     auto begin() {return _obj.rbegin();}
     auto end() {return _obj.rend();}
 };
-}
+}  // namespace Kontainer
 
 enum FileType {
     VIDEO = 1,
@@ -38,6 +38,14 @@ struct KFileData {
     QString name;
     QByteArray bytes;
 };
+
+struct Task {
+  QVector<KFileData> files;
+  std::vector<std::string> args;
+  int mask;
+};
+
+typedef QQueue<Task> TaskQueue;
 
 namespace {
 using namespace rapidjson;
@@ -397,5 +405,5 @@ QString generatePreview(QString video_path, QString video_name) {
   return preview_name;
 }
 }; // namespace FileUtils
-}
+}  // namespace
 #endif  // UTIL_HPP
