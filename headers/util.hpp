@@ -58,26 +58,45 @@ struct KSession {
 };
 
 static QString escapeText(QString s) {
-    qDebug() << "Escaping text";
-    if (s.contains("\t")) {
-        s.replace("\t", "\\t");
-    }
-    if (s.contains("'")) {
-        qDebug() << "Replacing single quote";
-        if (s.contains('"')) {
-            s.replace('"', "\\\"");
-        }
-        s.replace("'", "'\"\'\"'");
-        return s;
-    }
-    if (s.contains('"')) {
-        s.replace('"', "\\\"");
-    }
-    return s;
+  s.replace("\t", "\\t");
+  s.replace('"', "\\\"");
+  s.replace("'", "'\"\'\"'");
+  return s;
+}
+
+static QString escapeMessage(QString s) {
+  s.replace("\t", "\\t");
+  s.replace('"', "\\\"");
+  s.replace("'", "\'");
+  return s;
 }
 
 static QString escapeTextToRaw(QString s) {
     return escapeText(s).toUtf8().constData();
+}
+
+/**
+ * @brief configValue
+ * @param key [in] {QString} The key whose corresponding value is to be sought
+ * from the ConfigJson param
+ * @param [in] {ConfigJson} A Key-Value JSON Config object
+ * @return {QString} The value which corresonds to the key, or an empty string
+ *
+ * TODO: ConfigJson should probably be called something else, like
+ * ConfigJsonObject
+ */
+QString configValue(QString key, ConfigJson config) {
+  ConfigJson::iterator it{config.find(key)};  // Find iterator to element matching key
+  if (it != std::end(config)) {               // If element was found
+    return it->second;                        // Return the value of the Key-Pair element
+  }
+  return "";
+}
+
+bool configBoolValue(QString s, ConfigJson config) {
+  if (auto it{config.find(s)}; it != std::end(config)) {
+    return bool{it->second == "true"};
+  }
 }
 
 std::string getJsonString(std::string s) {
@@ -365,16 +384,17 @@ inline size_t findNullIndex(uint8_t* data) {
 
 namespace FileUtils {
 QString generatePreview(QString video_path, QString video_name) {
-    QString preview_name = video_name.left(video_name.size() - 4) + "-preview.jpg";
-//    QString command{
-//        "ffmpeg -ss 0 -i " + video_path + " -vf select=\"eq(pict_type\\,I)\" -vframes 1 ./assets/previews/" + preview_name};
-    QString command {
-        "ffmpeg -y -ss 0 -i '" + video_path + "' -vf \"scale=w=640:h=640:force_original_aspect_ratio=decrease,pad=w=640:h=640:x=(iw-ow)/2:y=(ih-oh/2):color=white\" -vframes 1 './assets/previews/" + preview_name + "'"
-    };
+  QString preview_name =
+      video_name.left(video_name.size() - 4) + "-preview.jpg";
+  QString command{
+      "ffmpeg -y -ss 0 -i '" + video_path +
+      "' -vf \"scale=w=640:h=640:force_original_aspect_ratio=decrease\" "
+      "-vframes 1 './assets/previews/" +
+      preview_name + "'"};
 
-    std::system(command.toUtf8());
+  std::system(command.toUtf8());
 
-    return preview_name;
+  return preview_name;
 }
 }; // namespace FileUtils
 }

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>940</width>
+    <width>970</width>
     <height>864</height>
    </rect>
   </property>
@@ -14,8 +14,8 @@
    <string>Dialog</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>favicon.ico</normaloff>favicon.ico</iconset>
+   <iconset resource="kres.qrc">
+    <normaloff>:/icons/favicon.ico</normaloff>:/icons/favicon.ico</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">border-color: rgb(0, 0, 0);
@@ -26,11 +26,11 @@ background-color: rgb(0, 43, 54);</string>
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>921</width>
+     <width>948</width>
      <height>851</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0,0,3,0,0">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0,0,0,3,0">
     <item>
      <widget class="QLabel" name="argDialogTitle">
       <property name="font">
@@ -63,8 +63,14 @@ color:  rgb(255, 85, 0);
         </property>
         <property name="minimumSize">
          <size>
-          <width>108</width>
+          <width>196</width>
           <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>196</width>
+          <height>16777215</height>
          </size>
         </property>
         <property name="styleSheet">
@@ -74,6 +80,9 @@ font-weight: 700;</string>
         </property>
         <property name="text">
          <string>Type</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -133,8 +142,14 @@ font-weight: 700;
         </property>
         <property name="minimumSize">
          <size>
-          <width>0</width>
+          <width>196</width>
           <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>196</width>
+          <height>16777215</height>
          </size>
         </property>
         <property name="styleSheet">
@@ -145,6 +160,9 @@ font-weight: 700;
         </property>
         <property name="text">
          <string>Input</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -159,22 +177,27 @@ font-weight: 700;
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QPushButton" name="addArgument">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: #2f535f;
+     </layout>
+    </item>
+    <item>
+     <widget class="QPushButton" name="addArgument">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: #2f535f;
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(149, 155, 156);
 font-weight: 700;
@@ -185,20 +208,14 @@ border-radius: 4px;
 border-color: #00000f;
 min-width: 4em;
 padding: 4px;</string>
-        </property>
-        <property name="text">
-         <string>Add</string>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>icons/right-arrow.png</normaloff>icons/right-arrow.png</iconset>
-        </property>
-        <property name="flat">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
+      </property>
+      <property name="text">
+       <string>Add</string>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+     </widget>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -224,6 +241,9 @@ font-weight: 700;</string>
         <property name="text">
          <string>Add file attachment</string>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
        </widget>
       </item>
       <item>
@@ -244,6 +264,11 @@ padding: 4px;</string>
         <property name="text">
          <string>Choose</string>
         </property>
+        <property name="icon">
+         <iconset theme="clip.png">
+          <normalon>:/icons/icons/clip.png</normalon>
+         </iconset>
+        </property>
        </widget>
       </item>
      </layout>
@@ -253,15 +278,21 @@ padding: 4px;</string>
       <item alignment="Qt::AlignVCenter">
        <widget class="QLabel" name="label_5">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="minimumSize">
          <size>
-          <width>52</width>
+          <width>196</width>
           <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>196</width>
+          <height>16777215</height>
          </size>
         </property>
         <property name="styleSheet">
@@ -273,19 +304,22 @@ font-weight: 700;
         <property name="text">
          <string>Time</string>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignHCenter</set>
+        </property>
        </widget>
       </item>
       <item alignment="Qt::AlignRight">
        <widget class="QDateTimeEdit" name="dateTime">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="minimumSize">
          <size>
-          <width>380</width>
+          <width>740</width>
           <height>38</height>
          </size>
         </property>
@@ -313,23 +347,7 @@ padding-left: 8px;</string>
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,0">
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Maximum</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
+     <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0">
       <item>
        <widget class="QTableWidget" name="argList">
         <property name="styleSheet">
@@ -366,28 +384,23 @@ padding-left: 2px;</string>
         <column/>
        </widget>
       </item>
-      <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Maximum</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
      </layout>
     </item>
     <item>
-     <widget class="QPushButton" name="clear">
-      <property name="styleSheet">
-       <string notr="true">background-color: #2f535f;
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <property name="spacing">
+       <number>4</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="clear">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: #2f535f;
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(149, 155, 156);
 font-weight: 700;
@@ -398,14 +411,17 @@ border-radius: 4px;
 border-color: #00000f;
 min-width: 4em;
 padding: 4px;</string>
-      </property>
-      <property name="text">
-       <string>Clear</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_5">
+        </property>
+        <property name="text">
+         <string>Clear</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normalon>:/icons/icons/trash.png</normalon>
+         </iconset>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QDialogButtonBox" name="argCommandButtons">
         <property name="sizePolicy">
@@ -437,7 +453,7 @@ padding: 4px;</string>
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="standardButtons">
-         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
+         <set>QDialogButtonBox::Close|QDialogButtonBox::Save</set>
         </property>
         <property name="centerButtons">
          <bool>true</bool>
@@ -449,7 +465,9 @@ padding: 4px;</string>
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="kres.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>argCommandButtons</sender>

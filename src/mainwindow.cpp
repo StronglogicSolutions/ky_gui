@@ -79,6 +79,11 @@ void MainWindow::setConnectScreen(bool visible) {
  * @brief MainWindow::buttonClicked
  */
 void MainWindow::connectClient() {
+  m_config = getConfigObject(ui->kyConfig->toPlainText());
+  QString file_path = m_config.at("fileDirectory");
+  if (file_path != NULL) {
+    arg_ui->setFilePath(file_path);
+  }
   setConnectScreen(false);
   qDebug() << "Connecting to KServer";
   QObject::connect(q_client, &Client::messageReceived, this,
@@ -95,7 +100,7 @@ void MainWindow::connectClient() {
       this->findChild<QPushButton*>("sendMessage");
   // Handle mouse
   QObject::connect(send_message_button, &QPushButton::clicked, this, [this]() {
-    q_client->sendMessage(escapeText(ui->inputText->toPlainText()));
+    q_client->sendMessage(escapeMessage(ui->inputText->toPlainText()));
     ui->inputText->clear();
   });
 
@@ -232,22 +237,24 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
     ui->messages->append(simple_message);
     console_ui.updateText(message);
   } else if (t == COMMANDS_UPDATE_TYPE) {
-    if (message == "New Session") {
-      ui->led->setState(true);
-    }
     qDebug() << "Updating commands";
     QComboBox* app_list = ui->appList;
     app_list->clear();
-    ConfigJson config = getConfigObject(ui->kyConfig->toPlainText());
-    QString default_app = config.at("defaultApp");
     int app_index = 0;
+    QString default_app = configValue("defaultApp", m_config);
     for (const auto& s : v) {
       app_list->addItem(s);
       if (s.toLower() == default_app.toLower()) {
-        q_client->setSelectedApp(std::vector<QString>{{default_app}});
+        q_client->setSelectedApp(std::vector<QString>{default_app});
         ui->appList->setCurrentIndex(app_index);
       }
       app_index++;
+    }
+    if (message == "New Session") {
+      ui->led->setState(true);
+      if (configBoolValue("schedulerMode", std::ref(m_config))) {
+        arg_ui->show();
+      }
     }
   } else if (t == PROCESS_REQUEST_TYPE) {
     qDebug() << "Updating process list";
@@ -294,9 +301,8 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
           event_message += app_name;
           event_message += ": ";
           event_message += v.at(2);
-        } else {
-          event_message += ": ";
-          event_message += v.at(1);
+        } else if (QString::compare(message, "Message Received") == 0) {
+          event_message += "\n" + v.at(1) + ": " + v.at(2);
         }
       }
     } else {

@@ -17,11 +17,11 @@ ArgDialog::ArgDialog(QWidget *parent)
       m_ig_post(IGPost{}) {
   ui->setupUi(this);
 
-  ui->argCommandButtons->button(QDialogButtonBox::Cancel)
-    ->setStyleSheet(QString("background:%1").arg("#2f535f"));
+  ui->argCommandButtons->button(QDialogButtonBox::Close)
+      ->setStyleSheet(QString("background:%1").arg("#2f535f"));
   QObject::connect(ui->addFile, &QPushButton::clicked, this, [this]() {
     KFileDialog file_dialog{};
-    auto file_path = file_dialog.openFileDialog();
+    auto file_path = file_dialog.openFileDialog(m_file_path);
     qDebug() << "Selected file:" << file_path;
     if (file_path.size() > 0) {
       auto slash_index = file_path.lastIndexOf("/") + 1;
@@ -53,10 +53,11 @@ ArgDialog::ArgDialog(QWidget *parent)
     }
   });
 
-  ui->argList->setHorizontalHeaderLabels(QStringList{"Value", "Type", "Preview", "Delete"});
-  ui->argList->setColumnWidth(0, 300);
-  ui->argList->setColumnWidth(1, 40);
-  ui->argList->setColumnWidth(2, 100);
+  ui->argList->setHorizontalHeaderLabels(
+      QStringList{"Type", "Value", "Preview", "Delete"});
+  ui->argList->setColumnWidth(0, 40);
+  ui->argList->setColumnWidth(1, 520);
+  ui->argList->setColumnWidth(2, 220);
   ui->argList->setColumnWidth(3, 30);
   ui->argList->verticalHeader()->setDefaultSectionSize(100);
 
@@ -157,8 +158,8 @@ void ArgDialog::setTaskArguments() {
 }
 
 void ArgDialog::addItem(QString value, QString type) {
-  QTableWidgetItem *item = new QTableWidgetItem(value);
-  QTableWidgetItem *item2 = new QTableWidgetItem(type);
+  QTableWidgetItem *item = new QTableWidgetItem(type);
+  QTableWidgetItem *item2 = new QTableWidgetItem(value);
   auto row = ui->argList->rowCount();
   ui->argList->insertRow(row);
   QPushButton *q_pb = new QPushButton();
@@ -198,6 +199,7 @@ void ArgDialog::clearPost() {
   m_ig_post.promote_share = "Share the post through IG story if you enjoy the phrase 🙋‍♀️";
   m_ig_post.requested_by_phrase = "The phrase was requested by ";
   ui->argType->setCurrentIndex(0);
+  ui->argList->setRowCount(0);
 }
 
 void ArgDialog::clearTask() {
@@ -206,9 +208,11 @@ void ArgDialog::clearTask() {
 }
 
 void ArgDialog::addRequestedBy(QString value) {
+  QStringList names = value.split(" ");
+  for (const auto &name : names) {
     if (std::find(m_ig_post.requested_by.begin(), m_ig_post.requested_by.end(), value.toUtf8().constData()) == m_ig_post.requested_by.end()) {
-        m_ig_post.requested_by.push_back(value.toUtf8().constData());
-        addToArgList(value, "requested_by");
+      m_ig_post.requested_by.push_back(name.toUtf8().constData());
+      addToArgList(name, "requested_by");
     } else {
         const char* message = "You have already inputed this name under \"requested_by\"";
         qDebug() << message;
@@ -218,21 +222,22 @@ void ArgDialog::addRequestedBy(QString value) {
             tr(message)
             );
     }
+  }
 }
 
 void ArgDialog::addToArgList(QString value, QString type) {
-    for (int i = 0; i < ui->argList->rowCount(); i++) {
-        auto item = ui->argList->item(i, 1);
-        if (item) {
-            if (QString::compare(item->text(), type) == 0) {
-                auto text = ui->argList->item(i, 0)->text();
-                text.append("\n");
-                text += value;
-                ui->argList->item(i, 0)->setText(text);
-                return;
-            }
-        }
+  for (int i = 0; i < ui->argList->rowCount(); i++) {
+    auto item = ui->argList->item(i, 0);
+    if (item) {
+      if (QString::compare(item->text(), type) == 0) {
+        auto text = ui->argList->item(i, 1)->text();
+        text.append("\n");
+        text += value;
+        ui->argList->item(i, 1)->setText(text);
+        return;
+      }
     }
+  }
     addItem(value, type);
 }
 
@@ -240,10 +245,10 @@ void ArgDialog::addOrReplaceInArgList(QString value, QString type) {
     for (int i = 0; i < ui->argList->rowCount(); i++) {
         auto item = ui->argList->item(i, 1);
         if (item) {
-            if (QString::compare(item->text(), type) == 0) {
-                ui->argList->item(i, 0)->setText(value);
-                return;
-            }
+          if (QString::compare(item->text(), type) == 0) {
+            ui->argList->item(i, 1)->setText(value);
+            return;
+          }
         }
     }
     addItem(value, type);
@@ -279,8 +284,11 @@ void ArgDialog::keyPressEvent(QKeyEvent *e) {
     }
 }
 
+void ArgDialog::setFilePath(QString path) { m_file_path = path; }
+
 ArgDialog::~ArgDialog()
 {
     delete ui;
 }
 
+void ArgDialog::accept() { qDebug() << "Sending request to schedule a task.."; }
