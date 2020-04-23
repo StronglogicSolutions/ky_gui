@@ -75,9 +75,20 @@ static QString escapeTextToRaw(QString s) {
     return escapeText(s).toUtf8().constData();
 }
 
-QString configValue(QString s, ConfigJson config) {
-  if (auto it{config.find(s)}; it != std::end(config)) {
-    return it->second;
+/**
+ * @brief configValue
+ * @param key [in] {QString} The key whose corresponding value is to be sought
+ * from the ConfigJson param
+ * @param [in] {ConfigJson} A Key-Value JSON Config object
+ * @return {QString} The value which corresonds to the key, or an empty string
+ *
+ * TODO: ConfigJson should probably be called something else, like
+ * ConfigJsonObject
+ */
+QString configValue(QString key, ConfigJson config) {
+  ConfigJson::iterator it{config.find(key)};  // Find iterator to element matching key
+  if (it != std::end(config)) {               // If element was found
+    return it->second;                        // Return the value of the Key-Pair element
   }
   return "";
 }
