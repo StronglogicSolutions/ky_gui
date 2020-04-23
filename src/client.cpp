@@ -286,12 +286,10 @@ void Client::sendTaskEncoded(TaskType type, std::vector<std::string> args) {
         m_task.clear();
         if (!m_task_queue.isEmpty()) {
           auto task = m_task_queue.dequeue();
-          if (!task.files.empty()) {
-            if (!outgoing_files.empty()) {
-              qDebug() << "There are still outgoing files left over from last "
-                          "task which were never sent. They are being deleted";
-              outgoing_files.clear();
-            }
+          if (!task.files.empty() && !outgoing_files.empty()) {
+            qDebug() << "There are still outgoing files left over from last "
+                        "task which were never sent. They are being deleted";
+            outgoing_files.clear();
           }
           // We simply need to send files. Once the last file is sent, Client
           // will check the value of m_task and send it to Server.

@@ -16,3 +16,6 @@ html
 qdoc.conf
 **/*/.autosave
 **.autosave
+ui_mainwindow.h
+ui_argdialog.h
+ui_consoledialog.h
