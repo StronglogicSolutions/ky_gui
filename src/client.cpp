@@ -224,7 +224,7 @@ std::string getTaskFileInfo(std::vector<SentFile> files) {
         } else {
             info += "image";
         }
-        info += "::";
+        info += ":";
     }
     qDebug() << "File Info: " << info.c_str();
     return info;
