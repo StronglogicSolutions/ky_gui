@@ -31,9 +31,8 @@ ArgDialog::ArgDialog(QWidget *parent)
       QMimeDatabase db;
       auto is_video = db.mimeTypeForFile(file_path).name().contains("video");
       addItem(file_name, "file");
-      m_ig_post.files.push_back(KFile{.name = file_name,
-                                      .path = file_path,
-                                      .type = is_video ? FileType::VIDEO : FileType::IMAGE});
+      m_ig_post.files.push_back(
+          KFile{.name = file_name, .path = file_path, .type = is_video ? FileType::VIDEO : FileType::IMAGE});
 
       if (is_video) {
         qDebug() << "File discovered to be video";
@@ -174,7 +173,22 @@ void ArgDialog::addItem(QString value, QString type) {
   q_pb->setText("Delete");
   q_pb->setIcon(std::move(QIcon(":/icons/icons/quit.png")));
   QObject::connect(q_pb, &QPushButton::clicked, this, [this]() {
-    ui->argList->removeRow(ui->argList->currentRow());
+    auto row_index = ui->argList->currentRow();
+    // If deleted item is a file, we need to remove it from the task
+    auto type = ui->argList->item(row_index, 0);
+    qDebug() << type->text();
+    if (type->text() == "file") {
+      auto value = ui->argList->item(row_index, 1);
+      qDebug() << value->text();
+      if (!value->text().isEmpty()) {
+        auto file_it = std::find_if(m_ig_post.files.begin(), m_ig_post.files.end(),
+                                    [value](const KFile &file) { return file.name == value->text(); });
+        if (file_it != m_ig_post.files.end()) {  // If file was matched
+          m_ig_post.files.erase(file_it);
+        }
+      }
+    }
+    ui->argList->removeRow(row_index);
   });
   ui->argList->setItem(row, 0, item);
   ui->argList->setItem(row, 1, item2);
