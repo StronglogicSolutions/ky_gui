@@ -72,6 +72,7 @@ private:
     QStandardItemModel* m_event_model;
     /** Misc */
     ConfigJson m_config;
+    uint16_t m_consecutive_events;
 
    private slots:
     /** Receivers */

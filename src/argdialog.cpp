@@ -165,7 +165,7 @@ void ArgDialog::addItem(QString value, QString type) {
   QPushButton *q_pb = new QPushButton();
   q_pb->setText("Delete");
   q_pb->setIcon(std::move(QIcon(":/icons/icons/quit.png")));
-  QObject::connect(q_pb, &QPushButton::clicked, this, [this, row]() {
+  QObject::connect(q_pb, &QPushButton::clicked, this, [this]() {
     ui->argList->removeRow(ui->argList->currentRow());
   });
   ui->argList->setItem(row, 0, item);
