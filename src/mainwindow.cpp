@@ -19,6 +19,35 @@ void infoMessageBox(QString text, QString title = "KYGUI") {
   box.exec();
 }
 
+bool isSameEvent(QString event1, QString event2) {
+  auto event_size =
+      event1.size() > event2.size() ? event2.size() : event1.size();
+  auto similarity_standard = event_size * 0.67;
+  auto similarity_index = 0;
+  for (auto i = 0; i < event_size; i++) {
+    if (event1[i] == event2[i]) {
+      similarity_index++;
+    }
+  }
+  return similarity_index > similarity_standard;
+}
+
+int getLikeEventNum(QString event, QList<QString> events) {
+  auto i = events.size() - 1;
+  auto hits = 0;
+  bool is_same_event = false;
+  auto incoming_event = event.remove(0, 11);
+  do {
+    auto existing_event = events[i];
+    if (is_same_event =
+            isSameEvent(incoming_event, existing_event.remove(0, 11))) {
+      i--;
+      hits++;
+    }
+  } while (is_same_event && i > -1);
+  return hits;
+}
+
 QString getTime() { return QDateTime::currentDateTime().toString("hh:mm:ss"); }
 
 /**
@@ -300,6 +329,20 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
       }
     } else {
       event_message += message;
+    }
+    if (m_events.size() > 1) {
+      auto last_event = m_events[m_events.size() - 1];
+      if (isSameEvent(message, last_event.remove(0, 11))) {
+        m_consecutive_events++;
+        auto count = getLikeEventNum(event_message, m_events);
+        QString clean_event_message =
+            event_message + " (" + QString::number(count) + ")";
+        m_events.push_back(event_message);
+        m_event_model->setItem(m_event_model->rowCount() - 1,
+                               createEventListItem(clean_event_message));
+        return;
+      }
+      m_consecutive_events = 0;
     }
     m_events.push_back(event_message);
     m_event_model->setItem(m_event_model->rowCount(),
