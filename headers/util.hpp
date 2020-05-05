@@ -405,15 +405,6 @@ bool serverWaitingForFile(const char* data) {
     return false;
 }
 
-// std::string stringTupleVecToJson(
-//    std::vector<std::pair<std::string, std::string>> v) {
-//    json j{};
-//    for (const auto& row : v) {
-//        j[row.first] = row.second;
-//    }
-//    return j;
-//}
-
 inline size_t findNullIndex(uint8_t* data) {
     size_t index = 0;
     while (data) {
