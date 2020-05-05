@@ -1,4 +1,4 @@
-﻿#include <include/consoledialog.h>
+﻿#include <include/ui/consoledialog.h>
 #include <QPushButton>
 #include "ui_consoledialog.h"
 

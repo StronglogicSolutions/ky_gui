@@ -1,5 +1,4 @@
 ky_gui.pro.user*
-ui_mainwindow.h
 ky_gui
 moc*
 tags
@@ -12,6 +11,9 @@ qrc_kres.*
 assets
 config
 ky_gui_plugin_import.cpp
+html
+qdoc.conf
+**/.autosave
 ui_mainwindow.h
 ui_argdialog.h
 ui_consoledialog.h

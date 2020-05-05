@@ -1,4 +1,4 @@
-﻿#include <include/argdialog.h>
+﻿#include <include/ui/argdialog.h>
 #include <ui_argdialog.h>
 #include <QCalendarWidget>
 #include <QDateTime>
@@ -68,6 +68,10 @@ ArgDialog::ArgDialog(QWidget *parent)
 
   QObject::connect(ui->addArgument, &QPushButton::clicked, this, [this]() {
     QString text = ui->argInput->toPlainText();
+    // TODO: argType values need to be set by configuration
+    // Can this somehow be known via the flatbuffer schema? I think not
+    // handling of type needs to be abstracted by a class which can be
+    // subclassed for various types of task: Instagram, etc
     auto type = ui->argType->currentText();
     if (text.size() > 0) {
       if (type == Args::HASHTAG_TYPE) {
@@ -98,9 +102,8 @@ ArgDialog::ArgDialog(QWidget *parent)
 
   QObject::connect(ui->argCommandButtons,
                    static_cast<void (QDialogButtonBox::*)(QAbstractButton *)>(
-                     &QDialogButtonBox::clicked),
-                   this,
-                   [this](QAbstractButton *button) {
+                       &QDialogButtonBox::clicked),
+                   this, [this](QAbstractButton *button) {
                      if (button->text() == "Save") {
                        if (m_ig_post.isReady()) {
                          setTaskArguments();
@@ -117,10 +120,10 @@ ArgDialog::ArgDialog(QWidget *parent)
                              QMessageBox::warning(this, tr("File Error"), tr("Unable to read file"));
                            }
                          }
+
                          if (!k_file_v.empty()) {
                            emit ArgDialog::uploadFiles(k_file_v);
                          }
-
                          emit ArgDialog::taskRequestReady(m_task, true);
                        }
                        clearPost(); // reset m_ig_post to default values
@@ -295,6 +298,9 @@ void ArgDialog::setFilePath(QString path) { m_file_path = path; }
 void ArgDialog::setConfig(QString config_string) {
   m_config_string = config_string;
   ui->user->addItems(getValueArgs(m_config_string.toUtf8(), "users"));
+  if (ui->user->count() > 0) {
+    m_ig_post.user = ui->user->itemText(0).toUtf8().constData();
+  }
 }
 
 ArgDialog::~ArgDialog()

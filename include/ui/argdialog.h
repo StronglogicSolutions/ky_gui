@@ -1,16 +1,16 @@
 ﻿#ifndef ARGDIALOG_H
 #define ARGDIALOG_H
 
+#include <include/ui/kfiledialog.h>
 #include <QDialog>
 #include <QFile>
 #include <QFileDialog>
+#include <QKeyEvent>
 #include <QMessageBox>
 #include <QPushButton>
+#include <headers/util.hpp>
 #include <string_view>
 #include <unordered_map>
-#include <QKeyEvent>
-#include <headers/util.hpp>
-#include <include/kfiledialog.h>
 
 namespace Args {
 const QString HEADER_TYPE = "header";

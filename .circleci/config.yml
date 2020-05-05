@@ -15,7 +15,7 @@ jobs:
       - run:
           name: notify_production
           command: |
-            curl http://artifact.stronglogicsolutions.com/?artifact=ky_gui&build_id=<< pipeline.number >>
+            curl http://artifact.stronglogicsolutions.com/?artifact=ky_gui
 
 workflows:
  version: 2
