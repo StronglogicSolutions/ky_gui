@@ -12,3 +12,6 @@ qrc_kres.*
 assets
 config
 ky_gui_plugin_import.cpp
+ui_mainwindow.h
+ui_argdialog.h
+ui_consoledialog.h
