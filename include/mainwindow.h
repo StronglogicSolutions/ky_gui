@@ -22,6 +22,12 @@ namespace ProcessState {
     static constexpr int FAILED = 4;
 }
 
+struct KListViewsStates {
+  bool eventViewBottom;
+  bool processViewBottom;
+  bool historyViewBottom;
+};
+
 const QString ProcessNames[4] = { "READY", "PENDING", "SUCCEEDED", "FAILED" };
 
 struct Process {
@@ -30,7 +36,8 @@ struct Process {
     QString start;
     QString end;
     QString id;
-    QString result;
+    QString result = "";
+    QString error = "";
 
     bool operator==(const Process &other) const {
         return name == other.name && state == other.state;
@@ -49,8 +56,20 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(int argc = 0, char** argv = nullptr, QWidget* parent = nullptr);
-    virtual void keyPressEvent(QKeyEvent* e);
     ~MainWindow();
+    class MessageParser {
+     public:
+      void init(MainWindow* window);
+      void handleCommands(StringVec commands, QString default_app);
+      void handleMessage(QString message, StringVec v);
+      QString handleEventMessage(QString message, StringVec v);
+      void updateProcessResult(QString id, QString result, bool error);
+      QString parseMessage(const QString& s, StringVec v);
+
+     private:
+      MainWindow* window;
+    };
+
 private:
     /** Process arguments */
     int cli_argc;
@@ -58,10 +77,10 @@ private:
     /** UI & Messages */
     void connectUi();
     void setConnectScreen(bool visible = true);
-    QString parseMessage(const QString& s, StringVec v);
+
     QString parseTaskInfo(StringVec v);
-    void updateProcessResult(QString request_id, QString result);
     /** UI Members */
+    MessageParser message_parser;
     Ui::MainWindow *ui;
     ArgDialog *arg_ui;
     ConsoleDialog console_ui;
@@ -72,6 +91,7 @@ private:
     QList<QString> m_events;
     QStandardItemModel* m_process_model;
     QStandardItemModel* m_event_model;
+    KListViewsStates m_view_states;
     /** Misc */
     ConfigJson m_config;
     uint16_t m_consecutive_events;
@@ -80,7 +100,6 @@ private:
     /** Receivers */
     void connectClient();
     void updateMessages(int t, const QString& s, StringVec v);
-    void handleKey();
 };
 
 
