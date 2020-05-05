@@ -1,18 +1,19 @@
-﻿#include <include/client.hpp>
-#include <arpa/inet.h>
+﻿#include <arpa/inet.h>
+#include <math.h>
 #include <netdb.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <functional>
+#include <QByteArray>
+#include <QDebug>
 #include <algorithm>
 #include <cstring>
-#include <QDebug>
-#include <QByteArray>
+#include <functional>
+#include <future>
+#include <include/client.hpp>
 #include <iostream>
 #include <vector>
-#include <future>
 #define FLATBUFFERS_DEBUG_VERIFICATION_FAILURE
 #include <headers/kmessage_codec.hpp>
 #include <headers/instatask_generated.h>
@@ -232,10 +233,10 @@ std::string getTaskFileInfo(std::vector<SentFile> files) {
  */
 void Client::sendTaskEncoded(TaskType type, std::vector<std::string> args) {
     if (type == TaskType::INSTAGRAM) {
-        if (args.size() < 7) {
-            qDebug() << "Not enough arguments to send an IGTask";
-            return;
-        }
+      if (args.size() < 8) {
+        qDebug() << "Not enough arguments to send an IGTask";
+        return;
+      }
         auto file_info = builder.CreateString(getTaskFileInfo(sent_files));
         auto time = builder.CreateString(args.at(0).c_str(), args.at(0).size());
         auto description = builder.CreateString(args.at(1).c_str(), args.at(1).size());
@@ -246,8 +247,12 @@ void Client::sendTaskEncoded(TaskType type, std::vector<std::string> args) {
         auto link_bio = builder.CreateString(args.at(6).c_str(), args.at(6).size());
         auto is_video = args.at(7) == "1";
         auto header = builder.CreateString(args.at(8).c_str(), args.at(8).size());
+        auto user = builder.CreateString(args.at(9).c_str(), args.at(9).size());
 
-        flatbuffers::Offset<IGTask> ig_task = CreateIGTask(builder, 96, file_info, time, description, hashtags, requested_by, requested_by_phrase, promote_share, link_bio, is_video, 16, header);
+        flatbuffers::Offset<IGTask> ig_task =
+            CreateIGTask(builder, 96, file_info, time, description, hashtags,
+                         requested_by, requested_by_phrase, promote_share,
+                         link_bio, is_video, 16, header, user);
 
         builder.Finish(ig_task);
 

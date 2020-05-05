@@ -274,6 +274,7 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
     }
     if (message == "New Session") {
       ui->led->setState(true);
+      arg_ui->setConfig(configValue("instagram", m_config));
       if (configBoolValue("schedulerMode", std::ref(m_config))) {
         arg_ui->show();
       }

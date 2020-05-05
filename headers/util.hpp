@@ -9,7 +9,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "json.hpp"
 #include "rapidjson/document.h"
 #include "rapidjson/pointer.h"
 #include "rapidjson/prettywriter.h"
@@ -49,7 +48,6 @@ typedef QQueue<Task> TaskQueue;
 
 namespace {
 using namespace rapidjson;
-using json = nlohmann::json;
 
 typedef std::string KOperation;
 
@@ -232,37 +230,64 @@ QVector<QString> getShortArgs(const char* data) {
 }
 
 QVector<QString> getArgs(const char* data) {
-    Document d;
-    d.Parse(data);
-    QVector<QString> args{};
-    if (d.HasMember("args")) {
-        for (const auto& m : d["args"].GetArray()) {
-            args.push_back(m.GetString());
-        }
+  Document d;
+  d.Parse(data);
+  QVector<QString> args{};
+  if (d.HasMember("args")) {
+    for (const auto& m : d["args"].GetArray()) {
+      args.push_back(m.GetString());
     }
-    return args;
+  }
+  return args;
 }
 
+QList<QString> getValueArgs(const char* data, QString key) {
+  auto key_value = key.toUtf8();
+  Document d;
+  d.Parse(data);
+  QList<QString> args{};
+  for (const auto& m : d.GetObject()) {
+    auto name = m.name.GetString();
+    if (name == key.toUtf8()) {
+      if (m.value.IsArray()) {
+        for (const auto& a : m.value.GetArray()) {
+          args.push_back(a.GetString());
+        }
+      }
+    }
+  }
+  return args;
+}
 
 CommandMap getArgMap(const char* data) {
-    Document d;
-    d.Parse(data);
-    CommandMap cm{};
-    if (d.HasMember("args")) {
-        for (const auto& m : d["args"].GetObject()) {
-            cm.emplace(std::stoi(m.name.GetString()), m.value.GetString());
-        }
+  Document d;
+  d.Parse(data);
+  CommandMap cm{};
+  if (d.HasMember("args")) {
+    for (const auto& m : d["args"].GetObject()) {
+      cm.emplace(std::stoi(m.name.GetString()), m.value.GetString());
     }
-    return cm;
+  }
+  return cm;
 }
 
 ConfigJson getConfigObject(QString json_string) {
     Document d;
     d.Parse(json_string.toUtf8());
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
     std::map<QString, QString> config_map{};
     if (d.IsObject()) {
         for (const auto& m : d.GetObject()) {
+          auto type = m.value.GetType();
+          if (m.value.GetType() == kStringType) {
             config_map.emplace(m.name.GetString(), m.value.GetString());
+          }
+          if (m.value.GetType() == kObjectType) {
+            m.value.Accept(writer);
+            QString config_value{buffer.GetString()};
+            config_map.emplace(m.name.GetString(), config_value);
+          }
         }
     }
     return config_map;
@@ -367,15 +392,6 @@ bool serverWaitingForFile(const char* data) {
         return strcmp(d["message"].GetString(), "File Ready") == 0;
     }
     return false;
-}
-
-std::string stringTupleVecToJson(
-    std::vector<std::pair<std::string, std::string>> v) {
-    json j{};
-    for (const auto& row : v) {
-        j[row.first] = row.second;
-    }
-    return j;
 }
 
 inline size_t findNullIndex(uint8_t* data) {

@@ -52,7 +52,7 @@ color:  rgb(255, 85, 0);
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0">
       <item>
        <widget class="QLabel" name="label_2">
         <property name="sizePolicy">
@@ -126,6 +126,56 @@ font-weight: 700;
           <string>link/bio</string>
          </property>
         </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="userLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>2</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>196</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>196</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(131, 148, 150);
+font-weight: 700;</string>
+        </property>
+        <property name="text">
+         <string>User</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="user">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: #2f535f;
+color: rgb(131, 148, 150);
+font-weight: 700;
+</string>
+        </property>
        </widget>
       </item>
      </layout>
