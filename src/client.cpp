@@ -164,15 +164,11 @@ void Client::start() {
  * @param [in] {const QString&} The message to send
  */
 void Client::sendMessage(const QString& s) {
-    if (m_client_socket_fd != -1) {
-        std::string json_string {"{\"type\":\"custom\", \"message\": \""};
-        json_string += s.toUtf8().data();
-        json_string += "\", \"args\":\"placeholder\"}";
-        // Send custom message as an encoded message
-        sendEncoded(json_string);
-    } else {
-        qDebug() << "You must first open a connection";
-    }
+  if (m_client_socket_fd != -1) {
+    sendEncoded(createMessage(s.toUtf8(), ""));
+  } else {
+    qDebug() << "You must first open a connection";
+  }
 }
 
 /**
@@ -286,12 +282,10 @@ void Client::sendTaskEncoded(TaskType type, std::vector<std::string> args) {
         m_task.clear();
         if (!m_task_queue.isEmpty()) {
           auto task = m_task_queue.dequeue();
-          if (!task.files.empty()) {
-            if (!outgoing_files.empty()) {
-              qDebug() << "There are still outgoing files left over from last "
-                          "task which were never sent. They are being deleted";
-              outgoing_files.clear();
-            }
+          if (!task.files.empty() && !outgoing_files.empty()) {
+            qDebug() << "There are still outgoing files left over from last "
+                        "task which were never sent. They are being deleted";
+            outgoing_files.clear();
           }
           // We simply need to send files. Once the last file is sent, Client
           // will check the value of m_task and send it to Server.
