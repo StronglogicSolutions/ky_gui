@@ -10,11 +10,7 @@
 #include <algorithm>
 #include <vector>
 
-ArgDialog::ArgDialog(QWidget *parent)
-    : QDialog(parent),
-      ui(new Ui::ArgDialog),
-      m_task(Task{}),
-      m_ig_post(IGPost{}) {
+ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), m_task(Task{}), m_ig_post(IGPost{}) {
   ui->setupUi(this);
 
   ui->argCommandButtons->button(QDialogButtonBox::Close)
@@ -176,14 +172,13 @@ void ArgDialog::addItem(QString value, QString type) {
     auto row_index = ui->argList->currentRow();
     // If deleted item is a file, we need to remove it from the task
     auto type = ui->argList->item(row_index, 0);
-    qDebug() << type->text();
     if (type->text() == "file") {
       auto value = ui->argList->item(row_index, 1);
-      qDebug() << value->text();
       if (!value->text().isEmpty()) {
         auto file_it = std::find_if(m_ig_post.files.begin(), m_ig_post.files.end(),
                                     [value](const KFile &file) { return file.name == value->text(); });
         if (file_it != m_ig_post.files.end()) {  // If file was matched
+          qDebug() << "Removing file from task arguments";
           m_ig_post.files.erase(file_it);
         }
       }
