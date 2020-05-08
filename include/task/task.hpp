@@ -20,7 +20,7 @@ class Task {
  public:
   virtual bool isReady() = 0;
   virtual const TaskArguments getTaskArguments() = 0;
-  virtual ~Task() = 0;
+  virtual ~Task(){};
 };
 }  // namespace Task
 

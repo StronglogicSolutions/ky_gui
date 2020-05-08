@@ -9,7 +9,7 @@ class InstagramTask : public Task {
  public:
   bool isReady() override { return false; }
   virtual const TaskArguments getTaskArguments() override;
-  ~InstagramTask() override {}
+  virtual ~InstagramTask() override;
 };
 }  // namespace Task
 
