@@ -6,9 +6,20 @@
 
 namespace Task {
 
+namespace Type {
+static constexpr const char* TEXT = "Text";
+static constexpr const char* FILE = "File";
+static constexpr const char* STRINGVECTOR = "StringVector";
+static constexpr const char* FILEVECTOR = "FileVector";
+static constexpr const char* DATETIME = "DateTime";
+static constexpr const char* BOOLEAN = "Boolean";
+}  // namespace Type
+
+using ArgumentType = const char*;
+
 class TaskArgument {
   QString name;
-  QString type;
+  ArgumentType type;
 
  public:
   TaskArgument(QString n, QString t) : name(n), type(t) {}
