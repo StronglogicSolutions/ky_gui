@@ -4,15 +4,26 @@
 #include <include/task/task.hpp>
 #include <type_traits>
 
+namespace Args {
+const QString HEADER_TYPE = "header";
+const QString DESCRIPTION_TYPE = "description";
+const QString HASHTAG_TYPE = "hashtag";
+const QString PROMOTE_TYPE = "promote/share";
+const QString LINK_BIO_TYPE = "link/bio";
+const QString REQUESTED_BY_TYPE = "requested by";
+}  // namespace Args
+
 class InstagramTask : public Scheduler::Task {
  public:
+  virtual void defineTaskArguments() override;
+  virtual const Scheduler::TaskArguments getTaskArguments() override;
+  virtual Scheduler::TypeVariant getTaskArgument(QString name) override;
+  virtual Scheduler::ArgumentValues getArgumentValues() override;
+  virtual void setArgument(QString name, Scheduler::TypeVariant arg) override;
   virtual bool isReady() override;
   virtual void clear() override;
-  virtual const Scheduler::TaskArguments getTaskArguments() override;
-  virtual void defineTaskArguments() override;
+  virtual void setDefaultValues() override;
   virtual ~InstagramTask() override;
-  template <typename T>
-  void setArgument(QString name, T arg);
 
  private:
   Scheduler::TaskArguments m_arguments;

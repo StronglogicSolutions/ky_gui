@@ -133,30 +133,20 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
 }
 
 void ArgDialog::setTaskArguments() {
-  m_task->clear();
-  std::string hashtags{};
-  for (const auto &tag : m_ig_post.hashtags) {
+  QString hashtags{};
+  for (const auto &tag : std::get<VariantIndex::STRVEC>(m_task->getTaskArgument("hashtags"))) {
     hashtags += "#" + tag + " ";
   }
-  hashtags.pop_back();
-  std::string requested_by{};
-  for (const auto &name : m_ig_post.requested_by) {
+  hashtags.chop(1);
+  QString requested_by{};
+  for (const auto &name : std::get<VariantIndex::STRVEC>(m_task->getTaskArgument("requested_by"))) {
     requested_by += "@" + name + "";
   }
   if (m_ig_post.requested_by.size() > 1) {
-    requested_by.pop_back();
+    requested_by.chop(1);
   }
-
-  m_task->setArgument<QString>("datetime", m_ig_post.datetime);
-  m_task->setArgument<QString>("description", m_ig_post.description);
-  m_task->setArgument<QString>("hashtags", hashtags);
-  m_task->setArgument<QString>("requested_by", requested_by);
-  m_task->setArgument<QString>("requested_by_phrase", m_ig_post.requested_by_phrase);
-  m_task->setArgument<QString>("promote_share", m_ig_post.promote_share);
-  m_task->setArgument<QString>("link_in_bio", m_ig_post.link_in_bio);
-  m_task->setArgument<QString>("is_video", std::to_string(m_ig_post.is_video));
-  m_task->setArgument<QString>("header", m_ig_post.header);
-  m_task->setArgument<QString>("user", m_ig_post.user);
+  m_task->setArgument("hashtags", hashtags);
+  m_task->setArgument("requested_by", requested_by);
 }
 
 void ArgDialog::addItem(QString value, QString type) {
@@ -202,19 +192,12 @@ void ArgDialog::addFile(QString path) {
 }
 
 void ArgDialog::clearPost() {
-  m_ig_post.files.clear();
-  m_ig_post.header = "Learn to speak like native Korean speakers 🙆‍♀️🇰🇷";
   QDateTime date_time = QDateTime::currentDateTime();
   ui->dateTime->setDateTime(date_time);
-  m_ig_post.datetime = date_time.toTime_t();
-  m_ig_post.hashtags.clear();
-  m_ig_post.description = "";
-  m_ig_post.link_in_bio = "Subscribe to my YouTube channel (link 🔗in bio) to learn more about "
-                          "Korean language and culture ❤";
-  m_ig_post.requested_by.clear();
-  m_ig_post.promote_share = "Share the post through IG story if you enjoy the phrase 🙋‍♀️";
-  m_ig_post.requested_by_phrase = "The phrase was requested by ";
-  m_ig_post.user = ui->user->currentText().toUtf8().constData();
+  m_task->clear();
+  m_task->setDefaultValues();
+  m_task->setArgument("datetime", date_time.toString());
+  m_task->setArgument("user", ui->user->currentText());
   ui->argType->setCurrentIndex(0);
   ui->argList->setRowCount(0);
 }
