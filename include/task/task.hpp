@@ -42,12 +42,27 @@ class TaskArgument : TaskArgumentBase {
   }
   TaskArgument(TaskArgument&& a) : name(std::move(a.name)), type(std::move(a.type)), value(std::move(a.value)) {}
   virtual QString text() const { return name; }
+  virtual void setValue(T new_value) { value = new_value; }
   QString name;
   ArgumentType type;
   T value;
 };
 
-using TaskArguments = std::vector<std::unique_ptr<TaskArgumentBase>>;
+using TaskIterator = std::vector<std::unique_ptr<TaskArgumentBase>>::iterator;
+
+class TaskArguments {
+ public:
+  TaskIterator getArgumentIterator(QString name) {
+    return std::find_if(values.begin(), values.end(), [name](auto argument) { return argument.text() == name; });
+  }
+  TaskIterator begin() { return values.begin(); }
+  TaskIterator end() { return values.end(); }
+  bool isValidIterator(TaskIterator it) { return it != values.end(); }
+  void setArguments(std::vector<std::unique_ptr<TaskArgumentBase>>&& new_values) { values = new_values; }
+
+ private:
+  std::vector<std::unique_ptr<TaskArgumentBase>> values;
+};
 
 class Task {
  public:

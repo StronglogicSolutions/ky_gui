@@ -26,11 +26,9 @@ const TaskArguments InstagramTask::getTaskArguments() { return m_arguments; }
 template <typename T>
 void InstagramTask::setArgument(QString name, T value) {
   if constexpr (std::is_same_v<T, QString>) {
-    auto it = std::find_if(m_arguments.begin(), m_arguments.end(),
-                           [name, value](auto argument) { return argument.text() == name; });
-    if (it != m_arguments.end()) {
-      it->value = value;
-    }
+    TaskIterator it =
+        std::find_if(m_arguments.begin(), m_arguments.end(), [name](auto argument) { return argument.text() == name; });
+    it->get()->setValue(value);
   }
 }
 
