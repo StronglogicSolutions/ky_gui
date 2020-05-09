@@ -7,6 +7,8 @@
 #include <variant>
 #include <vector>
 
+namespace Scheduler {
+
 enum FileType { VIDEO = 1, IMAGE = 2 };
 
 struct KFileData {
@@ -15,8 +17,6 @@ struct KFileData {
   QString path;
   QByteArray bytes;
 };
-
-namespace Scheduler {
 
 namespace Type {
 static constexpr const char* TEXT = "Text";
@@ -27,8 +27,14 @@ static constexpr const char* DATETIME = "DateTime";
 static constexpr const char* BOOLEAN = "Boolean";
 }  // namespace Type
 
+class TaskArgumentBase;
+class Task;
+
 using ArgumentType = const char*;
 using TypeVariant = std::variant<QString, bool, std::vector<std::string>, std::vector<KFileData>>;
+using TaskIterator = std::vector<std::unique_ptr<TaskArgumentBase>>::iterator;
+using TaskArguments = std::vector<std::unique_ptr<TaskArgumentBase>>;
+using TaskQueue = QQueue<Task>;
 
 class TaskArgumentBase {
  public:
@@ -52,9 +58,6 @@ class TaskArgument : TaskArgumentBase {
   T value;
 };
 
-using TaskIterator = std::vector<std::unique_ptr<TaskArgumentBase>>::iterator;
-using TaskArguments = std::vector<std::unique_ptr<TaskArgumentBase>>;
-
 class Task {
  public:
   virtual void defineTaskArguments() = 0;
@@ -63,8 +66,7 @@ class Task {
   virtual void clear() = 0;
   virtual ~Task(){};
 };
-}  // namespace Scheduler
 
-typedef QQueue<Task> TaskQueue;
+}  // namespace Scheduler
 
 #endif  // __TASK_HPP__
