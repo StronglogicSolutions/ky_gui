@@ -2,15 +2,20 @@
 #define __INSTAGRAM_TASK_HPP__
 
 #include <include/task/task.hpp>
+#include <type_traits>
 
-namespace Task {
-
-class InstagramTask : public Task {
+class InstagramTask : public Scheduler::Task {
  public:
-  bool isReady() override { return false; }
-  virtual const TaskArguments getTaskArguments() override;
+  virtual bool isReady() override;
+  virtual void clear() override;
+  virtual const Scheduler::TaskArguments getTaskArguments() override;
+  virtual void defineTaskArguments() override;
   virtual ~InstagramTask() override;
+  template <typename T>
+  void setArgument(QString name, T arg);
+
+ private:
+  Scheduler::TaskArguments m_arguments;
 };
-}  // namespace Task
 
 #endif  // __INSTAGRAM_TASK_HPP

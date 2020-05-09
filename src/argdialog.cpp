@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <vector>
 
-ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), m_task(Task{}), m_ig_post(IGPost{}) {
+ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), m_task(nullptr), m_ig_post(IGPost{}) {
   ui->setupUi(this);
 
   ui->argCommandButtons->button(QDialogButtonBox::Close)
@@ -148,16 +148,16 @@ void ArgDialog::setTaskArguments() {
         requested_by.pop_back();
     }
 
-    m_task.args.push_back(m_ig_post.datetime);
-    m_task.args.push_back(m_ig_post.description);
-    m_task.args.push_back(hashtags);
-    m_task.args.push_back(requested_by);
-    m_task.args.push_back(m_ig_post.requested_by_phrase);
-    m_task.args.push_back(m_ig_post.promote_share);
-    m_task.args.push_back(m_ig_post.link_in_bio);
-    m_task.args.push_back(std::to_string(m_ig_post.is_video));
-    m_task.args.push_back(m_ig_post.header);
-    m_task.args.push_back(m_ig_post.user);
+    m_task->setArgument<std::string>("datetime", m_ig_post.datetime);
+    m_task->setArgument<std::string>("description", m_ig_post.description);
+    m_task->setArgument<std::string>("hashtags", hashtags);
+    m_task->setArgument<std::string>("requested_by", requested_by);
+    m_task->setArgument<std::string>("requested_by_phrase", m_ig_post.requested_by_phrase);
+    m_task->setArgument<std::string>("promote_share", m_ig_post.promote_share);
+    m_task->setArgument<std::string>("link_in_bio", m_ig_post.link_in_bio);
+    m_task->setArgument<std::string>("is_video", std::to_string(m_ig_post.is_video));
+    m_task->setArgument<std::string>("header", m_ig_post.header);
+    m_task->setArgument<std::string>("user", m_ig_post.user);
 }
 
 void ArgDialog::addItem(QString value, QString type) {
@@ -220,10 +220,7 @@ void ArgDialog::clearPost() {
   ui->argList->setRowCount(0);
 }
 
-void ArgDialog::clearTask() {
-  m_task.args.clear();
-  m_task.mask = -1;
-}
+void ArgDialog::clearTask() { m_task->clear(); }
 
 void ArgDialog::addRequestedBy(QString value) {
   QStringList names = value.split(" ");
@@ -318,3 +315,10 @@ ArgDialog::~ArgDialog()
 }
 
 void ArgDialog::accept() { qDebug() << "Sending request to schedule a task.."; }
+
+void ArgDialog::setArgTypes() {
+  ui->argType->clear();
+  for (const auto &arg : m_task->getTaskArguments()) {
+    ui->argType->addItem(arg->text());
+  }
+}

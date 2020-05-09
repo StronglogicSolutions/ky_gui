@@ -38,11 +38,11 @@ struct KFileData {
     QByteArray bytes;
 };
 
-struct Task {
-  QVector<KFileData> files;
-  std::vector<std::string> args;
-  int mask;
-};
+// struct Task {
+//  QVector<KFileData> files;
+//  std::vector<std::string> args;
+//  int mask;
+//};
 
 typedef QQueue<Task> TaskQueue;
 

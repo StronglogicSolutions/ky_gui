@@ -9,8 +9,11 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <headers/util.hpp>
+#include <include/task/task.hpp>
 #include <string_view>
 #include <unordered_map>
+
+using namespace Scheduler;
 
 namespace Args {
 const QString HEADER_TYPE = "header";
@@ -78,10 +81,11 @@ class ArgDialog : public QDialog {
   void addHashtag(QString tag);
   void addRequestedBy(QString value);
   void setTaskArguments();
+  void setArgTypes();
   Ui::ArgDialog *ui;
   void addItem(QString value, QString type);
   void addFile(QString path);
-  Task m_task;
+  Task *m_task;
   IGPost m_ig_post;
   QString m_file_path;
   QString m_config_string;
