@@ -10,6 +10,8 @@
 
 namespace Scheduler {
 
+enum TaskType { INSTAGRAM = 1, OTHER = 2 };
+
 /**
  * Files
  */
@@ -64,7 +66,7 @@ using ArgumentType = const char*;
 using TypeVariant = std::variant<bool, int, QString, QVector<QString>, std::vector<KFileData>>;
 using TaskIterator = std::vector<std::unique_ptr<TaskArgumentBase>>::iterator;
 using TaskArguments = std::vector<std::unique_ptr<TaskArgumentBase>>;
-using TaskQueue = QQueue<Task>;
+using TaskQueue = QQueue<Task*>;
 using ArgumentValues = QVector<const QString>;
 
 /**
@@ -115,15 +117,23 @@ class TaskArgument : TaskArgumentBase {
 
   virtual const QString getStringValue() override {
     if (isIndex(value.index(), VariantIndex::QSTRING)) {
-      return value;
+      return std::get<VariantIndex::QSTRING>(value);
     } else if (isIndex(value.index(), VariantIndex::BOOLEAN)) {
-      return QString::number(value);
+      return QString::number(std::get<VariantIndex::BOOLEAN>(value));
     } else if (isIndex(value.index(), VariantIndex::INTEGER)) {
-      return QString::number(value);
+      return QString::number(std::get<VariantIndex::INTEGER>(value));
     }
   }
 
-  virtual TypeVariant getValue() override { return std::get<value.index()>(value); }
+  virtual TypeVariant getValue() override {
+    if (isIndex(value.index(), VariantIndex::QSTRING)) {
+      return std::get<VariantIndex::QSTRING>(value);
+    } else if (isIndex(value.index(), VariantIndex::BOOLEAN)) {
+      return std::get<VariantIndex::BOOLEAN>(value);
+    } else if (isIndex(value.index(), VariantIndex::INTEGER)) {
+      return std::get<VariantIndex::INTEGER>(value);
+    }
+  }
 
   virtual void clear() override {
     if (isIndex(value.index(), VariantIndex::STRVEC)) {
@@ -154,12 +164,17 @@ class TaskArgument : TaskArgumentBase {
  */
 class Task {
  public:
+  Task(){};
+  Task(KFileData);
+  Task(QVector<KFileData>);
   virtual void setArgument(QString name, TypeVariant arg) = 0;
   virtual const TaskArguments getTaskArguments() = 0;
   virtual TypeVariant getTaskArgument(QString name) = 0;
   virtual ArgumentValues getArgumentValues() = 0;
+  virtual TaskType getType() = 0;
   virtual void defineTaskArguments() = 0;
   virtual void setDefaultValues() = 0;
+  virtual const QVector<KFileData> getFiles() = 0;
   virtual bool isReady() = 0;
   virtual void clear() = 0;
   virtual ~Task(){};

@@ -108,9 +108,8 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
                          for (const auto &kfile : m_ig_post.files) {
                            QFile file(kfile.path);
                            if (file.open(QIODevice::ReadOnly)) {
-                             k_file_v.push_back(KFileData{.type = kfile.type,
-                                                          .name = kfile.name,
-                                                          .bytes = file.readAll()});
+                             k_file_v.push_back(KFileData{
+                                 .name = kfile.name, .type = kfile.type, .path = kfile.path, .bytes = file.readAll()});
                            } else {
                              QMessageBox::warning(this, tr("File Error"), tr("Unable to read file"));
                            }

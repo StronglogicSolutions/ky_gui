@@ -16,6 +16,9 @@ static const uint8_t USER = 9;
 static const uint8_t IS_VIDEO = 10;
 }  // namespace TaskIndex
 
+InstagramTask::InstagramTask(KFileData k_file) : files({k_file}) {}
+InstagramTask::InstagramTask(QVector<KFileData> k_files) : files(k_files) {}
+
 void InstagramTask::defineTaskArguments() {
   std::vector<std::unique_ptr<TaskArgumentBase>> args{};
   args.emplace_back(std::make_unique<TaskArgument<QString>>("header", Type::TEXT, QString{}));
@@ -23,8 +26,7 @@ void InstagramTask::defineTaskArguments() {
   args.emplace_back(std::make_unique<TaskArgument<QString>>("datetime", Type::DATETIME, QString{}));
   args.emplace_back(std::make_unique<TaskArgument<QString>>("promote_share", Type::TEXT, QString{}));
   args.emplace_back(std::make_unique<TaskArgument<QString>>("link_in_bio", Type::TEXT, QString{}));
-  args.emplace_back(
-      std::make_unique<TaskArgument<std::vector<QString>>>("hashtags", Type::STRINGVECTOR, std::vector<QString>{}));
+  args.emplace_back(std::make_unique<TaskArgument<QString>>("hashtags", Type::TEXT, QString{}));
   args.emplace_back(
       std::make_unique<TaskArgument<std::vector<QString>>>("requested_by", Type::STRINGVECTOR, std::vector<QString>{}));
   args.emplace_back(std::make_unique<TaskArgument<QString>>("requested_by_phrase", Type::TEXT, QString{}));
@@ -73,6 +75,8 @@ ArgumentValues InstagramTask::getArgumentValues() {
   return values;
 }
 
+const QVector<KFileData> InstagramTask::getFiles() { return files; }
+
 void InstagramTask::setDefaultValues() {
   m_arguments.at(TaskIndex::HEADER)->setValue("Learn to speak like native Korean speakers 🙆‍♀️🇰🇷");
   m_arguments.at(TaskIndex::PROMOTE_SHARE)
@@ -81,6 +85,8 @@ void InstagramTask::setDefaultValues() {
       ->setValue("Subscribe to my YouTube channel (link 🔗in bio) to learn more about Korean language and culture ❤");
   m_arguments.at(TaskIndex::REQUESTED_BY_PHRASE)->setValue("The phrase was requested by ");
 }
+
+Scheduler::TaskType getType() { return Scheduler::TaskType::INSTAGRAM; };
 
 void InstagramTask::clear() {
   for (const auto& argument : m_arguments) {

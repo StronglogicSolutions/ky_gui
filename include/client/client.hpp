@@ -1,22 +1,23 @@
 ﻿#ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include <QDialog>
 #include <QComboBox>
-#include <QPushButton>
-#include <QMessageBox>
-#include <QLineEdit>
-#include <QUuid>
+#include <QDialog>
 #include <QLabel>
-#include <QString>
-#include <QVector>
-#include <QQueue>
-#include <QThread>
+#include <QLineEdit>
+#include <QMessageBox>
 #include <QMetaType>
-#include <thread>
-#include <string>
-#include <utility>
+#include <QPushButton>
+#include <QQueue>
+#include <QString>
+#include <QThread>
+#include <QUuid>
+#include <QVector>
 #include <headers/util.hpp>
+#include <include/task/task.hpp>
+#include <string>
+#include <thread>
+#include <utility>
 
 static constexpr int MESSAGE_UPDATE_TYPE = 1;
 static constexpr int COMMANDS_UPDATE_TYPE = 2;
@@ -71,13 +72,13 @@ class Client : public QDialog {
   QString getAppName(int mask);
   int getSelectedApp();
   // Move this to private after moving responsibilities to Client
-  void scheduleTask(std::vector<std::string> task_args, bool file_pending);
+  void scheduleTask(Scheduler::Task* task, bool file_pending);
   MessageHandler createMessageHandler(std::function<void()> cb);
 
  public slots:
   void sendMessage(const QString& s);
   void setSelectedApp(std::vector<QString> app_names);
-  void sendFiles(QVector<KFileData> files);
+  void sendFiles(Scheduler::Task* task);
   void ping();
 
  signals:
@@ -88,6 +89,7 @@ class Client : public QDialog {
   void sendEncoded(std::string message);
   void sendFileEncoded(QByteArray bytes);
   void sendTaskEncoded(TaskType type, std::vector<std::string> args);
+  void sendTaskEncoded(Scheduler::Task* task);
   void processFileQueue();
   void handleMessages();
   void sendPackets(uint8_t* data, int size);
@@ -100,8 +102,8 @@ class Client : public QDialog {
   CommandMap m_commands;
   CommandArgMap m_command_arg_map;
   std::vector<int> selected_commands;
-  QQueue<KFileData> outgoing_files;
+  QQueue<Scheduler::KFileData> outgoing_files;
   std::vector<SentFile> sent_files;
-  TaskQueue m_task_queue;
+  Scheduler::TaskQueue m_task_queue;
 };
 #endif // CLIENT_HPP
