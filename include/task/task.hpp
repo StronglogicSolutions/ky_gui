@@ -62,24 +62,25 @@ class Task;
 /**
  * Aliases
  */
+using TaskQueue = QQueue<Task*>;
 using ArgumentType = const char*;
+using ArgumentValues = QVector<const QString>;
 using TypeVariant = std::variant<bool, int, QString, QVector<QString>, std::vector<KFileData>>;
 using TaskIterator = std::vector<std::unique_ptr<TaskArgumentBase>>::iterator;
 using TaskArguments = std::vector<std::unique_ptr<TaskArgumentBase>>;
-using TaskQueue = QQueue<Task*>;
-using ArgumentValues = QVector<const QString>;
 
 /**
  * The interface expected on our Task Arguments
  */
 class TaskArgumentBase {
  public:
-  virtual void setValue(TypeVariant v) = 0;
-  virtual TypeVariant getValue() = 0;
   virtual const QString text() = 0;
-  virtual void clear() = 0;
   virtual const QString getStringValue() = 0;
+  virtual TypeVariant getValue() = 0;
+  virtual void setValue(TypeVariant v) = 0;
   virtual bool isContainer() = 0;
+  virtual void clear() = 0;
+
 };
 
 /**
@@ -102,7 +103,8 @@ class TaskArgument : TaskArgumentBase {
    * @constructor
    * @param [in] {TaskArgument&&} a The R-value reference to a TaskArgument
    */
-  TaskArgument(TaskArgument&& a) : name(std::move(a.name)), type(std::move(a.type)), value(std::move(a.value)) {}
+  TaskArgument(TaskArgument&& a) :
+    name(std::move(a.name)), type(std::move(a.type)), value(std::move(a.value)) {}
   /**
    * text
    * @returns {QString} The name of the argument
@@ -115,6 +117,10 @@ class TaskArgument : TaskArgumentBase {
    */
   virtual void setValue(TypeVariant new_value) override { value = new_value; }
 
+  /**
+   * @brief getStringValue
+   * @return [out] {QString}
+   */
   virtual const QString getStringValue() override {
     if (isIndex(value.index(), VariantIndex::QSTRING)) {
       return std::get<VariantIndex::QSTRING>(value);
@@ -125,6 +131,10 @@ class TaskArgument : TaskArgumentBase {
     }
   }
 
+  /**
+   * @brief getValue
+   * @return [out] {TypeVariant}
+   */
   virtual TypeVariant getValue() override {
     if (isIndex(value.index(), VariantIndex::QSTRING)) {
       return std::get<VariantIndex::QSTRING>(value);
@@ -135,6 +145,9 @@ class TaskArgument : TaskArgumentBase {
     }
   }
 
+  /**
+   * @brief clear
+   */
   virtual void clear() override {
     if (isIndex(value.index(), VariantIndex::STRVEC)) {
       std::get<VariantIndex::STRVEC>(value).clear();
@@ -145,10 +158,14 @@ class TaskArgument : TaskArgumentBase {
     } else if (isIndex(value.index(), VariantIndex::INTEGER)) {
       std::get<VariantIndex::INTEGER>(value) = 0;
     } else if (isIndex(value.index(), VariantIndex::BOOLEAN)) {
-      std::get<VariantIndex::STRVEC>(value) = false;
+      std::get<VariantIndex::BOOLEAN>(value) = false;
     }
   }
 
+  /**
+   * @brief isContainer
+   * @return [out] {bool}
+   */
   virtual bool isContainer() override {
     return (isIndex(value.index(), VariantIndex::STRVEC) || isIndex(value.index(), VariantIndex::FILEVEC));
   }
