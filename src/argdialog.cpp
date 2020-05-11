@@ -15,36 +15,60 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
 
   ui->argCommandButtons->button(QDialogButtonBox::Close)
       ->setStyleSheet(QString("background:%1").arg("#2f535f"));
+
   QObject::connect(ui->addFile, &QPushButton::clicked, this, [this]() {
     KFileDialog file_dialog{};
     auto file_path = file_dialog.openFileDialog(m_file_path);
     qDebug() << "Selected file:" << file_path;
+
     if (file_path.size() > 0) {
       auto slash_index = file_path.lastIndexOf("/") + 1;
       QString file_name = file_path.right(file_path.size() - slash_index);
       QString dir = file_path.left(slash_index);
-      qDebug() << "Dir is " << dir;
-      QMimeDatabase db;
-      auto is_video = db.mimeTypeForFile(file_path).name().contains("video");
-      addItem(file_name, "file");
-      m_ig_post.files.push_back(
-          KFile{.name = file_name, .path = file_path, .type = is_video ? FileType::VIDEO : FileType::IMAGE});
+      QFile file(file_path);
 
-      if (is_video) {
-        qDebug() << "File discovered to be video";
-        m_ig_post.is_video = true; // rename to "sending_video"
-        QString preview_filename = FileUtils::generatePreview(file_path, file_name);
-        // TODO: create some way of verifying preview generation was successful
-        addFile("assets/previews/" + preview_filename);
-        addItem(preview_filename, "file");
-        addFile("assets/previews/" + preview_filename);
-        m_ig_post.files.push_back(KFile{.name = preview_filename,
-                                        .path = QCoreApplication::applicationDirPath()
-                                                + "/assets/previews/" + preview_filename,
-                                        .type = is_video ? FileType::VIDEO : FileType::IMAGE});
+      if (file.open(QIODevice::ReadOnly)) {
+        QMimeDatabase db;
+        auto is_video = db.mimeTypeForFile(file_path).name().contains("video");
+        addItem(file_name, "file");
+        m_task->setArgument("files", Scheduler::KFileData{
+                                         .name = file_name,
+                                         .type = is_video ? FileType::VIDEO : FileType::IMAGE,
+                                         .path = file_path,
+                                         .bytes = file.readAll()});
+
+        if (is_video) {
+          qDebug() << "File discovered to be video";
+          m_task->setArgument("is_video", true);
+          QString preview_filename = FileUtils::generatePreview(file_path, file_name);
+
+          auto preview_file_path = QCoreApplication::applicationDirPath()
+                                   + "/assets/previews/" + preview_filename;
+          file.setFileName(preview_file_path);
+          if (file.open(QIODevice::ReadOnly)) {
+            // TODO: create some way of verifying preview generation was successful
+            addFile("assets/previews/" + preview_filename);
+            addItem(preview_filename, "file");
+            addFile("assets/previews/" + preview_filename);
+            m_task->setArgument("files", Scheduler::KFileData{
+                                             .name = preview_filename,
+                                             .type = is_video ? FileType::VIDEO : FileType::IMAGE,
+                                             .path = preview_file_path,
+                                             .bytes = file.readAll()});
+          } else {
+            qDebug() << "Could not add preview image for video";
+            QMessageBox::warning(this, tr("File Error"), tr("Could not add preview image for video"));
+          }
+        } else {
+          addFile(file_path);
+        }
       } else {
-        addFile(file_path);
+        qDebug() << "Unable to open selected file";
+        QMessageBox::warning(this, tr("File Error"), tr("Unable to open selected file"));
       }
+    } else {
+      qDebug() << "Could not read the file path";
+      QMessageBox::warning(this, tr("File Error"), tr("Could not read the file path"));
     }
   });
 
@@ -100,25 +124,9 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
                        &QDialogButtonBox::clicked),
                    this, [this](QAbstractButton *button) {
                      if (button->text() == "Save") {
-                       if (m_ig_post.isReady()) {
+                       if (m_task->isReady()) {
                          setTaskArguments();
-                         QVector<KFileData> k_file_v{};
-                         k_file_v.reserve(m_ig_post.files.size());
-
-                         for (const auto &kfile : m_ig_post.files) {
-                           QFile file(kfile.path);
-                           if (file.open(QIODevice::ReadOnly)) {
-                             k_file_v.push_back(KFileData{
-                                 .name = kfile.name, .type = kfile.type, .path = kfile.path, .bytes = file.readAll()});
-                           } else {
-                             QMessageBox::warning(this, tr("File Error"), tr("Unable to read file"));
-                           }
-                         }
-
-                         if (!k_file_v.empty()) {
-                           emit ArgDialog::uploadFiles(k_file_v);
-                         }
-                         emit ArgDialog::taskRequestReady(m_task, true);
+                         emit ArgDialog::taskRequestReady(m_task);
                        }
                        clearPost(); // reset m_ig_post to default values
                      }

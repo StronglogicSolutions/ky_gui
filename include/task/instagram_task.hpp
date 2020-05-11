@@ -25,6 +25,8 @@ class InstagramTask : public Scheduler::Task {
   virtual const QVector<Scheduler::KFileData> getFiles() override;
   virtual Scheduler::TaskType getType() override;
   virtual void setArgument(QString name, Scheduler::TypeVariant arg) override;
+  virtual void setArgument(QString name, Scheduler::KFileData file) override;
+  virtual bool hasFiles() override;
   virtual bool isReady() override;
   virtual void clear() override;
   virtual void setDefaultValues() override;

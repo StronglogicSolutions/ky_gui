@@ -65,7 +65,7 @@ class Task;
 using TaskQueue = QQueue<Task*>;
 using ArgumentType = const char*;
 using ArgumentValues = QVector<const QString>;
-using TypeVariant = std::variant<bool, int, QString, QVector<QString>, std::vector<KFileData>>;
+using TypeVariant = std::variant<bool, int, QString, QVector<QString>, QVector<KFileData>>;
 using TaskIterator = std::vector<std::unique_ptr<TaskArgumentBase>>::iterator;
 using TaskArguments = std::vector<std::unique_ptr<TaskArgumentBase>>;
 
@@ -76,7 +76,10 @@ class TaskArgumentBase {
  public:
   virtual const QString text() = 0;
   virtual const QString getStringValue() = 0;
+  virtual uint8_t getTypeIndex();
   virtual TypeVariant getValue() = 0;
+  virtual void insert(QString value) = 0;
+  virtual void insert(KFileData file) = 0;
   virtual void setValue(TypeVariant v) = 0;
   virtual bool isContainer() = 0;
   virtual void clear() = 0;
@@ -170,6 +173,32 @@ class TaskArgument : TaskArgumentBase {
     return (isIndex(value.index(), VariantIndex::STRVEC) || isIndex(value.index(), VariantIndex::FILEVEC));
   }
 
+  /**
+   * @brief insert
+   * @param value
+   */
+  virtual void insert(QString value) override {
+
+  }
+
+  /**
+   * @brief insert
+   * @param file
+   */
+  virtual void insert(KFileData file) override {
+    if (value.index() == VariantIndex::FILEVEC) {
+      std::get<VariantIndex::FILEVEC>(value).push_back(file);
+    }
+  }
+
+  /**
+   * @brief getTypeIndex
+   * @return
+   */
+  virtual uint8_t getTypeIndex() override {
+    return value.index();
+  }
+
  private:
   QString name;
   ArgumentType type;
@@ -185,6 +214,7 @@ class Task {
   Task(KFileData);
   Task(QVector<KFileData>);
   virtual void setArgument(QString name, TypeVariant arg) = 0;
+  virtual void setArgument(QString name, Scheduler::KFileData file) = 0;
   virtual const TaskArguments getTaskArguments() = 0;
   virtual TypeVariant getTaskArgument(QString name) = 0;
   virtual ArgumentValues getArgumentValues() = 0;
@@ -192,6 +222,8 @@ class Task {
   virtual void defineTaskArguments() = 0;
   virtual void setDefaultValues() = 0;
   virtual const QVector<KFileData> getFiles() = 0;
+  virtual void addFile(KFileData file) = 0;
+  virtual bool hasFiles() = 0;
   virtual bool isReady() = 0;
   virtual void clear() = 0;
   virtual ~Task(){};

@@ -83,6 +83,21 @@ void InstagramTask::setArgument(QString name, TypeVariant value) {
 }
 
 /**
+ * @brief InstagramTask::setArgument
+ * @param name
+ * @param file
+ */
+void InstagramTask::setArgument(QString name, Scheduler::KFileData file) {
+  TaskIterator it =
+      std::find_if(m_arguments.begin(), m_arguments.end(), [name](auto argument) { return argument.text() == name; });
+  if (it != m_arguments.end() && it->get()->getTypeIndex() == Scheduler::VariantIndex::FILEVEC) {
+    it->get()->insert(file);
+  } else {
+    // Could not add file to container
+  }
+}
+
+/**
  * @brief InstagramTask::getTaskArgument
  * @param name
  * @return
@@ -150,6 +165,14 @@ void InstagramTask::clear() {
   for (const auto& argument : m_arguments) {
     argument->clear();
   }
+}
+
+/**
+ * @brief InstagramTask::hasFiles
+ * @return
+ */
+bool InstagramTask::hasFiles() {
+  return !files.empty();
 }
 
 /**

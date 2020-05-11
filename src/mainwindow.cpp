@@ -208,19 +208,13 @@ void MainWindow::connectClient() {
   });
 
   QObject::connect(
-      arg_ui, &ArgDialog::uploadFiles, this,
-      [this](QVector<KFileData> files) { q_client->sendFiles(files); });
-
-  QObject::connect(
       arg_ui, &ArgDialog::taskRequestReady, this,
-      [this](Task task, bool file_pending) {
+      [this](Task* task) {
         auto mask = q_client->getSelectedApp();
         if (mask > -1) {
-          if (q_client->getAppName(mask) == "Instagram") {
             qDebug() << "Scheduling a task";
-            task.args.push_back(std::to_string(mask));
-            q_client->scheduleTask(task.args, file_pending);
-          }
+            task->setArgument("mask", mask);
+            q_client->scheduleTask(task);
         }
       });
 

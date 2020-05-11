@@ -9,28 +9,14 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <headers/util.hpp>
+#include <include/task/instagram_task.hpp>
 #include <include/task/task.hpp>
 #include <string_view>
 #include <unordered_map>
 
 using namespace Scheduler;
 
-namespace Args {
-const QString HEADER_TYPE = "header";
-const QString DESCRIPTION_TYPE = "description";
-const QString HASHTAG_TYPE = "hashtag";
-const QString PROMOTE_TYPE = "promote/share";
-const QString LINK_BIO_TYPE = "link/bio";
-const QString REQUESTED_BY_TYPE = "requested by";
-}  // namespace Args
-
 typedef std::string Str;
-
-typedef struct KFile {
-  QString name;
-  QString path;
-  FileType type;
-} KFile;
 
 typedef struct IGPost {
   std::string header = "Learn to speak like native Korean speakers 🙆‍♀️🇰🇷";
@@ -41,7 +27,6 @@ typedef struct IGPost {
   std::vector<std::string> hashtags;
   std::vector<std::string> requested_by;
   const char *requested_by_phrase = "The phrase was requested by ";
-  std::vector<KFile> files;
   std::string user;
   bool is_video;
   bool isReady() {
@@ -69,8 +54,7 @@ class ArgDialog : public QDialog {
   ~ArgDialog();
 
  signals:
-  void uploadFiles(QVector<KFileData> files);
-  void taskRequestReady(Task task, bool file_pending);
+  void taskRequestReady(Scheduler::Task *task);
 
  private:
   void clearPost();

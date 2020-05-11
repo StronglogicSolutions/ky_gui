@@ -24,10 +24,7 @@ static constexpr int COMMANDS_UPDATE_TYPE = 2;
 static constexpr int EVENT_UPDATE_TYPE = 3;
 static constexpr int PROCESS_REQUEST_TYPE = 4;
 
-enum TaskType {
-    INSTAGRAM = 1,
-    OTHER = 2
-};
+using namespace Scheduler;
 
 namespace TaskCode {
 static constexpr int IGTASKBYTE = 0xFF;
@@ -72,7 +69,7 @@ class Client : public QDialog {
   QString getAppName(int mask);
   int getSelectedApp();
   // Move this to private after moving responsibilities to Client
-  void scheduleTask(Scheduler::Task* task, bool file_pending);
+  void scheduleTask(Scheduler::Task* task);
   MessageHandler createMessageHandler(std::function<void()> cb);
 
  public slots:
@@ -96,7 +93,7 @@ class Client : public QDialog {
   int argc;
   char** argv;
   int m_client_socket_fd;
-  std::vector<std::string> m_task;
+  Task* m_outbound_task;
   bool executing;
   bool file_was_sent;
   CommandMap m_commands;
