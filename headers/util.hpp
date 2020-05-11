@@ -32,19 +32,6 @@ enum FileType {
     IMAGE = 2
 };
 
-struct KFileData {
-    FileType type;
-    QString name;
-    QByteArray bytes;
-};
-
-// struct Task {
-//  QVector<KFileData> files;
-//  std::vector<std::string> args;
-//  int mask;
-//};
-
-typedef QQueue<Task> TaskQueue;
 
 namespace {
 using namespace rapidjson;
