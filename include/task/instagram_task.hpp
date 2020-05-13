@@ -16,16 +16,18 @@ const QString REQUESTED_BY_TYPE = "requested by";
 }  // namespace Scheduler
 class InstagramTask : public Scheduler::Task {
  public:
+  InstagramTask();
   InstagramTask(Scheduler::KFileData);
   InstagramTask(QVector<Scheduler::KFileData>);
   virtual void defineTaskArguments() override;
   virtual const Scheduler::TaskArguments getTaskArguments() override;
-  virtual Scheduler::TypeVariant getTaskArgument(QString name) override;
+  virtual const Scheduler::TypeVariant getTaskArgument(QString name) override;
   virtual Scheduler::ArgumentValues getArgumentValues() override;
   virtual const QVector<Scheduler::KFileData> getFiles() override;
   virtual Scheduler::TaskType getType() override;
   virtual void setArgument(QString name, Scheduler::TypeVariant arg) override;
-  virtual void setArgument(QString name, Scheduler::KFileData file) override;
+  virtual void addArgument(QString name, Scheduler::KFileData file) override;
+  virtual void addArgument(QString name, QString string) override;
   virtual bool hasFiles() override;
   virtual bool isReady() override;
   virtual void clear() override;

@@ -64,10 +64,9 @@ class Task;
  */
 using TaskQueue = QQueue<Task*>;
 using ArgumentType = const char*;
-using ArgumentValues = QVector<const QString>;
+using ArgumentValues = QVector<QString>;
 using TypeVariant = std::variant<bool, int, QString, QVector<QString>, QVector<KFileData>>;
 using TaskIterator = std::vector<std::unique_ptr<TaskArgumentBase>>::iterator;
-using TaskArguments = std::vector<std::unique_ptr<TaskArgumentBase>>;
 
 /**
  * The interface expected on our Task Arguments
@@ -92,10 +91,9 @@ class TaskArgumentBase {
  * A templated class providing a generic way for handling arguments whose types can be one from the set defined
  * by our TypeVariant alias
  */
-template <typename T = TypeVariant>
 class TaskArgument : TaskArgumentBase {
  public:
-  TaskArgument(QString n, ArgumentType t, T _value) {
+  TaskArgument(QString n, ArgumentType t, TypeVariant _value) {
     name = n;
     type = t;
     value = _value;
@@ -112,7 +110,7 @@ class TaskArgument : TaskArgumentBase {
    * text
    * @returns {QString} The name of the argument
    */
-  virtual const QString text() { return name; }
+  virtual const QString text() override { return name; }
 
   /**
    * setValue
@@ -132,6 +130,7 @@ class TaskArgument : TaskArgumentBase {
     } else if (isIndex(value.index(), VariantIndex::INTEGER)) {
       return QString::number(std::get<VariantIndex::INTEGER>(value));
     }
+    return "";
   }
 
   /**
@@ -177,8 +176,12 @@ class TaskArgument : TaskArgumentBase {
    * @brief insert
    * @param value
    */
-  virtual void insert(QString value) override {
-
+  virtual void insert(QString string) override {
+    if (isIndex(value.index(), VariantIndex::STRVEC)) {
+      std::get<VariantIndex::STRVEC>(value).push_back(string);
+    } else {
+      // Unable to push. Throw?
+    }
   }
 
   /**
@@ -188,6 +191,8 @@ class TaskArgument : TaskArgumentBase {
   virtual void insert(KFileData file) override {
     if (value.index() == VariantIndex::FILEVEC) {
       std::get<VariantIndex::FILEVEC>(value).push_back(file);
+    } else {
+      // Unable to push. Throw?
     }
   }
 
@@ -205,6 +210,8 @@ class TaskArgument : TaskArgumentBase {
   TypeVariant value;
 };
 
+using TaskArguments = std::vector<std::unique_ptr<TaskArgument>>;
+
 /**
  * The interface expected to be implemented in all Task types
  */
@@ -214,9 +221,10 @@ class Task {
   Task(KFileData);
   Task(QVector<KFileData>);
   virtual void setArgument(QString name, TypeVariant arg) = 0;
-  virtual void setArgument(QString name, Scheduler::KFileData file) = 0;
+  virtual void addArgument(QString name, Scheduler::KFileData file) = 0;
+  virtual void addArgument(QString name, QString string) = 0;
   virtual const TaskArguments getTaskArguments() = 0;
-  virtual TypeVariant getTaskArgument(QString name) = 0;
+  virtual const TypeVariant getTaskArgument(QString name) = 0;
   virtual ArgumentValues getArgumentValues() = 0;
   virtual TaskType getType() = 0;
   virtual void defineTaskArguments() = 0;
@@ -228,7 +236,6 @@ class Task {
   virtual void clear() = 0;
   virtual ~Task(){};
 };
-
 }  // namespace Scheduler
 
 #endif  // __TASK_HPP__
