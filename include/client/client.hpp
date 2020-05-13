@@ -36,10 +36,22 @@ typedef std::map<int, std::string> CommandMap;
 typedef std::map<int, std::vector<std::string>> CommandArgMap;
 typedef QVector<QString> StringVec;
 
+/**
+ * @brief The KString class
+ * Temporarily used to solve the interface problem with FlatBuffers, which seems designed to work best with std::string
+ */
+
+class KString : public QString {
+ public:
+  const QChar* c_str() {
+    return this->constData();
+  }
+};
+
 struct SentFile {
     int timestamp;
     QString name;
-    FileType type;
+    Scheduler::FileType type;
 };
 
 Q_DECLARE_METATYPE(StringVec)
@@ -85,7 +97,6 @@ class Client : public QDialog {
  private:
   void sendEncoded(std::string message);
   void sendFileEncoded(QByteArray bytes);
-  void sendTaskEncoded(TaskType type, std::vector<std::string> args);
   void sendTaskEncoded(Scheduler::Task* task);
   void processFileQueue();
   void handleMessages();

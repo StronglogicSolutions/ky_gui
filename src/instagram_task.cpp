@@ -32,32 +32,18 @@ InstagramTask::InstagramTask(QVector<KFileData> k_files) : files(k_files) {}
  * @brief InstagramTask::defineTaskArguments
  */
 void InstagramTask::defineTaskArguments() {
-  std::vector<std::unique_ptr<TaskArgumentBase>> args{};
-  args.emplace_back(std::make_unique<
-                    TaskArgument<QString>>("header", Type::TEXT, QString{}));
-  args.emplace_back(std::make_unique<
-                    TaskArgument<QString>>("description", Type::TEXT, QString{}));
-  args.emplace_back(std::make_unique<
-                    TaskArgument<QString>>("datetime", Type::DATETIME, QString{}));
-  args.emplace_back(std::make_unique<
-                    TaskArgument<QString>>("promote_share", Type::TEXT, QString{}));
-  args.emplace_back(std::make_unique<
-                    TaskArgument<QString>>("link_in_bio", Type::TEXT, QString{}));
-  args.emplace_back(std::make_unique<
-                    TaskArgument<QString>>("hashtags", Type::TEXT, QString{}));
-  args.emplace_back(std::make_unique<
-                    TaskArgument<
-                        std::vector<QString>>>("requested_by", Type::STRINGVECTOR, std::vector<QString>{}));
-  args.emplace_back(std::make_unique<
-                    TaskArgument<QString>>("requested_by_phrase", Type::TEXT, QString{}));
-  args.emplace_back(std::make_unique<
-                    TaskArgument<
-                        std::vector<KFileData>>>("files", Type::FILEVECTOR, std::vector<KFileData>{})),
-  args.emplace_back(std::make_unique<
-                    TaskArgument<QString>>("user", Type::TEXT, QString{}));
-  args.emplace_back(std::make_unique<
-                    TaskArgument<bool>>("is_video", Type::BOOLEAN, bool{}));
-  m_arguments = args;
+  m_arguments.clear();
+  m_arguments.emplace_back(std::make_unique<TaskArgument>("header", Type::TEXT, QString{}));
+  m_arguments.emplace_back(std::make_unique<TaskArgument>("description", Type::TEXT, QString{}));
+  m_arguments.emplace_back(std::make_unique<TaskArgument>("datetime", Type::DATETIME, QString{}));
+  m_arguments.emplace_back(std::make_unique<TaskArgument>("promote_share", Type::TEXT, QString{}));
+  m_arguments.emplace_back(std::make_unique<TaskArgument>("link_in_bio", Type::TEXT, QString{}));
+  m_arguments.emplace_back(std::make_unique<TaskArgument>("hashtags", Type::TEXT, QString{}));
+  m_arguments.emplace_back(std::make_unique<TaskArgument>("requested_by", Type::STRINGVECTOR, QVector<QString>{}));
+  m_arguments.emplace_back(std::make_unique<TaskArgument>("requested_by_phrase", Type::TEXT, QString{}));
+  m_arguments.emplace_back(std::make_unique<TaskArgument>("files", Type::FILEVECTOR, QVector<KFileData>{}));
+  m_arguments.emplace_back(std::make_unique<TaskArgument>("user", Type::TEXT, QString{}));
+  m_arguments.emplace_back(std::make_unique<TaskArgument>("is_video", Type::BOOLEAN, bool{}));
 }
 
 /**
@@ -66,34 +52,62 @@ void InstagramTask::defineTaskArguments() {
  * @param value
  */
 void InstagramTask::setArgument(QString name, TypeVariant value) {
-  TaskIterator it =
-      std::find_if(m_arguments.begin(), m_arguments.end(), [name](auto argument) { return argument.text() == name; });
-  if (it != m_arguments.end()) {
+//  TaskIterator it =
+//      std::find_if(m_arguments.begin(), m_arguments.end(), [name](auto argument) { return argument.text() == name; });
+for (const auto& argument : m_arguments) {
+  if (argument.get()->text() == name) {
     if (isIndex(value.index(), VariantIndex::QSTRING)) {
-      it->get()->setValue(value);
+      argument.get()->setValue(value);
     } else if (isIndex(value.index(), VariantIndex::BOOLEAN)) {
-      it->get()->setValue(QString::number(std::get<VariantIndex::BOOLEAN>(value)));
+      argument.get()->setValue(QString::number(std::get<VariantIndex::BOOLEAN>(value)));
     } else if (isIndex(value.index(), VariantIndex::INTEGER)) {
-      it->get()->setValue(QString::number(std::get<VariantIndex::INTEGER>(value)));
+      argument.get()->setValue(QString::number(std::get<VariantIndex::INTEGER>(value)));
     } else {
       // Could not set argument value
       // TODO: Log here
     }
   }
+  return;
+}
+//  if (it != m_arguments.end()) {
+//    if (isIndex(value.index(), VariantIndex::QSTRING)) {
+//      it->get()->setValue(value);
+//    } else if (isIndex(value.index(), VariantIndex::BOOLEAN)) {
+//      it->get()->setValue(QString::number(std::get<VariantIndex::BOOLEAN>(value)));
+//    } else if (isIndex(value.index(), VariantIndex::INTEGER)) {
+//      it->get()->setValue(QString::number(std::get<VariantIndex::INTEGER>(value)));
+//    } else {
+//      // Could not set argument value
+//      // TODO: Log here
+//    }
+//  }
 }
 
 /**
- * @brief InstagramTask::setArgument
+ * @brief InstagramTask::addArgument
  * @param name
  * @param file
  */
-void InstagramTask::setArgument(QString name, Scheduler::KFileData file) {
-  TaskIterator it =
-      std::find_if(m_arguments.begin(), m_arguments.end(), [name](auto argument) { return argument.text() == name; });
-  if (it != m_arguments.end() && it->get()->getTypeIndex() == Scheduler::VariantIndex::FILEVEC) {
-    it->get()->insert(file);
-  } else {
-    // Could not add file to container
+void InstagramTask::addArgument(QString name, Scheduler::KFileData file) {
+  for (const auto& argument : m_arguments) {
+    if (argument.get()->text() == name) {
+      argument.get()->insert(file);
+      return;
+    }
+  }
+}
+
+/**
+ * @brief InstagramTask::addArgument
+ * @param name
+ * @param string
+ */
+void InstagramTask::addArgument(QString name, QString string) {
+  for (const auto& argument : m_arguments) {
+    if (argument.get()->text() == name) {
+      argument.get()->insert(string);
+      return;
+    }
   }
 }
 
@@ -102,11 +116,11 @@ void InstagramTask::setArgument(QString name, Scheduler::KFileData file) {
  * @param name
  * @return
  */
-TypeVariant InstagramTask::getTaskArgument(QString name) {
-  TaskIterator it =
-      std::find_if(m_arguments.begin(), m_arguments.end(), [name](auto argument) { return argument.text() == name; });
-  if (it != m_arguments.end()) {
-    return it->get()->getValue();
+const TypeVariant InstagramTask::getTaskArgument(QString name) {
+  for (const auto& argument : m_arguments) {
+    if (argument.get()->text() == name) {
+      return argument.get()->getValue();
+    }
   }
   return "";  // Perhaps we should throw
 }
@@ -117,7 +131,7 @@ TypeVariant InstagramTask::getTaskArgument(QString name) {
  */
 ArgumentValues InstagramTask::getArgumentValues() {
   ArgumentValues values{static_cast<int>(m_arguments.size())};
-  for (const auto& argument : m_arguments) {
+  for (auto& argument : m_arguments) {
     if (!argument->isContainer()) {
       values.push_back(argument->getStringValue());
     }
@@ -129,7 +143,7 @@ ArgumentValues InstagramTask::getArgumentValues() {
  * @brief InstagramTask::getTaskArguments
  * @return
  */
-const TaskArguments InstagramTask::getTaskArguments() { return m_arguments; }
+const TaskArguments InstagramTask::getTaskArguments() { return std::move(m_arguments); }
 
 
 /**

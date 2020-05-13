@@ -18,25 +18,6 @@ using namespace Scheduler;
 
 typedef std::string Str;
 
-typedef struct IGPost {
-  std::string header = "Learn to speak like native Korean speakers 🙆‍♀️🇰🇷";
-  std::string description;
-  std::string datetime;
-  std::string promote_share = "Share the post through IG story if you enjoy the phrase 🙋‍♀️";
-  std::string link_in_bio = "Subscribe to my YouTube channel (link 🔗in bio) to learn more about Korean language and culture ❤";
-  std::vector<std::string> hashtags;
-  std::vector<std::string> requested_by;
-  const char *requested_by_phrase = "The phrase was requested by ";
-  std::string user;
-  bool is_video;
-  bool isReady() {
-    return header.size() > 0 && description.size() > 0 && datetime.size() > 0 &&
-           promote_share.size() > 0 && link_in_bio.size() > 0 &&
-           hashtags.size() > 0 && requested_by.size() > 0 && !files.empty() &&
-           files.at(0).path.size() > 0 && user.size() > 0;
-  }
-} IGPost;
-
 namespace Ui {
 class ArgDialog;
 }
@@ -46,7 +27,7 @@ class ArgDialog : public QDialog {
 
  public:
   explicit ArgDialog(QWidget *parent = nullptr);
-  virtual void keyPressEvent(QKeyEvent* e);
+  virtual void keyPressEvent(QKeyEvent* e) override;
   void setFilePath(QString path);
   virtual void accept() override;
   void setConfig(QString config_string);
@@ -70,7 +51,6 @@ class ArgDialog : public QDialog {
   void addItem(QString value, QString type);
   void addFile(QString path);
   Task *m_task;
-  IGPost m_ig_post;
   QString m_file_path;
   QString m_config_string;
 };

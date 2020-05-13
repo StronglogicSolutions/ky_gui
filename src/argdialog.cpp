@@ -10,7 +10,9 @@
 #include <algorithm>
 #include <vector>
 
-ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), m_task(nullptr), m_ig_post(IGPost{}) {
+using namespace Scheduler;
+
+ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), m_task(nullptr) {
   ui->setupUi(this);
 
   ui->argCommandButtons->button(QDialogButtonBox::Close)
@@ -31,7 +33,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
         QMimeDatabase db;
         auto is_video = db.mimeTypeForFile(file_path).name().contains("video");
         addItem(file_name, "file");
-        m_task->setArgument("files", Scheduler::KFileData{
+        m_task->addArgument("files", Scheduler::KFileData{
                                          .name = file_name,
                                          .type = is_video ? FileType::VIDEO : FileType::IMAGE,
                                          .path = file_path,
@@ -50,7 +52,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
             addFile("assets/previews/" + preview_filename);
             addItem(preview_filename, "file");
             addFile("assets/previews/" + preview_filename);
-            m_task->setArgument("files", Scheduler::KFileData{
+            m_task->addArgument("files", Scheduler::KFileData{
                                              .name = preview_filename,
                                              .type = is_video ? FileType::VIDEO : FileType::IMAGE,
                                              .path = preview_file_path,
@@ -73,8 +75,8 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
   });
 
   QObject::connect(ui->user, &QComboBox::currentTextChanged, this,
-                   [this](const QString &text) {
-                     m_ig_post.user = text.toUtf8().constData();
+                   [this](const QString &username) {
+                     m_task->setArgument("user", username);
                    });
 
   ui->argList->setHorizontalHeaderLabels(
@@ -97,13 +99,13 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
         addHashtag(text);
       } else if (type == Args::DESCRIPTION_TYPE) {
         addItem(text, type);
-        m_ig_post.description = escapeText(text).toUtf8().constData();
+        m_task->setArgument("description", escapeText(text));
       } else if (type == Args::PROMOTE_TYPE) {
         addOrReplaceInArgList(text, "promote/share");
-        m_ig_post.promote_share = text.toUtf8().constData();
+        m_task->setArgument("promote_share", text);
       } else if (type == Args::LINK_BIO_TYPE) {
         addOrReplaceInArgList(text, "link/bio");
-        m_ig_post.link_in_bio = text.toUtf8().constData();
+        m_task->setArgument("link_bio", text);
       } else if (type == Args::REQUESTED_BY_TYPE) {
         addRequestedBy(text);
       }
@@ -115,7 +117,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
 
   QObject::connect(ui->dateTime, &QDateTimeEdit::dateTimeChanged, this, [this]() {
     auto date_time = ui->dateTime->dateTime();
-    m_ig_post.datetime = std::string{std::to_string(date_time.toTime_t())};
+    m_task->setArgument("datetime", date_time.toString());
     qDebug() << "Time changed to" << date_time;
   });
 
@@ -139,6 +141,9 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
   });
 }
 
+/**
+ * @brief ArgDialog::setTaskArguments
+ */
 void ArgDialog::setTaskArguments() {
   QString hashtags{};
   for (const auto &tag : std::get<VariantIndex::STRVEC>(m_task->getTaskArgument("hashtags"))) {
@@ -149,13 +154,18 @@ void ArgDialog::setTaskArguments() {
   for (const auto &name : std::get<VariantIndex::STRVEC>(m_task->getTaskArgument("requested_by"))) {
     requested_by += "@" + name + "";
   }
-  if (m_ig_post.requested_by.size() > 1) {
+  if (requested_by.size() > 1) {
     requested_by.chop(1);
   }
   m_task->setArgument("hashtags", hashtags);
   m_task->setArgument("requested_by", requested_by);
 }
 
+/**
+ * @brief ArgDialog::addItem
+ * @param value
+ * @param type
+ */
 void ArgDialog::addItem(QString value, QString type) {
   QTableWidgetItem *item = new QTableWidgetItem(type);
   QTableWidgetItem *item2 = new QTableWidgetItem(value);
@@ -171,11 +181,14 @@ void ArgDialog::addItem(QString value, QString type) {
     if (type->text() == "file") {
       auto value = ui->argList->item(row_index, 1);
       if (!value->text().isEmpty()) {
-        auto file_it = std::find_if(m_ig_post.files.begin(), m_ig_post.files.end(),
-                                    [value](const KFile &file) { return file.name == value->text(); });
-        if (file_it != m_ig_post.files.end()) {  // If file was matched
+        // All of the following should be done by the task
+        QVector<Scheduler::KFileData> task_files = std::get<VariantIndex::FILEVEC>(m_task->getTaskArgument("files"));
+        auto file_it = std::find_if(task_files.begin(), task_files.end(),
+                                    [value](const Scheduler::KFileData &file) { return file.name == value->text(); });
+        if (file_it != task_files.end()) {  // If file was matched
           qDebug() << "Removing file from task arguments";
-          m_ig_post.files.erase(file_it);
+          task_files.erase(file_it);
+          m_task->setArgument("files", task_files); // Probably not necessary. Try without doing this
         }
       }
     }
@@ -186,6 +199,10 @@ void ArgDialog::addItem(QString value, QString type) {
   ui->argList->setCellWidget(row, 3, q_pb);
 }
 
+/**
+ * @brief ArgDialog::addFile
+ * @param path
+ */
 void ArgDialog::addFile(QString path) {
   auto row_count = ui->argList->rowCount();
 
@@ -198,6 +215,9 @@ void ArgDialog::addFile(QString path) {
   ui->argList->setItem(row_count - 1, 2, file_item);
 }
 
+/**
+ * @brief ArgDialog::clearPost
+ */
 void ArgDialog::clearPost() {
   QDateTime date_time = QDateTime::currentDateTime();
   ui->dateTime->setDateTime(date_time);
@@ -209,13 +229,21 @@ void ArgDialog::clearPost() {
   ui->argList->setRowCount(0);
 }
 
+/**
+ * @brief ArgDialog::clearTask
+ */
 void ArgDialog::clearTask() { m_task->clear(); }
 
+/**
+ * @brief ArgDialog::addRequestedBy
+ * @param value
+ */
 void ArgDialog::addRequestedBy(QString value) {
   QStringList names = value.split(" ");
+  QVector<QString> requested_by_names = std::get<VariantIndex::STRVEC>(m_task->getTaskArgument("requested_by"));
   for (const auto &name : names) {
-    if (std::find(m_ig_post.requested_by.begin(), m_ig_post.requested_by.end(), value.toUtf8().constData()) == m_ig_post.requested_by.end()) {
-      m_ig_post.requested_by.push_back(name.toUtf8().constData());
+    if (std::find(requested_by_names.begin(), requested_by_names.end(), value.toUtf8().constData()) == requested_by_names.end()) {
+      m_task->addArgument("requested_by", name);
       addToArgList(name, "requested_by");
     } else {
         const char* message = "You have already inputed this name under \"requested_by\"";
@@ -229,6 +257,11 @@ void ArgDialog::addRequestedBy(QString value) {
   }
 }
 
+/**
+ * @brief ArgDialog::addToArgList
+ * @param value
+ * @param type
+ */
 void ArgDialog::addToArgList(QString value, QString type) {
   for (int i = 0; i < ui->argList->rowCount(); i++) {
     auto item = ui->argList->item(i, 0);
@@ -245,6 +278,11 @@ void ArgDialog::addToArgList(QString value, QString type) {
     addItem(value, type);
 }
 
+/**
+ * @brief ArgDialog::addOrReplaceInArgList
+ * @param value
+ * @param type
+ */
 void ArgDialog::addOrReplaceInArgList(QString value, QString type) {
     for (int i = 0; i < ui->argList->rowCount(); i++) {
         auto item = ui->argList->item(i, 1);
@@ -258,24 +296,33 @@ void ArgDialog::addOrReplaceInArgList(QString value, QString type) {
     addItem(value, type);
 }
 
+/**
+ * @brief ArgDialog::addHashtag
+ * @param tag
+ */
 void ArgDialog::addHashtag(QString tag) {
     QStringList tags = tag.split(" ");
     for (const auto& tag : tags) {
-        if (std::find(m_ig_post.hashtags.begin(), m_ig_post.hashtags.end(), tag.toUtf8().constData()) == m_ig_post.hashtags.end()) {
-            m_ig_post.hashtags.push_back(tag.toUtf8().constData());
-            addToArgList(tag, "hashtag");
+      QVector<QString> hashtags = std::get<VariantIndex::STRVEC>(m_task->getTaskArgument("hashtags"));
+        if (std::find(hashtags.begin(), hashtags.end(), tag.toUtf8().constData()) == hashtags.end()) {
+          m_task->addArgument("hashtags", tag);
+          addToArgList(tag, "hashtag");
         } else {
-            const char* message = "Can't add the same hashtag twice";
-            qDebug() << message;
-            QMessageBox::warning(
-                this,
-                tr("Hashtags"),
-                tr(message)
-                );
+          const char* message = "Can't add the same hashtag twice";
+          qDebug() << message;
+          QMessageBox::warning(
+              this,
+              tr("Hashtags"),
+              tr(message)
+              );
         }
     }
 }
 
+/**
+ * @brief ArgDialog::keyPressEvent
+ * @param e
+ */
 void ArgDialog::keyPressEvent(QKeyEvent *e) {
     if (Qt::ControlModifier) {
         if(e->key()==Qt::Key_Return || e->key()==Qt::Key_Enter) {
@@ -288,13 +335,21 @@ void ArgDialog::keyPressEvent(QKeyEvent *e) {
     }
 }
 
+/**
+ * @brief ArgDialog::setFilePath
+ * @param path
+ */
 void ArgDialog::setFilePath(QString path) { m_file_path = path; }
 
+/**
+ * @brief ArgDialog::setConfig
+ * @param config_string
+ */
 void ArgDialog::setConfig(QString config_string) {
   m_config_string = config_string;
   ui->user->addItems(getValueArgs(m_config_string.toUtf8(), "users"));
   if (ui->user->count() > 0) {
-    m_ig_post.user = ui->user->itemText(0).toUtf8().constData();
+    m_task->setArgument("user", ui->user->itemText(0));
   }
 }
 
