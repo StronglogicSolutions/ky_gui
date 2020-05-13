@@ -27,12 +27,6 @@ public:
 };
 }  // namespace Kontainer
 
-enum FileType {
-    VIDEO = 1,
-    IMAGE = 2
-};
-
-
 namespace {
 using namespace rapidjson;
 
