@@ -17,8 +17,6 @@ const QString REQUESTED_BY_TYPE = "requested by";
 class InstagramTask : public Scheduler::Task {
  public:
   InstagramTask();
-  InstagramTask(Scheduler::KFileData);
-  InstagramTask(QVector<Scheduler::KFileData>);
   virtual void defineTaskArguments() override;
   virtual const Scheduler::TaskArguments getTaskArguments() override;
   virtual const Scheduler::TypeVariant getTaskArgument(QString name) override;
@@ -36,7 +34,6 @@ class InstagramTask : public Scheduler::Task {
 
  private:
   Scheduler::TaskArguments m_arguments;
-  QVector<Scheduler::KFileData> files;
 };
 
 #endif  // __INSTAGRAM_TASK_HPP
