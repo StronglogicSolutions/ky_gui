@@ -22,20 +22,7 @@ static const uint8_t MASK = 13;
 /**
  * @constructor
  */
-InstagramTask::InstagramTask() : files(QVector<KFileData>{}) {}
-
-
-/**
- * @constructor
- * @param [in] {KFileData} k_file
- */
-InstagramTask::InstagramTask(KFileData k_file) : files({k_file}) {}
-
-/**
- * @constructor
- * @param [in] {QVector<KFileData>} k_files
- */
-InstagramTask::InstagramTask(QVector<KFileData> k_files) : files(k_files) {}
+InstagramTask::InstagramTask() {}
 
 /**
  * @brief InstagramTask::defineTaskArguments
@@ -67,16 +54,6 @@ void InstagramTask::setArgument(QString name, TypeVariant value) {
   for (const auto& argument : m_arguments) {
     if (argument->text() == name) {
       argument->setValue(value);
-//      if (isIndex(argument->, VariantIndex::QSTRING)) {
-//        argument->setValue(value);
-//      } else if (isIndex(value.index(), VariantIndex::BOOLEAN)) {
-//        argument->setValue(QString::number(std::get<VariantIndex::BOOLEAN>(value)));
-//      } else if (isIndex(value.index(), VariantIndex::INTEGER)) {
-//        argument->setValue(QString::number(std::get<VariantIndex::INTEGER>(value)));
-//      } else {
-//        // Could not set argument value
-//        // TODO: Log here
-//      }
       return;
     }
   }
@@ -144,13 +121,6 @@ ArgumentValues InstagramTask::getArgumentValues() {
  */
 const TaskArguments InstagramTask::getTaskArguments() { return std::move(m_arguments); }
 
-
-/**
- * @brief InstagramTask::getFiles
- * @return
- */
-const QVector<KFileData> InstagramTask::getFiles() { return files; }
-
 /**
  * @brief InstagramTask::setDefaultValues
  */
@@ -181,7 +151,15 @@ void InstagramTask::clear() {
  * @return
  */
 bool InstagramTask::hasFiles() {
-  return !files.empty();
+  return !std::get<VariantIndex::FILEVEC>(getTaskArgument("files")).empty();
+}
+
+/**
+ * @brief InstagramTask::hasFiles
+ * @return
+ */
+const QVector<Scheduler::KFileData> InstagramTask::getFiles() {
+  return std::get<VariantIndex::FILEVEC>(getTaskArgument("files"));
 }
 
 /**
@@ -207,4 +185,5 @@ bool InstagramTask::isReady() {
 /**
  * @destructor
  */
-InstagramTask::~InstagramTask() {}
+InstagramTask::~InstagramTask() {
+}
