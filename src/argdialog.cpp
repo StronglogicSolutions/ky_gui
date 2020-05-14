@@ -15,6 +15,10 @@ using namespace Scheduler;
 ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), m_task(nullptr) {
   ui->setupUi(this);
 
+  m_task = new InstagramTask{};
+  m_task->defineTaskArguments();
+  m_task->setDefaultValues();
+
   ui->argCommandButtons->button(QDialogButtonBox::Close)
       ->setStyleSheet(QString("background:%1").arg("#2f535f"));
 
@@ -126,8 +130,8 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
                        &QDialogButtonBox::clicked),
                    this, [this](QAbstractButton *button) {
                      if (button->text() == "Save") {
+                       setTaskArguments();
                        if (m_task->isReady()) {
-                         setTaskArguments();
                          emit ArgDialog::taskRequestReady(m_task);
                        }
                        clearPost(); // reset m_ig_post to default values
@@ -157,8 +161,8 @@ void ArgDialog::setTaskArguments() {
   if (requested_by.size() > 1) {
     requested_by.chop(1);
   }
-  m_task->setArgument("hashtags", hashtags);
-  m_task->setArgument("requested_by", requested_by);
+  m_task->setArgument("hashtags_string", hashtags);
+  m_task->setArgument("requested_by_string", requested_by);
 }
 
 /**
@@ -353,9 +357,12 @@ void ArgDialog::setConfig(QString config_string) {
   }
 }
 
-ArgDialog::~ArgDialog()
-{
-    delete ui;
+/**
+ * @brief ArgDialog::~ArgDialog
+ */
+ArgDialog::~ArgDialog() {
+  delete m_task;
+  delete ui;
 }
 
 void ArgDialog::accept() { qDebug() << "Sending request to schedule a task.."; }

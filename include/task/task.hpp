@@ -41,13 +41,14 @@ static constexpr const char* STRINGVECTOR = "StringVector";
 static constexpr const char* FILEVECTOR = "FileVector";
 static constexpr const char* DATETIME = "DateTime";
 static constexpr const char* BOOLEAN = "Boolean";
+static constexpr const char* INTEGER = "Integer";
 }  // namespace Type
 
 namespace VariantIndex {
 static const uint8_t BOOLEAN = 0;
 static const uint8_t INTEGER = 1;
-static const uint8_t QSTRING = 2;
-static const uint8_t STRVEC = 3;
+static const uint8_t STRVEC = 2;
+static const uint8_t QSTRING = 3;
 static const uint8_t FILEVEC = 4;
 }  // namespace VariantIndex
 
@@ -65,7 +66,7 @@ class Task;
 using TaskQueue = QQueue<Task*>;
 using ArgumentType = const char*;
 using ArgumentValues = QVector<QString>;
-using TypeVariant = std::variant<bool, int, QString, QVector<QString>, QVector<KFileData>>;
+using TypeVariant = std::variant<bool, int, QVector<QString>, QString, QVector<KFileData>>;
 using TaskIterator = std::vector<std::unique_ptr<TaskArgumentBase>>::iterator;
 
 /**
@@ -75,7 +76,7 @@ class TaskArgumentBase {
  public:
   virtual const QString text() = 0;
   virtual const QString getStringValue() = 0;
-  virtual uint8_t getTypeIndex();
+  virtual uint8_t getTypeIndex() = 0;
   virtual TypeVariant getValue() = 0;
   virtual void insert(QString value) = 0;
   virtual void insert(KFileData file) = 0;
@@ -94,6 +95,7 @@ class TaskArgumentBase {
 class TaskArgument : TaskArgumentBase {
  public:
   TaskArgument(QString n, ArgumentType t, TypeVariant _value) {
+    auto index = _value.index();
     name = n;
     type = t;
     value = _value;
@@ -138,12 +140,18 @@ class TaskArgument : TaskArgumentBase {
    * @return [out] {TypeVariant}
    */
   virtual TypeVariant getValue() override {
+    size_t index = value.index();
+    bool equivalence = index == VariantIndex::STRVEC;
     if (isIndex(value.index(), VariantIndex::QSTRING)) {
       return std::get<VariantIndex::QSTRING>(value);
     } else if (isIndex(value.index(), VariantIndex::BOOLEAN)) {
       return std::get<VariantIndex::BOOLEAN>(value);
     } else if (isIndex(value.index(), VariantIndex::INTEGER)) {
       return std::get<VariantIndex::INTEGER>(value);
+    } else if (isIndex(value.index(), VariantIndex::STRVEC)) {
+      return std::get<VariantIndex::STRVEC>(value);
+    } else if (isIndex(value.index(), VariantIndex::FILEVEC)) {
+      return std::get<VariantIndex::FILEVEC>(value);
     }
   }
 
@@ -230,7 +238,6 @@ class Task {
   virtual void defineTaskArguments() = 0;
   virtual void setDefaultValues() = 0;
   virtual const QVector<KFileData> getFiles() = 0;
-  virtual void addFile(KFileData file) = 0;
   virtual bool hasFiles() = 0;
   virtual bool isReady() = 0;
   virtual void clear() = 0;

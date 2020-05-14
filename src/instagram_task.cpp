@@ -9,12 +9,21 @@ static const uint8_t DATETIME = 2;
 static const uint8_t PROMOTE_SHARE = 3;
 static const uint8_t LINK_IN_BIO = 4;
 static const uint8_t HASHTAGS = 5;
-static const uint8_t REQUESTED_BY = 6;
-static const uint8_t REQUESTED_BY_PHRASE = 7;
-static const uint8_t FILES = 8;
-static const uint8_t USER = 9;
-static const uint8_t IS_VIDEO = 10;
+static const uint8_t HASHTAGS_STRING = 6;
+static const uint8_t REQUESTED_BY = 7;
+static const uint8_t REQUESTED_BY_STRING = 8;
+static const uint8_t REQUESTED_BY_PHRASE = 9;
+static const uint8_t FILES = 10;
+static const uint8_t USER = 11;
+static const uint8_t IS_VIDEO = 12;
+static const uint8_t MASK = 13;
 }  // namespace TaskIndex
+
+/**
+ * @constructor
+ */
+InstagramTask::InstagramTask() : files(QVector<KFileData>{}) {}
+
 
 /**
  * @constructor
@@ -34,16 +43,19 @@ InstagramTask::InstagramTask(QVector<KFileData> k_files) : files(k_files) {}
 void InstagramTask::defineTaskArguments() {
   m_arguments.clear();
   m_arguments.emplace_back(std::make_unique<TaskArgument>("header", Type::TEXT, QString{}));
-  m_arguments.emplace_back(std::make_unique<TaskArgument>("description", Type::TEXT, QString{}));
-  m_arguments.emplace_back(std::make_unique<TaskArgument>("datetime", Type::DATETIME, QString{}));
+  m_arguments.emplace_back(std::make_unique<TaskArgument>("description", Type::TEXT, TypeVariant{QString{}}));
+  m_arguments.emplace_back(std::make_unique<TaskArgument>("datetime", Type::TEXT, QString{}));
   m_arguments.emplace_back(std::make_unique<TaskArgument>("promote_share", Type::TEXT, QString{}));
   m_arguments.emplace_back(std::make_unique<TaskArgument>("link_in_bio", Type::TEXT, QString{}));
-  m_arguments.emplace_back(std::make_unique<TaskArgument>("hashtags", Type::TEXT, QString{}));
+  m_arguments.emplace_back(std::make_unique<TaskArgument>("hashtags", Type::STRINGVECTOR, QVector<QString>{}));
+  m_arguments.emplace_back(std::make_unique<TaskArgument>("hashtags_string", Type::TEXT, QString{}));
   m_arguments.emplace_back(std::make_unique<TaskArgument>("requested_by", Type::STRINGVECTOR, QVector<QString>{}));
+  m_arguments.emplace_back(std::make_unique<TaskArgument>("requested_by_string", Type::TEXT, QString{}));
   m_arguments.emplace_back(std::make_unique<TaskArgument>("requested_by_phrase", Type::TEXT, QString{}));
   m_arguments.emplace_back(std::make_unique<TaskArgument>("files", Type::FILEVECTOR, QVector<KFileData>{}));
   m_arguments.emplace_back(std::make_unique<TaskArgument>("user", Type::TEXT, QString{}));
   m_arguments.emplace_back(std::make_unique<TaskArgument>("is_video", Type::BOOLEAN, bool{}));
+  m_arguments.emplace_back(std::make_unique<TaskArgument>("mask", Type::INTEGER, -1));
 }
 
 /**
@@ -52,35 +64,22 @@ void InstagramTask::defineTaskArguments() {
  * @param value
  */
 void InstagramTask::setArgument(QString name, TypeVariant value) {
-//  TaskIterator it =
-//      std::find_if(m_arguments.begin(), m_arguments.end(), [name](auto argument) { return argument.text() == name; });
-for (const auto& argument : m_arguments) {
-  if (argument.get()->text() == name) {
-    if (isIndex(value.index(), VariantIndex::QSTRING)) {
-      argument.get()->setValue(value);
-    } else if (isIndex(value.index(), VariantIndex::BOOLEAN)) {
-      argument.get()->setValue(QString::number(std::get<VariantIndex::BOOLEAN>(value)));
-    } else if (isIndex(value.index(), VariantIndex::INTEGER)) {
-      argument.get()->setValue(QString::number(std::get<VariantIndex::INTEGER>(value)));
-    } else {
-      // Could not set argument value
-      // TODO: Log here
+  for (const auto& argument : m_arguments) {
+    if (argument->text() == name) {
+      argument->setValue(value);
+//      if (isIndex(argument->, VariantIndex::QSTRING)) {
+//        argument->setValue(value);
+//      } else if (isIndex(value.index(), VariantIndex::BOOLEAN)) {
+//        argument->setValue(QString::number(std::get<VariantIndex::BOOLEAN>(value)));
+//      } else if (isIndex(value.index(), VariantIndex::INTEGER)) {
+//        argument->setValue(QString::number(std::get<VariantIndex::INTEGER>(value)));
+//      } else {
+//        // Could not set argument value
+//        // TODO: Log here
+//      }
+      return;
     }
   }
-  return;
-}
-//  if (it != m_arguments.end()) {
-//    if (isIndex(value.index(), VariantIndex::QSTRING)) {
-//      it->get()->setValue(value);
-//    } else if (isIndex(value.index(), VariantIndex::BOOLEAN)) {
-//      it->get()->setValue(QString::number(std::get<VariantIndex::BOOLEAN>(value)));
-//    } else if (isIndex(value.index(), VariantIndex::INTEGER)) {
-//      it->get()->setValue(QString::number(std::get<VariantIndex::INTEGER>(value)));
-//    } else {
-//      // Could not set argument value
-//      // TODO: Log here
-//    }
-//  }
 }
 
 /**
@@ -90,8 +89,8 @@ for (const auto& argument : m_arguments) {
  */
 void InstagramTask::addArgument(QString name, Scheduler::KFileData file) {
   for (const auto& argument : m_arguments) {
-    if (argument.get()->text() == name) {
-      argument.get()->insert(file);
+    if (argument->text() == name) {
+      argument->insert(file);
       return;
     }
   }
@@ -104,8 +103,8 @@ void InstagramTask::addArgument(QString name, Scheduler::KFileData file) {
  */
 void InstagramTask::addArgument(QString name, QString string) {
   for (const auto& argument : m_arguments) {
-    if (argument.get()->text() == name) {
-      argument.get()->insert(string);
+    if (argument->text() == name) {
+      argument->insert(string);
       return;
     }
   }
@@ -118,8 +117,8 @@ void InstagramTask::addArgument(QString name, QString string) {
  */
 const TypeVariant InstagramTask::getTaskArgument(QString name) {
   for (const auto& argument : m_arguments) {
-    if (argument.get()->text() == name) {
-      return argument.get()->getValue();
+    if (argument->text() == name) {
+      return argument->getValue();
     }
   }
   return "";  // Perhaps we should throw
@@ -156,21 +155,17 @@ const QVector<KFileData> InstagramTask::getFiles() { return files; }
  * @brief InstagramTask::setDefaultValues
  */
 void InstagramTask::setDefaultValues() {
-  m_arguments.at(TaskIndex::HEADER)
-      ->setValue("Learn to speak like native Korean speakers 🙆‍♀️🇰🇷");
-  m_arguments.at(TaskIndex::PROMOTE_SHARE)
-      ->setValue("Share the post through IG story if you enjoy the phrase 🙋‍♀️");
-  m_arguments.at(TaskIndex::LINK_IN_BIO)
-      ->setValue("Subscribe to my YouTube channel (link 🔗in bio) to learn more about Korean language and culture ❤");
-  m_arguments.at(TaskIndex::REQUESTED_BY_PHRASE)
-      ->setValue("The phrase was requested by ");
+  setArgument("header", TypeVariant{QString{"Learn to speak like native Korean speakers 🙆‍♀️🇰🇷"}});
+  setArgument("promote_share", TypeVariant{QString{"Share the post through IG story if you enjoy the phrase 🙋‍♀️"}});
+  setArgument("link_in_bio", TypeVariant{QString{"Subscribe to my YouTube channel (link 🔗in bio) to learn more about Korean language and culture ❤"}});
+  setArgument("requested_by_phrase", TypeVariant{QString{"The phrase was requested by "}});
 }
 
 /**
  * @brief getType
  * @return {Scheduler::TaskType} The type of task
  */
-Scheduler::TaskType getType() { return Scheduler::TaskType::INSTAGRAM; };
+Scheduler::TaskType InstagramTask::getType() { return Scheduler::TaskType::INSTAGRAM; };
 
 /**
  * @brief InstagramTask::clear
@@ -187,6 +182,26 @@ void InstagramTask::clear() {
  */
 bool InstagramTask::hasFiles() {
   return !files.empty();
+}
+
+/**
+ * @brief InstagramTask::isReady
+ * @return
+ */
+bool InstagramTask::isReady() {
+  auto header_size = std::get<VariantIndex::QSTRING>(getTaskArgument("header")).size();
+  auto description_size = std::get<VariantIndex::QSTRING>(getTaskArgument("description")).size();
+  auto datetime_size = std::get<VariantIndex::QSTRING>(getTaskArgument("datetime")).size();
+  auto promote_share_size = std::get<VariantIndex::QSTRING>(getTaskArgument("promote_share")).size();
+  auto link_in_bio_size = std::get<VariantIndex::QSTRING>(getTaskArgument("link_in_bio")).size();
+  auto hashtags_size = std::get<VariantIndex::QSTRING>(getTaskArgument("hashtags_string")).size();
+  auto requested_by_size = std::get<VariantIndex::QSTRING>(getTaskArgument("requested_by_string")).size();
+  auto hasFiles = std::get<VariantIndex::FILEVEC>(getTaskArgument("files")).size();
+  auto user_size = std::get<VariantIndex::QSTRING>(getTaskArgument("user")).size();
+
+  return header_size > 0 && description_size > 0 && datetime_size > 0 &&
+         promote_share_size > 0 && link_in_bio_size > 0 &&
+         hashtags_size > 0 && requested_by_size > 0 && hasFiles && user_size > 0;
 }
 
 /**

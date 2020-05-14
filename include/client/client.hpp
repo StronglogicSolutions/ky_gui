@@ -14,6 +14,7 @@
 #include <QUuid>
 #include <QVector>
 #include <headers/util.hpp>
+#include <headers/kstring.hpp>
 #include <include/task/task.hpp>
 #include <string>
 #include <thread>
@@ -35,18 +36,6 @@ static constexpr int PINGBYTE = 0xFD;
 typedef std::map<int, std::string> CommandMap;
 typedef std::map<int, std::vector<std::string>> CommandArgMap;
 typedef QVector<QString> StringVec;
-
-/**
- * @brief The KString class
- * Temporarily used to solve the interface problem with FlatBuffers, which seems designed to work best with std::string
- */
-
-class KString : public QString {
- public:
-  const QChar* c_str() {
-    return this->constData();
-  }
-};
 
 struct SentFile {
     int timestamp;

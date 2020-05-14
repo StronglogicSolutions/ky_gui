@@ -41,7 +41,7 @@ Client::MessageHandler Client::createMessageHandler(std::function<void()> cb) {
  * @param [in] {int} count
  * @param [in] {char**} arguments
  */
-Client::Client(QWidget *parent, int count, char** arguments) : QDialog(parent), argc(count), argv(arguments), m_client_socket_fd(-1), executing(false), m_commands({}) {
+Client::Client(QWidget *parent, int count, char** arguments) : QDialog(parent), argc(count), argv(arguments), m_client_socket_fd(-1), m_outbound_task(nullptr), executing(false), m_commands({}) {
     qRegisterMetaType<QVector<QString>>("QVector<QString>");
 }
 
@@ -243,17 +243,17 @@ std::string getTaskFileInfo(std::vector<SentFile> files) {
  */
 void Client::sendTaskEncoded(Scheduler::Task* task) {
   if (task->getType() == Scheduler::TaskType::INSTAGRAM) {
-    auto datetime = std::string{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("datetime")).toUtf8().constData()};
+    const auto hashtags = KString{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("hashtags"))};
     flatbuffers::Offset<IGTask> ig_task =
         CreateIGTask(
             builder,
             96,
             builder.CreateString(getTaskFileInfo(sent_files)),
-            builder.CreateString(datetime),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("datetime")).toUtf8().constData()}),
             builder.CreateString(
-                KString{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("description"))}),
-            builder.CreateString(
-                KString{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("hashtags"))}),
+                std::string{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("description")).toUtf8().constData()}),
+            builder.CreateString(hashtags
+               ),
             builder.CreateString(
                 KString{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("requested_by_phrase"))}),
             builder.CreateString(
