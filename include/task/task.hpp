@@ -132,7 +132,7 @@ class TaskArgument : TaskArgumentBase {
     } else if (isIndex(value.index(), VariantIndex::INTEGER)) {
       return QString::number(std::get<VariantIndex::INTEGER>(value));
     }
-    return "";
+    return ""; // Throw?
   }
 
   /**
@@ -140,8 +140,6 @@ class TaskArgument : TaskArgumentBase {
    * @return [out] {TypeVariant}
    */
   virtual TypeVariant getValue() override {
-    size_t index = value.index();
-    bool equivalence = index == VariantIndex::STRVEC;
     if (isIndex(value.index(), VariantIndex::QSTRING)) {
       return std::get<VariantIndex::QSTRING>(value);
     } else if (isIndex(value.index(), VariantIndex::BOOLEAN)) {
@@ -153,6 +151,7 @@ class TaskArgument : TaskArgumentBase {
     } else if (isIndex(value.index(), VariantIndex::FILEVEC)) {
       return std::get<VariantIndex::FILEVEC>(value);
     }
+    return ""; // Throw?
   }
 
   /**
