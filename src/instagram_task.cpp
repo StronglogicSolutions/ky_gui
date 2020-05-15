@@ -2,6 +2,9 @@
 
 using namespace Scheduler;
 
+/**
+ * These values contained inside the TaskIndex namespace represent the order in which the tasks are to be stored.
+ */
 namespace TaskIndex {
 static const uint8_t HEADER = 0;
 static const uint8_t DESCRIPTION = 1;
@@ -50,8 +53,8 @@ void InstagramTask::defineTaskArguments() {
 
 /**
  * @brief InstagramTask::setArgument
- * @param [in] {QString} name The name of the argment
- * @param [in] {TypeVariant} value The value of the argument
+ * @param [in] {QString}      name   The name of the argment
+ * @param [in] {TypeVariant}  value  The value of the argument
  */
 void InstagramTask::setArgument(QString name, TypeVariant value) {
   for (const auto& argument : m_arguments) {
@@ -63,11 +66,14 @@ void InstagramTask::setArgument(QString name, TypeVariant value) {
 }
 
 /**
+ * @warning This method is used to add values to an argument, and can only be used on arguments whose type is a form of container.
+ *
  * @brief InstagramTask::addArgument
- * @param [in] {QString} name The name of the argument
- * @param [in] {KFileData} file A data structure to be added to a container of files.
- *                         The KFileData structure contains metadata about a file and
- *                         its data as a byte array
+ *
+ * @param [in] {QString}    name  The name of the argument
+ * @param [in] {KFileData}  file  A data structure to be added to a container of files.
+ *                                The KFileData structure contains metadata about a file and
+ *                                its data as a byte array
  */
 void InstagramTask::addArgument(QString name, Scheduler::KFileData file) {
   for (const auto& argument : m_arguments) {
@@ -79,9 +85,12 @@ void InstagramTask::addArgument(QString name, Scheduler::KFileData file) {
 }
 
 /**
+ * @warning This method is used to add values to an argument, and can only be used on arguments whose type is a form of container.
+ *
  * @brief InstagramTask::addArgument
- * @param [in] {QString} name The name of the argument
- * @param [in] {QString} string A string value intended to be added to a container of strings
+ *
+ * @param [in] {QString} name     The name of the argument
+ * @param [in] {QString} string   A string value intended to be added to a container of strings
  */
 void InstagramTask::addArgument(QString name, QString string) {
   for (const auto& argument : m_arguments) {
@@ -94,8 +103,9 @@ void InstagramTask::addArgument(QString name, QString string) {
 
 /**
  * @brief InstagramTask::getTaskArgument
- * @param name
- * @return
+ *
+ * @param [in] {QString} name   The name of the argument to retrieve
+ * @return [out] {TypeVariant}  The value of the task
  */
 const TypeVariant InstagramTask::getTaskArgument(QString name) {
   for (const auto& argument : m_arguments) {
@@ -107,8 +117,12 @@ const TypeVariant InstagramTask::getTaskArgument(QString name) {
 }
 
 /**
+ * @warning This method does not return any task value whose type is a form of container.
+ *
  * @brief InstagramTask::getArgumentValues
- * @return
+ * @typedef QVector<QString> is aliased to ArgumentValues
+ *
+ * @return [out] {ArgumentValues} A vector of strings for all of the arguments that can be represented as a string.
  */
 ArgumentValues InstagramTask::getArgumentValues() {
   ArgumentValues values{static_cast<int>(m_arguments.size())};
@@ -121,13 +135,21 @@ ArgumentValues InstagramTask::getArgumentValues() {
 }
 
 /**
+ * @warning This method is used to claim ownership of the task's arguments. Use of this method will effectively REMOVE all arguments from
+ *          the task upon which it is called.
+ *
  * @brief InstagramTask::getTaskArguments
- * @return
+ * @typedef std::vector<std::unique_ptr<TaskArgument> is aliased to TaskArguments
+ *
+ * @return [out] {std::vector<std::unique_ptr<TaskArgument>} An R-value reference to a vector of unique pointers to the task's arguments.
+ *
  */
-const TaskArguments InstagramTask::getTaskArguments() { return std::move(m_arguments); }
+const TaskArguments&& InstagramTask::getTaskArguments() { return std::move(m_arguments); }
 
 /**
  * @brief InstagramTask::setDefaultValues
+ *
+ * Sets default values for the task's arguments
  */
 void InstagramTask::setDefaultValues() {
   setArgument("header", TypeVariant{QString{"Learn to speak like native Korean speakers 🙆‍♀️🇰🇷"}});
@@ -138,12 +160,15 @@ void InstagramTask::setDefaultValues() {
 
 /**
  * @brief getType
- * @return {Scheduler::TaskType} The type of task
+ *
+ * @return [out] {TaskType} The type of task
  */
 Scheduler::TaskType InstagramTask::getType() { return Scheduler::TaskType::INSTAGRAM; };
 
 /**
  * @brief InstagramTask::clear
+ *
+ * Clears the value of each task argument
  */
 void InstagramTask::clear() {
   for (const auto& argument : m_arguments) {
@@ -153,7 +178,8 @@ void InstagramTask::clear() {
 
 /**
  * @brief InstagramTask::hasFiles
- * @return
+ *
+ * @return [out] {bool} Indicates whether the task has files.
  */
 bool InstagramTask::hasFiles() {
   return !std::get<VariantIndex::FILEVEC>(getTaskArgument("files")).empty();
@@ -161,7 +187,8 @@ bool InstagramTask::hasFiles() {
 
 /**
  * @brief InstagramTask::hasFiles
- * @return
+ *
+ * @return [out] {QVector<KFileData>} A vector of data structures representing file metadata and the file data as bytes.
  */
 const QVector<Scheduler::KFileData> InstagramTask::getFiles() {
   return std::get<VariantIndex::FILEVEC>(getTaskArgument("files"));
@@ -169,7 +196,9 @@ const QVector<Scheduler::KFileData> InstagramTask::getFiles() {
 
 /**
  * @brief InstagramTask::isReady
- * @return
+ *
+ * @return [out] {bool} A boolean value indicating whether the minimal requirements sufficient to appropriately
+ *                      perform the task have been met.
  */
 bool InstagramTask::isReady() {
   auto header_size = std::get<VariantIndex::QSTRING>(getTaskArgument("header")).size();

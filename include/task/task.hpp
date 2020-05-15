@@ -231,7 +231,7 @@ class Task {
   virtual void setArgument(QString name, TypeVariant arg) = 0;
   virtual void addArgument(QString name, Scheduler::KFileData file) = 0;
   virtual void addArgument(QString name, QString string) = 0;
-  virtual const TaskArguments getTaskArguments() = 0;
+  virtual const TaskArguments&& getTaskArguments() = 0;
   virtual const TypeVariant getTaskArgument(QString name) = 0;
   virtual ArgumentValues getArgumentValues() = 0;
   virtual TaskType getType() = 0;
