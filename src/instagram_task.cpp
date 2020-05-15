@@ -26,6 +26,9 @@ InstagramTask::InstagramTask() {}
 
 /**
  * @brief InstagramTask::defineTaskArguments
+ *
+ * This method defines all of the arguments that are available to be set for the Task
+ *
  */
 void InstagramTask::defineTaskArguments() {
   m_arguments.clear();
@@ -47,8 +50,8 @@ void InstagramTask::defineTaskArguments() {
 
 /**
  * @brief InstagramTask::setArgument
- * @param name
- * @param value
+ * @param [in] {QString} name The name of the argment
+ * @param [in] {TypeVariant} value The value of the argument
  */
 void InstagramTask::setArgument(QString name, TypeVariant value) {
   for (const auto& argument : m_arguments) {
@@ -61,8 +64,10 @@ void InstagramTask::setArgument(QString name, TypeVariant value) {
 
 /**
  * @brief InstagramTask::addArgument
- * @param name
- * @param file
+ * @param [in] {QString} name The name of the argument
+ * @param [in] {KFileData} file A data structure to be added to a container of files.
+ *                         The KFileData structure contains metadata about a file and
+ *                         its data as a byte array
  */
 void InstagramTask::addArgument(QString name, Scheduler::KFileData file) {
   for (const auto& argument : m_arguments) {
@@ -75,8 +80,8 @@ void InstagramTask::addArgument(QString name, Scheduler::KFileData file) {
 
 /**
  * @brief InstagramTask::addArgument
- * @param name
- * @param string
+ * @param [in] {QString} name The name of the argument
+ * @param [in] {QString} string A string value intended to be added to a container of strings
  */
 void InstagramTask::addArgument(QString name, QString string) {
   for (const auto& argument : m_arguments) {
