@@ -107,9 +107,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   this->setWindowTitle("KYGUI");
   setStyleSheet(
       "QListView { font: 87 11pt \"Noto Sans\"; background-color: #2f535f;"
-      "color: rgb(131, "
-      "148, 150); font-weight: 700; background-color: rgb(29, 51, 59);color: "
-      "rgb(223, 252, 255);}");
+      "alternate-background-color: #616161; color: rgb(131, 148, 150); "
+      "font-weight: 700; background-color: rgb(29, 51, 59);"
+      "color: rgb(223, 252, 255);}");
   setConnectScreen();
   connect(ui->connect, &QPushButton::clicked, this, &MainWindow::connectClient);
   ui->eventList->setModel(m_event_model);

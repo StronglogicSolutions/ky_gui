@@ -276,6 +276,7 @@ font-weight: 700;</string>
        <property name="styleSheet">
         <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
 background-color: #2f535f;
+alternate-background-color: #616161;
 color: rgb(131, 148, 150);
 font-weight: 700;
 background-color: rgb(29, 51, 59);
