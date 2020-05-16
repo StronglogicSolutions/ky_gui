@@ -127,7 +127,8 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
 
   QObject::connect(ui->dateTime, &QDateTimeEdit::dateTimeChanged, this, [this]() {
     auto date_time = ui->dateTime->dateTime();
-    m_task->setArgument("datetime", date_time.toString());
+    m_task->setArgument("datetime", QString::number(date_time.toTime_t()));
+    auto new_time = std::get<Scheduler::VariantIndex::QSTRING>(m_task->getTaskArgument("datetime"));
     qDebug() << "Time changed to" << date_time;
   });
 
@@ -140,7 +141,6 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
                        if (m_task->isReady()) {
                          emit ArgDialog::taskRequestReady(m_task);
                        }
-                       clearPost(); // reset m_ig_post to default values
                      }
                    });
 
@@ -233,7 +233,7 @@ void ArgDialog::clearPost() {
   ui->dateTime->setDateTime(date_time);
   m_task->clear();
   m_task->setDefaultValues();
-  m_task->setArgument("datetime", date_time.toString());
+  m_task->setArgument("datetime", QString::number(date_time.toTime_t()));
   m_task->setArgument("user", ui->user->currentText());
   ui->argType->setCurrentIndex(0);
   ui->argList->setRowCount(0);
@@ -378,4 +378,8 @@ void ArgDialog::setArgTypes() {
   for (const auto &arg : m_task->getTaskArguments()) {
     ui->argType->addItem(arg->text());
   }
+}
+
+void ArgDialog::notifyClientSuccess() {
+  clearPost();
 }

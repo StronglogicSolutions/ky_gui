@@ -19,7 +19,6 @@ static const uint8_t REQUESTED_BY_PHRASE = 9;
 static const uint8_t FILES = 10;
 static const uint8_t USER = 11;
 static const uint8_t IS_VIDEO = 12;
-static const uint8_t MASK = 13;
 }  // namespace TaskIndex
 
 /**
@@ -48,7 +47,6 @@ void InstagramTask::defineTaskArguments() {
   m_arguments.emplace_back(std::make_unique<TaskArgument>("files", Type::FILEVECTOR, QVector<KFileData>{}));
   m_arguments.emplace_back(std::make_unique<TaskArgument>("user", Type::TEXT, QString{}));
   m_arguments.emplace_back(std::make_unique<TaskArgument>("is_video", Type::BOOLEAN, bool{}));
-  m_arguments.emplace_back(std::make_unique<TaskArgument>("mask", Type::INTEGER, -1));
 }
 
 /**

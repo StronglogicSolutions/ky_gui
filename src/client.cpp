@@ -243,7 +243,6 @@ std::string getTaskFileInfo(std::vector<SentFile> files) {
  */
 void Client::sendTaskEncoded(Scheduler::Task* task) {
   if (task->getType() == Scheduler::TaskType::INSTAGRAM) {
-    auto mask_value = std::get<Scheduler::VariantIndex::INTEGER>(task->getTaskArgument("mask"));
     flatbuffers::Offset<IGTask> ig_task =
         CreateIGTask(
             builder,
@@ -265,7 +264,7 @@ void Client::sendTaskEncoded(Scheduler::Task* task) {
             builder.CreateString(
 /*7*/           KString{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("link_in_bio"))}),
 /*8*/                   std::get<Scheduler::VariantIndex::BOOLEAN>(task->getTaskArgument("is_video")),
-/*9*/                   std::get<Scheduler::VariantIndex::INTEGER>(task->getTaskArgument("mask")),
+/*9*/                   getSelectedApp(),
             builder.CreateString(
 /*10*/          KString{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("header"))}),
             builder.CreateString(

@@ -31,6 +31,7 @@ class ArgDialog : public QDialog {
   void setFilePath(QString path);
   virtual void accept() override;
   void setConfig(QString config_string);
+  void notifyClientSuccess();
 
   ~ArgDialog();
 

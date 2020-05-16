@@ -212,9 +212,6 @@ void MainWindow::connectClient() {
       [this](Task* task) {
         auto mask = q_client->getSelectedApp();
         if (mask > -1) {
-            qDebug() << "Scheduling a task";
-            task->setArgument("mask", mask);
-            auto updated_mask_value = std::get<VariantIndex::INTEGER>(task->getTaskArgument("mask"));
             q_client->scheduleTask(task);
         }
       });
@@ -320,6 +317,7 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
     if (isKEvent<QString>(message,
                           Event::TASK_SCHEDULED)) {  // Event was scheduled task
       event_message += ". Details:\n" + parseTaskInfo(v);
+      arg_ui->notifyClientSuccess(); // Update ArgDialog accordingly
     }
     m_events.push_back(event_message);
     m_event_model->setItem(m_event_model->rowCount(),
