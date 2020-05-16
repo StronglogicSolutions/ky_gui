@@ -49,7 +49,6 @@ HEADERS += \
         include/task/instagram_task.hpp\
         headers/kmessage_codec.hpp \
         headers/instatask_generated.h \
-        headers/kstring.hpp \
         headers/util.hpp \
         headers/kiq_types.hpp \
         headers/rapidjson/writer.h \

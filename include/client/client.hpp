@@ -14,7 +14,6 @@
 #include <QUuid>
 #include <QVector>
 #include <headers/util.hpp>
-#include <headers/kstring.hpp>
 #include <include/task/task.hpp>
 #include <string>
 #include <thread>
