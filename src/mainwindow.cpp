@@ -214,6 +214,7 @@ void MainWindow::connectClient() {
         if (mask > -1) {
             qDebug() << "Scheduling a task";
             task->setArgument("mask", mask);
+            auto updated_mask_value = std::get<VariantIndex::INTEGER>(task->getTaskArgument("mask"));
             q_client->scheduleTask(task);
         }
       });

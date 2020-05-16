@@ -101,31 +101,6 @@ color: rgb(131, 148, 150);
 font-weight: 700;
 </string>
         </property>
-        <item>
-         <property name="text">
-          <string>description</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>hashtag</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>requested by</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>promote/share</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>link/bio</string>
-         </property>
-        </item>
        </widget>
       </item>
       <item>

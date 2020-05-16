@@ -62,7 +62,7 @@ void Client::handleMessages() {
         memset(receive_buffer, 0, MAX_PACKET_SIZE);
         ssize_t bytes_received = 0;
         bytes_received = recv(m_client_socket_fd, receive_buffer, MAX_PACKET_SIZE, 0);
-        if (bytes_received == 0) { // Finish message loop
+        if (bytes_received < 1) { // Finish message loop
             break;
         }
         size_t end_idx = findNullIndex(receive_buffer);
@@ -243,6 +243,7 @@ std::string getTaskFileInfo(std::vector<SentFile> files) {
  */
 void Client::sendTaskEncoded(Scheduler::Task* task) {
   if (task->getType() == Scheduler::TaskType::INSTAGRAM) {
+    auto mask_value = std::get<Scheduler::VariantIndex::INTEGER>(task->getTaskArgument("mask"));
     flatbuffers::Offset<IGTask> ig_task =
         CreateIGTask(
             builder,
