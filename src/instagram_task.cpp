@@ -135,6 +135,29 @@ ArgumentValues InstagramTask::getArgumentValues() {
 }
 
 /**
+ * @warning This method does not necessarily need to return all argument names.
+ *          In this use case, we are retrieving names to populate options in our
+ *          ArgType widget, thus we only return names for arguments whose values are
+ *          to be set or modified using the ArgType widget. For this reason, we have
+ *          hardcoded the return to be explicit about which arguments names are available.
+ *
+ * @brief InstagramTask::getArgumentNames
+ *
+ * @return [out] {QVector<QString>} A vector of argument names as strings.
+ */
+QVector<QString> InstagramTask::getArgumentNames() {
+  return QVector<QString>{
+      Scheduler::Args::DESCRIPTION_TYPE,
+      Scheduler::Args::HASHTAG_TYPE,
+      Scheduler::Args::REQUESTED_BY_TYPE,
+      Scheduler::Args::PROMOTE_TYPE,
+      Scheduler::Args::LINK_BIO_TYPE,
+      Scheduler::Args::HEADER_TYPE,
+      Scheduler::Args::REQUESTED_BY_PHRASE
+  };
+}
+
+/**
  * @warning This method is used to claim ownership of the task's arguments. Use of this method will effectively REMOVE all arguments from
  *          the task upon which it is called.
  *

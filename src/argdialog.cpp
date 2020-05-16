@@ -19,6 +19,10 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
   m_task->defineTaskArguments();
   m_task->setDefaultValues();
 
+  for (const auto& name : m_task->getArgumentNames()) {
+    ui->argType->addItem(name, QVariant::String);
+  }
+
   ui->argCommandButtons->button(QDialogButtonBox::Close)
       ->setStyleSheet(QString("background:%1").arg("#2f535f"));
 
@@ -93,10 +97,6 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
 
   QObject::connect(ui->addArgument, &QPushButton::clicked, this, [this]() {
     QString text = ui->argInput->toPlainText();
-    // TODO: argType values need to be set by configuration
-    // Can this somehow be known via the flatbuffer schema? I think not
-    // handling of type needs to be abstracted by a class which can be
-    // subclassed for various types of task: Instagram, etc
     auto type = ui->argType->currentText();
     if (text.size() > 0) {
       if (type == Args::HASHTAG_TYPE) {
@@ -112,6 +112,12 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
         m_task->setArgument("link_bio", text);
       } else if (type == Args::REQUESTED_BY_TYPE) {
         addRequestedBy(text);
+      } else if (type == Args::HEADER_TYPE) {
+        addItem(text, type);
+        m_task->setArgument("header", text);
+      } else if (type == Args::REQUESTED_BY_PHRASE) {
+        addItem(text, type);
+        m_task->setArgument("requested_by_phrase", text);
       }
       ui->argInput->clear();
     }

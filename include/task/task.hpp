@@ -233,6 +233,7 @@ class Task {
   virtual const TaskArguments&& getTaskArguments() = 0;
   virtual const TypeVariant getTaskArgument(QString name) = 0;
   virtual ArgumentValues getArgumentValues() = 0;
+  virtual QVector<QString> getArgumentNames() = 0;
   virtual TaskType getType() = 0;
   virtual void defineTaskArguments() = 0;
   virtual void setDefaultValues() = 0;
