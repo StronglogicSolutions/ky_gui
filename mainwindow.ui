@@ -32,7 +32,7 @@ QPushButton::hover:
 }
 </string>
    </property>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="logo">
     <property name="geometry">
      <rect>
       <x>450</x>

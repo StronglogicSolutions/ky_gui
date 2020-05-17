@@ -136,12 +136,13 @@ void MainWindow::setConnectScreen(bool visible) {
     ui->startScreen->raise();
     ui->kyConfig->activateWindow();
     ui->kyConfig->raise();
-    ui->startScreen->setMaximumSize(1080, 690);
-    ui->startScreen->setMinimumSize(1080, 690);
-    ui->connect->setMaximumSize(1080, 515);
-    ui->connect->setMinimumSize(1080, 515);
+    ui->startScreen->setMaximumSize(1080, 675);
+    ui->startScreen->setMinimumSize(1080, 675);
+    ui->connect->setMaximumSize(1080, 500);
+    ui->connect->setMinimumSize(1080, 500);
     ui->kyConfig->setMaximumSize(1080, 175);
     ui->kyConfig->setMinimumSize(1080, 175);
+    ui->logo->raise();
     QFile file(QCoreApplication::applicationDirPath() + "/config/config.json");
     file.open(QIODevice::ReadOnly | QFile::ReadOnly);
     QString config_json = QString::fromUtf8(file.readAll());
