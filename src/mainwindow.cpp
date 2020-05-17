@@ -138,10 +138,10 @@ void MainWindow::setConnectScreen(bool visible) {
     ui->kyConfig->raise();
     ui->startScreen->setMaximumSize(1080, 690);
     ui->startScreen->setMinimumSize(1080, 690);
-    ui->connect->setMaximumSize(1080, 615);
-    ui->connect->setMinimumSize(1080, 615);
-    ui->kyConfig->setMaximumSize(1080, 75);
-    ui->kyConfig->setMinimumSize(1080, 75);
+    ui->connect->setMaximumSize(1080, 515);
+    ui->connect->setMinimumSize(1080, 515);
+    ui->kyConfig->setMaximumSize(1080, 175);
+    ui->kyConfig->setMinimumSize(1080, 175);
     QFile file(QCoreApplication::applicationDirPath() + "/config/config.json");
     file.open(QIODevice::ReadOnly | QFile::ReadOnly);
     QString config_json = QString::fromUtf8(file.readAll());
@@ -245,8 +245,7 @@ void MainWindow::connectClient() {
 
   QObject::connect(ui->eventList, &QListView::clicked, this,
                    [this](const QModelIndex& index) {
-                     auto event = m_events.at(index.row());
-                     infoMessageBox(event, "Event");
+                     infoMessageBox(m_event_model->item(index.row(), index.column())->text(), "Event");
                    });
 
   QObject::connect(m_event_model, &QAbstractItemModel::rowsAboutToBeInserted,
