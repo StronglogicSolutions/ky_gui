@@ -109,7 +109,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
         m_task->setArgument("promote_share", text);
       } else if (type == Args::LINK_BIO_TYPE) {
         addOrReplaceInArgList(text, "link/bio");
-        m_task->setArgument("link_bio", text);
+        m_task->setArgument("link_in_bio", text);
       } else if (type == Args::REQUESTED_BY_TYPE) {
         addRequestedBy(text);
       } else if (type == Args::HEADER_TYPE) {
