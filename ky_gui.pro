@@ -33,6 +33,7 @@ SOURCES += \
         src/client.cpp \
         src/instagram_task.cpp\
         src/argdialog.cpp \
+        src/messagedialog.cpp \
         src/consoledialog.cpp \
         src/connection_indicator.cpp \
         src/kfiledialog.cpp \
@@ -41,6 +42,7 @@ SOURCES += \
 HEADERS += \
         include/ui/argdialog.h \
         include/ui/consoledialog.h \
+        include/ui/messagedialog.hpp \
         include/ui/mainwindow.h \
         include/ui/connection_indicator.h \
         include/ui/kfiledialog.h \
@@ -53,13 +55,14 @@ HEADERS += \
         headers/kiq_types.hpp \
         headers/rapidjson/writer.h \
         headers/rapidjson/stringbuffer.h \
-        headers/rapidjson/document.h \
+        headers/rapidjson/document.h
 
 
 FORMS += \
         argdialog.ui \
         consoledialog.ui \
-        mainwindow.ui
+        mainwindow.ui \
+        messagedialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -19,3 +19,4 @@ qdoc.conf
 ui_mainwindow.h
 ui_argdialog.h
 ui_consoledialog.h
+ui_messagedialog.h

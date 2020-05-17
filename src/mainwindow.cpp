@@ -132,12 +132,16 @@ MainWindow::~MainWindow() {
  */
 void MainWindow::setConnectScreen(bool visible) {
   if (visible) {
-    ui->startScreen->setMaximumSize(1366, 825);
-    ui->startScreen->setMinimumSize(1366, 825);
-    ui->connect->setMaximumSize(1366, 725);
-    ui->connect->setMinimumSize(1366, 725);
-    ui->kyConfig->setMaximumSize(1366, 75);
-    ui->kyConfig->setMinimumSize(1366, 75);
+    ui->startScreen->activateWindow();
+    ui->startScreen->raise();
+    ui->kyConfig->activateWindow();
+    ui->kyConfig->raise();
+    ui->startScreen->setMaximumSize(1080, 690);
+    ui->startScreen->setMinimumSize(1080, 690);
+    ui->connect->setMaximumSize(1080, 615);
+    ui->connect->setMinimumSize(1080, 615);
+    ui->kyConfig->setMaximumSize(1080, 75);
+    ui->kyConfig->setMinimumSize(1080, 75);
     QFile file(QCoreApplication::applicationDirPath() + "/config/config.json");
     file.open(QIODevice::ReadOnly | QFile::ReadOnly);
     QString config_json = QString::fromUtf8(file.readAll());
@@ -207,6 +211,10 @@ void MainWindow::connectClient() {
     }
   });
 
+  QObject::connect(ui->openMessages, &QPushButton::clicked, this, [this]() {
+    message_ui.show();
+  });
+
   QObject::connect(
       arg_ui, &ArgDialog::taskRequestReady, this,
       [this](Task* task) {
@@ -215,11 +223,6 @@ void MainWindow::connectClient() {
             q_client->scheduleTask(task);
         }
       });
-
-  QObject::connect(ui->tasks, &QPushButton::clicked, this, [this]() {
-    // TODO: Change this to a complete implementation
-    q_client->sendMessage("scheduler");
-  });
 
   QObject::connect(ui->viewConsole, &QPushButton::clicked, this,
                    [this]() { console_ui.show(); });
@@ -393,7 +396,7 @@ void MainWindow::MessageParser::handleCommands(StringVec commands,
  */
 void MainWindow::MessageParser::handleMessage(QString message, StringVec v) {
   auto simple_message = timestampPrefix() + parseMessage(message, v);
-  window->ui->messages->append(simple_message);
+  window->message_ui.append(simple_message);
 }
 
 /**
