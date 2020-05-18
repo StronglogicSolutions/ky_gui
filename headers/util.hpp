@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QQueue>
 #include <QString>
+#include <QMessageBox>
 #include <QVector>
 #include <charconv>
 #include <string>
@@ -389,15 +390,6 @@ bool serverWaitingForFile(const char* data) {
     return false;
 }
 
-// std::string stringTupleVecToJson(
-//    std::vector<std::pair<std::string, std::string>> v) {
-//    json j{};
-//    for (const auto& row : v) {
-//        j[row.first] = row.second;
-//    }
-//    return j;
-//}
-
 inline size_t findNullIndex(uint8_t* data) {
     size_t index = 0;
     while (data) {
@@ -425,5 +417,15 @@ QString generatePreview(QString video_path, QString video_name) {
   return preview_name;
 }
 }; // namespace FileUtils
+
+namespace UI {
+inline void infoMessageBox(QString text, QString title = "KYGUI") {
+  QMessageBox box;
+  box.setWindowTitle(title);
+  box.setText(text);
+  box.setButtonText(0, "Close");
+  box.exec();
+}
+} // namespace UI
 }  // namespace
 #endif  // UTIL_HPP

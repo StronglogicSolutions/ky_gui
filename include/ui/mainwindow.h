@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <include/ui/argdialog.h>
-#include <include/ui/consoledialog.h>
 #include <include/ui/messagedialog.hpp>
 #include <QList>
 #include <QListView>
@@ -84,7 +83,6 @@ public:
     MessageParser message_parser;
     Ui::MainWindow *ui;
     ArgDialog *arg_ui;
-    ConsoleDialog console_ui;
     MessageDialog message_ui;
     /** Client member */
     Client* q_client;

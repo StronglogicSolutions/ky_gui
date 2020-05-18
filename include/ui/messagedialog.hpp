@@ -14,7 +14,7 @@ class MessageDialog : public QDialog
 
  public:
   explicit MessageDialog(QWidget *parent = nullptr);
-  void append(QString message);
+  void append(QString message, bool formatted=false);
   ~MessageDialog();
 
  private:

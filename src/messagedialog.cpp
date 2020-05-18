@@ -10,8 +10,12 @@ MessageDialog::MessageDialog(QWidget *parent) :
   });
 }
 
-void MessageDialog::append(QString message) {
-  ui->messages->append(message);
+void MessageDialog::append(QString message, bool formatted) {
+  if (formatted) {
+    ui->messages->append(message);
+  } else {
+    ui->console->append(message);
+  }
 }
 
 MessageDialog::~MessageDialog() {

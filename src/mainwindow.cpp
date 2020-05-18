@@ -16,14 +16,6 @@
  * Helper functions
  */
 namespace {
-void infoMessageBox(QString text, QString title = "KYGUI") {
-  QMessageBox box;
-  box.setWindowTitle(title);
-  box.setText(text);
-  box.setButtonText(0, "Close");
-  box.exec();
-}
-
 bool isSameEvent(QString event1, QString event2) {
   auto event_size =
       event1.size() > event2.size() ? event2.size() : event1.size();
@@ -225,9 +217,6 @@ void MainWindow::connectClient() {
         }
       });
 
-  QObject::connect(ui->viewConsole, &QPushButton::clicked, this,
-                   [this]() { console_ui.show(); });
-
   QObject::connect(
       ui->processList, &QListView::clicked, this,
       [this](const QModelIndex& index) {
@@ -241,12 +230,12 @@ void MainWindow::connectClient() {
         if (process.end.size() > 0 || process.id == "Scheduled task") {
           process_info_text += "\n\nResult: \n" + process.result;
         }
-        infoMessageBox(process_info_text, "Process");
+        UI::infoMessageBox(process_info_text, "Process");
       });
 
   QObject::connect(ui->eventList, &QListView::clicked, this,
                    [this](const QModelIndex& index) {
-                     infoMessageBox(m_event_model->item(index.row(), index.column())->text(), "Event");
+                     UI::infoMessageBox(m_event_model->item(index.row(), index.column())->text(), "Event");
                    });
 
   QObject::connect(m_event_model, &QAbstractItemModel::rowsAboutToBeInserted,
@@ -278,7 +267,7 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
   if (t == MESSAGE_UPDATE_TYPE) {  // Normal message
     qDebug() << "Updating message area";
     message_parser.handleMessage(message, v);
-    console_ui.updateText(message);
+    message_ui.append(message);
   } else if (t == COMMANDS_UPDATE_TYPE) {  // Received app list from server
     qDebug() << "Updating commands";
     QString default_app = configValue("defaultApp", m_config);
@@ -395,8 +384,7 @@ void MainWindow::MessageParser::handleCommands(StringVec commands,
  * @param v
  */
 void MainWindow::MessageParser::handleMessage(QString message, StringVec v) {
-  auto simple_message = timestampPrefix() + parseMessage(message, v);
-  window->message_ui.append(simple_message);
+  window->message_ui.append(timestampPrefix() + parseMessage(message, v), true);
 }
 
 /**

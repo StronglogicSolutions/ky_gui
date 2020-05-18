@@ -127,9 +127,12 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
 
   QObject::connect(ui->dateTime, &QDateTimeEdit::dateTimeChanged, this, [this]() {
     auto date_time = ui->dateTime->dateTime();
-    m_task->setArgument("datetime", QString::number(date_time.toTime_t()));
-    auto new_time = std::get<Scheduler::VariantIndex::QSTRING>(m_task->getTaskArgument("datetime"));
-    qDebug() << "Time changed to" << date_time;
+    if (date_time > QDateTime::currentDateTime()) {
+      m_task->setArgument("datetime", QString::number(date_time.toTime_t()));
+      qDebug() << "Time changed to" << date_time;
+    } else {
+      UI::infoMessageBox("Unable to schedule tasks in the past!", "DateTime Error");
+    }
   });
 
   QObject::connect(ui->argCommandButtons,
@@ -140,6 +143,8 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
                        setTaskArguments();
                        if (m_task->isReady()) {
                          emit ArgDialog::taskRequestReady(m_task);
+                       } else {
+                         UI::infoMessageBox("Task is still missing arguments", "Task Verification Error");
                        }
                      }
                    });

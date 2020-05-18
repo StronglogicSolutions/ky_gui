@@ -34,14 +34,12 @@ SOURCES += \
         src/instagram_task.cpp\
         src/argdialog.cpp \
         src/messagedialog.cpp \
-        src/consoledialog.cpp \
         src/connection_indicator.cpp \
         src/kfiledialog.cpp \
 
         src/connection_indicator.cpp
 HEADERS += \
         include/ui/argdialog.h \
-        include/ui/consoledialog.h \
         include/ui/messagedialog.hpp \
         include/ui/mainwindow.h \
         include/ui/connection_indicator.h \
