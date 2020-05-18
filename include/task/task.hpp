@@ -95,7 +95,6 @@ class TaskArgumentBase {
 class TaskArgument : TaskArgumentBase {
  public:
   TaskArgument(QString n, ArgumentType t, TypeVariant _value) {
-    auto index = _value.index();
     name = n;
     type = t;
     value = _value;
