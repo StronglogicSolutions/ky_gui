@@ -516,7 +516,7 @@ color: rgb(223, 252, 255);</string>
               </layout>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0,0">
+              <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0">
                <property name="spacing">
                 <number>4</number>
                </property>
@@ -560,42 +560,6 @@ padding: 4px;</string>
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="viewConsole">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="autoFillBackground">
-                  <bool>false</bool>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">background-color: #c41900;
-font: 87 11pt &quot;Noto Sans&quot;;
-color: rgb(0, 0, 0);
-font-weight: 700;
-padding: 4px;
-border-style: outset;
-border-width: 2px;
-border-radius: 4px;
-border-color: #00000f;
-min-width: 4em;
-padding: 4px;</string>
-                 </property>
-                 <property name="text">
-                  <string>Console</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="kres.qrc">
-                   <normaloff>:/icons/log.png</normaloff>:/icons/log.png</iconset>
-                 </property>
-                 <property name="flat">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QPushButton" name="openMessages">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
@@ -620,11 +584,11 @@ min-width: 4em;
 padding: 4px;</string>
                  </property>
                  <property name="text">
-                  <string>Messages</string>
+                  <string>History</string>
                  </property>
                  <property name="icon">
                   <iconset resource="kres.qrc">
-                   <normaloff>:/icons/icons/messages.png</normaloff>:/icons/icons/messages.png</iconset>
+                   <normaloff>:/icons/icons/log.svg</normaloff>:/icons/icons/log.svg</iconset>
                  </property>
                  <property name="flat">
                   <bool>false</bool>
