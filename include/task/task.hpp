@@ -277,7 +277,7 @@ class Task {
   virtual void addArgument(QString name, QString string) = 0;
   virtual void removeArgument(QString name, TypeVariant arg) = 0;
   virtual const TaskArguments&& getTaskArguments() = 0;
-  virtual TaskArgument getTaskArgument(QString name) = 0;
+  virtual TaskArgument&& getTaskArgument(QString name) = 0;
   virtual const TypeVariant getTaskArgumentValue(QString name) = 0;
   virtual ArgumentValues getArgumentValues() = 0;
   virtual QVector<QString> getArgumentNames() = 0;

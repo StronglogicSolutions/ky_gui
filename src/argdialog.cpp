@@ -103,21 +103,21 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
         addHashtag(text);
       } else if (type == Args::DESCRIPTION_TYPE) {
         addItem(text, type);
-        m_task->setArgument("description", escapeText(text));
+        m_task->setArgument(Args::DESCRIPTION_TYPE, escapeText(text));
       } else if (type == Args::PROMOTE_TYPE) {
-        addOrReplaceInArgList(text, "promote/share");
-        m_task->setArgument("promote_share", text);
+        addOrReplaceInArgList(text, Args::PROMOTE_TYPE);
+        m_task->setArgument(Args::PROMOTE_TYPE, text);
       } else if (type == Args::LINK_BIO_TYPE) {
-        addOrReplaceInArgList(text, "link/bio");
-        m_task->setArgument("link_in_bio", text);
+        addOrReplaceInArgList(text, Args::LINK_BIO_TYPE);
+        m_task->setArgument(Args::LINK_BIO_TYPE, text);
       } else if (type == Args::REQUESTED_BY_TYPE) {
         addRequestedBy(text);
       } else if (type == Args::HEADER_TYPE) {
         addItem(text, type);
-        m_task->setArgument("header", text);
+        m_task->setArgument(Args::HEADER_TYPE, text);
       } else if (type == Args::REQUESTED_BY_PHRASE) {
         addItem(text, type);
-        m_task->setArgument("requested_by_phrase", text);
+        m_task->setArgument(Args::REQUESTED_BY_PHRASE, text);
       }
       ui->argInput->clear();
     }
@@ -156,12 +156,12 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
  */
 void ArgDialog::setTaskArguments() {
   QString hashtags{};
-  for (const auto &tag : std::get<VariantIndex::STRVEC>(m_task->getTaskArgument("hashtags"))) {
+  for (const auto &tag : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("hashtags"))) {
     hashtags += "#" + tag + " ";
   }
   hashtags.chop(1);
   QString requested_by{};
-  for (const auto &name : std::get<VariantIndex::STRVEC>(m_task->getTaskArgument("requested_by"))) {
+  for (const auto &name : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("requested_by"))) {
     requested_by += "@" + name + "";
   }
   if (requested_by.size() > 1) {
@@ -187,19 +187,28 @@ void ArgDialog::addItem(QString value, QString type) {
   QObject::connect(q_pb, &QPushButton::clicked, this, [this]() {
     auto row_index = ui->argList->currentRow();
     // If deleted item is a file, we need to remove it from the task
-    auto type = ui->argList->item(row_index, 0);
-    if (type->text() == "file") {
-      auto value = ui->argList->item(row_index, 1);
-      if (!value->text().isEmpty()) {
+    auto name = ui->argList->item(row_index, 0)->text();
+    auto value = ui->argList->item(row_index, 1)->text();
+    if (name == "file") {
+      if (!value.isEmpty()) {
         // All of the following should be done by the task
-        QVector<Scheduler::KFileData> task_files = std::get<VariantIndex::FILEVEC>(m_task->getTaskArgument("files"));
+        QVector<Scheduler::KFileData> task_files = std::get<VariantIndex::FILEVEC>(m_task->getTaskArgumentValue("files"));
         auto file_it = std::find_if(task_files.begin(), task_files.end(),
-                                    [value](const Scheduler::KFileData &file) { return file.name == value->text(); });
+                                    [value](const Scheduler::KFileData &file) { return file.name == value; });
         if (file_it != task_files.end()) {  // If file was matched
           qDebug() << "Removing file from task arguments";
           task_files.erase(file_it);
           m_task->setArgument("files", task_files); // Probably not necessary. Try without doing this
         }
+      }
+    } else {
+      auto&& argument = m_task->getTaskArgument(name);
+      if (argument.isContainer()) {
+        for (auto&& s : value.split("\n")) {
+          m_task->removeArgument(name, s);
+        }
+      } else {
+        argument.clear();
       }
     }
     ui->argList->removeRow(row_index);
@@ -250,7 +259,7 @@ void ArgDialog::clearTask() { m_task->clear(); }
  */
 void ArgDialog::addRequestedBy(QString value) {
   QStringList names = value.split(" ");
-  QVector<QString> requested_by_names = std::get<VariantIndex::STRVEC>(m_task->getTaskArgument("requested_by"));
+  QVector<QString> requested_by_names = std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("requested_by"));
   for (const auto &name : names) {
     if (std::find(requested_by_names.begin(), requested_by_names.end(), value.toUtf8().constData()) == requested_by_names.end()) {
       m_task->addArgument("requested_by", name);
@@ -311,12 +320,13 @@ void ArgDialog::addOrReplaceInArgList(QString value, QString type) {
  * @param tag
  */
 void ArgDialog::addHashtag(QString tag) {
+  // Need to be able to handle line breaks!!
     QStringList tags = tag.split(" ");
     for (const auto& tag : tags) {
-      QVector<QString> hashtags = std::get<VariantIndex::STRVEC>(m_task->getTaskArgument("hashtags"));
+      QVector<QString> hashtags = std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue(Args::HASHTAG_TYPE));
         if (std::find(hashtags.begin(), hashtags.end(), tag.toUtf8().constData()) == hashtags.end()) {
-          m_task->addArgument("hashtags", tag);
-          addToArgList(tag, "hashtag");
+          m_task->addArgument(Args::HASHTAG_TYPE, tag);
+          addToArgList(tag, Args::HASHTAG_TYPE);
         } else {
           const char* message = "Can't add the same hashtag twice";
           qDebug() << message;

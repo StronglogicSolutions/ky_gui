@@ -47,7 +47,7 @@ class InstagramTask : public Scheduler::Task {
    *
    * Easy access to an argument.
    */
-  virtual Scheduler::TaskArgument getTaskArgument(QString name) override;
+  virtual Scheduler::TaskArgument&& getTaskArgument(QString name) override;
 
   /**
    * Overrides @abstract Task::getTaskArgumentValue

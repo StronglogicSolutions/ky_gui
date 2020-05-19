@@ -131,7 +131,7 @@ void InstagramTask::addArgument(QString name, QString string) {
  * @param [in] {QString} name   The name of the argument to retrieve
  * @return [out] {TaskArgument}  The argument
  */
-TaskArgument InstagramTask::getTaskArgument(QString name) {
+TaskArgument&& InstagramTask::getTaskArgument(QString name) {
   for (const auto& argument : m_arguments) {
     if (argument->text() == name) {
       return *argument;
