@@ -67,7 +67,7 @@ using TaskQueue = QQueue<Task*>;
 using ArgumentType = const char*;
 using ArgumentValues = QVector<QString>;
 using TypeVariant = std::variant<bool, int, QVector<QString>, QString, QVector<KFileData>>;
-using TaskIterator = std::vector<std::unique_ptr<TaskArgumentBase>>::iterator;
+using TaskIterator = std::vector<TaskArgumentBase*>::iterator;
 
 /**
  * The interface expected on our Task Arguments
@@ -80,6 +80,7 @@ class TaskArgumentBase {
   virtual TypeVariant getValue() = 0;
   virtual void insert(QString value) = 0;
   virtual void insert(KFileData file) = 0;
+  virtual void remove(TypeVariant value) = 0;
   virtual void setValue(TypeVariant v) = 0;
   virtual bool isContainer() = 0;
   virtual void clear() = 0;
@@ -106,7 +107,16 @@ class TaskArgument : TaskArgumentBase {
    * @param [in] {TaskArgument&&} a The R-value reference to a TaskArgument
    */
   TaskArgument(TaskArgument&& a) :
-    name(std::move(a.name)), type(std::move(a.type)), value(std::move(a.value)) {}
+                                   name(std::move(a.name)), type(std::move(a.type)), value(std::move(a.value)) {}
+
+  /**
+   * Copy Constructor
+   *
+   * @constructor
+   * @param [in] {TaskArgument&&} a The const reference to a TaskArgument
+   */
+  TaskArgument(const TaskArgument& a) :
+                                        name(std::move(a.name)), type(std::move(a.type)), value(std::move(a.value)) {}
   /**
    * text
    * @returns {QString} The name of the argument
@@ -117,7 +127,9 @@ class TaskArgument : TaskArgumentBase {
    * setValue
    * @param [in] {TypeVariant} new_value The new value for this argument
    */
-  virtual void setValue(TypeVariant new_value) override { value = new_value; }
+  virtual void setValue(TypeVariant new_value) override {
+    value = new_value;
+  }
 
   /**
    * @brief getStringValue
@@ -203,6 +215,39 @@ class TaskArgument : TaskArgumentBase {
   }
 
   /**
+   * @brief remove
+   * @param value
+   */
+  virtual void remove(TypeVariant unwanted_value) override {
+    if (value.index() == VariantIndex::STRVEC && unwanted_value.index() == VariantIndex::QSTRING) {
+      auto&& container = std::get<VariantIndex::STRVEC>(value);
+      auto value_to_remove = std::get<VariantIndex::QSTRING>(unwanted_value);
+      auto it = std::find_if(container.begin(), container.end(), [&value_to_remove](QString s) {
+        return (s == value_to_remove);
+      });
+      if (it != container.end()) {
+        container.erase(it);
+        return;
+      } else {
+        throw std::out_of_range("Could not find value requested for removal");
+      }
+    } else if (value.index() == VariantIndex::STRVEC && unwanted_value.index() == VariantIndex::FILEVEC) {
+      auto&& container = std::get<VariantIndex::STRVEC>(value);
+      auto value_to_remove = std::get<VariantIndex::QSTRING>(unwanted_value);
+      auto it = std::find_if(container.begin(), container.end(), [&value_to_remove](QString s) {
+        return (s == value_to_remove);
+      });
+      if (it != container.end()) {
+        container.erase(it);
+        return;
+      } else {
+        throw std::out_of_range("Could not find value requested for removal");
+      }
+    }
+    throw std::invalid_argument("The value provided does not match any existing container");
+  }
+
+  /**
    * @brief getTypeIndex
    * @return
    */
@@ -216,7 +261,7 @@ class TaskArgument : TaskArgumentBase {
   TypeVariant value;
 };
 
-using TaskArguments = std::vector<std::unique_ptr<TaskArgument>>;
+using TaskArguments = std::vector<TaskArgument*>;
 
 /**
  * The interface expected to be implemented in all Task types
@@ -229,8 +274,10 @@ class Task {
   virtual void setArgument(QString name, TypeVariant arg) = 0;
   virtual void addArgument(QString name, Scheduler::KFileData file) = 0;
   virtual void addArgument(QString name, QString string) = 0;
+  virtual void removeArgument(QString name, TypeVariant arg) = 0;
   virtual const TaskArguments&& getTaskArguments() = 0;
-  virtual const TypeVariant getTaskArgument(QString name) = 0;
+  virtual TaskArgument&& getTaskArgument(QString name) = 0;
+  virtual const TypeVariant getTaskArgumentValue(QString name) = 0;
   virtual ArgumentValues getArgumentValues() = 0;
   virtual QVector<QString> getArgumentNames() = 0;
   virtual TaskType getType() = 0;

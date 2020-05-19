@@ -1,5 +1,5 @@
 ﻿#include <include/task/instagram_task.hpp>
-
+#include <QDebug>
 using namespace Scheduler;
 
 /**
@@ -34,19 +34,19 @@ InstagramTask::InstagramTask() {}
  */
 void InstagramTask::defineTaskArguments() {
   m_arguments.clear();
-  m_arguments.emplace_back(std::make_unique<TaskArgument>("header", Type::TEXT, QString{}));
-  m_arguments.emplace_back(std::make_unique<TaskArgument>("description", Type::TEXT, TypeVariant{QString{}}));
-  m_arguments.emplace_back(std::make_unique<TaskArgument>("datetime", Type::TEXT, QString{}));
-  m_arguments.emplace_back(std::make_unique<TaskArgument>("promote_share", Type::TEXT, QString{}));
-  m_arguments.emplace_back(std::make_unique<TaskArgument>("link_in_bio", Type::TEXT, QString{}));
-  m_arguments.emplace_back(std::make_unique<TaskArgument>("hashtags", Type::STRINGVECTOR, QVector<QString>{}));
-  m_arguments.emplace_back(std::make_unique<TaskArgument>("hashtags_string", Type::TEXT, QString{}));
-  m_arguments.emplace_back(std::make_unique<TaskArgument>("requested_by", Type::STRINGVECTOR, QVector<QString>{}));
-  m_arguments.emplace_back(std::make_unique<TaskArgument>("requested_by_string", Type::TEXT, QString{}));
-  m_arguments.emplace_back(std::make_unique<TaskArgument>("requested_by_phrase", Type::TEXT, QString{}));
-  m_arguments.emplace_back(std::make_unique<TaskArgument>("files", Type::FILEVECTOR, QVector<KFileData>{}));
-  m_arguments.emplace_back(std::make_unique<TaskArgument>("user", Type::TEXT, QString{}));
-  m_arguments.emplace_back(std::make_unique<TaskArgument>("is_video", Type::BOOLEAN, bool{}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"header", Type::TEXT, QString{}}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"description", Type::TEXT, TypeVariant{QString{}}}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"datetime", Type::TEXT, QString{}}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"promote_share", Type::TEXT, QString{}}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"link_in_bio", Type::TEXT, QString{}}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"hashtags", Type::STRINGVECTOR, QVector<QString>{}}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"hashtags_string", Type::TEXT, QString{}}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"requested_by", Type::STRINGVECTOR, QVector<QString>{}}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"requested_by_string", Type::TEXT, QString{}}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"requested_by_phrase", Type::TEXT, QString{}}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"files", Type::FILEVECTOR, QVector<KFileData>{}}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"user", Type::TEXT, QString{}}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"is_video", Type::BOOLEAN, bool{}}));
 }
 
 /**
@@ -55,10 +55,12 @@ void InstagramTask::defineTaskArguments() {
  * @param [in] {TypeVariant}  value  The value of the argument
  */
 void InstagramTask::setArgument(QString name, TypeVariant value) {
-  for (const auto& argument : m_arguments) {
+  for (auto&& argument : m_arguments) {
     if (argument->text() == name) {
-      argument->setValue(value);
-      return;
+      if (isIndex(value.index(), VariantIndex::STRVEC)) {
+        argument->setValue(std::get<VariantIndex::STRVEC>(value));
+        return;
+      }
     }
   }
 }
@@ -83,6 +85,29 @@ void InstagramTask::addArgument(QString name, Scheduler::KFileData file) {
 }
 
 /**
+ * @warning This method is used to remove a value to an argument, and can only be used on arguments whose type is a form of container.
+ *
+ * @brief InstagramTask::addArgument
+ *
+ * @param [in] {QString}      name  The name of the argument
+ * @param [in] {TypeVariant}  file  A data structure to be added to a container of files.
+ *                                The KFileData structure contains metadata about a file and
+ *                                its data as a byte array
+ */
+void InstagramTask::removeArgument(QString name, Scheduler::TypeVariant value) {
+  for (auto&& argument : m_arguments) {
+    if (argument->text() == name) {
+      if (argument->isContainer()) {
+        argument->remove(value);
+      } else {
+        argument->clear();
+      }
+      return;
+    }
+  }
+}
+
+/**
  * @warning This method is used to add values to an argument, and can only be used on arguments whose type is a form of container.
  *
  * @brief InstagramTask::addArgument
@@ -99,13 +124,29 @@ void InstagramTask::addArgument(QString name, QString string) {
   }
 }
 
+
 /**
  * @brief InstagramTask::getTaskArgument
  *
  * @param [in] {QString} name   The name of the argument to retrieve
- * @return [out] {TypeVariant}  The value of the task
+ * @return [out] {TaskArgument}  The argument
  */
-const TypeVariant InstagramTask::getTaskArgument(QString name) {
+TaskArgument&& InstagramTask::getTaskArgument(QString name) {
+  for (const auto& argument : m_arguments) {
+    if (argument->text() == name) {
+      return *argument;
+    }
+  }
+  return TaskArgument{"None", "None", ""};  // Perhaps we should throw
+}
+
+/**
+ * @brief InstagramTask::getTaskArgumentValue
+ *
+ * @param [in] {QString} name   The name of the argument to retrieve
+ * @return [out] {TypeVariant}  The value of the argument
+ */
+const TypeVariant InstagramTask::getTaskArgumentValue(QString name) {
   for (const auto& argument : m_arguments) {
     if (argument->text() == name) {
       return argument->getValue();
@@ -203,7 +244,7 @@ void InstagramTask::clear() {
  * @return [out] {bool} Indicates whether the task has files.
  */
 bool InstagramTask::hasFiles() {
-  return !std::get<VariantIndex::FILEVEC>(getTaskArgument("files")).empty();
+  return !std::get<VariantIndex::FILEVEC>(getTaskArgumentValue("files")).empty();
 }
 
 /**
@@ -212,7 +253,7 @@ bool InstagramTask::hasFiles() {
  * @return [out] {QVector<KFileData>} A vector of data structures representing file metadata and the file data as bytes.
  */
 const QVector<Scheduler::KFileData> InstagramTask::getFiles() {
-  return std::get<VariantIndex::FILEVEC>(getTaskArgument("files"));
+  return std::get<VariantIndex::FILEVEC>(getTaskArgumentValue("files"));
 }
 
 /**
@@ -222,15 +263,15 @@ const QVector<Scheduler::KFileData> InstagramTask::getFiles() {
  *                      perform the task have been met.
  */
 bool InstagramTask::isReady() {
-  auto header_size = std::get<VariantIndex::QSTRING>(getTaskArgument("header")).size();
-  auto description_size = std::get<VariantIndex::QSTRING>(getTaskArgument("description")).size();
-  auto datetime_size = std::get<VariantIndex::QSTRING>(getTaskArgument("datetime")).size();
-  auto promote_share_size = std::get<VariantIndex::QSTRING>(getTaskArgument("promote_share")).size();
-  auto link_in_bio_size = std::get<VariantIndex::QSTRING>(getTaskArgument("link_in_bio")).size();
-  auto hashtags_size = std::get<VariantIndex::QSTRING>(getTaskArgument("hashtags_string")).size();
-  auto requested_by_size = std::get<VariantIndex::QSTRING>(getTaskArgument("requested_by_string")).size();
-  auto hasFiles = std::get<VariantIndex::FILEVEC>(getTaskArgument("files")).size();
-  auto user_size = std::get<VariantIndex::QSTRING>(getTaskArgument("user")).size();
+  auto header_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("header")).size();
+  auto description_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("description")).size();
+  auto datetime_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("datetime")).size();
+  auto promote_share_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("promote_share")).size();
+  auto link_in_bio_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("link_in_bio")).size();
+  auto hashtags_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("hashtags_string")).size();
+  auto requested_by_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("requested_by_string")).size();
+  auto hasFiles = std::get<VariantIndex::FILEVEC>(getTaskArgumentValue("files")).size();
+  auto user_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("user")).size();
 
   return header_size > 0 && description_size > 0 && datetime_size > 0 &&
          promote_share_size > 0 && link_in_bio_size > 0 &&

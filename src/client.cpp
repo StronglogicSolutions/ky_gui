@@ -250,25 +250,35 @@ void Client::sendTaskEncoded(Scheduler::Task* task) {
             builder.CreateString(
 /*0*/           getTaskFileInfo(sent_files)),
             builder.CreateString(
-/*1*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("datetime")).toUtf8().constData()}),
+/*1*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+                                      task->getTaskArgumentValue("datetime")).toUtf8().constData()}),
             builder.CreateString(
-/*2*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("description")).toUtf8().constData()}),
+/*2*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+                                      task->getTaskArgumentValue("description")).toUtf8().constData()}),
             builder.CreateString(
-/*3*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("hashtags_string")).toUtf8().constData()}),
+/*3*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+                                      task->getTaskArgumentValue("hashtags_string")).toUtf8().constData()}),
             builder.CreateString(
-/*4*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("requested_by_string")).toUtf8().constData()}),
+/*4*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+                                      task->getTaskArgumentValue("requested_by_string")).toUtf8().constData()}),
             builder.CreateString(
-/*5*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("requested_by_phrase")).toUtf8().constData()}),
+/*5*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+                                      task->getTaskArgumentValue("requested_by_phrase")).toUtf8().constData()}),
             builder.CreateString(
-/*6*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("promote_share")).toUtf8().constData()}),
+/*6*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+                                      task->getTaskArgumentValue("promote_share")).toUtf8().constData()}),
             builder.CreateString(
-/*7*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("link_in_bio")).toUtf8().constData()}),
-/*8*/           std::get<Scheduler::VariantIndex::BOOLEAN>(task->getTaskArgument("is_video")),
+/*7*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+                                      task->getTaskArgumentValue("link_in_bio")).toUtf8().constData()}),
+/*8*/           std::get<Scheduler::VariantIndex::BOOLEAN>(
+                                      task->getTaskArgumentValue("is_video")),
 /*9*/           getSelectedApp(),
             builder.CreateString(
-/*10*/          std::string{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("header")).toUtf8().constData()}),
+/*10*/          std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+                                       task->getTaskArgumentValue("header")).toUtf8().constData()}),
             builder.CreateString(
-/*11*/          std::string{std::get<Scheduler::VariantIndex::QSTRING>(task->getTaskArgument("user")).toUtf8().constData()}));
+/*11*/          std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+                                       task->getTaskArgumentValue("user")).toUtf8().constData()}));
     builder.Finish(ig_task);
 
     uint8_t* encoded_message_buffer = builder.GetBufferPointer();
