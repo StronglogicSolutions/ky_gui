@@ -8,7 +8,7 @@ namespace Scheduler {
 namespace Args {
 const QString HEADER_TYPE = "header";
 const QString DESCRIPTION_TYPE = "description";
-const QString HASHTAG_TYPE = "hashtag";
+const QString HASHTAG_TYPE = "hashtags";
 const QString PROMOTE_TYPE = "promote_share";
 const QString LINK_BIO_TYPE = "link_in_bio";
 const QString REQUESTED_BY_TYPE = "requested_by";
@@ -45,9 +45,16 @@ class InstagramTask : public Scheduler::Task {
   /**
    * Overrides @abstract Task::getTaskArgument
    *
+   * Easy access to an argument.
+   */
+  virtual Scheduler::TaskArgument getTaskArgument(QString name) override;
+
+  /**
+   * Overrides @abstract Task::getTaskArgumentValue
+   *
    * Easy access to an argument's value.
    */
-  virtual const Scheduler::TypeVariant getTaskArgument(QString name) override;
+  virtual const Scheduler::TypeVariant getTaskArgumentValue(QString name) override;
 
   /**
    * Overrides @abstract Task::getArgumentValues
@@ -97,6 +104,13 @@ class InstagramTask : public Scheduler::Task {
    * Add an additional value to a string container argument.
    */
   virtual void addArgument(QString name, QString string) override;
+
+  /**
+   * Overrides @abstract Task::removeArgument
+   *
+   * Remove a value from a container argument.
+   */
+  virtual void removeArgument(QString name, Scheduler::TypeVariant arg) override;
 
   /**
    * Overrides @abstract Task::hasFiles
