@@ -134,10 +134,10 @@ void InstagramTask::addArgument(QString name, QString string) {
 TaskArgument&& InstagramTask::getTaskArgument(QString name) {
   for (const auto& argument : m_arguments) {
     if (argument->text() == name) {
-      return *argument;
+      return std::move(*argument);
     }
   }
-  return TaskArgument{"None", "None", ""};  // Perhaps we should throw
+  throw std::invalid_argument("Argument not found");
 }
 
 /**
