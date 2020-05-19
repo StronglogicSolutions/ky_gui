@@ -57,10 +57,8 @@ void InstagramTask::defineTaskArguments() {
 void InstagramTask::setArgument(QString name, TypeVariant value) {
   for (auto&& argument : m_arguments) {
     if (argument->text() == name) {
-      if (isIndex(value.index(), VariantIndex::STRVEC)) {
-        argument->setValue(std::get<VariantIndex::STRVEC>(value));
-        return;
-      }
+      argument->setValue(value);
+      return;
     }
   }
 }
