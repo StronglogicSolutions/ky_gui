@@ -7,6 +7,7 @@
 namespace Scheduler {
 namespace Args {
 const QString HEADER_TYPE = "header";
+const QString FILE_TYPE = "files";
 const QString DESCRIPTION_TYPE = "description";
 const QString HASHTAG_TYPE = "hashtags";
 const QString PROMOTE_TYPE = "promote_share";

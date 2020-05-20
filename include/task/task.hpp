@@ -232,11 +232,11 @@ class TaskArgument : TaskArgumentBase {
       } else {
         throw std::out_of_range("Could not find value requested for removal");
       }
-    } else if (value.index() == VariantIndex::STRVEC && unwanted_value.index() == VariantIndex::FILEVEC) {
-      auto&& container = std::get<VariantIndex::STRVEC>(value);
-      auto value_to_remove = std::get<VariantIndex::QSTRING>(unwanted_value);
-      auto it = std::find_if(container.begin(), container.end(), [&value_to_remove](QString s) {
-        return (s == value_to_remove);
+    } else if (value.index() == VariantIndex::FILEVEC && unwanted_value.index() == VariantIndex::QSTRING) {
+      auto&& container = std::get<VariantIndex::FILEVEC>(value);
+      auto file_to_remove = std::get<VariantIndex::QSTRING>(unwanted_value);
+      auto it = std::find_if(container.begin(), container.end(), [&file_to_remove](Scheduler::KFileData f) {
+        return (f.name == file_to_remove);
       });
       if (it != container.end()) {
         container.erase(it);

@@ -183,30 +183,20 @@ void ArgDialog::addItem(QString value, QString type) {
   QPushButton *q_pb = new QPushButton();
   q_pb->setText("Delete");
   q_pb->setIcon(std::move(QIcon(":/icons/icons/quit.png")));
+  // Set listener on Delete button
   QObject::connect(q_pb, &QPushButton::clicked, this, [this]() {
     auto row_index = ui->argList->currentRow();
-    // If deleted item is a file, we need to remove it from the task
     auto name = ui->argList->item(row_index, 0)->text();
+    if (name == "file") { // UI displays files as type "file", but the argument is named "files"
+      name = Args::FILE_TYPE;
+    }
     auto value = ui->argList->item(row_index, 1)->text();
-    if (name == "file") {
-      if (!value.isEmpty()) {
-        // All of the following should be done by the task
-        QVector<Scheduler::KFileData> task_files = std::get<VariantIndex::FILEVEC>(m_task->getTaskArgumentValue("files"));
-        auto file_it = std::find_if(task_files.begin(), task_files.end(),
-                                    [value](const Scheduler::KFileData &file) { return file.name == value; });
-        if (file_it != task_files.end()) {  // If file was matched
-          qDebug() << "Removing file from task arguments";
-          task_files.erase(file_it);
-          m_task->setArgument("files", task_files); // Probably not necessary. Try without doing this
-        }
-      }
-    } else {
-      for (auto&& s : value.split("\n")) { // If there are multiple values, they are separated by line breaks
-        m_task->removeArgument(name, s);
-      }
+    for (auto&& s : value.split("\n")) { // If there are multiple values, they are separated by line breaks
+      m_task->removeArgument(name, s);
     }
     ui->argList->removeRow(row_index);
   });
+
   ui->argList->setItem(row, 0, item);
   ui->argList->setItem(row, 1, item2);
   ui->argList->setCellWidget(row, 3, q_pb);
