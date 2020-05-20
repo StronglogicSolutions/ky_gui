@@ -1,7 +1,6 @@
 ﻿#include <include/ui/argdialog.h>
 #include <ui_argdialog.h>
 #include <QCalendarWidget>
-#include <QDateTime>
 #include <QDebug>
 #include <QIODevice>
 #include <QMimeDatabase>
@@ -126,13 +125,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
   ui->dateTime->setDateTime(QDateTime::currentDateTime());
 
   QObject::connect(ui->dateTime, &QDateTimeEdit::dateTimeChanged, this, [this]() {
-    auto date_time = ui->dateTime->dateTime();
-    if (date_time > QDateTime::currentDateTime()) {
-      m_task->setArgument("datetime", QString::number(date_time.toTime_t()));
-      qDebug() << "Time changed to" << date_time;
-    } else {
-      UI::infoMessageBox("Unable to schedule tasks in the past!", "DateTime Error");
-    }
+    m_task->setArgument("datetime", QString::number(ui->dateTime->dateTime().toTime_t()));
   });
 
   QObject::connect(ui->argCommandButtons,
@@ -141,6 +134,12 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
                    this, [this](QAbstractButton *button) {
                      if (button->text() == "Save") {
                        setTaskArguments();
+                       uint task_date_time = std::get<Scheduler::VariantIndex::QSTRING>(
+                                                 m_task->getTaskArgumentValue("datetime")).toUInt();
+                       if (task_date_time <= TimeUtils::unixtime()) {
+                         UI::infoMessageBox("Unable to schedule tasks in the past!", "DateTime Error");
+                         return;
+                       }
                        if (m_task->isReady()) {
                          emit ArgDialog::taskRequestReady(m_task);
                        } else {
@@ -229,10 +228,8 @@ void ArgDialog::addFile(QString path) {
  */
 void ArgDialog::clearPost() {
   QDateTime date_time = QDateTime::currentDateTime();
-  ui->dateTime->setDateTime(date_time);
   m_task->clear();
   m_task->setDefaultValues();
-  m_task->setArgument("datetime", QString::number(date_time.toTime_t()));
   m_task->setArgument("user", ui->user->currentText());
   ui->argType->setCurrentIndex(0);
   ui->argList->setRowCount(0);

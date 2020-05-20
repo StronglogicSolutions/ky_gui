@@ -1,6 +1,4 @@
 ﻿#include <include/ui/mainwindow.h>
-
-#include <QDateTime>
 #include <QDebug>
 #include <QLayout>
 #include <QScrollBar>
@@ -45,9 +43,8 @@ int getLikeEventNum(QString event, QList<QString> events) {
   return hits;
 }
 
-QString getTime() { return QDateTime::currentDateTime().toString("hh:mm:ss"); }
 QString timestampPrefix() {
-  return QDateTime::currentDateTime().toString("hh:mm:ss") + " - ";
+  return TimeUtils::getTime() + " - ";
 }
 
 /**
@@ -283,7 +280,7 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
     qDebug() << "Updating process list";
     m_processes.push_back(Process{.name = v.at(1),
                                   .state = ProcessState::PENDING,
-                                  .start = getTime(),
+                                  .start = TimeUtils::getTime(),
                                   .id = v.at(2)});
     int row = 0;
     for (const auto& process : m_processes) {
@@ -419,7 +416,7 @@ void MainWindow::MessageParser::updateProcessResult(
   // unique identifier
   for (int i = window->m_processes.size() - 1; i >= 0; i--) {
     if (window->m_processes.at(i).id == id) {
-      window->m_processes.at(i).end = getTime();
+      window->m_processes.at(i).end = TimeUtils::getTime();
       window->m_processes.at(i).state =
           !error ? ProcessState::SUCCEEDED : ProcessState::FAILED;
       window->m_processes.at(i).result = result;
@@ -459,7 +456,7 @@ QString MainWindow::MessageParser::handleEventMessage(QString message,
           Process new_process{
               .name = app_name,
               .state = !error ? ProcessState::SUCCEEDED : ProcessState::FAILED,
-              .start = getTime(),
+              .start = TimeUtils::getTime(),
               .id = "Scheduled task",
               .error = error ? v.at(3) : "No errors reported"};
           if (v.count() > 2 && !v.at(2).isEmpty()) {

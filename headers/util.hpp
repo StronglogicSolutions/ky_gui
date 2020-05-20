@@ -5,6 +5,7 @@
 #include <QQueue>
 #include <QString>
 #include <QMessageBox>
+#include <QDateTime>
 #include <QVector>
 #include <charconv>
 #include <string>
@@ -427,5 +428,10 @@ inline void infoMessageBox(QString text, QString title = "KYGUI") {
   box.exec();
 }
 } // namespace UI
+namespace TimeUtils {
+inline QString getTime() { return QDateTime::currentDateTime().toString("hh:mm:ss"); }
+inline uint unixtime() { return QDateTime::currentDateTime().toTime_t(); }
+} // namespace TimeUtils
+
 }  // namespace
 #endif  // UTIL_HPP
