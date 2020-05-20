@@ -85,12 +85,11 @@ void InstagramTask::addArgument(QString name, Scheduler::KFileData file) {
 /**
  * @warning This method is used to remove a value to an argument, and can only be used on arguments whose type is a form of container.
  *
- * @brief InstagramTask::addArgument
+ * @brief InstagramTask::removeArgument
  *
- * @param [in] {QString}      name  The name of the argument
- * @param [in] {TypeVariant}  file  A data structure to be added to a container of files.
- *                                The KFileData structure contains metadata about a file and
- *                                its data as a byte array
+ * @param [in] {QString}      name   The name of the argument, whose value is expected to be a container.
+ * @param [in] {TypeVariant}  value  The value to be removed from the container argument.
+ *
  */
 void InstagramTask::removeArgument(QString name, Scheduler::TypeVariant value) {
   for (auto&& argument : m_arguments) {

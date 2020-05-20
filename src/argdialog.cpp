@@ -128,7 +128,6 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
   QObject::connect(ui->dateTime, &QDateTimeEdit::dateTimeChanged, this, [this]() {
     auto date_time = ui->dateTime->dateTime();
     m_task->setArgument("datetime", QString::number(date_time.toTime_t()));
-    auto new_time = std::get<Scheduler::VariantIndex::QSTRING>(m_task->getTaskArgument("datetime"));
     qDebug() << "Time changed to" << date_time;
   });
 
@@ -202,13 +201,8 @@ void ArgDialog::addItem(QString value, QString type) {
         }
       }
     } else {
-      auto&& argument = m_task->getTaskArgument(name);
-      if (argument.isContainer()) {
-        for (auto&& s : value.split("\n")) {
-          m_task->removeArgument(name, s);
-        }
-      } else {
-        argument.clear();
+      for (auto&& s : value.split("\n")) { // If there are multiple values, they are separated by line breaks
+        m_task->removeArgument(name, s);
       }
     }
     ui->argList->removeRow(row_index);
