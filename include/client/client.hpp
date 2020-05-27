@@ -29,6 +29,7 @@ using namespace Scheduler;
 namespace TaskCode {
 static constexpr int IGTASKBYTE = 0xFF;
 static constexpr int GENMSGBYTE = 0xFE;
+static constexpr int GENTASKBYTE = 0xFC;
 static constexpr int PINGBYTE = 0xFD;
 }  // namespace TaskCode
 

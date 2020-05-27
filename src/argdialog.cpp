@@ -14,14 +14,6 @@ using namespace Scheduler;
 ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), m_task(nullptr) {
   ui->setupUi(this);
 
-  m_task = new InstagramTask{};
-  m_task->defineTaskArguments();
-  m_task->setDefaultValues();
-
-  for (const auto& name : m_task->getArgumentNames()) {
-    ui->argType->addItem(name, QVariant::String);
-  }
-
   ui->argCommandButtons->button(QDialogButtonBox::Close)
       ->setStyleSheet(QString("background:%1").arg("#2f535f"));
 
@@ -155,24 +147,49 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
   });
 }
 
+void ArgDialog::showEvent(QShowEvent* event) {
+  if (event->type() == QEvent::Show) {
+    if (m_app_name == Scheduler::INSTAGRAM_NAME) {
+      m_task = new InstagramTask{};
+    } else {
+      m_task = new GenericTask{};
+    }
+    m_task->defineTaskArguments();
+    m_task->setDefaultValues();
+
+    ui->argType->clear();
+
+    for (const auto& name : m_task->getArgumentNames()) {
+      ui->argType->addItem(name, QVariant::String);
+    }
+
+    ui->user->addItems(getValueArgs(m_config_string.toUtf8(), "users"));
+    if (ui->user->count() > 0) {
+      m_task->setArgument("user", ui->user->itemText(0));
+    }
+  }
+}
+
 /**
  * @brief ArgDialog::setTaskArguments
  */
 void ArgDialog::setTaskArguments() {
-  QString hashtags{};
-  for (const auto &tag : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("hashtags"))) {
-    hashtags += "#" + tag + " ";
+  if (m_task->getType() == TaskType::INSTAGRAM) {
+    QString hashtags{};
+    for (const auto &tag : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("hashtags"))) {
+      hashtags += "#" + tag + " ";
+    }
+    hashtags.chop(1);
+    QString requested_by{};
+    for (const auto &name : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("requested_by"))) {
+      requested_by += "@" + name + "";
+    }
+    if (requested_by.size() > 1) {
+      requested_by.chop(1);
+    }
+    m_task->setArgument("hashtags_string", hashtags);
+    m_task->setArgument("requested_by_string", requested_by);
   }
-  hashtags.chop(1);
-  QString requested_by{};
-  for (const auto &name : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("requested_by"))) {
-    requested_by += "@" + name + "";
-  }
-  if (requested_by.size() > 1) {
-    requested_by.chop(1);
-  }
-  m_task->setArgument("hashtags_string", hashtags);
-  m_task->setArgument("requested_by_string", requested_by);
 }
 
 /**
@@ -348,16 +365,16 @@ void ArgDialog::keyPressEvent(QKeyEvent *e) {
  */
 void ArgDialog::setFilePath(QString path) { m_file_path = path; }
 
+void ArgDialog::setAppName(QString app_name) {
+  m_app_name = app_name;
+}
+
 /**
  * @brief ArgDialog::setConfig
  * @param config_string
  */
 void ArgDialog::setConfig(QString config_string) {
   m_config_string = config_string;
-  ui->user->addItems(getValueArgs(m_config_string.toUtf8(), "users"));
-  if (ui->user->count() > 0) {
-    m_task->setArgument("user", ui->user->itemText(0));
-  }
 }
 
 /**

@@ -10,7 +10,9 @@
 
 namespace Scheduler {
 
-enum TaskType { INSTAGRAM = 1, OTHER = 2 };
+enum TaskType { INSTAGRAM = 1, GENERIC = 2, OTHER = 3 };
+
+static constexpr const char* INSTAGRAM_NAME = "Instagram";
 
 /**
  * Files
@@ -281,6 +283,7 @@ class Task {
   virtual ArgumentValues getArgumentValues() = 0;
   virtual QVector<QString> getArgumentNames() = 0;
   virtual TaskType getType() = 0;
+  virtual int getTaskCode() = 0;
   virtual void defineTaskArguments() = 0;
   virtual void setDefaultValues() = 0;
   virtual const QVector<KFileData> getFiles() = 0;

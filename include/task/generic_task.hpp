@@ -1,37 +1,31 @@
-﻿#ifndef __INSTAGRAM_TASK_HPP__
-#define __INSTAGRAM_TASK_HPP__
+﻿#ifndef __GENERIC_TASK_HPP__
+#define __GENERIC_TASK_HPP__
 
 #include <include/task/task.hpp>
 #include <type_traits>
 
 namespace Scheduler {
-namespace Args {
+namespace GenericArgs {
 const QString HEADER_TYPE = "header";
 const QString FILE_TYPE = "files";
 const QString DESCRIPTION_TYPE = "description";
-const QString HASHTAG_TYPE = "hashtags";
-const QString PROMOTE_TYPE = "promote_share";
-const QString LINK_BIO_TYPE = "link_in_bio";
-const QString REQUESTED_BY_TYPE = "requested_by";
-const QString REQUESTED_BY_PHRASE = "requested_by_phrase";
 }  // namespace Args
-
 namespace TaskCode {
-  static constexpr int IGTASKBYTE = 0xFF;
+static constexpr int GENTASKBYTE = 0xFC;
 }
 }  // namespace Scheduler
 
 /**
- * @brief The InstagramTask class
+ * @brief The GenericTask class
  *
- * Class to organize and transport data necessary to perform an Instagram Task.
+ * Class to organize and transport data necessary to perform generic tasks.
  */
-class InstagramTask : public Scheduler::Task {
+class GenericTask : public Scheduler::Task {
  public:
   /**
    * @constructor
    */
-  InstagramTask();
+  GenericTask();
 
   /**
    * Overrides @abstract Task::defineTaskArguments
@@ -156,7 +150,7 @@ class InstagramTask : public Scheduler::Task {
    * Overrides @abstract Task::~Task
    * @destructor
    */
-  virtual ~InstagramTask() override;
+  virtual ~GenericTask() override;
 
  private:
   /**
@@ -167,4 +161,4 @@ class InstagramTask : public Scheduler::Task {
   Scheduler::TaskArguments m_arguments;
 };
 
-#endif  // __INSTAGRAM_TASK_HPP
+#endif  // __GENERIC_TASK_HPP

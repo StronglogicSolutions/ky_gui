@@ -99,7 +99,7 @@ public:
    private slots:
     /** Receivers */
     void connectClient();
-    void updateMessages(int t, const QString& s, StringVec v);
+    void onMessageReceived(int t, const QString& s, StringVec v);
 };
 
 
