@@ -17,9 +17,11 @@
 #define FLATBUFFERS_DEBUG_VERIFICATION_FAILURE
 #include <headers/kmessage_codec.hpp>
 #include <headers/instatask_generated.h>
+#include <headers/generictask_generated.h>
 
 using namespace KData;
 using namespace IGData;
+using namespace GenericData;
 
 static const int MAX_PACKET_SIZE = 4096;
 static const int HEADER_SIZE = 4;
@@ -242,80 +244,89 @@ std::string getTaskFileInfo(std::vector<SentFile> files) {
  * @param [in] {Scheduler::Task*} task The task arguments
  */
 void Client::sendTaskEncoded(Scheduler::Task* task) {
+  qDebug() << getSelectedApp();
   if (task->getType() == Scheduler::TaskType::INSTAGRAM) {
     flatbuffers::Offset<IGTask> ig_task =
         CreateIGTask(
             builder,
-/*ID*/          96,
-            builder.CreateString(
-/*0*/           getTaskFileInfo(sent_files)),
-            builder.CreateString(
-/*1*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-                                      task->getTaskArgumentValue("datetime")).toUtf8().constData()}),
-            builder.CreateString(
-/*2*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-                                      task->getTaskArgumentValue("description")).toUtf8().constData()}),
-            builder.CreateString(
-/*3*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-                                      task->getTaskArgumentValue("hashtags_string")).toUtf8().constData()}),
-            builder.CreateString(
-/*4*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-                                      task->getTaskArgumentValue("requested_by_string")).toUtf8().constData()}),
-            builder.CreateString(
-/*5*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-                                      task->getTaskArgumentValue("requested_by_phrase")).toUtf8().constData()}),
-            builder.CreateString(
-/*6*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-                                      task->getTaskArgumentValue("promote_share")).toUtf8().constData()}),
-            builder.CreateString(
-/*7*/           std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-                                      task->getTaskArgumentValue("link_in_bio")).toUtf8().constData()}),
-/*8*/           std::get<Scheduler::VariantIndex::BOOLEAN>(
-                                      task->getTaskArgumentValue("is_video")),
-/*9*/           getSelectedApp(),
-            builder.CreateString(
-/*10*/          std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-                                       task->getTaskArgumentValue("header")).toUtf8().constData()}),
-            builder.CreateString(
-/*11*/          std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-                                       task->getTaskArgumentValue("user")).toUtf8().constData()}));
+            96, // ID
+            builder.CreateString(getTaskFileInfo(sent_files)),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("datetime")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("description")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("hashtags_string")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("requested_by_string")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("requested_by_phrase")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("promote_share")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("link_in_bio")).toUtf8().constData()}),
+            std::get<Scheduler::VariantIndex::BOOLEAN>(
+              task->getTaskArgumentValue("is_video")),
+              getSelectedApp(),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("header")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("user")).toUtf8().constData()}));
     builder.Finish(ig_task);
+  } else {
+    flatbuffers::Offset<GenericTask> generic_task =
+        CreateGenericTask(
+            builder,
+              96, // ID
+            builder.CreateString(getTaskFileInfo(sent_files)),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("datetime")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("description")).toUtf8().constData()}),
+            std::get<Scheduler::VariantIndex::BOOLEAN>(
+              task->getTaskArgumentValue("is_video")),
+              getSelectedApp(),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("header")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("user")).toUtf8().constData()}));
+    builder.Finish(generic_task);
+  }
 
-    uint8_t* encoded_message_buffer = builder.GetBufferPointer();
-    uint32_t size = builder.GetSize();
-    uint8_t send_buffer[MAX_PACKET_SIZE];
+  uint8_t* encoded_message_buffer = builder.GetBufferPointer();
+  uint32_t size = builder.GetSize();
+  uint8_t send_buffer[MAX_PACKET_SIZE];
 
-    memset(send_buffer, 0, MAX_PACKET_SIZE);
+  memset(send_buffer, 0, MAX_PACKET_SIZE);
 
-    send_buffer[0] = (size >> 24) & 0xFF;
-    send_buffer[1] = (size >> 16) & 0xFF;
-    send_buffer[2] = (size >> 8) & 0xFF;
-    send_buffer[3] = size & 0xFF;
-    send_buffer[4] = (TaskCode::IGTASKBYTE & 0xFF);
+  send_buffer[0] = (size >> 24) & 0xFF;
+  send_buffer[1] = (size >> 16) & 0xFF;
+  send_buffer[2] = (size >> 8) & 0xFF;
+  send_buffer[3] = size & 0xFF;
+  send_buffer[4] = (task->getTaskCode() & 0xFF);
 
-    std::memcpy(send_buffer + 5, encoded_message_buffer, size);
-    qDebug() << "Ready to send:";
-    std::string message_to_send{};
-    for (unsigned int i = 0; i < (size + 5); i++) {
-      message_to_send += (char)*(send_buffer + i);
+  std::memcpy(send_buffer + 5, encoded_message_buffer, size);
+  qDebug() << "Ready to send:";
+  std::string message_to_send{};
+  for (unsigned int i = 0; i < (size + 5); i++) {
+    message_to_send += (char)*(send_buffer + i);
+  }
+  qDebug() << "Final size: " << (size + 5);
+  // Send start operation
+  ::send(m_client_socket_fd, send_buffer, size + 5, 0);
+  // Cleanup and process queue
+  builder.Clear();
+  sent_files.clear();
+  m_outbound_task = nullptr;
+  if (!m_task_queue.isEmpty()) {
+    m_outbound_task = m_task_queue.dequeue();
+    // TODO work from here
+    if (m_outbound_task->hasFiles() && !outgoing_files.empty()) {
+      qDebug() << "There are still outgoing files left over from last "
+                  "task which were never sent. They are being deleted";
+      outgoing_files.clear();
     }
-    qDebug() << "Final size: " << (size + 5);
-    // Send start operation
-    ::send(m_client_socket_fd, send_buffer, size + 5, 0);
-    // Cleanup and process queue
-    builder.Clear();
-    sent_files.clear();
-    m_outbound_task = nullptr;
-    if (!m_task_queue.isEmpty()) {
-      m_outbound_task = m_task_queue.dequeue();
-      // TODO work from here
-      if (m_outbound_task->hasFiles() && !outgoing_files.empty()) {
-        qDebug() << "There are still outgoing files left over from last "
-                    "task which were never sent. They are being deleted";
-        outgoing_files.clear();
-      }
-      sendFiles(m_outbound_task);
-    }
+    sendFiles(m_outbound_task);
   }
 }
 

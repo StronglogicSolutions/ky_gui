@@ -155,6 +155,8 @@ void MainWindow::setConnectScreen(bool visible) {
  * @brief MainWindow::connectClient
  */
 void MainWindow::connectClient() {
+  auto text = ui->kyConfig->toPlainText();
+  qDebug() << text;
   m_config = getConfigObject(ui->kyConfig->toPlainText());
   QString file_path = m_config.at("fileDirectory");
   if (file_path != NULL) {
@@ -163,7 +165,7 @@ void MainWindow::connectClient() {
   setConnectScreen(false);
   qDebug() << "Connecting to KServer";
   QObject::connect(q_client, &Client::messageReceived, this,
-                   &MainWindow::updateMessages);
+                   &MainWindow::onMessageReceived);
 
   QProgressBar* progressBar = ui->progressBar;
   q_client->start();
@@ -185,8 +187,9 @@ void MainWindow::connectClient() {
       static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
       this, [this]() {
         QString app_name = ui->appList->currentText();
-        // TODO: I know, it's awful. Fix this
         q_client->setSelectedApp(std::vector<QString>{{app_name}});
+        arg_ui->setAppName(app_name);
+        arg_ui->setConfig(configValue(app_name, m_config, true));
       });
   QPushButton* disconnect_button = this->findChild<QPushButton*>("disconnect");
   QObject::connect(disconnect_button, &QPushButton::clicked, this, [this]() {
@@ -267,10 +270,12 @@ void MainWindow::connectClient() {
 }
 
 /**
- * @brief MainWindow::updateMessages
- * @param s
+ * @brief MainWindow::onMessageReceived
+ * @param t
+ * @param message
+ * @param v
  */
-void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
+void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
   QString timestamp_prefix = timestampPrefix();
   if (t == MESSAGE_UPDATE_TYPE) {  // Normal message
     qDebug() << "Updating message area";
@@ -282,7 +287,8 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
     message_parser.handleCommands(v, default_app);
     if (message == "New Session") {  // Session has started
       ui->led->setState(true);
-      arg_ui->setConfig(configValue("instagram", m_config));
+      auto app_name = q_client->getAppName(q_client->getSelectedApp());
+      arg_ui->setConfig(configValue(app_name, m_config, true));
       if (configBoolValue("schedulerMode", std::ref(m_config))) {
         arg_ui->show();
       }
@@ -382,6 +388,8 @@ void MainWindow::MessageParser::handleCommands(StringVec commands,
     app_list->addItem(s);
     if (s.toLower() == default_command.toLower()) {
       window->ui->appList->setCurrentIndex(app_index);
+      std::vector<QString> selected{std::move(default_command)};
+      window->q_client->setSelectedApp(std::move(selected));
     }
     app_index++;
   }

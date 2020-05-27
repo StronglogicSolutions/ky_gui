@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <headers/util.hpp>
 #include <include/task/instagram_task.hpp>
+#include <include/task/generic_task.hpp>
 #include <include/task/task.hpp>
 #include <string_view>
 #include <unordered_map>
@@ -30,6 +31,7 @@ class ArgDialog : public QDialog {
   virtual void keyPressEvent(QKeyEvent* e) override;
   void setFilePath(QString path);
   virtual void accept() override;
+  void setAppName(QString task_name);
   void setConfig(QString config_string);
   void notifyClientSuccess();
 
@@ -37,6 +39,9 @@ class ArgDialog : public QDialog {
 
  signals:
   void taskRequestReady(Scheduler::Task *task);
+
+ protected:
+  void showEvent(QShowEvent* event) override;
 
  private:
   void clearPost();
@@ -54,6 +59,7 @@ class ArgDialog : public QDialog {
   Task *m_task;
   QString m_file_path;
   QString m_config_string;
+  QString m_app_name;
 };
 
 #endif  // ARGDIALOG_H
