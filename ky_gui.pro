@@ -31,7 +31,8 @@ SOURCES += \
         src/main.cpp \
         src/mainwindow.cpp \
         src/client.cpp \
-        src/instagram_task.cpp\
+        src/instagram_task.cpp \
+        src/generic_task.cpp \
         src/argdialog.cpp \
         src/consoledialog.cpp \
         src/connection_indicator.cpp \
@@ -47,8 +48,10 @@ HEADERS += \
         include/client/client.hpp \
         include/task/task.hpp \
         include/task/instagram_task.hpp\
+        include/task/generic_task.hpp\
         headers/kmessage_codec.hpp \
         headers/instatask_generated.h \
+        headers/generictask_generated.h \
         headers/util.hpp \
         headers/kiq_types.hpp \
         headers/rapidjson/writer.h \
