@@ -333,18 +333,15 @@ QString MainWindow::parseTaskInfo(StringVec v) {
     qDebug() << "Can't parse when not connected";
     return task_info;
   }
-  auto size = v.size();
-  if (size < 3) {
-    qDebug() << "Not enough arguments to parse task information";
+  // TODO: We expect 5 arguments. Create a better verification pattern.
+  auto error = v.size() != 5;
+  if (error) {
+    task_info += "\n !ERROR! - " + v.at(3);
   } else {
-    auto error = size == 4;
     task_info += "  UUID - " + v.at(0) + "\n  ID - " + v.at(1) + "\n  APP - " +
                  q_client->getAppName(std::stoi(v.at(2).toUtf8().constData())) +
-                 "\n ENV - " + (v.at(3));
-    if (error) {
-      task_info += "\n !ERROR! - " + v.at(3);
+                 "\nENV - " + (v.at(3) + "FILES: " + v.at(4));
     }
-  }
   return task_info;
 }
 
