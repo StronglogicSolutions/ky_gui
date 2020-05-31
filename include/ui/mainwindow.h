@@ -93,7 +93,7 @@ public:
     QStandardItemModel* m_event_model;
     KListViewsStates m_view_states;
     /** Misc */
-    ConfigJson m_config;
+    QJsonObject m_config;
     uint16_t m_consecutive_events;
 
    private slots:

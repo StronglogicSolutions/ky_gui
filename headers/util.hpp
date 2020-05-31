@@ -2,6 +2,9 @@
 #define UTIL_HPP
 #pragma GCC system_header
 #include <QDebug>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include <QQueue>
 #include <QString>
 #include <QMessageBox>
@@ -90,9 +93,56 @@ QString configValue(QString key, ConfigJson config, bool use_default = false) {
   return "";
 }
 
+QString configValue(QString key, QJsonObject config, bool use_default = false) {
+  if (!config.contains(key) && use_default) {
+    if (config.contains("default")) {
+      return config.value("default").toString();
+    }
+  } else {
+    return config.value(key).toString();
+  }
+  return "";
+}
+
+QList<QString> configValueToQList(QString key, QJsonObject config) {
+  QList<QString> list{};
+  if (config.contains(key)) {
+    auto value = config.value(key);
+    if (value.isArray()) {
+      for (auto && item : value.toArray()) {
+        list.append(item.toString());
+      }
+    }
+  }
+  return list;
+}
+
+QJsonObject configObject(QString key, QJsonObject config, bool use_default = false) {
+  auto key_value = key.toLower();
+  if (!config.contains(key_value) && use_default) {
+    if (config.contains("default")) {
+      return config["default"].toObject();
+    }
+  } else {
+    return config[key_value].toObject();
+  }
+  qDebug() << "Returning empty QJsonObject :(";
+  return QJsonObject{};
+}
+
+QJsonObject loadJsonConfig(QString json_string) {
+  return QJsonDocument::fromJson(json_string.toUtf8()).object();
+}
+
 bool configBoolValue(QString s, ConfigJson config) {
   if (auto it{config.find(s)}; it != std::end(config)) {
     return bool{it->second == "true"};
+  }
+}
+
+bool configBoolValue(QString key, QJsonObject config) {
+  if (config.contains(key)) {
+    return bool{config.value(key).toString().compare("true") == 0};
   }
 }
 

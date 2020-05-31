@@ -163,7 +163,9 @@ void ArgDialog::showEvent(QShowEvent* event) {
       ui->argType->addItem(name, QVariant::String);
     }
 
-    ui->user->addItems(getValueArgs(m_config_string.toUtf8(), "users"));
+    if (m_config.contains("users")) {
+      ui->user->addItems(configValueToQList("users", m_config));
+    }
     if (ui->user->count() > 0) {
       m_task->setArgument("user", ui->user->itemText(0));
     }
@@ -373,8 +375,8 @@ void ArgDialog::setAppName(QString app_name) {
  * @brief ArgDialog::setConfig
  * @param config_string
  */
-void ArgDialog::setConfig(QString config_string) {
-  m_config_string = config_string;
+void ArgDialog::setConfig(QJsonObject config) {
+  m_config = config;
 }
 
 /**

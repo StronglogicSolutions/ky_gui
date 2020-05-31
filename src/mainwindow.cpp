@@ -151,8 +151,8 @@ void MainWindow::setConnectScreen(bool visible) {
 void MainWindow::connectClient() {
   auto text = ui->kyConfig->toPlainText();
   qDebug() << text;
-  m_config = getConfigObject(ui->kyConfig->toPlainText());
-  QString file_path = m_config.at("fileDirectory");
+  m_config = loadJsonConfig(ui->kyConfig->toPlainText());
+  QString file_path = configValue("fileDirectory", m_config);
   if (file_path != NULL) {
     arg_ui->setFilePath(file_path);
   }
@@ -183,7 +183,8 @@ void MainWindow::connectClient() {
         QString app_name = ui->appList->currentText();
         q_client->setSelectedApp(std::vector<QString>{{app_name}});
         arg_ui->setAppName(app_name);
-        arg_ui->setConfig(configValue(app_name, m_config, true));
+        auto json_object = configObject(app_name, m_config, true);
+        arg_ui->setConfig(json_object);
       });
   QPushButton* disconnect_button = this->findChild<QPushButton*>("disconnect");
   QObject::connect(disconnect_button, &QPushButton::clicked, this, [this]() {
@@ -276,9 +277,9 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
     message_parser.handleCommands(v, default_app);
     if (message == "New Session") {  // Session has started
       ui->led->setState(true);
-      auto app_name = q_client->getAppName(q_client->getSelectedApp());
-      arg_ui->setConfig(configValue(app_name, m_config, true));
       if (configBoolValue("schedulerMode", std::ref(m_config))) {
+        auto app_name = q_client->getAppName(q_client->getSelectedApp());
+        arg_ui->setConfig(configObject(app_name, m_config, true));
         arg_ui->show();
       }
     }

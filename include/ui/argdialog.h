@@ -32,7 +32,7 @@ class ArgDialog : public QDialog {
   void setFilePath(QString path);
   virtual void accept() override;
   void setAppName(QString task_name);
-  void setConfig(QString config_string);
+  void setConfig(QJsonObject config);
   void notifyClientSuccess();
 
   ~ArgDialog();
@@ -58,7 +58,7 @@ class ArgDialog : public QDialog {
   void addFile(QString path);
   Task *m_task;
   QString m_file_path;
-  QString m_config_string;
+  QJsonObject m_config;
   QString m_app_name;
 };
 
