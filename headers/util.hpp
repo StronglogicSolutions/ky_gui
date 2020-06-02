@@ -39,9 +39,7 @@ typedef std::string KOperation;
 
 typedef std::vector<std::pair<std::string, std::string>> TupVec;
 typedef std::vector<std::map<int, std::string>> MapVec;
-typedef std::vector<std::string> StdStringVec;
 typedef std::map<int, std::string> CommandMap;
-typedef std::map<QString, QString> ConfigJson;
 
 struct KSession {
     int id;
@@ -71,7 +69,7 @@ static QString escapeTextToRaw(QString s) {
  * @brief configValue
  * @param [in] {QString}    key          The key whose corresponding value is to be sought from the
  *                                       ConfigJson param
- * @param [in] {ConfigJson} config       JSON Config object
+ * @param [in] {QJsonObject}config       JSON Config object
  * @param [in] {bool}       use_default  Indicates that the default key will be sought if no value
  *                                       matching the key parameter is found
  * @return {QString} The value which corresonds to the key, or an empty string
@@ -79,19 +77,6 @@ static QString escapeTextToRaw(QString s) {
  * TODO: ConfigJson should probably be called something else, like
  * ConfigJsonObject
  */
-QString configValue(QString key, ConfigJson config, bool use_default = false) {
-  ConfigJson::iterator it{config.find(key.toLower())};  // Find iterator to element matching key
-  if (it != std::end(config)) {               // If element was found
-    return it->second;                        // Return the value of the Key-Pair element
-  }
-  if (use_default) {
-    it = config.find("default");
-    if (it != std::end(config)) {               // If element was found
-      return it->second;                        // Return the value of the Key-Pair element
-    }
-  }
-  return "";
-}
 
 QString configValue(QString key, QJsonObject config, bool use_default = false) {
   if (!config.contains(key) && use_default) {
@@ -132,12 +117,6 @@ QJsonObject configObject(QString key, QJsonObject config, bool use_default = fal
 
 QJsonObject loadJsonConfig(QString json_string) {
   return QJsonDocument::fromJson(json_string.toUtf8()).object();
-}
-
-bool configBoolValue(QString s, ConfigJson config) {
-  if (auto it{config.find(s)}; it != std::end(config)) {
-    return bool{it->second == "true"};
-  }
 }
 
 bool configBoolValue(QString key, QJsonObject config) {
@@ -326,29 +305,6 @@ CommandMap getArgMap(const char* data) {
     }
   }
   return cm;
-}
-
-ConfigJson getConfigObject(QString json_string) {
-    Document d;
-    d.Parse(json_string.toUtf8());
-    StringBuffer buffer;
-    Writer<StringBuffer> writer(buffer);
-    std::map<QString, QString> config_map{};
-    if (d.IsObject()) {
-        for (const auto& m : d.GetObject()) {
-          auto type = m.value.GetType();
-          if (m.value.GetType() == kStringType) {
-            config_map.emplace(m.name.GetString(), m.value.GetString());
-          }
-          if (m.value.GetType() == kObjectType) {
-            m.value.Accept(writer);
-            QString config_value{buffer.GetString()};
-            config_map.emplace(m.name.GetString(), config_value);
-            writer.Reset(buffer);
-          }
-        }
-    }
-    return config_map;
 }
 
 std::string createMessage(const char* data,
