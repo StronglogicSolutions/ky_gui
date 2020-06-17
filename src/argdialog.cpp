@@ -164,6 +164,7 @@ void ArgDialog::showEvent(QShowEvent* event) {
     }
 
     if (m_config.contains("users")) {
+      ui->user->clear();
       ui->user->addItems(configValueToQList("users", m_config));
     }
     if (ui->user->count() > 0) {
