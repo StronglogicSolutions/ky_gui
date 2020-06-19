@@ -89,6 +89,7 @@ class Client : public QDialog {
   void sendTaskEncoded(Scheduler::Task* task);
   void processFileQueue();
   void handleMessages();
+  void handleEvent(std::string data);
   void sendPackets(uint8_t* data, int size);
   int argc;
   char** argv;

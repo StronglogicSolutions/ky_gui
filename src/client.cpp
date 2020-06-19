@@ -43,8 +43,18 @@ Client::MessageHandler Client::createMessageHandler(std::function<void()> cb) {
  * @param [in] {int} count
  * @param [in] {char**} arguments
  */
-Client::Client(QWidget *parent, int count, char** arguments) : QDialog(parent), argc(count), argv(arguments), m_client_socket_fd(-1), m_outbound_task(nullptr), executing(false), m_commands({}) {
-    qRegisterMetaType<QVector<QString>>("QVector<QString>");
+Client::Client(QWidget *parent,
+               int count,
+               char** arguments)
+    : QDialog(parent),
+      argc(count),
+      argv(arguments),
+      m_client_socket_fd(-1),
+      m_outbound_task(nullptr),
+      executing(false),
+      m_commands({}){
+  // Register metadata type for passing data over slots/signals
+  qRegisterMetaType<QVector<QString>>("QVector<QString>");
 }
 
 /**
@@ -69,7 +79,6 @@ void Client::handleMessages() {
         }
         size_t end_idx = findNullIndex(receive_buffer);
         std::string data_string{receive_buffer, receive_buffer + end_idx};
-        qDebug() << "Received data from KServer: \n" << data_string.c_str();
         if (isPong(data_string.c_str())) {
             qDebug() << "Server returned pong";
             continue;
@@ -84,28 +93,35 @@ void Client::handleMessages() {
         } else if (serverWaitingForFile(data_string.c_str())) { // Server expects a file
             processFileQueue();
         } else if (isEvent(data_string.c_str())) { // Receiving event
-            QString event = getEvent(data_string.c_str());
-            QVector<QString> args = getArgs(data_string.c_str());
-            emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args); // Update UI (event)
-            if (isUploadCompleteEvent(event.toUtf8().constData())) { // Upload complete
-              if (!args.isEmpty()) {
-                sent_files.at(sent_files.size() - 1).timestamp =
-                    std::stoi(args.at(0).toUtf8().constData()); // mark file with server-generated timestamp
-                if (outgoing_files.isEmpty()) { // Task files are all sent
-                  sendTaskEncoded(m_outbound_task); // Send remaining task data to complete scheduling
-                  file_was_sent = false;
-                } else { // Begin file upload operation. Task will be sent after all outgoing files are sent.
-                  sendEncoded(
-                      createOperation("FileUpload", {"Subsequent file"}));
-                }
-              }
-            }
+          handleEvent(data_string);
         }
         std::string formatted_json = getJsonString(data_string);
-        emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(formatted_json.data(), formatted_json.size()), {});
+        emit Client::messageReceived(
+            MESSAGE_UPDATE_TYPE,
+            QString::fromUtf8(formatted_json.data(), formatted_json.size()), {}
+        );
     }
     memset(receive_buffer, 0, 2048);
     ::close(m_client_socket_fd);
+}
+
+void Client::handleEvent(std::string data) {
+  QString event = getEvent(data.c_str());
+  QVector<QString> args = getArgs(data.c_str());
+  emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args); // Update UI (event)
+  if (isUploadCompleteEvent(event.toUtf8().constData())) { // Upload complete
+    if (!args.isEmpty()) {
+      sent_files.at(sent_files.size() - 1).timestamp =
+          std::stoi(args.at(0).toUtf8().constData()); // mark file with server-generated timestamp
+      if (outgoing_files.isEmpty()) { // Task files are all sent
+        sendTaskEncoded(m_outbound_task); // Send remaining task data to complete scheduling
+        file_was_sent = false;
+      } else { // Begin file upload operation. Task will be sent after all outgoing files are sent.
+        sendEncoded(
+            createOperation("FileUpload", {"Subsequent file"}));
+      }
+    }
+  }
 }
 
 /**
