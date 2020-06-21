@@ -154,8 +154,11 @@ void ArgDialog::showEvent(QShowEvent* event) {
     } else {
       m_task = new GenericTask{};
     }
-    m_task->defineTaskArguments();
-    m_task->setDefaultValues();
+
+    if (m_task->isEmpty()) {
+      m_task->defineTaskArguments();
+      m_task->setDefaultValues();
+    }
 
     ui->argType->clear();
 

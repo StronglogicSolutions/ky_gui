@@ -56,10 +56,11 @@ class ArgDialog : public QDialog {
   Ui::ArgDialog *ui;
   void addItem(QString value, QString type);
   void addFile(QString path);
-  Task *m_task;
-  QString m_file_path;
-  QJsonObject m_config;
-  QString m_app_name;
+
+  Task*         m_task;
+  QString       m_file_path;
+  QJsonObject   m_config;
+  QString       m_app_name;
 };
 
 #endif  // ARGDIALOG_H

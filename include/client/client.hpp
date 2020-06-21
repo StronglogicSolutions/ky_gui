@@ -91,17 +91,19 @@ class Client : public QDialog {
   void handleMessages();
   void handleEvent(std::string data);
   void sendPackets(uint8_t* data, int size);
-  int argc;
-  char** argv;
-  int m_client_socket_fd;
-  Task* m_outbound_task;
-  bool executing;
-  bool file_was_sent;
-  CommandMap m_commands;
-  CommandArgMap m_command_arg_map;
-  std::vector<int> selected_commands;
-  QQueue<Scheduler::KFileData> outgoing_files;
-  std::vector<SentFile> sent_files;
-  Scheduler::TaskQueue m_task_queue;
+
+  int                           argc;
+  char**                        argv;
+  int                           m_client_socket_fd;
+  bool                          executing;
+  bool                          file_was_sent;
+
+  Task*                         m_outbound_task;
+  CommandMap                    m_commands;
+  CommandArgMap                 m_command_arg_map;
+  std::vector<int>              selected_commands;
+  std::vector<SentFile>         sent_files;
+  Scheduler::TaskQueue          m_task_queue;
+  QQueue<Scheduler::KFileData>  outgoing_files;
 };
 #endif // CLIENT_HPP

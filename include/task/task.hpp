@@ -29,6 +29,12 @@ struct KFileData {
   FileType type;
   QString path;
   QByteArray bytes;
+
+//  friend std::ostream &operator<<(std::ostream &out, const KFileData& file) {
+//    out << "Name: " << file.name.toUtf8()
+//        << "\nType: " << file.type;
+//    return out;
+//  }
 };
 
 /**
@@ -65,11 +71,13 @@ class Task;
 /**
  * Aliases
  */
-using TaskQueue = QQueue<Task*>;
-using ArgumentType = const char*;
-using ArgumentValues = QVector<QString>;
-using TypeVariant = std::variant<bool, int, QVector<QString>, QString, QVector<KFileData>>;
-using TaskIterator = std::vector<TaskArgumentBase*>::iterator;
+using TaskQueue       = QQueue<Task*>;
+using ArgumentType    = const char*;
+using ArgumentValues  = QVector<QString>;
+using TypeVariant     = std::variant<
+                          bool, int, QVector<QString>, QString, QVector<KFileData>
+                        >;
+using TaskIterator    = std::vector<TaskArgumentBase*>::iterator;
 
 /**
  * The interface expected on our Task Arguments
@@ -289,6 +297,16 @@ class Task {
   virtual const QVector<KFileData> getFiles() = 0;
   virtual bool hasFiles() = 0;
   virtual bool isReady() = 0;
+  virtual bool isEmpty() {
+    bool empty = true;
+    for (const auto& arg : getArgumentValues()) {
+      if (!arg.isEmpty()) {
+        empty = false;
+      }
+    }
+    return empty;
+  }
+
   virtual void clear() = 0;
   virtual ~Task(){};
 };
