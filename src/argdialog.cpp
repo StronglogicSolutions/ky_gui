@@ -393,6 +393,7 @@ void ArgDialog::setConfig(QJsonObject config) {
  */
 ArgDialog::~ArgDialog() {
   delete m_task;
+  delete m_pending_task;
   delete m_loader;
   delete ui;
 }
@@ -435,7 +436,6 @@ void ArgDialog::displayLoader(bool visible) {
     ui->loaderText->setMaximumSize(width, height);
     ui->loaderText->setMinimumSize(width, height / 2);
     m_loader->start();
-    m_loader_widget.move(this->rect().topLeft());
   } else {
     m_loader_widget.hide();
     ui->loaderMovie->hide();
