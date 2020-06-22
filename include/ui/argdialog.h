@@ -15,9 +15,27 @@
 #include <string_view>
 #include <unordered_map>
 
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QMovie>
+
 using namespace Scheduler;
 
 typedef std::string Str;
+
+class KLoader : public QWidget {
+ public:
+  KLoader() {
+    QWidget* verticalLayoutWidget = new QWidget();
+    verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
+    verticalLayoutWidget->setGeometry(QRect(10, 10, 500, 500));
+    QVBoxLayout* verticalLayout = new QVBoxLayout(verticalLayoutWidget);
+    verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+    verticalLayout->setContentsMargins(0, 0, 0, 0);
+    QLabel* loader_title = new QLabel{"Loading...", this};
+    verticalLayout->addWidget(loader_title);
+  }
+};
 
 namespace Ui {
 class ArgDialog;
@@ -47,6 +65,7 @@ class ArgDialog : public QDialog {
   void clearPost();
   void defaultPost();
   void clearTask();
+  void displayLoader(bool visible);
   void addToArgList(QString value, QString type);
   void addOrReplaceInArgList(QString value, QString type);
   void addHashtag(QString tag);
@@ -61,6 +80,9 @@ class ArgDialog : public QDialog {
   QString       m_file_path;
   QJsonObject   m_config;
   QString       m_app_name;
+  QMovie*       m_loader;
+  QWidget      m_loader_widget;
+  QVBoxLayout  m_loader_layout;
 };
 
 #endif  // ARGDIALOG_H

@@ -14,6 +14,13 @@ using namespace Scheduler;
 ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), m_task(nullptr) {
   ui->setupUi(this);
 
+  m_loader = new QMovie{":/icons/loader.gif"};
+  //    m_loader_widget = new QWidget{};
+  //    m_loader_layout = new QVBoxLayout{};
+  m_loader_layout.addWidget(ui->loaderMovie);
+  m_loader_layout.addWidget(ui->loaderText);
+  m_loader_widget.setLayout(&m_loader_layout);
+
   ui->argCommandButtons->button(QDialogButtonBox::Close)
       ->setStyleSheet(QString("background:%1").arg("#2f535f"));
 
@@ -134,6 +141,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
                        }
                        if (m_task->isReady()) {
                          emit ArgDialog::taskRequestReady(m_task);
+                         displayLoader(true);
                        } else {
                          UI::infoMessageBox("Task is still missing arguments", "Task Verification Error");
                        }
@@ -388,6 +396,9 @@ void ArgDialog::setConfig(QJsonObject config) {
  */
 ArgDialog::~ArgDialog() {
   delete m_task;
+  delete m_loader;
+//  delete m_loader_layout;
+//  delete m_loader_widget;
   delete ui;
 }
 
@@ -402,4 +413,36 @@ void ArgDialog::setArgTypes() {
 
 void ArgDialog::notifyClientSuccess() {
   clearPost();
+  displayLoader(false);
+}
+
+void ArgDialog::displayLoader(bool visible) {
+  if (visible) {
+    auto height = 400;
+    auto width = 480;
+    this->setWindowOpacity(0.3);
+    m_loader_widget.setMaximumSize(width, height);
+    m_loader_widget.setMinimumSize(width, height);
+    m_loader_widget.show();
+    m_loader_widget.activateWindow();
+    m_loader_widget.raise();
+    ui->loaderMovie->setMovie(m_loader);
+    ui->loaderMovie->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ui->loaderMovie->show();
+    ui->loaderMovie->activateWindow();
+    ui->loaderMovie->raise();
+    ui->loaderMovie->setMaximumSize(width, height);
+    ui->loaderMovie->setMinimumSize(width, height / 2);
+    ui->loaderText->setMaximumSize(width, height);
+    ui->loaderText->setMinimumSize(width, height / 2);
+    m_loader->start();
+    m_loader_widget.move(this->rect().topLeft());
+  } else {
+    m_loader_widget.hide();
+    ui->loaderMovie->hide();
+    ui->loaderMovie->setVisible(false);
+    ui->loaderText->hide();
+    ui->loaderText->setVisible(false);
+    this->setWindowOpacity(1);
+  }
 }

@@ -489,6 +489,32 @@ padding: 4px;</string>
     </item>
    </layout>
   </widget>
+  <widget class="QLabel" name="loaderText">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>0</width>
+     <height>0</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Sending request to Server. Please wait ...</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="loaderMovie">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>0</width>
+     <height>0</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="kres.qrc"/>
