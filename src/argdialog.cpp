@@ -141,6 +141,10 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
                        }
                        if (m_task->isReady()) {
                          emit ArgDialog::taskRequestReady(m_task);
+                         m_pending_task = m_task;
+                         m_task = nullptr;
+                         m_task = createTask(m_app_name);
+                         clearPost();
                          displayLoader(true);
                        } else {
                          UI::infoMessageBox("Task is still missing arguments", "Task Verification Error");
@@ -157,15 +161,8 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
 
 void ArgDialog::showEvent(QShowEvent* event) {
   if (event->type() == QEvent::Show) {
-    if (m_app_name == Scheduler::INSTAGRAM_NAME) {
-      m_task = new InstagramTask{};
-    } else {
-      m_task = new GenericTask{};
-    }
-
-    if (m_task->isEmpty()) {
-      m_task->defineTaskArguments();
-      m_task->setDefaultValues();
+    if (m_task == nullptr) {
+      m_task = createTask(m_app_name);
     }
 
     ui->argType->clear();
@@ -397,8 +394,6 @@ void ArgDialog::setConfig(QJsonObject config) {
 ArgDialog::~ArgDialog() {
   delete m_task;
   delete m_loader;
-//  delete m_loader_layout;
-//  delete m_loader_widget;
   delete ui;
 }
 
@@ -412,15 +407,19 @@ void ArgDialog::setArgTypes() {
 }
 
 void ArgDialog::notifyClientSuccess() {
-  clearPost();
   displayLoader(false);
+  if (m_pending_task != nullptr) {
+    m_task = m_pending_task;
+    m_pending_task = nullptr;
+  } else {
+    clearPost();
+  }
 }
 
 void ArgDialog::displayLoader(bool visible) {
   if (visible) {
     auto height = 400;
     auto width = 480;
-    this->setWindowOpacity(0.3);
     m_loader_widget.setMaximumSize(width, height);
     m_loader_widget.setMinimumSize(width, height);
     m_loader_widget.show();
@@ -443,6 +442,5 @@ void ArgDialog::displayLoader(bool visible) {
     ui->loaderMovie->setVisible(false);
     ui->loaderText->hide();
     ui->loaderText->setVisible(false);
-    this->setWindowOpacity(1);
   }
 }

@@ -313,6 +313,7 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
     if (isKEvent<QString>(message,
                           Event::TASK_SCHEDULED)) {  // Event was scheduled task
       event_message += ". Details:\n" + parseTaskInfo(v);
+      UI::infoMessageBox(event_message, "Schedule request succeeded");
       arg_ui->notifyClientSuccess(); // Update ArgDialog accordingly
     }
     m_events.push_back(event_message);

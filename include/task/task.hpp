@@ -12,8 +12,6 @@ namespace Scheduler {
 
 enum TaskType { INSTAGRAM = 1, GENERIC = 2, OTHER = 3 };
 
-static constexpr const char* INSTAGRAM_NAME = "Instagram";
-
 /**
  * Files
  */

@@ -10,6 +10,9 @@ const QString HEADER_TYPE = "header";
 const QString FILE_TYPE = "files";
 const QString DESCRIPTION_TYPE = "description";
 }  // namespace Args
+
+static constexpr const char* GENERIC_NAME = "Generic";
+
 namespace TaskCode {
 static constexpr int GENTASKBYTE = 0xFC;
 }
