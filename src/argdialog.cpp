@@ -391,7 +391,9 @@ void ArgDialog::setConfig(QJsonObject config) {
  */
 ArgDialog::~ArgDialog() {
   delete m_task;
-  delete m_pending_task;
+  if (m_pending_task == nullptr) {
+    delete m_pending_task;
+  }
   delete m_loader;
   delete ui;
 }
