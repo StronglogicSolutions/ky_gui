@@ -14,12 +14,10 @@ using namespace Scheduler;
 ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), m_task(nullptr) {
   ui->setupUi(this);
 
-  m_loader = new QMovie{":/icons/loader.gif"};
-  //    m_loader_widget = new QWidget{};
-  //    m_loader_layout = new QVBoxLayout{};
-  m_loader_layout.addWidget(ui->loaderMovie);
-  m_loader_layout.addWidget(ui->loaderText);
-  m_loader_widget.setLayout(&m_loader_layout);
+//  m_loader = new QMovie{":/icons/loader.gif"};
+//  m_loader_layout.addWidget(ui->loaderMovie);
+//  m_loader_layout.addWidget(ui->loaderText);
+//  m_loader_widget.setLayout(&m_loader_layout);
 
   ui->argCommandButtons->button(QDialogButtonBox::Close)
       ->setStyleSheet(QString("background:%1").arg("#2f535f"));
@@ -145,7 +143,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
                          m_task = nullptr;
                          m_task = createTask(m_app_name);
                          clearPost();
-                         displayLoader(true);
+                         // displayLoader(true);
                        } else {
                          UI::infoMessageBox("Task is still missing arguments", "Task Verification Error");
                        }
@@ -408,10 +406,9 @@ void ArgDialog::setArgTypes() {
 }
 
 void ArgDialog::notifyClientSuccess() {
-  displayLoader(false);
+  // displayLoader(false);
   if (m_pending_task != nullptr) {
-    m_task = m_pending_task;
-    m_pending_task = nullptr;
+    delete m_pending_task;
   } else {
     clearPost();
   }
