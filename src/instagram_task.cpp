@@ -228,9 +228,9 @@ Scheduler::TaskType InstagramTask::getType() { return Scheduler::TaskType::INSTA
 /**
  * @brief getTaskCode
  *
- * @return [out] {int} The task bytecode
+ * @return [out] {uint32_t} The task bytecode
  */
-int InstagramTask::getTaskCode() { return TaskCode::IGTASKBYTE; };
+uint32_t InstagramTask::getTaskCode() { return TaskCode::IGTASKBYTE; };
 
 /**
  * @brief InstagramTask::clear

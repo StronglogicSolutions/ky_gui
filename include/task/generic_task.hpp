@@ -91,7 +91,7 @@ class GenericTask : public Scheduler::Task {
    *
    * Returns the task's byte code.
    */
-  virtual int getTaskCode() override;
+  virtual uint32_t getTaskCode() override;
 
   /**
    * Overrides @abstract Task::setArgument

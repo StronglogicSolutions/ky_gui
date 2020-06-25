@@ -205,9 +205,9 @@ Scheduler::TaskType GenericTask::getType() { return Scheduler::TaskType::GENERIC
 /**
  * @brief getTaskCode
  *
- * @return [out] {int} The task bytecode
+ * @return [out] {uint32_t} The task bytecode
  */
-int GenericTask::getTaskCode() { return TaskCode::GENTASKBYTE; };
+uint32_t GenericTask::getTaskCode() { return TaskCode::GENTASKBYTE; };
 
 
 /**

@@ -7,10 +7,25 @@
 #include <memory>
 #include <variant>
 #include <vector>
+#include <map>
 
 namespace Scheduler {
 
 enum TaskType { INSTAGRAM = 1, GENERIC = 2, OTHER = 3 };
+
+namespace TaskCode {
+static constexpr uint32_t GENTASKCODE = 0xFC;
+static constexpr uint32_t IGTASKCODE = 0xFF;
+}
+
+inline static std::map<std::string, uint32_t> TaskCodes{
+    {"Generic", TaskCode::GENTASKCODE},
+    {"Instagram", TaskCode::IGTASKCODE}
+};
+
+inline static uint32_t findTaskCode(QString key) {
+  return TaskCodes.at(key.toUtf8().constData());
+}
 
 /**
  * Files
@@ -289,7 +304,7 @@ class Task {
   virtual ArgumentValues getArgumentValues() = 0;
   virtual QVector<QString> getArgumentNames() = 0;
   virtual TaskType getType() = 0;
-  virtual int getTaskCode() = 0;
+  virtual uint32_t getTaskCode() = 0;
   virtual void defineTaskArguments() = 0;
   virtual void setDefaultValues() = 0;
   virtual const QVector<KFileData> getFiles() = 0;

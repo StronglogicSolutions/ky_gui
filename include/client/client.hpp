@@ -24,13 +24,11 @@ static constexpr int COMMANDS_UPDATE_TYPE = 2;
 static constexpr int EVENT_UPDATE_TYPE = 3;
 static constexpr int PROCESS_REQUEST_TYPE = 4;
 
-using namespace Scheduler;
+//using namespace Scheduler;
 
 namespace TaskCode {
-static constexpr int IGTASKBYTE = 0xFF;
-static constexpr int GENMSGBYTE = 0xFE;
-static constexpr int GENTASKBYTE = 0xFC;
-static constexpr int PINGBYTE = 0xFD;
+static constexpr uint32_t GENMSGBYTE = 0xFE;
+static constexpr uint32_t PINGBYTE = 0xFD;
 }  // namespace TaskCode
 
 typedef std::map<int, std::string> CommandMap;
@@ -98,7 +96,7 @@ class Client : public QDialog {
   bool                          executing;
   bool                          file_was_sent;
 
-  Task*                         m_outbound_task;
+  Scheduler::Task*                         m_outbound_task;
   CommandMap                    m_commands;
   CommandArgMap                 m_command_arg_map;
   std::vector<int>              selected_commands;

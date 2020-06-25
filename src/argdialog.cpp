@@ -159,7 +159,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
 
 void ArgDialog::showEvent(QShowEvent* event) {
   if (event->type() == QEvent::Show) {
-    if (m_task == nullptr) {
+    if (m_task == nullptr || m_task->getTaskCode() != findTaskCode(m_app_name)) {
       m_task = createTask(m_app_name);
     }
 
