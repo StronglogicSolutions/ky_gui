@@ -18,6 +18,15 @@ static constexpr uint32_t GENTASKCODE = 0xFC;
 static constexpr uint32_t IGTASKCODE = 0xFF;
 }
 
+namespace TaskIndex {
+static constexpr uint32_t ERROR = 0x03;
+static constexpr uint32_t UUID = 0x00;
+static constexpr uint32_t ID = 0x01;
+static constexpr uint32_t MASK = 0x02;
+static constexpr uint32_t ENVFILE = 0x03;
+static constexpr uint32_t FILENUM = 0x04;
+} // namespace TaskInfo
+
 inline static std::map<std::string, uint32_t> TaskCodes{
     {"Generic", TaskCode::GENTASKCODE},
     {"Instagram", TaskCode::IGTASKCODE}

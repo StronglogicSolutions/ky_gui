@@ -323,7 +323,14 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
     qDebug() << "Unknown update type. Cannot update UI";
   }
 }
-
+namespace TaskIndex {
+static constexpr uint32_t ERROR = 0x03;
+static constexpr uint32_t UUID = 0x00;
+static constexpr uint32_t ID = 0x01;
+static constexpr uint32_t MASK = 0x02;
+static constexpr uint32_t ENVFILE = 0x03;
+static constexpr uint32_t FILENUM = 0x04;
+} // namespace TaskInfo
 /**
  * @brief MainWindow::parseTaskInfo
  * @param v
@@ -336,14 +343,17 @@ QString MainWindow::parseTaskInfo(StringVec v) {
     return task_info;
   }
   // TODO: We expect 5 arguments. Create a better verification pattern.
-  auto error = v.size() != 5;
+  auto error = v.size() < 5;
   if (error) {
-    task_info += "\n !ERROR! - " + v.at(3);
+    task_info += "\n!ERROR! - " + v.at(TaskIndex::ERROR);
   } else {
-    task_info += "  UUID - " + v.at(0) + "\n  ID - " + v.at(1) + "\n  APP - " +
-                 q_client->getAppName(std::stoi(v.at(2).toUtf8().constData())) +
-                 "\nENV - " + (v.at(3) + "FILES: " + v.at(4));
+    task_info += "UUID - " + v.at(TaskIndex::UUID) + "\nID - " + v.at(TaskIndex::ID) + "\nAPP - " +
+                 q_client->getAppName(std::stoi(v.at(TaskIndex::MASK).toUtf8().constData())) +
+                 "\nENV - " + (v.at(TaskIndex::ENVFILE) + "\nFILES - " + v.at(TaskIndex::FILENUM));
+    for (auto i = 5; i < v.size(); i++) {
+      task_info += "\nFILENAME - " + v.at(i);
     }
+  }
   return task_info;
 }
 
