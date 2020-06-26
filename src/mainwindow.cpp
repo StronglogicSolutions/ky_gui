@@ -323,14 +323,7 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
     qDebug() << "Unknown update type. Cannot update UI";
   }
 }
-namespace TaskIndex {
-static constexpr uint32_t ERROR = 0x03;
-static constexpr uint32_t UUID = 0x00;
-static constexpr uint32_t ID = 0x01;
-static constexpr uint32_t MASK = 0x02;
-static constexpr uint32_t ENVFILE = 0x03;
-static constexpr uint32_t FILENUM = 0x04;
-} // namespace TaskInfo
+
 /**
  * @brief MainWindow::parseTaskInfo
  * @param v
