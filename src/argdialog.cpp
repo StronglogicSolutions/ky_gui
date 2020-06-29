@@ -394,7 +394,7 @@ ArgDialog::~ArgDialog() {
   if (m_pending_task == nullptr) {
     delete m_pending_task;
   }
-  delete m_loader;
+//  delete m_loader;
   delete ui;
 }
 
