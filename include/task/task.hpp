@@ -33,7 +33,10 @@ inline static std::map<std::string, uint32_t> TaskCodes{
 };
 
 inline static uint32_t findTaskCode(QString key) {
-  return TaskCodes.at(key.toUtf8().constData());
+  auto it = TaskCodes.find(key.toUtf8().constData());
+  return it == TaskCodes.end() ?
+    TaskCodes.at("Generic") :
+    (*it).second;
 }
 
 /**
