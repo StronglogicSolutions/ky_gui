@@ -155,6 +155,14 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
     ui->argList->setRowCount(0);
     qDebug() << "Task cleared and restored to default values";
   });
+
+  QObject::connect(ui->recurring, &QComboBox::currentTextChanged, this, [this](const QString& text) {
+    if (m_task->getType() == Scheduler::TaskType::GENERIC) {
+      m_task->setArgument("recurring", findTaskFrequency(text));
+    }
+  });
+
+
 }
 
 void ArgDialog::showEvent(QShowEvent* event) {
@@ -204,14 +212,15 @@ void ArgDialog::setTaskArguments() {
  * @param type
  */
 void ArgDialog::addItem(QString value, QString type) {
+  auto row = ui->argList->rowCount(); // insert row
+  ui->argList->insertRow(row);
+  // Create UI elements
   QTableWidgetItem *item = new QTableWidgetItem(type);
   QTableWidgetItem *item2 = new QTableWidgetItem(value);
-  auto row = ui->argList->rowCount();
-  ui->argList->insertRow(row);
   QPushButton *q_pb = new QPushButton();
   q_pb->setText("Delete");
   q_pb->setIcon(std::move(QIcon(":/icons/icons/quit.png")));
-  // Set listener on Delete button
+  // Delete listener
   QObject::connect(q_pb, &QPushButton::clicked, this, [this]() {
     auto row_index = ui->argList->currentRow();
     auto name = ui->argList->item(row_index, 0)->text();
@@ -224,7 +233,6 @@ void ArgDialog::addItem(QString value, QString type) {
     }
     ui->argList->removeRow(row_index);
   });
-
   ui->argList->setItem(row, 0, item);
   ui->argList->setItem(row, 1, item2);
   ui->argList->setCellWidget(row, 3, q_pb);

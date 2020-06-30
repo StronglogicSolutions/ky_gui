@@ -12,6 +12,7 @@ static const uint8_t DATETIME = 2;
 static const uint8_t FILES = 3;
 static const uint8_t USER = 4;
 static const uint8_t IS_VIDEO = 5;
+static const uint8_t RECURRING = 6;
 }  // namespace TaskIndex
 
 /**
@@ -33,6 +34,7 @@ void GenericTask::defineTaskArguments() {
   m_arguments.emplace_back(std::move(new TaskArgument{"files", Type::FILEVECTOR, QVector<KFileData>{}}));
   m_arguments.emplace_back(std::move(new TaskArgument{"user", Type::TEXT, QString{}}));
   m_arguments.emplace_back(std::move(new TaskArgument{"is_video", Type::BOOLEAN, bool{}}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"recurring", Type::INTEGER, findTaskFrequency("No")}));
 }
 
 /**

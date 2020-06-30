@@ -27,15 +27,29 @@ static constexpr uint32_t ENVFILE = 0x03;
 static constexpr uint32_t FILENUM = 0x04;
 } // namespace TaskInfo
 
-inline static std::map<std::string, uint32_t> TaskCodes{
-    {"Generic", TaskCode::GENTASKCODE},
+inline static const std::map<std::string, uint32_t> TaskCodes{
+    {"Generic",   TaskCode::GENTASKCODE},
     {"Instagram", TaskCode::IGTASKCODE}
+};
+
+inline static const std::map<std::string, uint32_t> TaskFrequency{
+    {"No",      0x00},
+    {"Hourly",  0x01},
+    {"Daily",   0x02},
+    {"Weekly",  0x03}
 };
 
 inline static uint32_t findTaskCode(QString key) {
   auto it = TaskCodes.find(key.toUtf8().constData());
   return it == TaskCodes.end() ?
     TaskCodes.at("Generic") :
+    (*it).second;
+}
+
+inline static int findTaskFrequency(const QString& key) {
+  auto it = TaskFrequency.find(key.toUtf8().constData());
+  return it == TaskFrequency.end() ?
+    TaskCodes.at("No") :
     (*it).second;
 }
 

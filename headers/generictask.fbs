@@ -9,6 +9,7 @@ table GenericTask {
   mask: int;
   header: string;
   user: string;
+  recurring: int;
 }
 
 root_type GenericTask;

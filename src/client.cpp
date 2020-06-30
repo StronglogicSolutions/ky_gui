@@ -306,6 +306,7 @@ void Client::sendTaskEncoded(Scheduler::Task* task) {
               task->getTaskArgumentValue("header")).toUtf8().constData()}),
             builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
               task->getTaskArgumentValue("user")).toUtf8().constData()}));
+              task->getTaskArgumentValue("recurring");
     builder.Finish(generic_task);
   }
 
