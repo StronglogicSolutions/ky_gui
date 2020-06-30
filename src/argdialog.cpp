@@ -193,9 +193,6 @@ void ArgDialog::setTaskArguments() {
     for (const auto &name : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("requested_by"))) {
       requested_by += "@" + name + "";
     }
-    if (requested_by.size() > 1) {
-      requested_by.chop(1);
-    }
     m_task->setArgument("hashtags_string", hashtags);
     m_task->setArgument("requested_by_string", requested_by);
   }
@@ -272,14 +269,20 @@ void ArgDialog::clearTask() { m_task->clear(); }
  */
 void ArgDialog::addRequestedBy(QString value) {
   QStringList names = value.split(" ");
-  QVector<QString> requested_by_names = std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("requested_by"));
+  QVector<QString> requested_by_names =
+      std::get<VariantIndex::STRVEC>(
+          m_task->getTaskArgumentValue("requested_by"));
+
   for (const auto &name : names) {
-    if (std::find(requested_by_names.begin(), requested_by_names.end(), value.toUtf8().constData()) == requested_by_names.end()) {
+    if (std::find(
+            requested_by_names.begin(), requested_by_names.end(),  value.toUtf8().constData()) == requested_by_names.end()) {
       m_task->addArgument("requested_by", name);
       addToArgList(name, "requested_by");
     } else {
-        const char* message = "You have already inputed this name under \"requested_by\"";
+        const char* message =
+          "You have already inputed this name under \"requested_by\"";
         qDebug() << message;
+
         QMessageBox::warning(
             this,
             tr("Requested By"),
