@@ -15,14 +15,17 @@ enum TaskType { INSTAGRAM = 1, GENERIC = 2, OTHER = 3 };
 
 namespace TaskCode {
 static constexpr uint32_t GENTASKCODE = 0xFC;
-static constexpr uint32_t IGTASKCODE = 0xFF;
+static constexpr uint32_t IGTASKCODE  = 0xFF;
 }
 
+static constexpr uint32_t GENERIC_TASK_ID   = 96;
+static constexpr uint32_t INSTAGRAM_TASK_ID = 97;
+
 namespace TaskIndex {
-static constexpr uint32_t ERROR = 0x03;
-static constexpr uint32_t UUID = 0x00;
-static constexpr uint32_t ID = 0x01;
-static constexpr uint32_t MASK = 0x02;
+static constexpr uint32_t ERROR   = 0x03;
+static constexpr uint32_t UUID    = 0x00;
+static constexpr uint32_t ID      = 0x01;
+static constexpr uint32_t MASK    = 0x02;
 static constexpr uint32_t ENVFILE = 0x03;
 static constexpr uint32_t FILENUM = 0x04;
 } // namespace TaskInfo
@@ -64,10 +67,10 @@ enum FileType { VIDEO = 1, IMAGE = 2 };
  * Structure for holding file bytes and metadata
  */
 struct KFileData {
-  QString name;
-  FileType type;
-  QString path;
-  QByteArray bytes;
+  QString     name;
+  FileType    type;
+  QString     path;
+  QByteArray  bytes;
 
 //  friend std::ostream &operator<<(std::ostream &out, const KFileData& file) {
 //    out << "Name: " << file.name.toUtf8()
@@ -82,21 +85,21 @@ struct KFileData {
  * Describes the types of task arguments available for use
  */
 namespace Type {
-static constexpr const char* TEXT = "Text";
-static constexpr const char* FILE = "File";
+static constexpr const char* TEXT         = "Text";
+static constexpr const char* FILE         = "File";
 static constexpr const char* STRINGVECTOR = "StringVector";
-static constexpr const char* FILEVECTOR = "FileVector";
-static constexpr const char* DATETIME = "DateTime";
-static constexpr const char* BOOLEAN = "Boolean";
-static constexpr const char* INTEGER = "Integer";
+static constexpr const char* FILEVECTOR   = "FileVector";
+static constexpr const char* DATETIME     = "DateTime";
+static constexpr const char* BOOLEAN      = "Boolean";
+static constexpr const char* INTEGER      = "Integer";
 }  // namespace Type
 
 namespace VariantIndex {
-static const uint8_t BOOLEAN = 0;
-static const uint8_t INTEGER = 1;
-static const uint8_t STRVEC = 2;
-static const uint8_t QSTRING = 3;
-static const uint8_t FILEVEC = 4;
+static const uint8_t BOOLEAN  = 0;
+static const uint8_t INTEGER  = 1;
+static const uint8_t STRVEC   = 2;
+static const uint8_t QSTRING  = 3;
+static const uint8_t FILEVEC  = 4;
 }  // namespace VariantIndex
 
 inline bool isIndex(uint8_t v, uint8_t i) { return v == i; }
@@ -144,19 +147,20 @@ class TaskArgumentBase {
  */
 class TaskArgument : TaskArgumentBase {
  public:
-  TaskArgument(QString n, ArgumentType t, TypeVariant _value) {
-    name = n;
-    type = t;
-    value = _value;
-  }
+  TaskArgument(QString n, ArgumentType t, TypeVariant _value)
+      : name(n),
+        type(t),
+        value(_value) {}
   /**
    * Move Constructor
    *
    * @constructor
    * @param [in] {TaskArgument&&} a The R-value reference to a TaskArgument
    */
-  TaskArgument(TaskArgument&& a) :
-                                   name(std::move(a.name)), type(std::move(a.type)), value(std::move(a.value)) {}
+  TaskArgument(TaskArgument&& a)
+      : name(std::move(a.name)),
+        type(std::move(a.type)),
+        value(std::move(a.value)) {}
 
   /**
    * Copy Constructor
@@ -164,8 +168,10 @@ class TaskArgument : TaskArgumentBase {
    * @constructor
    * @param [in] {TaskArgument&&} a The const reference to a TaskArgument
    */
-  TaskArgument(const TaskArgument& a) :
-                                        name(std::move(a.name)), type(std::move(a.type)), value(std::move(a.value)) {}
+  TaskArgument(const TaskArgument& a)
+      : name(std::move(a.name)),
+        type(std::move(a.type)),
+        value(std::move(a.value)) {}
   /**
    * text
    * @returns {QString} The name of the argument
@@ -305,9 +311,9 @@ class TaskArgument : TaskArgumentBase {
   }
 
  private:
-  QString name;
-  ArgumentType type;
-  TypeVariant value;
+  QString       name;
+  ArgumentType  type;
+  TypeVariant   value;
 };
 
 using TaskArguments = std::vector<TaskArgument*>;

@@ -28,6 +28,94 @@ static const int HEADER_SIZE = 4;
 
 flatbuffers::FlatBufferBuilder builder(1024);
 
+namespace Task {
+/**
+ * @brief getTaskFileInfo
+ * @param [in] {std::vector<SentFile>} files The files to produce an information string from
+ * @return std::string A string with the following format denoting each file:
+ * `1580057341filename|image::`
+ */
+std::string getTaskFileInfo(std::vector<SentFile> files) {
+  std::string info{};
+  for (const auto& f : files) {
+    info += std::to_string(f.timestamp);
+    info += f.name.toUtf8().constData();
+    info += "|";
+    if (f.type == Scheduler::FileType::VIDEO) {
+      info += "video";
+    } else {
+      info += "image";
+    }
+    info += ":";
+  }
+  qDebug() << "File Info: " << info.c_str();
+  return info;
+}
+
+flatbuffers::Offset<GenericTask> createGenericTask(
+    Scheduler::Task* task, uint32_t app_mask, std::vector<SentFile> sent_files) {
+  return CreateGenericTask(
+    builder,
+    Scheduler::GENERIC_TASK_ID, // ID
+    builder.CreateString(getTaskFileInfo(sent_files)),
+    builder.CreateString(
+      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+        task->getTaskArgumentValue("datetime")).toUtf8().constData()}),
+    builder.CreateString(
+      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+        task->getTaskArgumentValue("description")).toUtf8().constData()}),
+      std::get<Scheduler::VariantIndex::BOOLEAN>(
+        task->getTaskArgumentValue("is_video")),
+        app_mask,
+    builder.CreateString(
+      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+        task->getTaskArgumentValue("header")).toUtf8().constData()}),
+    builder.CreateString(
+      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+        task->getTaskArgumentValue("user")).toUtf8().constData()}),
+      std::get<Scheduler::VariantIndex::INTEGER>(
+        task->getTaskArgumentValue("recurring")));
+}
+
+flatbuffers::Offset<IGTask> createIGTask(
+    Scheduler::Task* task, uint32_t app_mask, std::vector<SentFile> sent_files) {
+  return CreateIGTask(
+    builder,
+    Scheduler::INSTAGRAM_TASK_ID, // ID
+    builder.CreateString(getTaskFileInfo(sent_files)),
+    builder.CreateString(
+      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+        task->getTaskArgumentValue("datetime")).toUtf8().constData()}),
+    builder.CreateString(
+      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+        task->getTaskArgumentValue("description")).toUtf8().constData()}),
+    builder.CreateString(
+      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+        task->getTaskArgumentValue("hashtags_string")).toUtf8().constData()}),
+    builder.CreateString(
+      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+        task->getTaskArgumentValue("requested_by_string")).toUtf8().constData()}),
+    builder.CreateString(
+      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+        task->getTaskArgumentValue("requested_by_phrase")).toUtf8().constData()}),
+    builder.CreateString(
+      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+        task->getTaskArgumentValue("promote_share")).toUtf8().constData()}),
+    builder.CreateString(
+      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+        task->getTaskArgumentValue("link_in_bio")).toUtf8().constData()}),
+    std::get<Scheduler::VariantIndex::BOOLEAN>(
+        task->getTaskArgumentValue("is_video")),
+        app_mask,
+    builder.CreateString(
+      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+        task->getTaskArgumentValue("header")).toUtf8().constData()}),
+    builder.CreateString(
+      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+        task->getTaskArgumentValue("user")).toUtf8().constData()}));
+}
+}
+
 /**
  * @param [in] {std::function<void()>} cb A non-returning function to be called without parameter
  * @returns {MessageHandler} A message loop handler
@@ -233,81 +321,17 @@ void Client::sendEncoded(std::string message) {
 }
 
 /**
- * @brief getTaskFileInfo
- * @param [in] {std::vector<SentFile>} files The files to produce an information string from
- * @return std::string A string with the following format denoting each file:
- * `1580057341filename|image::`
- */
-std::string getTaskFileInfo(std::vector<SentFile> files) {
-    std::string info{};
-    for (const auto& f : files) {
-        info += std::to_string(f.timestamp);
-        info += f.name.toUtf8().constData();
-        info += "|";
-        if (f.type == Scheduler::FileType::VIDEO) {
-            info += "video";
-        } else {
-            info += "image";
-        }
-        info += ":";
-    }
-    qDebug() << "File Info: " << info.c_str();
-    return info;
-}
-
-/**
  * @brief Client::sendTaskEncoded
  * @param [in] {Scheduler::Task*} task The task arguments
  */
 void Client::sendTaskEncoded(Scheduler::Task* task) {
-  qDebug() << getSelectedApp();
   if (task->getType() == Scheduler::TaskType::INSTAGRAM) {
     flatbuffers::Offset<IGTask> ig_task =
-        CreateIGTask(
-            builder,
-            96, // ID
-            builder.CreateString(getTaskFileInfo(sent_files)),
-            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-              task->getTaskArgumentValue("datetime")).toUtf8().constData()}),
-            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-              task->getTaskArgumentValue("description")).toUtf8().constData()}),
-            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-              task->getTaskArgumentValue("hashtags_string")).toUtf8().constData()}),
-            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-              task->getTaskArgumentValue("requested_by_string")).toUtf8().constData()}),
-            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-              task->getTaskArgumentValue("requested_by_phrase")).toUtf8().constData()}),
-            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-              task->getTaskArgumentValue("promote_share")).toUtf8().constData()}),
-            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-              task->getTaskArgumentValue("link_in_bio")).toUtf8().constData()}),
-            std::get<Scheduler::VariantIndex::BOOLEAN>(
-              task->getTaskArgumentValue("is_video")),
-              getSelectedApp(),
-            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-              task->getTaskArgumentValue("header")).toUtf8().constData()}),
-            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-              task->getTaskArgumentValue("user")).toUtf8().constData()}));
+      Task::createIGTask(task, getSelectedApp(), sent_files);
     builder.Finish(ig_task);
   } else {
     flatbuffers::Offset<GenericTask> generic_task =
-        CreateGenericTask(
-            builder,
-              96, // ID
-            builder.CreateString(getTaskFileInfo(sent_files)),
-            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-              task->getTaskArgumentValue("datetime")).toUtf8().constData()}),
-            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-              task->getTaskArgumentValue("description")).toUtf8().constData()}),
-            std::get<Scheduler::VariantIndex::BOOLEAN>(
-              task->getTaskArgumentValue("is_video")),
-              getSelectedApp(),
-            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-              task->getTaskArgumentValue("header")).toUtf8().constData()}),
-            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-              task->getTaskArgumentValue("user")).toUtf8().constData()}));
-            std::get<Scheduler::VariantIndex::INTEGER>(
-              task->getTaskArgumentValue("recurring"));
+      Task::createGenericTask(task, getSelectedApp(), sent_files);
     builder.Finish(generic_task);
   }
 
