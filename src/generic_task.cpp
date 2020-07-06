@@ -6,13 +6,14 @@ using namespace Scheduler;
  * These values contained inside the TaskIndex namespace represent the order in which the tasks are to be stored.
  */
 namespace TaskIndex {
-static const uint8_t HEADER = 0;
-static const uint8_t DESCRIPTION = 1;
-static const uint8_t DATETIME = 2;
-static const uint8_t FILES = 3;
-static const uint8_t USER = 4;
-static const uint8_t IS_VIDEO = 5;
-static const uint8_t RECURRING = 6;
+static const uint8_t HEADER       = 0;
+static const uint8_t DESCRIPTION  = 1;
+static const uint8_t DATETIME     = 2;
+static const uint8_t FILES        = 3;
+static const uint8_t USER         = 4;
+static const uint8_t IS_VIDEO     = 5;
+static const uint8_t RECURRING    = 6;
+static const uint8_t NOTIFY       = 7;
 }  // namespace TaskIndex
 
 /**
@@ -35,6 +36,7 @@ void GenericTask::defineTaskArguments() {
   m_arguments.emplace_back(std::move(new TaskArgument{"user", Type::TEXT, QString{}}));
   m_arguments.emplace_back(std::move(new TaskArgument{"is_video", Type::BOOLEAN, bool{}}));
   m_arguments.emplace_back(std::move(new TaskArgument{"recurring", Type::INTEGER, findTaskFrequency("No")}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"notify", Type::BOOLEAN, false}));
 }
 
 /**

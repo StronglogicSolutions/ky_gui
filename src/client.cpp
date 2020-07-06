@@ -74,7 +74,10 @@ flatbuffers::Offset<GenericTask> createGenericTask(
       std::string{std::get<Scheduler::VariantIndex::QSTRING>(
         task->getTaskArgumentValue("user")).toUtf8().constData()}),
       std::get<Scheduler::VariantIndex::INTEGER>(
-        task->getTaskArgumentValue("recurring")));
+        task->getTaskArgumentValue("recurring")),
+      std::get<Scheduler::VariantIndex::BOOLEAN>(
+        task->getTaskArgumentValue("notify"))
+      );
 }
 
 flatbuffers::Offset<IGTask> createIGTask(
