@@ -35,7 +35,7 @@ inline static const std::map<std::string, uint32_t> TaskCodes{
     {"Instagram", TaskCode::IGTASKCODE}
 };
 
-inline static const std::map<std::string, uint32_t> TaskFrequency{
+inline static const std::map<std::string, int> TaskFrequency{
     {"No",      0x00},
     {"Hourly",  0x01},
     {"Daily",   0x02},

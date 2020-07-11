@@ -58,26 +58,29 @@ flatbuffers::Offset<GenericTask> createGenericTask(
     builder,
     Scheduler::GENERIC_TASK_ID, // ID
     builder.CreateString(getTaskFileInfo(sent_files)),
-    builder.CreateString(
-      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-        task->getTaskArgumentValue("datetime")).toUtf8().constData()}),
-    builder.CreateString(
-      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-        task->getTaskArgumentValue("description")).toUtf8().constData()}),
-      std::get<Scheduler::VariantIndex::BOOLEAN>(
-        task->getTaskArgumentValue("is_video")),
-        app_mask,
-    builder.CreateString(
-      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-        task->getTaskArgumentValue("header")).toUtf8().constData()}),
-    builder.CreateString(
-      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-        task->getTaskArgumentValue("user")).toUtf8().constData()}),
-      std::get<Scheduler::VariantIndex::INTEGER>(
-        task->getTaskArgumentValue("recurring")),
-      std::get<Scheduler::VariantIndex::BOOLEAN>(
-        task->getTaskArgumentValue("notify"))
-      );
+    builder.CreateString(std::string{std::get<QString>(
+      task->getTaskArgumentValue("datetime")).toUtf8().constData()
+    }),
+    builder.CreateString(std::string{std::get<QString>(
+      task->getTaskArgumentValue("description")).toUtf8().constData()
+    }),
+    std::get<bool>(
+      task->getTaskArgumentValue("is_video")
+    ),
+      app_mask,
+    builder.CreateString(std::string{std::get<QString>(
+      task->getTaskArgumentValue("header")).toUtf8().constData()
+    }),
+    builder.CreateString(std::string{std::get<QString>(
+      task->getTaskArgumentValue("user")).toUtf8().constData()
+    }),
+    std::get<int>(
+      task->getTaskArgumentValue("recurring")
+    ),
+    std::get<bool>(
+      task->getTaskArgumentValue("notify")
+    )
+  );
 }
 
 flatbuffers::Offset<IGTask> createIGTask(
@@ -86,35 +89,26 @@ flatbuffers::Offset<IGTask> createIGTask(
     builder,
     Scheduler::INSTAGRAM_TASK_ID, // ID
     builder.CreateString(getTaskFileInfo(sent_files)),
-    builder.CreateString(
-      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+    builder.CreateString(std::string{std::get<QString>(
         task->getTaskArgumentValue("datetime")).toUtf8().constData()}),
-    builder.CreateString(
-      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+    builder.CreateString(std::string{std::get<QString>(
         task->getTaskArgumentValue("description")).toUtf8().constData()}),
-    builder.CreateString(
-      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+    builder.CreateString(std::string{std::get<QString>(
         task->getTaskArgumentValue("hashtags_string")).toUtf8().constData()}),
-    builder.CreateString(
-      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+    builder.CreateString(std::string{std::get<QString>(
         task->getTaskArgumentValue("requested_by_string")).toUtf8().constData()}),
-    builder.CreateString(
-      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+    builder.CreateString(std::string{std::get<QString>(
         task->getTaskArgumentValue("requested_by_phrase")).toUtf8().constData()}),
-    builder.CreateString(
-      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+    builder.CreateString(std::string{std::get<QString>(
         task->getTaskArgumentValue("promote_share")).toUtf8().constData()}),
-    builder.CreateString(
-      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+    builder.CreateString(std::string{std::get<QString>(
         task->getTaskArgumentValue("link_in_bio")).toUtf8().constData()}),
-    std::get<Scheduler::VariantIndex::BOOLEAN>(
+    std::get<bool>(
         task->getTaskArgumentValue("is_video")),
         app_mask,
-    builder.CreateString(
-      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+    builder.CreateString(std::string{std::get<QString>(
         task->getTaskArgumentValue("header")).toUtf8().constData()}),
-    builder.CreateString(
-      std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+    builder.CreateString(std::string{std::get<QString>(
         task->getTaskArgumentValue("user")).toUtf8().constData()}));
 }
 }
@@ -141,8 +135,8 @@ Client::Client(QWidget *parent,
       argc(count),
       argv(arguments),
       m_client_socket_fd(-1),
-      m_outbound_task(nullptr),
       executing(false),
+      m_outbound_task(nullptr),
       m_commands({}){
   // Register metadata type for passing data over slots/signals
   qRegisterMetaType<QVector<QString>>("QVector<QString>");
@@ -160,40 +154,40 @@ Client::~Client() {
  * @brief Client::handleMessages
  */
 void Client::handleMessages() {
-    uint8_t receive_buffer[MAX_PACKET_SIZE];
-    for (;;) {
-        memset(receive_buffer, 0, MAX_PACKET_SIZE);
-        ssize_t bytes_received = 0;
-        bytes_received = recv(m_client_socket_fd, receive_buffer, MAX_PACKET_SIZE, 0);
-        if (bytes_received < 1) { // Finish message loop
-            break;
-        }
-        size_t end_idx = findNullIndex(receive_buffer);
-        std::string data_string{receive_buffer, receive_buffer + end_idx};
-        if (isPong(data_string.c_str())) {
-            qDebug() << "Server returned pong";
-            continue;
-        }
-        StringVec s_v{};
-        if (isNewSession(data_string.c_str())) { // Session Start
-            m_commands = getArgMap(data_string.c_str());
-            for (const auto& [k, v] : m_commands) { // Receive available commands
-                s_v.push_back(v.data());
-            }
-            emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", s_v); // Update UI
-        } else if (serverWaitingForFile(data_string.c_str())) { // Server expects a file
-            processFileQueue();
-        } else if (isEvent(data_string.c_str())) { // Receiving event
-          handleEvent(data_string);
-        }
-        std::string formatted_json = getJsonString(data_string);
-        emit Client::messageReceived(
-            MESSAGE_UPDATE_TYPE,
-            QString::fromUtf8(formatted_json.data(), formatted_json.size()), {}
-        );
+  uint8_t receive_buffer[MAX_PACKET_SIZE];
+  for (;;) {
+    memset(receive_buffer, 0, MAX_PACKET_SIZE);
+    ssize_t bytes_received = 0;
+    bytes_received = recv(m_client_socket_fd, receive_buffer, MAX_PACKET_SIZE, 0);
+    if (bytes_received < 1) { // Finish message loop
+        break;
     }
-    memset(receive_buffer, 0, 2048);
-    ::close(m_client_socket_fd);
+    size_t end_idx = findNullIndex(receive_buffer);
+    std::string data_string{receive_buffer, receive_buffer + end_idx};
+    if (isPong(data_string.c_str())) {
+      qDebug() << "Server returned pong";
+      continue;
+    }
+    StringVec s_v{};
+    if (isNewSession(data_string.c_str())) { // Session Start
+      m_commands = getArgMap(data_string.c_str());
+      for (const auto& [k, v] : m_commands) { // Receive available commands
+        s_v.push_back(v.data());
+      }
+      emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", s_v); // Update UI
+    } else if (serverWaitingForFile(data_string.c_str())) { // Server expects a file
+      processFileQueue();
+    } else if (isEvent(data_string.c_str())) { // Receiving event
+      handleEvent(data_string);
+    }
+    std::string formatted_json = getJsonString(data_string);
+    emit Client::messageReceived(
+      MESSAGE_UPDATE_TYPE,
+      QString::fromUtf8(formatted_json.data(), formatted_json.size()), {}
+    );
+  }
+  memset(receive_buffer, 0, 2048);
+  ::close(m_client_socket_fd);
 }
 
 void Client::handleEvent(std::string data) {
@@ -203,13 +197,14 @@ void Client::handleEvent(std::string data) {
   if (isUploadCompleteEvent(event.toUtf8().constData())) { // Upload complete
     if (!args.isEmpty()) {
       sent_files.at(sent_files.size() - 1).timestamp =
-          std::stoi(args.at(0).toUtf8().constData()); // mark file with server-generated timestamp
+        std::stoi(args.at(0).toUtf8().constData()); // mark file with server-generated timestamp
       if (outgoing_files.isEmpty()) { // Task files are all sent
         sendTaskEncoded(m_outbound_task); // Send remaining task data to complete scheduling
         file_was_sent = false;
       } else { // Begin file upload operation. Task will be sent after all outgoing files are sent.
         sendEncoded(
-            createOperation("FileUpload", {"Subsequent file"}));
+          createOperation("FileUpload", {"Subsequent file"})
+        );
       }
     }
   }
@@ -222,8 +217,8 @@ void Client::processFileQueue() {
   Scheduler::KFileData outgoing_file = outgoing_files.dequeue();
   sendFileEncoded(outgoing_file.bytes);
   sent_files.push_back(SentFile{
-      .name = outgoing_file.name,
-      .type = outgoing_file.type
+    .name = outgoing_file.name,
+    .type = outgoing_file.type
   });
 }
 
@@ -231,47 +226,49 @@ void Client::processFileQueue() {
  * @brief Client::start
  */
 void Client::start() {
-    if (m_client_socket_fd == -1) {
-        m_client_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-        if (m_client_socket_fd != -1) {
-            sockaddr_in server_socket;
-            char* end;
-            server_socket.sin_family = AF_INET;
-            auto port_value = strtol(argv[2], &end, 10);
-            if (port_value < 0 || end == argv[2]) {
-                return;
-            }
-            int socket_option = 1;
-            // Free up the port to begin listening again
-            setsockopt(m_client_socket_fd, SOL_SOCKET, SO_REUSEADDR, &socket_option,
-                       sizeof(socket_option));
+  if (m_client_socket_fd == -1) {
+    m_client_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (m_client_socket_fd != -1) {
+      sockaddr_in server_socket;
+      char* end;
+      server_socket.sin_family = AF_INET;
+      auto port_value = strtol(argv[2], &end, 10);
+      if (port_value < 0 || end == argv[2]) {
+          return;
+      }
+      int socket_option = 1;
+      // Free up the port to begin listening again
+      setsockopt(
+        m_client_socket_fd, SOL_SOCKET, SO_REUSEADDR, &socket_option,
+        sizeof(socket_option)
+      );
 
-            server_socket.sin_port = htons(port_value);
-            inet_pton(AF_INET, argv[1], &server_socket.sin_addr.s_addr);
+      server_socket.sin_port = htons(port_value);
+      inet_pton(AF_INET, argv[1], &server_socket.sin_addr.s_addr);
 
-            if (::connect(m_client_socket_fd, reinterpret_cast<sockaddr*>(&server_socket),
-                          sizeof(server_socket)) != -1) {
-                std::string start_operation_string = createOperation("start", {});
-                // Send operation as an encoded message
-                sendEncoded(start_operation_string);
-                // Delegate message handling to its own thread
-                std::function<void()> message_send_fn = [this]() {
-                    this->handleMessages();
-                };
-                MessageHandler message_handler = createMessageHandler(message_send_fn);
-                // Handle received messages on separate thread
-                std::thread (message_handler).detach();
+      if (::connect(m_client_socket_fd, reinterpret_cast<sockaddr*>(&server_socket),
+                    sizeof(server_socket)) != -1) {
+          std::string start_operation_string = createOperation("start", {});
+          // Send operation as an encoded message
+          sendEncoded(start_operation_string);
+          // Delegate message handling to its own thread
+          std::function<void()> message_send_fn = [this]() {
+            this->handleMessages();
+          };
+          MessageHandler message_handler = createMessageHandler(message_send_fn);
+          // Handle received messages on separate thread
+          std::thread (message_handler).detach();
 
-            } else {
-                qDebug() << errno;
-                ::close(m_client_socket_fd);
-            }
-        } else {
-            qDebug() << "Failed to create new connection";
-        }
+      } else {
+        qDebug() << errno;
+        ::close(m_client_socket_fd);
+      }
     } else {
-        qDebug() << "Connection already in progress";
+      qDebug() << "Failed to create new connection";
     }
+  } else {
+    qDebug() << "Connection already in progress";
+  }
 }
 
 /**
@@ -279,15 +276,15 @@ void Client::start() {
  * @param [in] {const QString&} The message to send
  */
 void Client::sendMessage(const QString& s) {
-    if (m_client_socket_fd != -1) {
-        std::string json_string {"{\"type\":\"custom\", \"message\": \""};
-        json_string += s.toUtf8().data();
-        json_string += "\", \"args\":\"placeholder\"}";
-        // Send custom message as an encoded message
-        sendEncoded(json_string);
-    } else {
-        qDebug() << "You must first open a connection";
-    }
+  if (m_client_socket_fd != -1) {
+    std::string json_string {"{\"type\":\"custom\", \"message\": \""};
+    json_string += s.toUtf8().data();
+    json_string += "\", \"args\":\"placeholder\"}";
+    // Send custom message as an encoded message
+    sendEncoded(json_string);
+  } else {
+    qDebug() << "You must first open a connection";
+  }
 }
 
 /**
@@ -295,32 +292,32 @@ void Client::sendMessage(const QString& s) {
  * @param [in] {std::string message} The message to send
  */
 void Client::sendEncoded(std::string message) {
-    std::vector<uint8_t> fb_byte_vector{message.begin(), message.end()};
-    auto byte_vector = builder.CreateVector(fb_byte_vector);
-    auto k_message = CreateMessage(builder, 69, byte_vector);
+  std::vector<uint8_t> fb_byte_vector{message.begin(), message.end()};
+  auto byte_vector = builder.CreateVector(fb_byte_vector);
+  auto k_message = CreateMessage(builder, 69, byte_vector);
 
-    builder.Finish(k_message);
+  builder.Finish(k_message);
 
-    uint8_t* encoded_message_buffer = builder.GetBufferPointer();
-    uint32_t size = builder.GetSize();
+  uint8_t* encoded_message_buffer = builder.GetBufferPointer();
+  uint32_t size = builder.GetSize();
 
-    uint8_t send_buffer[MAX_PACKET_SIZE];
-    memset(send_buffer, 0, MAX_PACKET_SIZE);
-    send_buffer[0] = (size & 0xFF) >> 24;
-    send_buffer[1] = (size & 0xFF) >> 16;
-    send_buffer[2] = (size & 0xFF) >> 8;
-    send_buffer[3] = (size & 0xFF);
-    send_buffer[4] = (TaskCode::GENMSGBYTE & 0xFF);
-    std::memcpy(send_buffer + 5, encoded_message_buffer, size);
-    qDebug() << "Sending encoded message";
-    std::string message_to_send{};
-    for (unsigned int i = 0; i < (size + 5); i++) {
-        message_to_send += (char)*(send_buffer + i);
-    }
-    qDebug() << "Encoded message size: " << (size + 5);
-    // Send start operation
-    ::send(m_client_socket_fd, send_buffer, size + 5, 0);
-    builder.Clear();
+  uint8_t send_buffer[MAX_PACKET_SIZE];
+  memset(send_buffer, 0, MAX_PACKET_SIZE);
+  send_buffer[0] = (size & 0xFF) >> 24;
+  send_buffer[1] = (size & 0xFF) >> 16;
+  send_buffer[2] = (size & 0xFF) >> 8;
+  send_buffer[3] = (size & 0xFF);
+  send_buffer[4] = (TaskCode::GENMSGBYTE & 0xFF);
+  std::memcpy(send_buffer + 5, encoded_message_buffer, size);
+  qDebug() << "Sending encoded message";
+  std::string message_to_send{};
+  for (unsigned int i = 0; i < (size + 5); i++) {
+      message_to_send += (char)*(send_buffer + i);
+  }
+  qDebug() << "Encoded message size: " << (size + 5);
+  // Send start operation
+  ::send(m_client_socket_fd, send_buffer, size + 5, 0);
+  builder.Clear();
 }
 
 /**
@@ -344,19 +341,14 @@ void Client::sendTaskEncoded(Scheduler::Task* task) {
 
   memset(send_buffer, 0, MAX_PACKET_SIZE);
 
-  send_buffer[0] = (size >> 24) & 0xFF;
-  send_buffer[1] = (size >> 16) & 0xFF;
-  send_buffer[2] = (size >> 8) & 0xFF;
-  send_buffer[3] = size & 0xFF;
+  send_buffer[0] = (size >> 24)         & 0xFF;
+  send_buffer[1] = (size >> 16)         & 0xFF;
+  send_buffer[2] = (size >> 8)          & 0xFF;
+  send_buffer[3] = size                 & 0xFF;
   send_buffer[4] = (task->getTaskCode() & 0xFF);
 
   std::memcpy(send_buffer + 5, encoded_message_buffer, size);
-  qDebug() << "Ready to send:";
-  std::string message_to_send{};
-  for (unsigned int i = 0; i < (size + 5); i++) {
-    message_to_send += (char)*(send_buffer + i);
-  }
-  qDebug() << "Final size: " << (size + 5);
+  qDebug() << "Ready to send task";
   // Send start operation
   ::send(m_client_socket_fd, send_buffer, size + 5, 0);
   // Cleanup and process queue
@@ -381,51 +373,48 @@ void Client::sendTaskEncoded(Scheduler::Task* task) {
  * @param [in] {int}      size The size of the buffer to be packetized and sent
  */
 void Client::sendPackets(uint8_t* data, int size) {
-    uint32_t total_size = static_cast<uint32_t>(size + HEADER_SIZE);
-    uint32_t total_packets = static_cast<uint32_t>(ceil(
-        static_cast<double>(
-            static_cast<double>(total_size) / static_cast<double>(MAX_PACKET_SIZE)) // total size / packet
-        )
-    );
-    uint32_t idx = 0;
-    for (; idx < total_packets; idx++) {
-        bool is_first_packet = (idx == 0);
-        bool is_last_packet = (idx == (total_packets - 1));
-        if (is_first_packet) {
-          uint32_t first_packet_size =
-              std::min(size + HEADER_SIZE, MAX_PACKET_SIZE);
-          uint8_t packet[first_packet_size];
+  uint32_t total_size = static_cast<uint32_t>(size + HEADER_SIZE);
+  uint32_t total_packets = static_cast<uint32_t>(ceil(
+      static_cast<double>(
+          static_cast<double>(total_size) / static_cast<double>(MAX_PACKET_SIZE)) // total size / packet
+      )
+  );
+  uint32_t idx = 0;
+  for (; idx < total_packets; idx++) {
+    bool is_first_packet = (idx == 0);
+    bool is_last_packet = (idx == (total_packets - 1));
+    if (is_first_packet) {
+      uint32_t first_packet_size =
+          std::min(size + HEADER_SIZE, MAX_PACKET_SIZE);
+      uint8_t packet[first_packet_size];
 
-          packet[0] = (total_size >> 24) & 0xFF;
-          packet[1] = (total_size >> 16) & 0xFF;
-          packet[2] = (total_size >> 8) & 0xFF;
-          packet[3] = (total_size) & 0xFF;
+      packet[0] = (total_size >> 24) & 0xFF;
+      packet[1] = (total_size >> 16) & 0xFF;
+      packet[2] = (total_size >> 8)  & 0xFF;
+      packet[3] = (total_size)       & 0xFF;
 
-          std::memcpy(packet + HEADER_SIZE, data, first_packet_size - HEADER_SIZE);
-          /**
-           * SEND PACKET !!!
-           */
-          ::send(m_client_socket_fd, packet, first_packet_size, 0);
-          if (is_last_packet) {
-            break;
-          }
-          continue;
-        }
-        int offset = (idx * MAX_PACKET_SIZE) - HEADER_SIZE;
-        uint32_t packet_size = std::min(size - offset, MAX_PACKET_SIZE);
-        uint8_t packet[packet_size];
-
-        std::memcpy(packet, data + offset, packet_size);
-        /**
-         * SEND PACKET !!!
-         */
-        ::send(m_client_socket_fd, packet, packet_size, 0);
-        if (is_last_packet) {
-            // cleanup
-            qDebug() << "Last packet of file sent";
-            file_was_sent = true;
-        }
+      std::memcpy(packet + HEADER_SIZE, data, first_packet_size - HEADER_SIZE);
+      /**
+       * SEND PACKET !!!
+       */
+      ::send(m_client_socket_fd, packet, first_packet_size, 0);
+      if (is_last_packet) {
+        break;
+      }
+      continue;
     }
+    int offset = (idx * MAX_PACKET_SIZE) - HEADER_SIZE;
+    uint32_t packet_size = std::min(size - offset, MAX_PACKET_SIZE);
+    uint8_t packet[packet_size];
+
+    std::memcpy(packet, data + offset, packet_size);
+    // Send packet
+    ::send(m_client_socket_fd, packet, packet_size, 0);
+    if (is_last_packet) {
+      qDebug() << "Last packet of file sent";
+      file_was_sent = true;
+    }
+  }
 }
 
 void Client::ping() {
@@ -448,24 +437,24 @@ void Client::ping() {
  * @param [in] {QByteArray} bytes An array of bytes to send
  */
 void Client::sendFileEncoded(QByteArray bytes) {
-    sendPackets(reinterpret_cast<uint8_t*>(bytes.data()), bytes.size());
+  sendPackets(reinterpret_cast<uint8_t*>(bytes.data()), bytes.size());
 }
 
 /**
  * @brief Client::closeConnection
  */
 void Client::closeConnection() {
-    if (m_client_socket_fd != -1) {
-        std::string stop_operation_string = createOperation("stop", {});
-        // Send operation as an encoded message
-        sendEncoded(stop_operation_string);
-        // Clean up socket file descriptor
-        ::shutdown(m_client_socket_fd, SHUT_RDWR);
-        ::close(m_client_socket_fd);
-        m_client_socket_fd = -1;
-        return;
-    }
-    qDebug() << "There is no active connection to close";
+  if (m_client_socket_fd != -1) {
+    std::string stop_operation_string = createOperation("stop", {});
+    // Send operation as an encoded message
+    sendEncoded(stop_operation_string);
+    // Clean up socket file descriptor
+    ::shutdown(m_client_socket_fd, SHUT_RDWR);
+    ::close(m_client_socket_fd);
+    m_client_socket_fd = -1;
+    return;
+  }
+  qDebug() << "There is no active connection to close";
 }
 
 /**
@@ -473,15 +462,15 @@ void Client::closeConnection() {
  * @param [in] TYPE SHOULD CHANGE app_names
  */
 void Client::setSelectedApp(std::vector<QString> app_names) {
-    selected_commands.clear();
-    for (const auto& name : app_names) {
-        qDebug() << "Matching mask to " << name;
-        for (const auto& command : m_commands) {
-            if (command.second.c_str() == name.toUtf8()) {
-                selected_commands.push_back(command.first);
-            }
-        }
+  selected_commands.clear();
+  for (const auto& name : app_names) {
+    qDebug() << "Matching mask to " << name;
+    for (const auto& command : m_commands) {
+      if (command.second.c_str() == name.toUtf8()) {
+          selected_commands.push_back(command.first);
+      }
     }
+  }
 }
 
 /**
@@ -489,12 +478,12 @@ void Client::setSelectedApp(std::vector<QString> app_names) {
  * @returns {int} The mask representing the selected application
  */
 int Client::getSelectedApp() {
-    if (selected_commands.size() == 1) {
-        return selected_commands.at(0);
-    } else {
-        QMessageBox::warning(this, tr("App Selection Error"), tr("Unable to retrieve app selection"));
-    }
-    return -1;
+  if (selected_commands.size() == 1) {
+    return selected_commands.at(0);
+  } else {
+    QMessageBox::warning(this, tr("App Selection Error"), tr("Unable to retrieve app selection"));
+  }
+  return -1;
 }
 
 /**
@@ -503,28 +492,35 @@ int Client::getSelectedApp() {
  * @returns {QString} The application name
  */
 QString Client::getAppName(int mask) {
-    auto app = m_commands.find(mask);
-    if (app != m_commands.end()) {
-        return QString{app->second.c_str()};
-    }
-    return QString{""};
+  auto app = m_commands.find(mask);
+  if (app != m_commands.end()) {
+    return QString{app->second.c_str()};
+  }
+  return QString{""};
 }
 
 /**
  * @brief Client::execute
  */
 void Client::execute() {
-    if (!selected_commands.empty()) {
-        executing = true;
-        for (const auto& command : selected_commands) {
-            auto app_name = getAppName(command);
-            auto message = app_name + " pending";
-            auto request_id = QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces);
-            emit Client::messageReceived(PROCESS_REQUEST_TYPE, message, { QString{command}, app_name, request_id });
-            std::string execute_operation = createOperation("Execute", {std::to_string(command), std::string(request_id.toUtf8().constData())});
-            sendEncoded(execute_operation);
-        }
+  if (!selected_commands.empty()) {
+    executing = true;
+    for (const auto& command : selected_commands) {
+      auto app_name = getAppName(command);
+      auto message = app_name + " pending";
+      auto request_id =
+        QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces);
+      emit Client::messageReceived(
+        PROCESS_REQUEST_TYPE, message, { QString{command}, app_name, request_id }
+      );
+    std::string execute_operation =
+      createOperation(
+        "Execute",
+          {std::to_string(command),  std::string(request_id.toUtf8().constData())}
+      );
+      sendEncoded(execute_operation);
     }
+  }
 }
 
 /**
