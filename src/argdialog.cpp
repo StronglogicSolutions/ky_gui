@@ -164,7 +164,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
 
   QObject::connect(ui->notification, &QComboBox::currentTextChanged, this, [this](const QString& text) {
     if (m_task->getType() == Scheduler::TaskType::GENERIC) {
-      m_task->setArgument("recurring", text.compare("Yes") == 0 ? true : false);
+      m_task->setArgument("notify", text.compare("Yes") == 0 ? true : false);
     }
   });
 }
