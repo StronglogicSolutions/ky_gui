@@ -197,6 +197,8 @@ const TaskArguments&& GenericTask::getTaskArguments() { return std::move(m_argum
  */
 void GenericTask::setDefaultValues() {
   setArgument("header", TypeVariant{QString{"Generic Task"}});
+  setArgument("recurring", 0);
+  setArgument("notify", false);
 }
 
 /**
