@@ -77,7 +77,7 @@ flatbuffers::Offset<GenericTask> createGenericTask(
     std::get<int>(
       task->getTaskArgumentValue("recurring")
     ),
-    std::get<bool>(
+    std::get<0>(
       task->getTaskArgumentValue("notify")
     )
   );
