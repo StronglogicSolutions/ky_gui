@@ -173,6 +173,17 @@ void ArgDialog::showEvent(QShowEvent* event) {
   if (event->type() == QEvent::Show) {
     if (m_task == nullptr || m_task->getTaskCode() != findTaskCode(m_app_name)) {
       m_task = createTask(m_app_name);
+      if (m_task->getType() == INSTAGRAM) {   // recurring and notification should
+        ui->recurring->hide();                // only be visible for generic tasks
+        ui->recurringLabel->hide();
+        ui->notification->hide();
+        ui->notificationLabel->hide();
+      } else if (ui->recurring->isHidden()) {
+        ui->recurring->show();
+        ui->recurringLabel->show();
+        ui->notification->show();
+        ui->notificationLabel->show();
+      }
     }
 
     ui->argType->clear();
