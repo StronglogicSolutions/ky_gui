@@ -53,15 +53,36 @@ QString timestampPrefix() {
  * @return
  */
 QStandardItem* createProcessListItem(Process process) {
-  return new QStandardItem(
-      QString("%0 requested for execution. ID: %1\nStatus: %2\nTime: %3   "
-              "Done: %4\n Errors: %5")
-          .arg(process.name)
-          .arg(process.id)
-          .arg(ProcessNames[process.state - 1])
-          .arg(process.start)
-          .arg(process.end)
-          .arg(process.error));
+
+  QString processResultText{"%0 requested for execution. "
+      "ID: %1\n"
+      "Status: %2\n"
+      "Time: %3   "
+      "Done: %4\n"
+  };
+
+  auto error = !process.error.isEmpty();
+
+  if (error) {
+    processResultText += "Errors: %5";
+    return new QStandardItem{
+      processResultText
+      .arg(process.name)
+      .arg(process.id)
+      .arg(ProcessNames[process.state - 1])
+      .arg(process.start)
+      .arg(process.end)
+      .arg(process.error)
+    };
+  }
+  return new QStandardItem{
+    processResultText
+    .arg(process.name)
+    .arg(process.id)
+    .arg(ProcessNames[process.state - 1])
+    .arg(process.start)
+    .arg(process.end)
+  };
 }
 
 /**
@@ -468,7 +489,7 @@ QString MainWindow::MessageParser::handleEventMessage(QString message,
               .state = !error ? ProcessState::SUCCEEDED : ProcessState::FAILED,
               .start = TimeUtils::getTime(),
               .id = "Scheduled task",
-              .error = error ? v.at(3) : "No errors reported"};
+              .error = error ? v.at(3) : ""};
           if (v.count() > 2 && !v.at(2).isEmpty()) {
             new_process.result = v.at(2);
             new_process.end = new_process.start;
