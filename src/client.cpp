@@ -291,7 +291,11 @@ void Client::sendMessage(const QString& s) {
  * @brief Client::sendEncoded
  * @param [in] {std::string message} The message to send
  */
-void Client::sendEncoded(std::string message) {
+template <typename T>
+void Client::sendEncoded(T message) {
+  if constexpr (!(std::is_same<T, std::string>::value ||
+                  std::is_same<T, QString>::value)) return;
+
   std::vector<uint8_t> fb_byte_vector{message.begin(), message.end()};
   auto byte_vector = builder.CreateVector(fb_byte_vector);
   auto k_message = CreateMessage(builder, 69, byte_vector);
@@ -412,7 +416,7 @@ void Client::sendPackets(uint8_t* data, int size) {
     ::send(m_client_socket_fd, packet, packet_size, 0);
     if (is_last_packet) {
       qDebug() << "Last packet of file sent";
-      file_was_sent = true;
+//      file_was_sent = true;
     }
   }
 }
@@ -559,4 +563,15 @@ void Client::sendFiles(Scheduler::Task* task) {
     m_task_queue.enqueue(task);
     qDebug() << "Still attempting to send a different file";
   }
+}
+
+/**
+ */
+void Client::sendIPCMessage(const QString& message) {
+  sendEncoded(createOperation(
+      "ipc",
+      {
+        message.toUtf8().constData()
+      }
+  ));
 }

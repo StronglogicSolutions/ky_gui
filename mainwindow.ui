@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1080</width>
+    <width>960</width>
     <height>768</height>
    </rect>
   </property>
@@ -194,21 +194,21 @@ font-weight: 700;</string>
      <rect>
       <x>10</x>
       <y>50</y>
-      <width>1061</width>
+      <width>941</width>
       <height>651</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
+    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1">
      <property name="sizeConstraint">
       <enum>QLayout::SetMaximumSize</enum>
      </property>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
        <property name="spacing">
         <number>4</number>
        </property>
        <item>
-        <layout class="QGridLayout" name="gridLayout_2" rowstretch="5" columnstretch="0,0,0">
+        <layout class="QGridLayout" name="gridLayout_2" rowstretch="0" columnstretch="3,4" columnminimumwidth="0,0">
          <property name="sizeConstraint">
           <enum>QLayout::SetNoConstraint</enum>
          </property>
@@ -216,7 +216,7 @@ font-weight: 700;</string>
           <number>0</number>
          </property>
          <item row="0" column="0">
-          <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,2">
+          <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,2">
            <property name="spacing">
             <number>4</number>
            </property>
@@ -246,6 +246,9 @@ font-weight: 700;</string>
            </item>
            <item>
             <widget class="QComboBox" name="appList">
+             <property name="autoFillBackground">
+              <bool>true</bool>
+             </property>
              <property name="styleSheet">
               <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
 background-color: #2f535f;
@@ -253,6 +256,37 @@ color: rgb(131, 148, 150);
 font-weight: 700;
 </string>
              </property>
+             <property name="editable">
+              <bool>true</bool>
+             </property>
+             <property name="currentText">
+              <string>Available Processes</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="ipcList">
+             <property name="autoFillBackground">
+              <bool>true</bool>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: #2f535f;
+color: rgb(131, 148, 150);
+font-weight: 700;
+</string>
+             </property>
+             <property name="editable">
+              <bool>true</bool>
+             </property>
+             <property name="currentText">
+              <string>Get Results</string>
+             </property>
+             <item>
+              <property name="text">
+               <string>Get Results</string>
+              </property>
+             </item>
             </widget>
            </item>
            <item>
@@ -351,6 +385,61 @@ padding: 4px;</string>
                </property>
               </widget>
              </item>
+             <item>
+              <widget class="QPushButton" name="ipc">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                 <horstretch>100</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Noto Sans</family>
+                 <pointsize>11</pointsize>
+                 <weight>87</weight>
+                 <italic>false</italic>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="autoFillBackground">
+                <bool>false</bool>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(255, 85, 0);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 43, 54);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+               </property>
+               <property name="text">
+                <string>IPC</string>
+               </property>
+               <property name="icon">
+                <iconset resource="kres.qrc">
+                 <normaloff>:/icons/icons/execute.png</normaloff>:/icons/icons/execute.png</iconset>
+               </property>
+               <property name="checkable">
+                <bool>false</bool>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+               <property name="default">
+                <bool>false</bool>
+               </property>
+               <property name="flat">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
             </layout>
            </item>
            <item>
@@ -392,10 +481,7 @@ color: rgb(223, 252, 255);</string>
           </layout>
          </item>
          <item row="0" column="1">
-          <layout class="QGridLayout" name="gridLayout" rowstretch="1"/>
-         </item>
-         <item row="0" column="2">
-          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0">
+          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0,0">
            <property name="spacing">
             <number>4</number>
            </property>
@@ -465,7 +551,10 @@ item { border-bottom: 1px solid black; padding: 16px;} </string>
             </layout>
            </item>
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,1">
+            <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0">
+             <property name="spacing">
+              <number>6</number>
+             </property>
              <property name="sizeConstraint">
               <enum>QLayout::SetMaximumSize</enum>
              </property>
@@ -515,27 +604,29 @@ color: rgb(223, 252, 255);</string>
                </item>
               </layout>
              </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0">
+             <property name="spacing">
+              <number>4</number>
+             </property>
+             <property name="sizeConstraint">
+              <enum>QLayout::SetMinimumSize</enum>
+             </property>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0">
-               <property name="spacing">
-                <number>4</number>
+              <widget class="QPushButton" name="disconnect">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
                </property>
-               <property name="sizeConstraint">
-                <enum>QLayout::SetMinimumSize</enum>
+               <property name="autoFillBackground">
+                <bool>false</bool>
                </property>
-               <item>
-                <widget class="QPushButton" name="disconnect">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="autoFillBackground">
-                  <bool>false</bool>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+               <property name="styleSheet">
+                <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
 background-color: rgb(255, 0, 4);
 font-weight: 700;
@@ -546,68 +637,32 @@ border-radius: 4px;
 border-color: #00000f;
 min-width: 4em;
 padding: 4px;</string>
-                 </property>
-                 <property name="text">
-                  <string>Disconnect</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="kres.qrc">
-                   <normaloff>:/icons/disconnect.png</normaloff>:/icons/disconnect.png</iconset>
-                 </property>
-                 <property name="flat">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="openMessages">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="autoFillBackground">
-                  <bool>false</bool>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">background-color: rgb(255, 85, 0);
-font: 87 11pt &quot;Noto Sans&quot;;
-color: rgb(0, 43, 54);
-font-weight: 700;
-padding: 4px;
-border-style: outset;
-border-width: 2px;
-border-radius: 4px;
-border-color: #00000f;
-min-width: 4em;
-padding: 4px;</string>
-                 </property>
-                 <property name="text">
-                  <string>History</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="kres.qrc">
-                   <normaloff>:/icons/icons/log.svg</normaloff>:/icons/icons/log.svg</iconset>
-                 </property>
-                 <property name="flat">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="sendMessage">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="autoFillBackground">
-                  <bool>false</bool>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">background-color: rgb(130, 255, 121);
+               </property>
+               <property name="text">
+                <string>Close</string>
+               </property>
+               <property name="icon">
+                <iconset resource="kres.qrc">
+                 <normaloff>:/icons/disconnect.png</normaloff>:/icons/disconnect.png</iconset>
+               </property>
+               <property name="flat">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="sendMessage">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="autoFillBackground">
+                <bool>false</bool>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(130, 255, 121);
 background-color: rgb(2, 180, 43);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
@@ -619,29 +674,27 @@ border-radius: 4px;
 border-color: #00000f;
 min-width: 4em;
 padding: 4px;</string>
-                 </property>
-                 <property name="text">
-                  <string>Send</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="kres.qrc">
-                   <normaloff>:/icons/send-button.png</normaloff>:/icons/send-button.png</iconset>
-                 </property>
-                 <property name="checkable">
-                  <bool>false</bool>
-                 </property>
-                 <property name="autoDefault">
-                  <bool>false</bool>
-                 </property>
-                 <property name="default">
-                  <bool>false</bool>
-                 </property>
-                 <property name="flat">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
+               </property>
+               <property name="text">
+                <string>Send</string>
+               </property>
+               <property name="icon">
+                <iconset resource="kres.qrc">
+                 <normaloff>:/icons/send-button.png</normaloff>:/icons/send-button.png</iconset>
+               </property>
+               <property name="checkable">
+                <bool>false</bool>
+               </property>
+               <property name="autoDefault">
+                <bool>false</bool>
+               </property>
+               <property name="default">
+                <bool>false</bool>
+               </property>
+               <property name="flat">
+                <bool>false</bool>
+               </property>
+              </widget>
              </item>
             </layout>
            </item>
@@ -650,50 +703,73 @@ padding: 4px;</string>
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
-         <property name="spacing">
-          <number>4</number>
-         </property>
-        </layout>
-       </item>
-       <item>
-        <widget class="QProgressBar" name="progressBar">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">background-color: #2f535f;
+        <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="3,1">
+         <item>
+          <widget class="QProgressBar" name="progressBar">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: #2f535f;
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);</string>
-         </property>
-         <property name="value">
-          <number>0</number>
-         </property>
-        </widget>
+           </property>
+           <property name="value">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="openMessages">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(255, 85, 0);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 43, 54);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+           </property>
+           <property name="text">
+            <string>History</string>
+           </property>
+           <property name="icon">
+            <iconset resource="kres.qrc">
+             <normaloff>:/icons/icons/log.svg</normaloff>:/icons/icons/log.svg</iconset>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
     </layout>
    </widget>
-  </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1080</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuK_Y_GUI">
-    <property name="title">
-     <string>K Y GUI</string>
-    </property>
-   </widget>
-   <addaction name="menuK_Y_GUI"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -714,6 +790,28 @@ color: rgb(0, 0, 0);</string>
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>960</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuK_Y_GUI">
+    <property name="title">
+     <string>K Y GUI</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuKIQ_Services">
+    <property name="title">
+     <string>KIQ Services</string>
+    </property>
+   </widget>
+   <addaction name="menuK_Y_GUI"/>
+   <addaction name="menuKIQ_Services"/>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

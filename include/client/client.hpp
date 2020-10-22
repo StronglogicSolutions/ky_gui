@@ -76,13 +76,15 @@ class Client : public QDialog {
   void setSelectedApp(std::vector<QString> app_names);
   void sendFiles(Scheduler::Task* task);
   void ping();
+  void sendIPCMessage(const QString& s);
 
  signals:
   void messageReceived(int t, QString s, QVector<QString> args);
   void eventReceived(int t, std::string event, StringVec args);
 
  private:
-  void sendEncoded(std::string message);
+  template <typename T>
+  void sendEncoded(T message);
   void sendFileEncoded(QByteArray bytes);
   void sendTaskEncoded(Scheduler::Task* task);
   void processFileQueue();

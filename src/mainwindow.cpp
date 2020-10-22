@@ -52,13 +52,13 @@ QString timestampPrefix() {
  * @param process
  * @return
  */
-QStandardItem* createProcessListItem(Process process) {
+QStandardItem* createProcessListItem(int index, Process process) {
 
-  QString processResultText{"%0 requested for execution. "
-      "ID: %1\n"
-      "Status: %2\n"
-      "Time: %3   "
-      "Done: %4\n"
+  QString processResultText{"%0. %1 requested for execution.\n"
+      "ID: %2\n"
+      "Status: %3\n"
+      "Time: %4   "
+      "Done: %5\n"
   };
 
   auto error = !process.error.isEmpty();
@@ -67,6 +67,7 @@ QStandardItem* createProcessListItem(Process process) {
     processResultText += "Errors: %5";
     return new QStandardItem{
       processResultText
+      .arg(index)
       .arg(process.name)
       .arg(process.id)
       .arg(ProcessNames[process.state - 1])
@@ -77,6 +78,7 @@ QStandardItem* createProcessListItem(Process process) {
   }
   return new QStandardItem{
     processResultText
+    .arg(index)
     .arg(process.name)
     .arg(process.id)
     .arg(ProcessNames[process.state - 1])
@@ -275,6 +277,10 @@ void MainWindow::connectClient() {
                      }
                    });
 
+  QObject::connect(ui->ipc, &QPushButton::clicked, this, [this]() {
+    q_client->sendIPCMessage(ui->ipcList->currentText());
+  });
+
   QTimer* timer = new QTimer(this);
   connect(timer, &QTimer::timeout, q_client, &Client::ping);
   timer->start(10000);
@@ -312,7 +318,7 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
                                   .id = v.at(2)});
     int row = 0;
     for (const auto& process : m_processes) {
-      m_process_model->setItem(row, createProcessListItem(process));
+      m_process_model->setItem(row, createProcessListItem((row + 1), process));
       row++;
     }
   } else if (t == EVENT_UPDATE_TYPE) {  // Received event from server
@@ -452,7 +458,7 @@ void MainWindow::MessageParser::updateProcessResult(
           !error ? ProcessState::SUCCEEDED : ProcessState::FAILED;
       window->m_processes.at(i).result = result;
       window->m_process_model->setItem(
-          i, 0, createProcessListItem(window->m_processes.at(i)));
+          i, 0, createProcessListItem((i + 1), window->m_processes.at(i)));
       return;
     }
   }
@@ -494,9 +500,12 @@ QString MainWindow::MessageParser::handleEventMessage(QString message,
             new_process.result = v.at(2);
             new_process.end = new_process.start;
           }
+          auto index = window->m_process_model->rowCount();
           window->m_processes.push_back(new_process);
-          window->m_process_model->setItem(window->m_process_model->rowCount(),
-                                           createProcessListItem(new_process));
+          window->m_process_model->setItem(
+            index,
+            createProcessListItem((index + 1), new_process)
+          );
         }
         event_message += app_name;
         event_message += ": ";
