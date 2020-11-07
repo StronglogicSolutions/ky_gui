@@ -17,9 +17,11 @@
 #define FLATBUFFERS_DEBUG_VERIFICATION_FAILURE
 #include <headers/kmessage_codec.hpp>
 #include <headers/instatask_generated.h>
+#include <headers/generictask_generated.h>
 
 using namespace KData;
 using namespace IGData;
+using namespace GenericData;
 
 static const int MAX_PACKET_SIZE = 4096;
 static const int HEADER_SIZE = 4;
@@ -41,7 +43,7 @@ Client::MessageHandler Client::createMessageHandler(std::function<void()> cb) {
  * @param [in] {int} count
  * @param [in] {char**} arguments
  */
-Client::Client(QWidget *parent, int count, char** arguments) : QDialog(parent), argc(count), argv(arguments), m_client_socket_fd(-1), m_commands({}), executing(false) {
+Client::Client(QWidget *parent, int count, char** arguments) : QDialog(parent), argc(count), argv(arguments), m_client_socket_fd(-1), m_outbound_task(nullptr), executing(false), m_commands({}) {
     qRegisterMetaType<QVector<QString>>("QVector<QString>");
 }
 
@@ -62,7 +64,7 @@ void Client::handleMessages() {
         memset(receive_buffer, 0, MAX_PACKET_SIZE);
         ssize_t bytes_received = 0;
         bytes_received = recv(m_client_socket_fd, receive_buffer, MAX_PACKET_SIZE, 0);
-        if (bytes_received == 0) { // Finish message loop
+        if (bytes_received < 1) { // Finish message loop
             break;
         }
         size_t end_idx = findNullIndex(receive_buffer);
@@ -88,15 +90,15 @@ void Client::handleMessages() {
             if (isUploadCompleteEvent(event.toUtf8().constData())) { // Upload complete
               if (!args.isEmpty()) {
                 sent_files.at(sent_files.size() - 1).timestamp =
-                    std::stoi(args.at(0).toUtf8().constData());
-                if (outgoing_files.isEmpty()) {
-                  sendTaskEncoded(TaskType::INSTAGRAM, m_task);
+                    std::stoi(args.at(0).toUtf8().constData()); // mark file with server-generated timestamp
+                if (outgoing_files.isEmpty()) { // Task files are all sent
+                  sendTaskEncoded(m_outbound_task); // Send remaining task data to complete scheduling
                   file_was_sent = false;
-                } else {
+                } else { // Begin file upload operation. Task will be sent after all outgoing files are sent.
                   sendEncoded(
                       createOperation("FileUpload", {"Subsequent file"}));
                 }
-                }
+              }
             }
         }
         std::string formatted_json = getJsonString(data_string);
@@ -104,14 +106,20 @@ void Client::handleMessages() {
     }
     memset(receive_buffer, 0, 2048);
     ::close(m_client_socket_fd);
-//    ::shutdown(m_client_socket_fd, SHUT_RDWR);
 }
 
+/**
+ * @brief Client::processFileQueue
+ */
 void Client::processFileQueue() {
-    KFileData outgoing_file = outgoing_files.dequeue();
-    sendFileEncoded(outgoing_file.bytes);
-    sent_files.push_back(SentFile{.name = outgoing_file.name, .type = outgoing_file.type });
+  Scheduler::KFileData outgoing_file = outgoing_files.dequeue();
+  sendFileEncoded(outgoing_file.bytes);
+  sent_files.push_back(SentFile{
+      .name = outgoing_file.name,
+      .type = outgoing_file.type
+  });
 }
+
 /**
  * @brief Client::start
  */
@@ -203,6 +211,7 @@ void Client::sendEncoded(std::string message) {
     ::send(m_client_socket_fd, send_buffer, size + 5, 0);
     builder.Clear();
 }
+
 /**
  * @brief getTaskFileInfo
  * @param [in] {std::vector<SentFile>} files The files to produce an information string from
@@ -215,7 +224,7 @@ std::string getTaskFileInfo(std::vector<SentFile> files) {
         info += std::to_string(f.timestamp);
         info += f.name.toUtf8().constData();
         info += "|";
-        if (f.type == FileType::VIDEO) {
+        if (f.type == Scheduler::FileType::VIDEO) {
             info += "video";
         } else {
             info += "image";
@@ -228,71 +237,93 @@ std::string getTaskFileInfo(std::vector<SentFile> files) {
 
 /**
  * @brief Client::sendTaskEncoded
- * @param [in] {TaskType}                 type The type of task
- * @param [in] {std::vector<std::string>} args The task arguments
+ * @param [in] {Scheduler::Task*} task The task arguments
  */
-void Client::sendTaskEncoded(TaskType type, std::vector<std::string> args) {
-    if (type == TaskType::INSTAGRAM) {
-      if (args.size() < 8) {
-        qDebug() << "Not enough arguments to send an IGTask";
-        return;
-      }
-        auto file_info = builder.CreateString(getTaskFileInfo(sent_files));
-        auto time = builder.CreateString(args.at(0).c_str(), args.at(0).size());
-        auto description = builder.CreateString(args.at(1).c_str(), args.at(1).size());
-        auto hashtags = builder.CreateString(args.at(2).c_str(), args.at(2).size());
-        auto requested_by = builder.CreateString(args.at(3).c_str(), args.at(3).size());
-        auto requested_by_phrase = builder.CreateString(args.at(4).c_str(), args.at(4).size());
-        auto promote_share = builder.CreateString(args.at(5).c_str(), args.at(5).size());
-        auto link_bio = builder.CreateString(args.at(6).c_str(), args.at(6).size());
-        auto is_video = args.at(7) == "1";
-        auto header = builder.CreateString(args.at(8).c_str(), args.at(8).size());
-        auto user = builder.CreateString(args.at(9).c_str(), args.at(9).size());
+void Client::sendTaskEncoded(Scheduler::Task* task) {
+  qDebug() << getSelectedApp();
+  if (task->getType() == Scheduler::TaskType::INSTAGRAM) {
+    flatbuffers::Offset<IGTask> ig_task =
+        CreateIGTask(
+            builder,
+            96, // ID
+            builder.CreateString(getTaskFileInfo(sent_files)),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("datetime")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("description")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("hashtags_string")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("requested_by_string")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("requested_by_phrase")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("promote_share")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("link_in_bio")).toUtf8().constData()}),
+            std::get<Scheduler::VariantIndex::BOOLEAN>(
+              task->getTaskArgumentValue("is_video")),
+              getSelectedApp(),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("header")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("user")).toUtf8().constData()}));
+    builder.Finish(ig_task);
+  } else {
+    flatbuffers::Offset<GenericTask> generic_task =
+        CreateGenericTask(
+            builder,
+              96, // ID
+            builder.CreateString(getTaskFileInfo(sent_files)),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("datetime")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("description")).toUtf8().constData()}),
+            std::get<Scheduler::VariantIndex::BOOLEAN>(
+              task->getTaskArgumentValue("is_video")),
+              getSelectedApp(),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("header")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("user")).toUtf8().constData()}));
+    builder.Finish(generic_task);
+  }
 
-        flatbuffers::Offset<IGTask> ig_task =
-            CreateIGTask(builder, 96, file_info, time, description, hashtags,
-                         requested_by, requested_by_phrase, promote_share,
-                         link_bio, is_video, 16, header, user);
+  uint8_t* encoded_message_buffer = builder.GetBufferPointer();
+  uint32_t size = builder.GetSize();
+  uint8_t send_buffer[MAX_PACKET_SIZE];
 
-        builder.Finish(ig_task);
+  memset(send_buffer, 0, MAX_PACKET_SIZE);
 
-        uint8_t* encoded_message_buffer = builder.GetBufferPointer();
-        uint32_t size = builder.GetSize();
+  send_buffer[0] = (size >> 24) & 0xFF;
+  send_buffer[1] = (size >> 16) & 0xFF;
+  send_buffer[2] = (size >> 8) & 0xFF;
+  send_buffer[3] = size & 0xFF;
+  send_buffer[4] = (task->getTaskCode() & 0xFF);
 
-        uint8_t send_buffer[MAX_PACKET_SIZE];
-        memset(send_buffer, 0, MAX_PACKET_SIZE);
-        send_buffer[0] = (size >> 24) & 0xFF;
-        send_buffer[1] = (size >> 16) & 0xFF;
-        send_buffer[2] = (size >> 8) & 0xFF;
-        send_buffer[3] = size & 0xFF;
-        send_buffer[4] = (TaskCode::IGTASKBYTE & 0xFF);
-
-        std::memcpy(send_buffer + 5, encoded_message_buffer, size);
-        qDebug() << "Ready to send:";
-        std::string message_to_send{};
-        for (unsigned int i = 0; i < (size + 5); i++) {
-            message_to_send += (char)*(send_buffer + i);
-            qDebug() << (char)*(send_buffer + i);
-        }
-        qDebug() << "Final size: " << (size + 5);
-        // Send start operation
-        ::send(m_client_socket_fd, send_buffer, size + 5, 0);
-        builder.Clear();
-        sent_files.clear();
-        m_task.clear();
-        if (!m_task_queue.isEmpty()) {
-          auto task = m_task_queue.dequeue();
-          if (!task.files.empty() && !outgoing_files.empty()) {
-            qDebug() << "There are still outgoing files left over from last "
-                        "task which were never sent. They are being deleted";
-            outgoing_files.clear();
-          }
-          // We simply need to send files. Once the last file is sent, Client
-          // will check the value of m_task and send it to Server.
-          m_task = task.args;
-          sendFiles(task.files);
-        }
+  std::memcpy(send_buffer + 5, encoded_message_buffer, size);
+  qDebug() << "Ready to send:";
+  std::string message_to_send{};
+  for (unsigned int i = 0; i < (size + 5); i++) {
+    message_to_send += (char)*(send_buffer + i);
+  }
+  qDebug() << "Final size: " << (size + 5);
+  // Send start operation
+  ::send(m_client_socket_fd, send_buffer, size + 5, 0);
+  // Cleanup and process queue
+  builder.Clear();
+  sent_files.clear();
+  m_outbound_task = nullptr;
+  if (!m_task_queue.isEmpty()) {
+    m_outbound_task = m_task_queue.dequeue();
+    // TODO work from here
+    if (m_outbound_task->hasFiles() && !outgoing_files.empty()) {
+      qDebug() << "There are still outgoing files left over from last "
+                  "task which were never sent. They are being deleted";
+      outgoing_files.clear();
     }
+    sendFiles(m_outbound_task);
+  }
 }
 
 /**
@@ -351,9 +382,9 @@ void Client::sendPackets(uint8_t* data, int size) {
 void Client::ping() {
   if (m_client_socket_fd != -1) {  // if we have active connection
     if (outgoing_files.size() == 0 || file_was_sent) {
-      // 1st condition: we aren't sending file packets
-      // 2nd condition: we're sending packets, but one file has sent and we want
-      // to ping in case the server is unresponsive
+      /* 1st condition: we aren't sending file packets
+         2nd condition: we were sending packets, but the file is complete and we want
+         to ping in case the server is unresponsive */
       uint8_t send_buffer[5];
       memset(send_buffer, 0, 5);
       send_buffer[4] = (TaskCode::PINGBYTE & 0xFF);
@@ -450,41 +481,37 @@ void Client::execute() {
 /**
  * @brief Client::scheduleTask
  * @param [in] {std::vector<std::string>} task_args The task arguments
- * @param [in] {bool}                     file_pending A boolean indicating whether there are files being sent for this task
+ * @param [in] {bool}                     file_pending A boolean indicating whether there are
+ *                                        files being sent for this task
  */
-void Client::scheduleTask(std::vector<std::string> task_args, bool file_pending) {
-    if (file_pending) {
-      if (m_task.empty()) {
-        m_task = task_args;
-      } else {
-        if (!m_task_queue.empty() && m_task_queue.front().args.empty()) {
-          m_task_queue.front().args.assign(task_args.begin(), task_args.end());
-        } else {
-          qDebug() << "Could not identify the queued task for updating";
-        }
-      }
+void Client::scheduleTask(Scheduler::Task* task) {
+  if (m_outbound_task == nullptr) {
+    m_outbound_task = std::move(task);
+    if (m_outbound_task->hasFiles()) {
+      sendFiles(m_outbound_task);
     } else {
-        qDebug() << "Requesting a task to be scheduled";
-        sendTaskEncoded(TaskType::INSTAGRAM, task_args);
+      qDebug() << "Requesting a task to be scheduled";
+      sendTaskEncoded(m_outbound_task);
     }
+  } else {
+    m_task_queue.enqueue(task);
+  }
 }
 
 /**
  * @brief Client::sendFiles
  * @param [in] {QVector<const QByteArray} files The files to be sent
  */
-void Client::sendFiles(QVector<KFileData> files) {
-    if (outgoing_files.isEmpty()) {
-      file_was_sent = false;
-      for (const auto& file : files) {
-        outgoing_files.enqueue(std::move(file));
-        }
-        std::string send_file_operation = createOperation("FileUpload", {});
-        sendEncoded(send_file_operation);
-    } else {
-      // TODO: place in queue and check queue after we finish scheduling the
-      // task associated with the outgoing files
-      m_task_queue.enqueue(Task{.files = files});
-      qDebug() << "Still attempting to send a different file";
+void Client::sendFiles(Scheduler::Task* task) {
+  if (outgoing_files.isEmpty()) {
+    file_was_sent = false;
+    for (const auto& file : task->getFiles()) {
+      outgoing_files.enqueue(std::move(file));
     }
+    std::string send_file_operation = createOperation("FileUpload", {});
+    sendEncoded(send_file_operation);
+  } else {
+    m_task_queue.enqueue(task);
+    qDebug() << "Still attempting to send a different file";
+  }
 }

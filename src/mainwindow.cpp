@@ -107,9 +107,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   this->setWindowTitle("KYGUI");
   setStyleSheet(
       "QListView { font: 87 11pt \"Noto Sans\"; background-color: #2f535f;"
-      "color: rgb(131, "
-      "148, 150); font-weight: 700; background-color: rgb(29, 51, 59);color: "
-      "rgb(223, 252, 255);}");
+      "alternate-background-color: #616161; color: rgb(131, 148, 150); "
+      "font-weight: 700; background-color: rgb(29, 51, 59);"
+      "color: rgb(223, 252, 255);}");
   setConnectScreen();
   connect(ui->connect, &QPushButton::clicked, this, &MainWindow::connectClient);
   ui->eventList->setModel(m_event_model);
@@ -155,6 +155,8 @@ void MainWindow::setConnectScreen(bool visible) {
  * @brief MainWindow::connectClient
  */
 void MainWindow::connectClient() {
+  auto text = ui->kyConfig->toPlainText();
+  qDebug() << text;
   m_config = getConfigObject(ui->kyConfig->toPlainText());
   QString file_path = m_config.at("fileDirectory");
   if (file_path != NULL) {
@@ -163,7 +165,7 @@ void MainWindow::connectClient() {
   setConnectScreen(false);
   qDebug() << "Connecting to KServer";
   QObject::connect(q_client, &Client::messageReceived, this,
-                   &MainWindow::updateMessages);
+                   &MainWindow::onMessageReceived);
 
   QProgressBar* progressBar = ui->progressBar;
   q_client->start();
@@ -185,8 +187,9 @@ void MainWindow::connectClient() {
       static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
       this, [this]() {
         QString app_name = ui->appList->currentText();
-        // TODO: I know, it's awful. Fix this
         q_client->setSelectedApp(std::vector<QString>{{app_name}});
+        arg_ui->setAppName(app_name);
+        arg_ui->setConfig(configValue(app_name, m_config, true));
       });
   QPushButton* disconnect_button = this->findChild<QPushButton*>("disconnect");
   QObject::connect(disconnect_button, &QPushButton::clicked, this, [this]() {
@@ -208,19 +211,11 @@ void MainWindow::connectClient() {
   });
 
   QObject::connect(
-      arg_ui, &ArgDialog::uploadFiles, this,
-      [this](QVector<KFileData> files) { q_client->sendFiles(files); });
-
-  QObject::connect(
       arg_ui, &ArgDialog::taskRequestReady, this,
-      [this](Task task, bool file_pending) {
+      [this](Task* task) {
         auto mask = q_client->getSelectedApp();
         if (mask > -1) {
-          if (q_client->getAppName(mask) == "Instagram") {
-            qDebug() << "Scheduling a task";
-            task.args.push_back(std::to_string(mask));
-            q_client->scheduleTask(task.args, file_pending);
-          }
+            q_client->scheduleTask(task);
         }
       });
 
@@ -275,10 +270,12 @@ void MainWindow::connectClient() {
 }
 
 /**
- * @brief MainWindow::updateMessages
- * @param s
+ * @brief MainWindow::onMessageReceived
+ * @param t
+ * @param message
+ * @param v
  */
-void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
+void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
   QString timestamp_prefix = timestampPrefix();
   if (t == MESSAGE_UPDATE_TYPE) {  // Normal message
     qDebug() << "Updating message area";
@@ -290,7 +287,8 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
     message_parser.handleCommands(v, default_app);
     if (message == "New Session") {  // Session has started
       ui->led->setState(true);
-      arg_ui->setConfig(configValue("instagram", m_config));
+      auto app_name = q_client->getAppName(q_client->getSelectedApp());
+      arg_ui->setConfig(configValue(app_name, m_config, true));
       if (configBoolValue("schedulerMode", std::ref(m_config))) {
         arg_ui->show();
       }
@@ -325,6 +323,7 @@ void MainWindow::updateMessages(int t, const QString& message, StringVec v) {
     if (isKEvent<QString>(message,
                           Event::TASK_SCHEDULED)) {  // Event was scheduled task
       event_message += ". Details:\n" + parseTaskInfo(v);
+      arg_ui->notifyClientSuccess(); // Update ArgDialog accordingly
     }
     m_events.push_back(event_message);
     m_event_model->setItem(m_event_model->rowCount(),
@@ -389,6 +388,8 @@ void MainWindow::MessageParser::handleCommands(StringVec commands,
     app_list->addItem(s);
     if (s.toLower() == default_command.toLower()) {
       window->ui->appList->setCurrentIndex(app_index);
+      std::vector<QString> selected{std::move(default_command)};
+      window->q_client->setSelectedApp(std::move(selected));
     }
     app_index++;
   }

@@ -27,25 +27,6 @@ public:
 };
 }  // namespace Kontainer
 
-enum FileType {
-    VIDEO = 1,
-    IMAGE = 2
-};
-
-struct KFileData {
-    FileType type;
-    QString name;
-    QByteArray bytes;
-};
-
-struct Task {
-  QVector<KFileData> files;
-  std::vector<std::string> args;
-  int mask;
-};
-
-typedef QQueue<Task> TaskQueue;
-
 namespace {
 using namespace rapidjson;
 
@@ -83,18 +64,26 @@ static QString escapeTextToRaw(QString s) {
 
 /**
  * @brief configValue
- * @param key [in] {QString} The key whose corresponding value is to be sought
- * from the ConfigJson param
- * @param [in] {ConfigJson} A Key-Value JSON Config object
+ * @param [in] {QString}    key          The key whose corresponding value is to be sought from the
+ *                                       ConfigJson param
+ * @param [in] {ConfigJson} config       JSON Config object
+ * @param [in] {bool}       use_default  Indicates that the default key will be sought if no value
+ *                                       matching the key parameter is found
  * @return {QString} The value which corresonds to the key, or an empty string
  *
  * TODO: ConfigJson should probably be called something else, like
  * ConfigJsonObject
  */
-QString configValue(QString key, ConfigJson config) {
-  ConfigJson::iterator it{config.find(key)};  // Find iterator to element matching key
+QString configValue(QString key, ConfigJson config, bool use_default = false) {
+  ConfigJson::iterator it{config.find(key.toLower())};  // Find iterator to element matching key
   if (it != std::end(config)) {               // If element was found
     return it->second;                        // Return the value of the Key-Pair element
+  }
+  if (use_default) {
+    it = config.find("default");
+    if (it != std::end(config)) {               // If element was found
+      return it->second;                        // Return the value of the Key-Pair element
+    }
   }
   return "";
 }
@@ -141,7 +130,10 @@ bool isUploadCompleteEvent(const char* event) {
 bool isEvent(const char* data) {
     Document d;
     d.Parse(data);
-    return strcmp(d["type"].GetString(), "event") == 0;
+    if (d.HasMember("type")); {
+      return strcmp(d["type"].GetString(), "event") == 0;
+    }
+    return false;
 }
 
 template <typename T>
@@ -257,12 +249,14 @@ QList<QString> getValueArgs(const char* data, QString key) {
   Document d;
   d.Parse(data);
   QList<QString> args{};
-  for (const auto& m : d.GetObject()) {
-    auto name = m.name.GetString();
-    if (name == key.toUtf8()) {
-      if (m.value.IsArray()) {
-        for (const auto& a : m.value.GetArray()) {
-          args.push_back(a.GetString());
+  if (d.IsObject()) {
+    for (const auto& m : d.GetObject()) {
+      auto name = m.name.GetString();
+      if (name == key.toUtf8()) {
+        if (m.value.IsArray()) {
+          for (const auto& a : m.value.GetArray()) {
+            args.push_back(a.GetString());
+          }
         }
       }
     }
@@ -298,6 +292,7 @@ ConfigJson getConfigObject(QString json_string) {
             m.value.Accept(writer);
             QString config_value{buffer.GetString()};
             config_map.emplace(m.name.GetString(), config_value);
+            writer.Reset(buffer);
           }
         }
     }

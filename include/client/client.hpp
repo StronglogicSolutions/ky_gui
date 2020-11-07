@@ -1,36 +1,35 @@
 ﻿#ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include <QDialog>
 #include <QComboBox>
-#include <QPushButton>
-#include <QMessageBox>
-#include <QLineEdit>
-#include <QUuid>
+#include <QDialog>
 #include <QLabel>
-#include <QString>
-#include <QVector>
-#include <QQueue>
-#include <QThread>
+#include <QLineEdit>
+#include <QMessageBox>
 #include <QMetaType>
-#include <thread>
-#include <string>
-#include <utility>
+#include <QPushButton>
+#include <QQueue>
+#include <QString>
+#include <QThread>
+#include <QUuid>
+#include <QVector>
 #include <headers/util.hpp>
+#include <include/task/task.hpp>
+#include <string>
+#include <thread>
+#include <utility>
 
 static constexpr int MESSAGE_UPDATE_TYPE = 1;
 static constexpr int COMMANDS_UPDATE_TYPE = 2;
 static constexpr int EVENT_UPDATE_TYPE = 3;
 static constexpr int PROCESS_REQUEST_TYPE = 4;
 
-enum TaskType {
-    INSTAGRAM = 1,
-    OTHER = 2
-};
+using namespace Scheduler;
 
 namespace TaskCode {
 static constexpr int IGTASKBYTE = 0xFF;
 static constexpr int GENMSGBYTE = 0xFE;
+static constexpr int GENTASKBYTE = 0xFC;
 static constexpr int PINGBYTE = 0xFD;
 }  // namespace TaskCode
 
@@ -41,7 +40,7 @@ typedef QVector<QString> StringVec;
 struct SentFile {
     int timestamp;
     QString name;
-    FileType type;
+    Scheduler::FileType type;
 };
 
 Q_DECLARE_METATYPE(StringVec)
@@ -71,13 +70,13 @@ class Client : public QDialog {
   QString getAppName(int mask);
   int getSelectedApp();
   // Move this to private after moving responsibilities to Client
-  void scheduleTask(std::vector<std::string> task_args, bool file_pending);
+  void scheduleTask(Scheduler::Task* task);
   MessageHandler createMessageHandler(std::function<void()> cb);
 
  public slots:
   void sendMessage(const QString& s);
   void setSelectedApp(std::vector<QString> app_names);
-  void sendFiles(QVector<KFileData> files);
+  void sendFiles(Scheduler::Task* task);
   void ping();
 
  signals:
@@ -87,21 +86,21 @@ class Client : public QDialog {
  private:
   void sendEncoded(std::string message);
   void sendFileEncoded(QByteArray bytes);
-  void sendTaskEncoded(TaskType type, std::vector<std::string> args);
+  void sendTaskEncoded(Scheduler::Task* task);
   void processFileQueue();
   void handleMessages();
   void sendPackets(uint8_t* data, int size);
   int argc;
   char** argv;
   int m_client_socket_fd;
-  std::vector<std::string> m_task;
+  Task* m_outbound_task;
   bool executing;
   bool file_was_sent;
   CommandMap m_commands;
   CommandArgMap m_command_arg_map;
   std::vector<int> selected_commands;
-  QQueue<KFileData> outgoing_files;
+  QQueue<Scheduler::KFileData> outgoing_files;
   std::vector<SentFile> sent_files;
-  TaskQueue m_task_queue;
+  Scheduler::TaskQueue m_task_queue;
 };
 #endif // CLIENT_HPP
