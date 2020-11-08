@@ -15,17 +15,12 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-namespace Kontainer {
-/** Reverse Iterator */
-template <class T>
-class ReverseIterator {
-    T& _obj;
-public:
-    ReverseIterator(T &obj) : _obj(obj) {}
-    auto begin() {return _obj.rbegin();}
-    auto end() {return _obj.rend();}
+struct KApplication {
+  QString mask;
+  QString name;
+  QString path;
+  QString data;
 };
-}  // namespace Kontainer
 
 namespace {
 using namespace rapidjson;
@@ -37,6 +32,8 @@ typedef std::vector<std::map<int, std::string>> MapVec;
 typedef std::vector<std::string> StdStringVec;
 typedef std::map<int, std::string> CommandMap;
 typedef std::map<QString, QString> ConfigJson;
+
+
 
 struct KSession {
     int id;

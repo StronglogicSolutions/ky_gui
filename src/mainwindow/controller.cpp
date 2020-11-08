@@ -31,20 +31,51 @@ void MainWindow::Controller::init(MainWindow* window) {
  * @param commands
  * @param default_command
  */
-void MainWindow::Controller::handleCommands(StringVec commands,
-                                               QString default_command) {
+void MainWindow::Controller::handleCommands(StringVec args,
+                                            QString default_command) {
+  uint8_t MASK_INDEX = 0;
+  uint8_t NAME_INDEX = 1;
+  uint8_t PATH_INDEX = 2;
+  uint8_t DATA_INDEX = 3;
+
   QComboBox* app_list = window->ui->appList;
   app_list->clear();
-  int app_index = 0;
-  for (const auto& s : commands) {
-    app_list->addItem(s);
-    if (s.toLower() == default_command.toLower()) {
-      window->ui->appList->setCurrentIndex(app_index);
-      std::vector<QString> selected{std::move(default_command)};
-      window->q_client->setSelectedApp(std::move(selected));
+  int app_index{0};
+  int arg_index{0};
+
+  QVector<KApplication> k_applications{};
+  KApplication application{};
+  k_applications.reserve((args.size() / 4));
+
+  for (const auto& arg : args) {
+    if (arg_index == MASK_INDEX) {
+      application.mask = arg;
     }
-    app_index++;
+    else
+    if (arg_index == NAME_INDEX) {
+      application.name = arg;
+    }
+    else
+    if (arg_index == PATH_INDEX) {
+      application.path = arg;
+    }
+    else
+    if (arg_index == DATA_INDEX) {
+      application.data = arg;
+      app_index++;
+      arg_index = 0;
+      app_list->addItem(application.name);
+      if (application.name.toLower() == default_command.toLower()) {
+        window->ui->appList->setCurrentIndex(app_index);
+        std::vector<QString> selected{default_command};
+        window->q_client->setSelectedApp(selected);
+      }
+      k_applications.push_back(application);
+      continue;
+    }
+    arg_index++;
   }
+  window->q_client->setCommands(k_applications);
 }
 /**
  * @brief MainWindow::MessageParser::handleMessage

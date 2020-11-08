@@ -419,8 +419,8 @@ void Client::setSelectedApp(std::vector<QString> app_names) {
     for (const auto& name : app_names) {
         qDebug() << "Matching mask to " << name;
         for (const auto& command : m_commands) {
-            if (command.second.c_str() == name.toUtf8()) {
-                selected_commands.push_back(command.first);
+            if (command.name == name) {
+              selected_commands.push_back(command.mask.toInt());
             }
         }
     }
@@ -445,11 +445,12 @@ int Client::getSelectedApp() {
  * @returns {QString} The application name
  */
 QString Client::getAppName(int mask) {
-    auto app = m_commands.find(mask);
-    if (app != m_commands.end()) {
-        return QString{app->second.c_str()};
+  for (const auto& command : m_commands) {
+    if (command.mask.toInt() == mask) {
+      return command.name;
     }
-    return QString{""};
+  }
+  return "";
 }
 
 /**

@@ -45,7 +45,7 @@ static constexpr int GENTASKBYTE = 0xFC;
 static constexpr int PINGBYTE    = 0xFD;
 }  // namespace TaskCode
 
-typedef std::map<int, std::string> CommandMap;
+typedef QVector<KApplication> Commands;
 typedef std::map<int, std::vector<std::string>> CommandArgMap;
 typedef QVector<QString> StringVec;
 
@@ -88,6 +88,13 @@ class Client : public QDialog {
  public slots:
   void sendMessage(const QString& s);
   void setSelectedApp(std::vector<QString> app_names);
+  void setCommands(Commands commands) {
+    if (selected_commands.empty()) {
+      auto first_command = commands.front();
+      selected_commands = {first_command.mask.toInt()};
+    }
+    m_commands = commands;
+  }
   void sendFiles(Scheduler::Task* task);
   void ping();
 
@@ -108,7 +115,7 @@ class Client : public QDialog {
   Task* m_outbound_task;
   bool executing;
   bool file_was_sent;
-  CommandMap m_commands;
+  Commands      m_commands;
   CommandArgMap m_command_arg_map;
   std::vector<int> selected_commands;
   QQueue<Scheduler::KFileData> outgoing_files;

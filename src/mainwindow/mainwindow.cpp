@@ -278,6 +278,7 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
     m_controller.handleMessage(message, v);
     console_ui.updateText(message);
   } else if (t == COMMANDS_UPDATE_TYPE) {  // Received app list from server
+    // TODO: Parse arg map -> every 4 elements is a data set for one command
     qDebug() << "Updating commands";
     QString default_app = configValue("defaultApp", m_config);
     m_controller.handleCommands(v, default_app);
