@@ -1,6 +1,6 @@
 ﻿#ifndef UTIL_HPP
 #define UTIL_HPP
-#pragma GCC system_header
+
 #include <QDebug>
 #include <QQueue>
 #include <QString>

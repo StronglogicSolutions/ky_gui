@@ -1,6 +1,19 @@
 ﻿#ifndef CLIENT_HPP
 #define CLIENT_HPP
 
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <math.h>
+#include <netdb.h>
+#include <cstring>
+#include <QByteArray>
+#include <algorithm>
+#include <functional>
+#include <thread>
+#include <utility>
+
 #include <QComboBox>
 #include <QDialog>
 #include <QLabel>
@@ -8,29 +21,28 @@
 #include <QMessageBox>
 #include <QMetaType>
 #include <QPushButton>
-#include <QQueue>
-#include <QString>
 #include <QThread>
 #include <QUuid>
-#include <QVector>
-#include <headers/util.hpp>
-#include <include/task/task.hpp>
-#include <string>
-#include <thread>
-#include <utility>
 
-static constexpr int MESSAGE_UPDATE_TYPE = 1;
+#include <headers/kmessage_codec.hpp>
+#include <headers/instatask_generated.h>
+#include <headers/generictask_generated.h>
+#include <headers/util.hpp>
+
+#include <include/task/task.hpp>
+
+static constexpr int MESSAGE_UPDATE_TYPE  = 1;
 static constexpr int COMMANDS_UPDATE_TYPE = 2;
-static constexpr int EVENT_UPDATE_TYPE = 3;
+static constexpr int EVENT_UPDATE_TYPE    = 3;
 static constexpr int PROCESS_REQUEST_TYPE = 4;
 
 using namespace Scheduler;
 
 namespace TaskCode {
-static constexpr int IGTASKBYTE = 0xFF;
-static constexpr int GENMSGBYTE = 0xFE;
+static constexpr int IGTASKBYTE  = 0xFF;
+static constexpr int GENMSGBYTE  = 0xFE;
 static constexpr int GENTASKBYTE = 0xFC;
-static constexpr int PINGBYTE = 0xFD;
+static constexpr int PINGBYTE    = 0xFD;
 }  // namespace TaskCode
 
 typedef std::map<int, std::string> CommandMap;
@@ -38,8 +50,8 @@ typedef std::map<int, std::vector<std::string>> CommandArgMap;
 typedef QVector<QString> StringVec;
 
 struct SentFile {
-    int timestamp;
-    QString name;
+    int                 timestamp;
+    QString             name;
     Scheduler::FileType type;
 };
 

@@ -11,6 +11,11 @@
         <file>icons/clip.png</file>
         <file>favicon.ico</file>
         <file>icons/log.svg</file>
+        <file>icons/add.png</file>
+        <file>icons/cancel.png</file>
+        <file>icons/revert.png</file>
+        <file>icons/checkmark.png</file>
+        <file>icons/gear.png</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/log.png</file>

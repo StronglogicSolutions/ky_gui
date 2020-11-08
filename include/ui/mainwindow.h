@@ -1,17 +1,26 @@
 ﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <include/ui/argdialog.h>
-#include <include/ui/consoledialog.h>
 #include <QList>
 #include <QListView>
 #include <QListWidgetItem>
 #include <QMainWindow>
 #include <QStandardItem>
 #include <QStandardItemModel>
-#include <QString>
 #include <QTableView>
 #include <QTimer>
+#include <QDateTime>
+#include <QLayout>
+#include <QScrollBar>
+#include <QTextEdit>
+#include <QTextStream>
+
+#include <include/ui/argdialog.h>
+#include <include/ui/consoledialog.h>
+#include <include/ui/appdialog.hpp>
+
+#include "ui_mainwindow.h"
+
 #include <headers/kiq_types.hpp>
 #include <include/client/client.hpp>
 
@@ -44,7 +53,12 @@ struct Process {
     }
 };
 
-// struct Event {};
+namespace utils {
+QString getTime();
+QString timestampPrefix();
+QStandardItem* createProcessListItem(Process process);
+QStandardItem* createEventListItem(QString event);
+} // namespace utils
 
 namespace Ui {
 class MainWindow;
@@ -58,7 +72,7 @@ public:
     explicit MainWindow(int argc = 0, char** argv = nullptr, QWidget* parent = nullptr);
     ~MainWindow();
 
-    class MessageParser {
+    class Controller {
      public:
       void init(MainWindow* window);
       void handleCommands(StringVec commands, QString default_app);
@@ -80,10 +94,11 @@ public:
 
     QString parseTaskInfo(StringVec v);
     /** UI Members */
-    MessageParser message_parser;
-    Ui::MainWindow *ui;
-    ArgDialog *arg_ui;
-    ConsoleDialog console_ui;
+    Controller      m_controller;
+    Ui::MainWindow* ui;
+    ArgDialog*      arg_ui;
+    ConsoleDialog   console_ui;
+    AppDialog       app_ui;
     /** Client member */
     Client* q_client;
     /** Models */

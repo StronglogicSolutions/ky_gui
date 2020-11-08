@@ -102,15 +102,36 @@ font-weight: 700;</string>
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="appList">
-           <property name="styleSheet">
-            <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QComboBox" name="appList">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
 background-color: #2f535f;
 color: rgb(131, 148, 150);
 font-weight: 700;
 </string>
-           </property>
-          </widget>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="editApps">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="kres.qrc">
+               <normaloff>:/icons/icons/gear.png</normaloff>:/icons/icons/gear.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_2">

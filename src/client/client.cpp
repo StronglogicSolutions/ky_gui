@@ -1,30 +1,13 @@
-﻿#include <arpa/inet.h>
-#include <math.h>
-#include <netdb.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <QByteArray>
-#include <QDebug>
-#include <algorithm>
-#include <cstring>
-#include <functional>
-#include <future>
+﻿#define FLATBUFFERS_DEBUG_VERIFICATION_FAILURE
+
 #include <include/client/client.hpp>
-#include <iostream>
-#include <vector>
-#define FLATBUFFERS_DEBUG_VERIFICATION_FAILURE
-#include <headers/kmessage_codec.hpp>
-#include <headers/instatask_generated.h>
-#include <headers/generictask_generated.h>
 
 using namespace KData;
 using namespace IGData;
 using namespace GenericData;
 
 static const int MAX_PACKET_SIZE = 4096;
-static const int HEADER_SIZE = 4;
+static const int HEADER_SIZE     = 4;
 
 flatbuffers::FlatBufferBuilder builder(1024);
 
@@ -43,8 +26,15 @@ Client::MessageHandler Client::createMessageHandler(std::function<void()> cb) {
  * @param [in] {int} count
  * @param [in] {char**} arguments
  */
-Client::Client(QWidget *parent, int count, char** arguments) : QDialog(parent), argc(count), argv(arguments), m_client_socket_fd(-1), m_outbound_task(nullptr), executing(false), m_commands({}) {
-    qRegisterMetaType<QVector<QString>>("QVector<QString>");
+Client::Client(QWidget *parent, int count, char** arguments)
+: QDialog(parent),
+  argc(count),
+  argv(arguments),
+  m_client_socket_fd(-1),
+  m_outbound_task(nullptr),
+  executing(false),
+  m_commands({}) {
+  qRegisterMetaType<QVector<QString>>("QVector<QString>");
 }
 
 /**
@@ -74,32 +64,33 @@ void Client::handleMessages() {
             qDebug() << "Server returned pong";
             continue;
         }
-        StringVec s_v{};
+
         if (isNewSession(data_string.c_str())) { // Session Start
-            m_commands = getArgMap(data_string.c_str());
-            for (const auto& [k, v] : m_commands) { // Receive available commands
-                s_v.push_back(v.data());
-            }
-            emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", s_v); // Update UI
+//            m_commands = getArgMap(data_string.c_str());
+//            for (const auto& [k, v] : m_commands) { // Receive available commands
+//                s_v.push_back(v.data());
+//            }
+          StringVec s_v = getArgs(data_string.c_str());
+          emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", s_v); // Update UI
         } else if (serverWaitingForFile(data_string.c_str())) { // Server expects a file
-            processFileQueue();
+          processFileQueue();
         } else if (isEvent(data_string.c_str())) { // Receiving event
-            QString event = getEvent(data_string.c_str());
-            QVector<QString> args = getArgs(data_string.c_str());
-            emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args); // Update UI (event)
-            if (isUploadCompleteEvent(event.toUtf8().constData())) { // Upload complete
-              if (!args.isEmpty()) {
-                sent_files.at(sent_files.size() - 1).timestamp =
-                    std::stoi(args.at(0).toUtf8().constData()); // mark file with server-generated timestamp
-                if (outgoing_files.isEmpty()) { // Task files are all sent
-                  sendTaskEncoded(m_outbound_task); // Send remaining task data to complete scheduling
-                  file_was_sent = false;
-                } else { // Begin file upload operation. Task will be sent after all outgoing files are sent.
-                  sendEncoded(
-                      createOperation("FileUpload", {"Subsequent file"}));
-                }
+          QString event = getEvent(data_string.c_str());
+          QVector<QString> args = getArgs(data_string.c_str());
+          emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args); // Update UI (event)
+          if (isUploadCompleteEvent(event.toUtf8().constData())) { // Upload complete
+            if (!args.isEmpty()) {
+              sent_files.at(sent_files.size() - 1).timestamp =
+                  std::stoi(args.at(0).toUtf8().constData()); // mark file with server-generated timestamp
+              if (outgoing_files.isEmpty()) { // Task files are all sent
+                sendTaskEncoded(m_outbound_task); // Send remaining task data to complete scheduling
+                file_was_sent = false;
+              } else { // Begin file upload operation. Task will be sent after all outgoing files are sent.
+                sendEncoded(
+                    createOperation("FileUpload", {"Subsequent file"}));
               }
             }
+          }
         }
         std::string formatted_json = getJsonString(data_string);
         emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(formatted_json.data(), formatted_json.size()), {});
@@ -334,9 +325,9 @@ void Client::sendTaskEncoded(Scheduler::Task* task) {
 void Client::sendPackets(uint8_t* data, int size) {
     uint32_t total_size = static_cast<uint32_t>(size + HEADER_SIZE);
     uint32_t total_packets = static_cast<uint32_t>(ceil(
-        static_cast<double>(
-            static_cast<double>(total_size) / static_cast<double>(MAX_PACKET_SIZE)) // total size / packet
-        )
+      static_cast<double>(
+          static_cast<double>(total_size) / static_cast<double>(MAX_PACKET_SIZE)) // total size / packet
+      )
     );
     uint32_t idx = 0;
     for (; idx < total_packets; idx++) {
@@ -465,17 +456,22 @@ QString Client::getAppName(int mask) {
  * @brief Client::execute
  */
 void Client::execute() {
-    if (!selected_commands.empty()) {
-        executing = true;
-        for (const auto& command : selected_commands) {
-            auto app_name = getAppName(command);
-            auto message = app_name + " pending";
-            auto request_id = QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces);
-            emit Client::messageReceived(PROCESS_REQUEST_TYPE, message, { QString{command}, app_name, request_id });
-            std::string execute_operation = createOperation("Execute", {std::to_string(command), std::string(request_id.toUtf8().constData())});
-            sendEncoded(execute_operation);
-        }
+  if (!selected_commands.empty()) {
+    executing = true;
+    for (const auto& command : selected_commands) {
+      auto app_name = getAppName(command);
+      auto message = app_name + " pending";
+      auto request_id = QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces);
+      emit Client::messageReceived(PROCESS_REQUEST_TYPE, message, { QString{command}, app_name, request_id });
+      std::string execute_operation = createOperation(
+          "Execute",
+          {
+            std::to_string(command),
+            std::string(request_id.toUtf8().constData())
+          } );
+      sendEncoded(execute_operation);
     }
+  }
 }
 
 /**
