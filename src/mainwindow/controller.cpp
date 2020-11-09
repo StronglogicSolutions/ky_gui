@@ -76,6 +76,7 @@ void MainWindow::Controller::handleCommands(StringVec args,
     arg_index++;
   }
   window->q_client->setCommands(k_applications);
+  window->app_ui.setApplications(k_applications);
 }
 /**
  * @brief MainWindow::MessageParser::handleMessage

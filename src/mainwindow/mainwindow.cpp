@@ -93,11 +93,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   m_controller.init(this);
   ui->setupUi(this);
   this->setWindowTitle("KYGUI");
-  setStyleSheet(
-      "QListView { font: 87 11pt \"Noto Sans\"; background-color: #2f535f;"
-      "alternate-background-color: #616161; color: rgb(131, 148, 150); "
-      "font-weight: 700; background-color: rgb(29, 51, 59);"
-      "color: rgb(223, 252, 255);}");
+  setStyleSheet(KYGUI_STYLESHEET);
   setConnectScreen();
   connect(ui->connect, &QPushButton::clicked, this, &MainWindow::connectClient);
   ui->eventList->setModel(m_event_model);
@@ -202,14 +198,14 @@ void MainWindow::connectClient() {
     }
   });
 
-  QObject::connect(
-      arg_ui, &ArgDialog::taskRequestReady, this,
-      [this](Task* task) {
-        auto mask = q_client->getSelectedApp();
-        if (mask > -1) {
-            q_client->scheduleTask(task);
-        }
-      });
+  QObject::connect(arg_ui, &ArgDialog::taskRequestReady, this,
+    [this](Task* task) {
+      auto mask = q_client->getSelectedApp();
+      if (mask > -1) {
+          q_client->scheduleTask(task);
+      }
+    }
+  );
 
   QObject::connect(ui->tasks, &QPushButton::clicked, this, [this]() {
     // TODO: Change this to a complete implementation

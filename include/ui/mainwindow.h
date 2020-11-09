@@ -24,6 +24,12 @@
 #include <headers/kiq_types.hpp>
 #include <include/client/client.hpp>
 
+const QString KYGUI_STYLESHEET{
+  "QListView { font: 87 11pt \"Noto Sans\"; background-color: #2f535f;"
+  "alternate-background-color: #616161; color: rgb(131, 148, 150); "
+  "font-weight: 700; background-color: rgb(29, 51, 59);"
+  "color: rgb(223, 252, 255);}"};
+
 namespace ProcessState {
     static constexpr int READY = 1;
     static constexpr int PENDING = 2;
