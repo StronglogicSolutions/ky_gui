@@ -17,6 +17,9 @@ class AppDialog : public QDialog
   void     setApplications(QVector<KApplication> applications) { m_applications = applications; }
   ~AppDialog();
 
+ signals:
+  void appRequest(KApplication application);
+
  protected:
   virtual void showEvent(QShowEvent *) override;
 

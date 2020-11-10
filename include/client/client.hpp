@@ -80,6 +80,13 @@ class Client : public QDialog {
   void closeConnection();
   void execute();
   QString getAppName(int mask);
+  bool    hasApp(KApplication application) {
+    for (const auto& app : m_commands) {
+      if (app.name == application.name) return true;
+    }
+    return false;
+  }
+  void registerApp(KApplication application);
   int getSelectedApp();
   // Move this to private after moving responsibilities to Client
   void scheduleTask(Scheduler::Task* task);

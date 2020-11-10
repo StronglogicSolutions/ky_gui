@@ -207,6 +207,19 @@ void MainWindow::connectClient() {
     }
   );
 
+  QObject::connect(&app_ui, &AppDialog::appRequest, this,
+    [this](KApplication application) {
+      if (q_client->hasApp(application)) {
+       QMessageBox::warning(this, tr("Application request"),
+                            tr("An application with that name already exists"));
+       return;
+      }
+      q_client->registerApp(application);
+    }
+  );
+
+
+
   QObject::connect(ui->tasks, &QPushButton::clicked, this, [this]() {
     // TODO: Change this to a complete implementation
     q_client->sendMessage("scheduler");

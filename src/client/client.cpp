@@ -512,3 +512,15 @@ void Client::sendFiles(Scheduler::Task* task) {
     qDebug() << "Still attempting to send a different file";
   }
 }
+
+void Client::registerApp(KApplication application) {
+  std::vector<std::string> operation_args{
+    application.name.toUtf8().constData(),
+    application.path.toUtf8().constData(),
+    application.data.toUtf8().constData(),
+    application.mask.toUtf8().constData()
+  };
+  std::string operation_string = createOperation("RegisterApp", operation_args);
+
+  sendEncoded(operation_string);
+}

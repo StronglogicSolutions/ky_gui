@@ -10,6 +10,10 @@ AppDialog::AppDialog(QWidget *parent) :
     this->close();
   });
 
+  QObject::connect(ui->addApp, &QPushButton::clicked, this, [this]() {
+    emit appRequest(KApplication{.name = "Mugatu"});
+  });
+
   QObject::connect(ui->appList, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
    this, [this]() {
      QString app_name = ui->appList->currentText();
@@ -34,3 +38,4 @@ void AppDialog::showEvent(QShowEvent *) {
     ui->appList->addItem(app.name);
   }
 }
+
