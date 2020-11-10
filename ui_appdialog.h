@@ -97,6 +97,18 @@ public:
 
         addApp = new QPushButton(verticalLayoutWidget);
         addApp->setObjectName(QString::fromUtf8("addApp"));
+        addApp->setMinimumSize(QSize(100, 30));
+        addApp->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 58, 70);\n"
+"font: 87 11pt \"Noto Sans\";\n"
+"color: rgb(0, 0, 0);\n"
+"font-weight: 700;\n"
+"padding: 4px;\n"
+"border-style: outset;\n"
+"border-width: 2px;\n"
+"border-radius: 4px;\n"
+"border-color: #00000f;\n"
+"min-width: 4em;\n"
+"padding: 4px;"));
         QIcon icon;
         icon.addFile(QString::fromUtf8(":/icons/icons/add.png"), QSize(), QIcon::Normal, QIcon::Off);
         addApp->setIcon(icon);
@@ -202,6 +214,18 @@ public:
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         save = new QPushButton(verticalLayoutWidget);
         save->setObjectName(QString::fromUtf8("save"));
+        save->setMinimumSize(QSize(100, 30));
+        save->setStyleSheet(QString::fromUtf8("background-color: rgb(2, 180, 43);\n"
+"font: 87 11pt \"Noto Sans\";\n"
+"color: rgb(0, 0, 0);\n"
+"font-weight: 700;\n"
+"padding: 4px;\n"
+"border-style: outset;\n"
+"border-width: 2px;\n"
+"border-radius: 4px;\n"
+"border-color: #00000f;\n"
+"min-width: 4em;\n"
+"padding: 4px;"));
         QIcon icon1;
         icon1.addFile(QString::fromUtf8(":/icons/icons/checkmark.png"), QSize(), QIcon::Normal, QIcon::Off);
         save->setIcon(icon1);
@@ -210,6 +234,18 @@ public:
 
         revert = new QPushButton(verticalLayoutWidget);
         revert->setObjectName(QString::fromUtf8("revert"));
+        revert->setMinimumSize(QSize(100, 30));
+        revert->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 58, 70);\n"
+"font: 87 11pt \"Noto Sans\";\n"
+"color: rgb(0, 0, 0);\n"
+"font-weight: 700;\n"
+"padding: 4px;\n"
+"border-style: outset;\n"
+"border-width: 2px;\n"
+"border-radius: 4px;\n"
+"border-color: #00000f;\n"
+"min-width: 4em;\n"
+"padding: 4px;"));
         QIcon icon2;
         icon2.addFile(QString::fromUtf8(":/icons/icons/revert.png"), QSize(), QIcon::Normal, QIcon::Off);
         revert->setIcon(icon2);
@@ -218,6 +254,18 @@ public:
 
         close = new QPushButton(verticalLayoutWidget);
         close->setObjectName(QString::fromUtf8("close"));
+        close->setMinimumSize(QSize(100, 30));
+        close->setStyleSheet(QString::fromUtf8("background-color: rgb(170, 0, 0);\n"
+"font: 87 11pt \"Noto Sans\";\n"
+"color: rgb(0, 0, 0);\n"
+"font-weight: 700;\n"
+"padding: 4px;\n"
+"border-style: outset;\n"
+"border-width: 2px;\n"
+"border-radius: 4px;\n"
+"border-color: #00000f;\n"
+"min-width: 4em;\n"
+"padding: 4px;"));
         QIcon icon3;
         icon3.addFile(QString::fromUtf8(":/icons/icons/cancel.png"), QSize(), QIcon::Normal, QIcon::Off);
         close->setIcon(icon3);

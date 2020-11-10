@@ -605,8 +605,7 @@ padding: 4px;</string>
               <bool>false</bool>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(130, 255, 121);
-background-color: rgb(2, 180, 43);
+              <string notr="true">background-color: rgb(2, 180, 43);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
 font-weight: 700;

@@ -24,6 +24,9 @@ class AppDialog : public QDialog
   virtual void showEvent(QShowEvent *) override;
 
  private:
+  void setInputMode(bool mode = true);
+  void setFields(QString app_name);
+
   Ui::AppDialog*        ui;
   QVector<KApplication> m_applications;
 };
