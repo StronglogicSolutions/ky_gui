@@ -3,6 +3,7 @@
 /**
  * Helper functions
  */
+
 namespace utils {
 void infoMessageBox(QString text, QString title = "KYGUI") {
   QMessageBox box;
@@ -41,9 +42,8 @@ int getLikeEventNum(QString event, QList<QString> events) {
   return hits;
 }
 
-QString getTime() { return QDateTime::currentDateTime().toString("hh:mm:ss"); }
 QString timestampPrefix() {
-  return QDateTime::currentDateTime().toString("hh:mm:ss") + " - ";
+  return TimeUtils::getTime() + " - ";
 }
 
 /**
@@ -52,15 +52,36 @@ QString timestampPrefix() {
  * @return
  */
 QStandardItem* createProcessListItem(Process process) {
-  return new QStandardItem(
-      QString("%0 requested for execution. ID: %1\nStatus: %2\nTime: %3   "
-              "Done: %4\n Errors: %5")
-          .arg(process.name)
-          .arg(process.id)
-          .arg(ProcessNames[process.state - 1])
-          .arg(process.start)
-          .arg(process.end)
-          .arg(process.error));
+
+  QString processResultText{"%0 requested for execution. "
+      "ID: %1\n"
+      "Status: %2\n"
+      "Time: %3   "
+      "Done: %4\n"
+  };
+
+  auto error = !process.error.isEmpty();
+
+  if (error) {
+    processResultText += "Errors: %5";
+    return new QStandardItem{
+      processResultText
+      .arg(process.name)
+      .arg(process.id)
+      .arg(ProcessNames[process.state - 1])
+      .arg(process.start)
+      .arg(process.end)
+      .arg(process.error)
+    };
+  }
+  return new QStandardItem{
+    processResultText
+    .arg(process.name)
+    .arg(process.id)
+    .arg(ProcessNames[process.state - 1])
+    .arg(process.start)
+    .arg(process.end)
+  };
 }
 
 /**
@@ -145,8 +166,8 @@ void MainWindow::setConnectScreen(bool visible) {
 void MainWindow::connectClient() {
   auto text = ui->kyConfig->toPlainText();
   qDebug() << text;
-  m_config = getConfigObject(ui->kyConfig->toPlainText());
-  QString file_path = m_config.at("fileDirectory");
+  m_config = loadJsonConfig(ui->kyConfig->toPlainText());
+  QString file_path = configValue("fileDirectory", m_config);
   if (file_path != NULL) {
     arg_ui->setFilePath(file_path);
   }
@@ -177,7 +198,8 @@ void MainWindow::connectClient() {
         QString app_name = ui->appList->currentText();
         q_client->setSelectedApp(std::vector<QString>{{app_name}});
         arg_ui->setAppName(app_name);
-        arg_ui->setConfig(configValue(app_name, m_config, true));
+        auto json_object = configObject(app_name, m_config, true);
+        arg_ui->setConfig(json_object);
       });
   QPushButton* disconnect_button = this->findChild<QPushButton*>("disconnect");
   QObject::connect(disconnect_button, &QPushButton::clicked, this, [this]() {
@@ -217,16 +239,6 @@ void MainWindow::connectClient() {
       q_client->registerApp(application);
     }
   );
-
-
-
-  QObject::connect(ui->tasks, &QPushButton::clicked, this, [this]() {
-    // TODO: Change this to a complete implementation
-    q_client->sendMessage("scheduler");
-  });
-
-  QObject::connect(ui->viewConsole, &QPushButton::clicked, this,
-                   [this]() { console_ui.show(); });
 
   QObject::connect(
       ui->processList, &QListView::clicked, this,
@@ -285,7 +297,7 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
   if (t == MESSAGE_UPDATE_TYPE) {  // Normal message
     qDebug() << "Updating message area";
     m_controller.handleMessage(message, v);
-    console_ui.updateText(message);
+    message_ui.append(message);
   } else if (t == COMMANDS_UPDATE_TYPE) {  // Received app list from server
     // TODO: Parse arg map -> every 4 elements is a data set for one command
     qDebug() << "Updating commands";
@@ -293,9 +305,9 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
     m_controller.handleCommands(v, default_app);
     if (message == "New Session") {  // Session has started
       ui->led->setState(true);
-      auto app_name = q_client->getAppName(q_client->getSelectedApp());
-      arg_ui->setConfig(configValue(app_name, m_config, true));
       if (configBoolValue("schedulerMode", std::ref(m_config))) {
+        auto app_name = q_client->getAppName(q_client->getSelectedApp());
+        arg_ui->setConfig(configObject(app_name, m_config, true));
         arg_ui->show();
       }
     }
@@ -303,7 +315,7 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
     qDebug() << "Updating process list";
     m_processes.push_back(Process{.name = v.at(1),
                                   .state = ProcessState::PENDING,
-                                  .start = utils::getTime(),
+                                  .start = TimeUtils::getTime(),
                                   .id = v.at(2)});
     int row = 0;
     for (const auto& process : m_processes) {
@@ -329,6 +341,7 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
     if (isKEvent<QString>(message,
                           Event::TASK_SCHEDULED)) {  // Event was scheduled task
       event_message += ". Details:\n" + parseTaskInfo(v);
+      UI::infoMessageBox(event_message, "Schedule request succeeded");
       arg_ui->notifyClientSuccess(); // Update ArgDialog accordingly
     }
     m_events.push_back(event_message);
@@ -350,16 +363,16 @@ QString MainWindow::parseTaskInfo(StringVec v) {
     qDebug() << "Can't parse when not connected";
     return task_info;
   }
-  auto size = v.size();
-  if (size < 3) {
-    qDebug() << "Not enough arguments to parse task information";
+  // TODO: We expect 5 arguments. Create a better verification pattern.
+  auto error = v.size() < 5;
+  if (error) {
+    task_info += "\n!ERROR! - " + v.at(TaskIndex::ERROR);
   } else {
-    auto error = size == 4;
-    task_info += "  UUID - " + v.at(0) + "\n  ID - " + v.at(1) + "\n  APP - " +
-                 q_client->getAppName(std::stoi(v.at(2).toUtf8().constData())) +
-                 "\n ENV - " + (v.at(3));
-    if (error) {
-      task_info += "\n !ERROR! - " + v.at(3);
+    task_info += "UUID - " + v.at(TaskIndex::UUID) + "\nID - " + v.at(TaskIndex::ID) + "\nAPP - " +
+                 q_client->getAppName(std::stoi(v.at(TaskIndex::MASK).toUtf8().constData())) +
+                 "\nENV - " + (v.at(TaskIndex::ENVFILE) + "\nFILES - " + v.at(TaskIndex::FILENUM));
+    for (auto i = 5; i < v.size(); i++) {
+      task_info += "\nFILENAME - " + v.at(i);
     }
   }
   return task_info;

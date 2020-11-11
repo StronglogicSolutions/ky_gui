@@ -16,7 +16,7 @@
 #include <QTextStream>
 
 #include <include/ui/argdialog.h>
-#include <include/ui/consoledialog.h>
+#include <include/ui/messagedialog.hpp>
 #include <include/ui/appdialog.hpp>
 
 #include "ui_mainwindow.h"
@@ -91,31 +91,32 @@ public:
       MainWindow* window;
     };
 
-    /** Process arguments */
-    int cli_argc;
-    char** cli_argv;
     /** UI & Messages */
     void connectUi();
     void setConnectScreen(bool visible = true);
-
     QString parseTaskInfo(StringVec v);
+
+    /** Process arguments */
+    int                   cli_argc;
+    char**                cli_argv;
     /** UI Members */
-    Controller      m_controller;
-    Ui::MainWindow* ui;
-    ArgDialog*      arg_ui;
-    ConsoleDialog   console_ui;
-    AppDialog       app_ui;
+    Controller            m_controller;
+    Ui::MainWindow*       ui;
+    ArgDialog*            arg_ui;
+    AppDialog             app_ui;
+    MessageDialog         message_ui;
+
     /** Client member */
-    Client* q_client;
+    Client*               q_client;
     /** Models */
-    std::vector<Process> m_processes;
-    QList<QString> m_events;
-    QStandardItemModel* m_process_model;
-    QStandardItemModel* m_event_model;
-    KListViewsStates m_view_states;
+    std::vector<Process>  m_processes;
+    QList<QString>        m_events;
+    QStandardItemModel*   m_process_model;
+    QStandardItemModel*   m_event_model;
+    KListViewsStates      m_view_states;
     /** Misc */
-    ConfigJson m_config;
-    uint16_t m_consecutive_events;
+    QJsonObject           m_config;
+    uint16_t              m_consecutive_events;
 
    private slots:
     /** Receivers */

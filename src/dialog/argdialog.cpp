@@ -1,7 +1,6 @@
 ﻿#include <include/ui/argdialog.h>
 #include <ui_argdialog.h>
 #include <QCalendarWidget>
-#include <QDateTime>
 #include <QDebug>
 #include <QIODevice>
 #include <QMimeDatabase>
@@ -14,6 +13,11 @@ using namespace Scheduler;
 
 ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), m_task(nullptr) {
   ui->setupUi(this);
+
+//  m_loader = new QMovie{":/icons/loader.gif"};
+//  m_loader_layout.addWidget(ui->loaderMovie);
+//  m_loader_layout.addWidget(ui->loaderText);
+//  m_loader_widget.setLayout(&m_loader_layout);
 
   ui->argCommandButtons->button(QDialogButtonBox::Close)
       ->setStyleSheet(QString("background:%1").arg("#2f535f"));
@@ -130,9 +134,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
   ui->dateTime->setDateTime(QDateTime::currentDateTime());
 
   QObject::connect(ui->dateTime, &QDateTimeEdit::dateTimeChanged, this, [this]() {
-    auto date_time = ui->dateTime->dateTime();
-    m_task->setArgument("datetime", QString::number(date_time.toTime_t()));
-    qDebug() << "Time changed to" << date_time;
+    m_task->setArgument("datetime", QString::number(ui->dateTime->dateTime().toTime_t()));
   });
 
   QObject::connect(ui->addRuntimeArg, &QPushButton::clicked, this, [this]() {
@@ -159,8 +161,21 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
                    this, [this](QAbstractButton *button) {
                      if (button->text() == "Save") {
                        setTaskArguments();
+                       uint task_date_time = std::get<Scheduler::VariantIndex::QSTRING>(
+                                                 m_task->getTaskArgumentValue("datetime")).toUInt();
+                       if (task_date_time <= TimeUtils::unixtime()) {
+                         UI::infoMessageBox("Unable to schedule tasks in the past!", "DateTime Error");
+                         return;
+                       }
                        if (m_task->isReady()) {
                          emit ArgDialog::taskRequestReady(m_task);
+                         m_pending_task = m_task;
+                         m_task = nullptr;
+                         m_task = createTask(m_app_name);
+                         clearPost();
+                         // displayLoader(true);
+                       } else {
+                         UI::infoMessageBox("Task is still missing arguments", "Task Verification Error");
                        }
                      }
                    });
@@ -170,17 +185,36 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
     ui->argList->setRowCount(0);
     qDebug() << "Task cleared and restored to default values";
   });
+
+  QObject::connect(ui->recurring, &QComboBox::currentTextChanged, this, [this](const QString& text) {
+    if (m_task->getType() == Scheduler::TaskType::GENERIC) {
+      m_task->setArgument("recurring", findTaskFrequency(text));
+    }
+  });
+
+  QObject::connect(ui->notification, &QComboBox::currentTextChanged, this, [this](const QString& text) {
+    if (m_task->getType() == Scheduler::TaskType::GENERIC) {
+      m_task->setArgument("notify", text.compare("Yes") == 0 ? true : false);
+    }
+  });
 }
 
 void ArgDialog::showEvent(QShowEvent* event) {
   if (event->type() == QEvent::Show) {
-    if (m_app_name == Scheduler::INSTAGRAM_NAME) {
-      m_task = new InstagramTask{};
-    } else {
-      m_task = new GenericTask{};
+    if (m_task == nullptr || m_task->getTaskCode() != findTaskCode(m_app_name)) {
+      m_task = createTask(m_app_name);
+      if (m_task->getType() == INSTAGRAM) {   // recurring and notification should
+        ui->recurring->hide();                // only be visible for generic tasks
+        ui->recurringLabel->hide();
+        ui->notification->hide();
+        ui->notificationLabel->hide();
+      } else if (ui->recurring->isHidden()) {
+        ui->recurring->show();
+        ui->recurringLabel->show();
+        ui->notification->show();
+        ui->notificationLabel->show();
+      }
     }
-    m_task->defineTaskArguments();
-    m_task->setDefaultValues();
 
     ui->argType->clear();
 
@@ -188,7 +222,10 @@ void ArgDialog::showEvent(QShowEvent* event) {
       ui->argType->addItem(name, QVariant::String);
     }
 
-    ui->user->addItems(getValueArgs(m_config_string.toUtf8(), "users"));
+    if (m_config.contains("users")) {
+      ui->user->clear();
+      ui->user->addItems(configValueToQList("users", m_config));
+    }
     if (ui->user->count() > 0) {
       m_task->setArgument("user", ui->user->itemText(0));
     }
@@ -210,9 +247,6 @@ void ArgDialog::setTaskArguments() {
     for (const auto &name : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("requested_by"))) {
       requested_by += "@" + name + "";
     }
-    if (requested_by.size() > 1) {
-      requested_by.chop(1);
-    }
     m_task->setArgument("hashtags_string", hashtags);
     m_task->setArgument("requested_by_string", requested_by);
   }
@@ -233,14 +267,15 @@ void ArgDialog::setTaskArguments() {
  * @param type
  */
 void ArgDialog::addItem(QString value, QString type) {
+  auto row = ui->argList->rowCount(); // insert row
+  ui->argList->insertRow(row);
+  // Create UI elements
   QTableWidgetItem *item = new QTableWidgetItem(type);
   QTableWidgetItem *item2 = new QTableWidgetItem(value);
-  auto row = ui->argList->rowCount();
-  ui->argList->insertRow(row);
   QPushButton *q_pb = new QPushButton();
   q_pb->setText("Delete");
   q_pb->setIcon(std::move(QIcon(":/icons/icons/quit.png")));
-  // Set listener on Delete button
+  // Delete listener
   QObject::connect(q_pb, &QPushButton::clicked, this, [this]() {
     auto row_index = ui->argList->currentRow();
     auto name = ui->argList->item(row_index, 0)->text();
@@ -253,7 +288,6 @@ void ArgDialog::addItem(QString value, QString type) {
     }
     ui->argList->removeRow(row_index);
   });
-
   ui->argList->setItem(row, 0, item);
   ui->argList->setItem(row, 1, item2);
   ui->argList->setCellWidget(row, 3, q_pb);
@@ -280,10 +314,8 @@ void ArgDialog::addFile(QString path) {
  */
 void ArgDialog::clearPost() {
   QDateTime date_time = QDateTime::currentDateTime();
-  ui->dateTime->setDateTime(date_time);
   m_task->clear();
   m_task->setDefaultValues();
-  m_task->setArgument("datetime", QString::number(date_time.toTime_t()));
   m_task->setArgument("user", ui->user->currentText());
   ui->argType->setCurrentIndex(0);
   ui->argList->setRowCount(0);
@@ -300,14 +332,20 @@ void ArgDialog::clearTask() { m_task->clear(); }
  */
 void ArgDialog::addRequestedBy(QString value) {
   QStringList names = value.split(" ");
-  QVector<QString> requested_by_names = std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("requested_by"));
+  QVector<QString> requested_by_names =
+      std::get<VariantIndex::STRVEC>(
+          m_task->getTaskArgumentValue("requested_by"));
+
   for (const auto &name : names) {
-    if (std::find(requested_by_names.begin(), requested_by_names.end(), value.toUtf8().constData()) == requested_by_names.end()) {
+    if (std::find(
+            requested_by_names.begin(), requested_by_names.end(),  value.toUtf8().constData()) == requested_by_names.end()) {
       m_task->addArgument("requested_by", name);
       addToArgList(name, "requested_by");
     } else {
-        const char* message = "You have already inputed this name under \"requested_by\"";
+        const char* message =
+          "You have already inputed this name under \"requested_by\"";
         qDebug() << message;
+
         QMessageBox::warning(
             this,
             tr("Requested By"),
@@ -410,8 +448,8 @@ void ArgDialog::setAppName(QString app_name) {
  * @brief ArgDialog::setConfig
  * @param config_string
  */
-void ArgDialog::setConfig(QString config_string) {
-  m_config_string = config_string;
+void ArgDialog::setConfig(QJsonObject config) {
+  m_config = config;
 }
 
 /**
@@ -419,6 +457,10 @@ void ArgDialog::setConfig(QString config_string) {
  */
 ArgDialog::~ArgDialog() {
   delete m_task;
+  if (m_pending_task == nullptr) {
+    delete m_pending_task;
+  }
+//  delete m_loader;
   delete ui;
 }
 
@@ -432,5 +474,38 @@ void ArgDialog::setArgTypes() {
 }
 
 void ArgDialog::notifyClientSuccess() {
-  clearPost();
+  // displayLoader(false);
+  if (m_pending_task != nullptr) {
+    delete m_pending_task;
+  } else {
+    clearPost();
+  }
+}
+
+void ArgDialog::displayLoader(bool visible) {
+  if (visible) {
+    auto height = 400;
+    auto width = 480;
+    m_loader_widget.setMaximumSize(width, height);
+    m_loader_widget.setMinimumSize(width, height);
+    m_loader_widget.show();
+    m_loader_widget.activateWindow();
+    m_loader_widget.raise();
+    ui->loaderMovie->setMovie(m_loader);
+    ui->loaderMovie->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ui->loaderMovie->show();
+    ui->loaderMovie->activateWindow();
+    ui->loaderMovie->raise();
+    ui->loaderMovie->setMaximumSize(width, height);
+    ui->loaderMovie->setMinimumSize(width, height / 2);
+    ui->loaderText->setMaximumSize(width, height);
+    ui->loaderText->setMinimumSize(width, height / 2);
+    m_loader->start();
+  } else {
+    m_loader_widget.hide();
+    ui->loaderMovie->hide();
+    ui->loaderMovie->setVisible(false);
+    ui->loaderText->hide();
+    ui->loaderText->setVisible(false);
+  }
 }

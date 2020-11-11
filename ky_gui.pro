@@ -36,14 +36,15 @@ SOURCES += \
         src/task/generic_task.cpp \
         src/dialog/appdialog.cpp \
         src/dialog/argdialog.cpp \
-        src/dialog/consoledialog.cpp \
+        src/dialog/messagedialog.cpp \
         src/component/connection_indicator.cpp \
         src/component/kfiledialog.cpp
+
 
 HEADERS += \
         include/ui/appdialog.hpp \
         include/ui/argdialog.h \
-        include/ui/consoledialog.h \
+        include/ui/messagedialog.hpp \
         include/ui/mainwindow.h \
         include/ui/connection_indicator.h \
         include/ui/kfiledialog.h \
@@ -58,14 +59,15 @@ HEADERS += \
         headers/kiq_types.hpp \
         headers/rapidjson/writer.h \
         headers/rapidjson/stringbuffer.h \
-        headers/rapidjson/document.h \
+        headers/rapidjson/document.h
 
 
 FORMS += \
         appdialog.ui \
         argdialog.ui \
         consoledialog.ui \
-        mainwindow.ui
+        mainwindow.ui \
+        messagedialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -16,6 +16,7 @@
         <file>icons/revert.png</file>
         <file>icons/checkmark.png</file>
         <file>icons/gear.png</file>
+        <file>icons/messages.png</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/log.png</file>
@@ -23,5 +24,6 @@
         <file>icons/disconnect.png</file>
         <file>style/style.css</file>
         <file>style/messagebox.css</file>
+        <file>icons/loader.gif</file>
     </qresource>
 </RCC>

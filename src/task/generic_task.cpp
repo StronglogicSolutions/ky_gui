@@ -12,8 +12,10 @@ static const uint8_t DATETIME       = 2;
 static const uint8_t FILES          = 3;
 static const uint8_t USER           = 4;
 static const uint8_t IS_VIDEO       = 5;
-static const uint8_t RUNTIME        = 6;
-static const uint8_t RUNTIME_STRING = 7;
+static const uint8_t RECURRING      = 6;
+static const uint8_t NOTIFY         = 7;
+static const uint8_t RUNTIME        = 8;
+static const uint8_t RUNTIME_STRING = 9;
 }  // namespace TaskIndex
 
 /**
@@ -35,6 +37,8 @@ void GenericTask::defineTaskArguments() {
   m_arguments.emplace_back(std::move(new TaskArgument{"files", Type::FILEVECTOR, QVector<KFileData>{}}));
   m_arguments.emplace_back(std::move(new TaskArgument{"user", Type::TEXT, QString{}}));
   m_arguments.emplace_back(std::move(new TaskArgument{"is_video", Type::BOOLEAN, bool{}}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"recurring", Type::INTEGER, findTaskFrequency("No")}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"notify", Type::BOOLEAN, false}));
   m_arguments.emplace_back(std::move(new TaskArgument{"runtime", Type::STRINGVECTOR, QVector<QString>{}}));
   m_arguments.emplace_back(std::move(new TaskArgument{"runtime_string", Type::TEXT, QString{}}));
 }
@@ -197,6 +201,8 @@ const TaskArguments&& GenericTask::getTaskArguments() { return std::move(m_argum
  */
 void GenericTask::setDefaultValues() {
   setArgument("header", TypeVariant{QString{"Generic Task"}});
+  setArgument("recurring", 0);
+  setArgument("notify", false);
 }
 
 /**
@@ -209,9 +215,9 @@ Scheduler::TaskType GenericTask::getType() { return Scheduler::TaskType::GENERIC
 /**
  * @brief getTaskCode
  *
- * @return [out] {int} The task bytecode
+ * @return [out] {uint32_t} The task bytecode
  */
-int GenericTask::getTaskCode() { return TaskCode::GENTASKBYTE; };
+uint32_t GenericTask::getTaskCode() { return Scheduler::TaskCode::GENTASKBYTE; };
 
 
 /**

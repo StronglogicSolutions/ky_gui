@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>970</width>
-    <height>864</height>
+    <height>904</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,11 +26,11 @@ background-color: rgb(0, 43, 54);</string>
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>948</width>
-     <height>851</height>
+     <width>946</width>
+     <height>891</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0,0,0,0,3,0">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0,0,0,0,0,3,0">
     <item>
      <widget class="QLabel" name="argDialogTitle">
       <property name="font">
@@ -52,7 +52,7 @@ color:  rgb(255, 85, 0);
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0">
+     <layout class="QHBoxLayout" name="ahorizontalLayout" stretch="0,0,0,0">
       <item>
        <widget class="QLabel" name="label_2">
         <property name="sizePolicy">
@@ -156,7 +156,7 @@ font-weight: 700;
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QHBoxLayout" name="bhorizontalLayout_2">
       <item>
        <widget class="QLabel" name="label_3">
         <property name="sizePolicy">
@@ -439,17 +439,144 @@ font-size: 16pt;</string>
      </layout>
     </item>
     <item>
-     <widget class="QLabel" name="label">
-      <property name="styleSheet">
-       <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+     <layout class="QHBoxLayout" name="zhorizontalLayout_8">
+      <item>
+       <widget class="QLabel" name="notificationLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>196</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>196</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
 color: rgb(131, 148, 150);
 font-weight: 700;
-padding-left: 8px;</string>
-      </property>
-      <property name="text">
-       <string>Items to send</string>
-      </property>
-     </widget>
+ qproperty-alignment: 'AlignHCenter';</string>
+        </property>
+        <property name="text">
+         <string>Email notification</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignHCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="notification">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: #2f535f;
+color: rgb(131, 148, 150);
+font-weight: 700;
+</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>No</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Yes</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <item>
+       <widget class="QLabel" name="recurringLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>196</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>196</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(131, 148, 150);
+font-weight: 700;
+ qproperty-alignment: 'AlignHCenter';</string>
+        </property>
+        <property name="text">
+         <string>Recurring</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignHCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="recurring">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: #2f535f;
+color: rgb(131, 148, 150);
+font-weight: 700;
+</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>No</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Hourly</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Daily</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Weekly</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0">
@@ -574,6 +701,32 @@ padding: 4px;</string>
      </layout>
     </item>
    </layout>
+  </widget>
+  <widget class="QLabel" name="loaderText">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>0</width>
+     <height>0</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Sending request to Server. Please wait ...</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="loaderMovie">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>0</width>
+     <height>0</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
   </widget>
  </widget>
  <resources>
