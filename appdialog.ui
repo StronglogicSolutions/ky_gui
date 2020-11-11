@@ -26,7 +26,22 @@ color: rgb(161, 164, 167);</string>
      <height>851</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="2,1,1,1,1,0,0">
+    <property name="spacing">
+     <number>18</number>
+    </property>
+    <property name="leftMargin">
+     <number>16</number>
+    </property>
+    <property name="topMargin">
+     <number>16</number>
+    </property>
+    <property name="rightMargin">
+     <number>16</number>
+    </property>
+    <property name="bottomMargin">
+     <number>16</number>
+    </property>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0">
       <item>
@@ -272,13 +287,25 @@ font-weight: 700;</string>
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
       <item>
        <widget class="QPushButton" name="save">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>100</width>
-          <height>30</height>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>420</width>
+          <height>16777215</height>
          </size>
         </property>
         <property name="styleSheet">
@@ -295,20 +322,30 @@ min-width: 4em;
 padding: 4px;</string>
         </property>
         <property name="text">
-         <string>Save</string>
+         <string>Submit</string>
         </property>
         <property name="icon">
          <iconset resource="kres.qrc">
-          <normaloff>:/icons/icons/checkmark.png</normaloff>:/icons/icons/checkmark.png</iconset>
+          <normaloff>:/icons/send-button.png</normaloff>:/icons/send-button.png</iconset>
         </property>
        </widget>
       </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
       <item>
        <widget class="QPushButton" name="revert">
         <property name="minimumSize">
          <size>
           <width>100</width>
           <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>420</width>
+          <height>16777215</height>
          </size>
         </property>
         <property name="styleSheet">
@@ -339,6 +376,12 @@ padding: 4px;</string>
          <size>
           <width>100</width>
           <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>420</width>
+          <height>16777215</height>
          </size>
         </property>
         <property name="styleSheet">

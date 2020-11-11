@@ -1,7 +1,7 @@
 ﻿#include "include/ui/appdialog.hpp"
 #include "ui_appdialog.h"
 
-bool input_mode{false};
+static bool input_mode{false};
 
 AppDialog::AppDialog(QWidget *parent) :
                                         QDialog(parent),
@@ -13,9 +13,16 @@ AppDialog::AppDialog(QWidget *parent) :
   });
 
   QObject::connect(ui->addApp, &QPushButton::clicked, this, [this]() {
-//    emit appRequest(KApplication{.name = "Mugatu"});
-    input_mode = !input_mode;
-    setInputMode(input_mode);
+    toggleInputMode();
+  });
+
+  QObject::connect(ui->save, &QPushButton::clicked, this, [this]() {
+    emit appRequest(KApplication{
+      .name = ui->nameText->text(),
+      .path = ui->pathText->text(),
+      .data = ui->dataText->text(),
+      .mask = ui->maskText->text()
+    });
   });
 
   QObject::connect(ui->appList, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -47,8 +54,9 @@ void AppDialog::setFields(QString app_name) {
   }
 }
 
-void AppDialog::setInputMode(bool mode) {
-  if (mode) {
+void AppDialog::toggleInputMode() {
+  input_mode = !input_mode;
+  if (input_mode) {
     ui->appList->setStyleSheet("QComboBox { color: #33383c }");
     ui->addApp->setStyleSheet(
         "QPushButton { "

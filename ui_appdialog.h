@@ -44,8 +44,9 @@ public:
     QHBoxLayout *horizontalLayout_5;
     QLabel *maskLabel;
     QLineEdit *maskText;
-    QHBoxLayout *horizontalLayout;
+    QHBoxLayout *horizontalLayout_7;
     QPushButton *save;
+    QHBoxLayout *horizontalLayout;
     QPushButton *revert;
     QPushButton *close;
 
@@ -60,8 +61,9 @@ public:
         verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
         verticalLayoutWidget->setGeometry(QRect(10, 10, 951, 851));
         verticalLayout = new QVBoxLayout(verticalLayoutWidget);
+        verticalLayout->setSpacing(18);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        verticalLayout->setContentsMargins(0, 0, 0, 0);
+        verticalLayout->setContentsMargins(16, 16, 16, 16);
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         appsLabel = new QLabel(verticalLayoutWidget);
@@ -210,11 +212,17 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_5);
 
-        horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        horizontalLayout_7 = new QHBoxLayout();
+        horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
         save = new QPushButton(verticalLayoutWidget);
         save->setObjectName(QString::fromUtf8("save"));
-        save->setMinimumSize(QSize(100, 30));
+        QSizePolicy sizePolicy2(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(save->sizePolicy().hasHeightForWidth());
+        save->setSizePolicy(sizePolicy2);
+        save->setMinimumSize(QSize(100, 25));
+        save->setMaximumSize(QSize(420, 16777215));
         save->setStyleSheet(QString::fromUtf8("background-color: rgb(2, 180, 43);\n"
 "font: 87 11pt \"Noto Sans\";\n"
 "color: rgb(0, 0, 0);\n"
@@ -227,14 +235,20 @@ public:
 "min-width: 4em;\n"
 "padding: 4px;"));
         QIcon icon1;
-        icon1.addFile(QString::fromUtf8(":/icons/icons/checkmark.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon1.addFile(QString::fromUtf8(":/icons/send-button.png"), QSize(), QIcon::Normal, QIcon::Off);
         save->setIcon(icon1);
 
-        horizontalLayout->addWidget(save);
+        horizontalLayout_7->addWidget(save);
 
+
+        verticalLayout->addLayout(horizontalLayout_7);
+
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         revert = new QPushButton(verticalLayoutWidget);
         revert->setObjectName(QString::fromUtf8("revert"));
         revert->setMinimumSize(QSize(100, 30));
+        revert->setMaximumSize(QSize(420, 16777215));
         revert->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 58, 70);\n"
 "font: 87 11pt \"Noto Sans\";\n"
 "color: rgb(0, 0, 0);\n"
@@ -255,6 +269,7 @@ public:
         close = new QPushButton(verticalLayoutWidget);
         close->setObjectName(QString::fromUtf8("close"));
         close->setMinimumSize(QSize(100, 30));
+        close->setMaximumSize(QSize(420, 16777215));
         close->setStyleSheet(QString::fromUtf8("background-color: rgb(170, 0, 0);\n"
 "font: 87 11pt \"Noto Sans\";\n"
 "color: rgb(0, 0, 0);\n"
@@ -275,6 +290,11 @@ public:
 
         verticalLayout->addLayout(horizontalLayout);
 
+        verticalLayout->setStretch(0, 2);
+        verticalLayout->setStretch(1, 1);
+        verticalLayout->setStretch(2, 1);
+        verticalLayout->setStretch(3, 1);
+        verticalLayout->setStretch(4, 1);
 
         retranslateUi(AppDialog);
 
@@ -290,7 +310,7 @@ public:
         pathLabel->setText(QCoreApplication::translate("AppDialog", "Path", nullptr));
         dataLabel->setText(QCoreApplication::translate("AppDialog", "Data", nullptr));
         maskLabel->setText(QCoreApplication::translate("AppDialog", "Mask", nullptr));
-        save->setText(QCoreApplication::translate("AppDialog", "Save", nullptr));
+        save->setText(QCoreApplication::translate("AppDialog", "Submit", nullptr));
         revert->setText(QCoreApplication::translate("AppDialog", "Revert", nullptr));
         close->setText(QCoreApplication::translate("AppDialog", "Close", nullptr));
     } // retranslateUi

@@ -276,7 +276,9 @@ void Client::sendTaskEncoded(Scheduler::Task* task) {
             builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
               task->getTaskArgumentValue("header")).toUtf8().constData()}),
             builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
-              task->getTaskArgumentValue("user")).toUtf8().constData()}));
+              task->getTaskArgumentValue("user")).toUtf8().constData()}),
+            builder.CreateString(std::string{std::get<Scheduler::VariantIndex::QSTRING>(
+              task->getTaskArgumentValue("runtime_string")).toUtf8().constData()}));
     builder.Finish(generic_task);
   }
 
@@ -514,7 +516,10 @@ void Client::sendFiles(Scheduler::Task* task) {
 }
 
 void Client::registerApp(KApplication application) {
+  uint8_t REGISTER_REQUEST_BYTE{0x00};
+
   std::vector<std::string> operation_args{
+    std::to_string(REGISTER_REQUEST_BYTE),
     application.name.toUtf8().constData(),
     application.path.toUtf8().constData(),
     application.data.toUtf8().constData(),

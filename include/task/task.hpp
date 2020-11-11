@@ -9,6 +9,9 @@
 #include <vector>
 
 namespace Scheduler {
+namespace Args {
+const QString RUNTIME_ARG_TYPE = "runtime_arg";
+} // namespace Args
 
 enum TaskType { INSTAGRAM = 1, GENERIC = 2, OTHER = 3 };
 

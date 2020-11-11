@@ -6,12 +6,14 @@ using namespace Scheduler;
  * These values contained inside the TaskIndex namespace represent the order in which the tasks are to be stored.
  */
 namespace TaskIndex {
-static const uint8_t HEADER = 0;
-static const uint8_t DESCRIPTION = 1;
-static const uint8_t DATETIME = 2;
-static const uint8_t FILES = 3;
-static const uint8_t USER = 4;
-static const uint8_t IS_VIDEO = 5;
+static const uint8_t HEADER         = 0;
+static const uint8_t DESCRIPTION    = 1;
+static const uint8_t DATETIME       = 2;
+static const uint8_t FILES          = 3;
+static const uint8_t USER           = 4;
+static const uint8_t IS_VIDEO       = 5;
+static const uint8_t RUNTIME        = 6;
+static const uint8_t RUNTIME_STRING = 7;
 }  // namespace TaskIndex
 
 /**
@@ -33,6 +35,8 @@ void GenericTask::defineTaskArguments() {
   m_arguments.emplace_back(std::move(new TaskArgument{"files", Type::FILEVECTOR, QVector<KFileData>{}}));
   m_arguments.emplace_back(std::move(new TaskArgument{"user", Type::TEXT, QString{}}));
   m_arguments.emplace_back(std::move(new TaskArgument{"is_video", Type::BOOLEAN, bool{}}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"runtime", Type::STRINGVECTOR, QVector<QString>{}}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"runtime_string", Type::TEXT, QString{}}));
 }
 
 /**
@@ -246,11 +250,11 @@ const QVector<Scheduler::KFileData> GenericTask::getFiles() {
  *                      perform the task have been met.
  */
 bool GenericTask::isReady() {
-  auto header_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("header")).size();
+  auto header_size      = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("header")).size();
   auto description_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("description")).size();
-  auto datetime_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("datetime")).size();
-  auto hasFiles = std::get<VariantIndex::FILEVEC>(getTaskArgumentValue("files")).size();
-  auto user_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("user")).size();
+  auto datetime_size    = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("datetime")).size();
+  auto hasFiles         = std::get<VariantIndex::FILEVEC>(getTaskArgumentValue("files")).size();
+  auto user_size        = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("user")).size();
 
   return header_size > 0 && description_size > 0 && datetime_size > 0 &&
          hasFiles && user_size > 0;

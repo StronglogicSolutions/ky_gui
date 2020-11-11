@@ -15,11 +15,11 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-struct KApplication {
-  QString mask;
+struct KApplication {  
   QString name;
   QString path;
   QString data;
+  QString mask;
 };
 
 namespace {
