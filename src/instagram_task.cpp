@@ -228,9 +228,9 @@ Scheduler::TaskType InstagramTask::getType() { return Scheduler::TaskType::INSTA
 /**
  * @brief getTaskCode
  *
- * @return [out] {int} The task bytecode
+ * @return [out] {uint32_t} The task bytecode
  */
-int InstagramTask::getTaskCode() { return TaskCode::IGTASKBYTE; };
+uint32_t InstagramTask::getTaskCode() { return TaskCode::IGTASKBYTE; };
 
 /**
  * @brief InstagramTask::clear
@@ -275,8 +275,8 @@ bool InstagramTask::isReady() {
   auto link_in_bio_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("link_in_bio")).size();
   auto hashtags_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("hashtags_string")).size();
   auto requested_by_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("requested_by_string")).size();
-  auto hasFiles = std::get<VariantIndex::FILEVEC>(getTaskArgumentValue("files")).size();
-  auto user_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("user")).size();
+  auto hasFiles = this->hasFiles();
+  auto user_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("user")).size() > 0;
 
   return header_size > 0 && description_size > 0 && datetime_size > 0 &&
          promote_share_size > 0 && link_in_bio_size > 0 &&

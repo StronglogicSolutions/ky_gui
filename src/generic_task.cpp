@@ -6,12 +6,14 @@ using namespace Scheduler;
  * These values contained inside the TaskIndex namespace represent the order in which the tasks are to be stored.
  */
 namespace TaskIndex {
-static const uint8_t HEADER = 0;
-static const uint8_t DESCRIPTION = 1;
-static const uint8_t DATETIME = 2;
-static const uint8_t FILES = 3;
-static const uint8_t USER = 4;
-static const uint8_t IS_VIDEO = 5;
+static const uint8_t HEADER       = 0;
+static const uint8_t DESCRIPTION  = 1;
+static const uint8_t DATETIME     = 2;
+static const uint8_t FILES        = 3;
+static const uint8_t USER         = 4;
+static const uint8_t IS_VIDEO     = 5;
+static const uint8_t RECURRING    = 6;
+static const uint8_t NOTIFY       = 7;
 }  // namespace TaskIndex
 
 /**
@@ -33,6 +35,8 @@ void GenericTask::defineTaskArguments() {
   m_arguments.emplace_back(std::move(new TaskArgument{"files", Type::FILEVECTOR, QVector<KFileData>{}}));
   m_arguments.emplace_back(std::move(new TaskArgument{"user", Type::TEXT, QString{}}));
   m_arguments.emplace_back(std::move(new TaskArgument{"is_video", Type::BOOLEAN, bool{}}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"recurring", Type::INTEGER, findTaskFrequency("No")}));
+  m_arguments.emplace_back(std::move(new TaskArgument{"notify", Type::BOOLEAN, false}));
 }
 
 /**
@@ -193,6 +197,8 @@ const TaskArguments&& GenericTask::getTaskArguments() { return std::move(m_argum
  */
 void GenericTask::setDefaultValues() {
   setArgument("header", TypeVariant{QString{"Generic Task"}});
+  setArgument("recurring", 0);
+  setArgument("notify", false);
 }
 
 /**
@@ -205,9 +211,9 @@ Scheduler::TaskType GenericTask::getType() { return Scheduler::TaskType::GENERIC
 /**
  * @brief getTaskCode
  *
- * @return [out] {int} The task bytecode
+ * @return [out] {uint32_t} The task bytecode
  */
-int GenericTask::getTaskCode() { return TaskCode::GENTASKBYTE; };
+uint32_t GenericTask::getTaskCode() { return TaskCode::GENTASKBYTE; };
 
 
 /**
@@ -246,14 +252,10 @@ const QVector<Scheduler::KFileData> GenericTask::getFiles() {
  *                      perform the task have been met.
  */
 bool GenericTask::isReady() {
-  auto header_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("header")).size();
-  auto description_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("description")).size();
-  auto datetime_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("datetime")).size();
-  auto hasFiles = std::get<VariantIndex::FILEVEC>(getTaskArgumentValue("files")).size();
-  auto user_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("user")).size();
-
-  return header_size > 0 && description_size > 0 && datetime_size > 0 &&
-         hasFiles && user_size > 0;
+  return std::get<VariantIndex::QSTRING>(
+    getTaskArgumentValue("datetime")
+  ) // GenericTask only needs a datetime value to run
+  .size() > 0;
 }
 
 /**

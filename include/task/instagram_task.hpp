@@ -16,6 +16,8 @@ const QString REQUESTED_BY_TYPE = "requested_by";
 const QString REQUESTED_BY_PHRASE = "requested_by_phrase";
 }  // namespace Args
 
+static constexpr const char* INSTAGRAM_NAME = "Instagram";
+
 namespace TaskCode {
   static constexpr int IGTASKBYTE = 0xFF;
 }
@@ -94,7 +96,7 @@ class InstagramTask : public Scheduler::Task {
    *
    * Returns the task's byte code.
    */
-  virtual int getTaskCode() override;
+  virtual uint32_t getTaskCode() override;
 
   /**
    * Overrides @abstract Task::setArgument

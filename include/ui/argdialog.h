@@ -15,9 +15,24 @@
 #include <string_view>
 #include <unordered_map>
 
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QMovie>
+
 using namespace Scheduler;
 
-typedef std::string Str;
+inline Task* createTask(QString task_name = GENERIC_NAME) {
+  Task* task;
+  if (task_name == INSTAGRAM_NAME) {
+     task = new InstagramTask{};
+  } else {
+    task = new GenericTask{};
+  }
+  task->defineTaskArguments();
+  task->setDefaultValues();
+
+  return task;
+}
 
 namespace Ui {
 class ArgDialog;
@@ -32,7 +47,7 @@ class ArgDialog : public QDialog {
   void setFilePath(QString path);
   virtual void accept() override;
   void setAppName(QString task_name);
-  void setConfig(QString config_string);
+  void setConfig(QJsonObject config);
   void notifyClientSuccess();
 
   ~ArgDialog();
@@ -47,6 +62,7 @@ class ArgDialog : public QDialog {
   void clearPost();
   void defaultPost();
   void clearTask();
+  void displayLoader(bool visible);
   void addToArgList(QString value, QString type);
   void addOrReplaceInArgList(QString value, QString type);
   void addHashtag(QString tag);
@@ -56,10 +72,15 @@ class ArgDialog : public QDialog {
   Ui::ArgDialog *ui;
   void addItem(QString value, QString type);
   void addFile(QString path);
-  Task *m_task;
-  QString m_file_path;
-  QString m_config_string;
-  QString m_app_name;
+
+  Task*         m_task;
+  Task*         m_pending_task;
+  QString       m_file_path;
+  QJsonObject   m_config;
+  QString       m_app_name;
+  QMovie*       m_loader;
+  QWidget      m_loader_widget;
+  QVBoxLayout  m_loader_layout;
 };
 
 #endif  // ARGDIALOG_H

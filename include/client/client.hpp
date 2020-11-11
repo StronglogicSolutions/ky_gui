@@ -24,13 +24,11 @@ static constexpr int COMMANDS_UPDATE_TYPE = 2;
 static constexpr int EVENT_UPDATE_TYPE = 3;
 static constexpr int PROCESS_REQUEST_TYPE = 4;
 
-using namespace Scheduler;
+//using namespace Scheduler;
 
 namespace TaskCode {
-static constexpr int IGTASKBYTE = 0xFF;
-static constexpr int GENMSGBYTE = 0xFE;
-static constexpr int GENTASKBYTE = 0xFC;
-static constexpr int PINGBYTE = 0xFD;
+static constexpr uint32_t GENMSGBYTE = 0xFE;
+static constexpr uint32_t PINGBYTE = 0xFD;
 }  // namespace TaskCode
 
 typedef std::map<int, std::string> CommandMap;
@@ -89,18 +87,21 @@ class Client : public QDialog {
   void sendTaskEncoded(Scheduler::Task* task);
   void processFileQueue();
   void handleMessages();
+  void handleEvent(std::string data);
   void sendPackets(uint8_t* data, int size);
-  int argc;
-  char** argv;
-  int m_client_socket_fd;
-  Task* m_outbound_task;
-  bool executing;
-  bool file_was_sent;
-  CommandMap m_commands;
-  CommandArgMap m_command_arg_map;
-  std::vector<int> selected_commands;
-  QQueue<Scheduler::KFileData> outgoing_files;
-  std::vector<SentFile> sent_files;
-  Scheduler::TaskQueue m_task_queue;
+
+  int                           argc;
+  char**                        argv;
+  int                           m_client_socket_fd;
+  bool                          executing;
+  bool                          file_was_sent;
+
+  Scheduler::Task*                         m_outbound_task;
+  CommandMap                    m_commands;
+  CommandArgMap                 m_command_arg_map;
+  std::vector<int>              selected_commands;
+  std::vector<SentFile>         sent_files;
+  Scheduler::TaskQueue          m_task_queue;
+  QQueue<Scheduler::KFileData>  outgoing_files;
 };
 #endif // CLIENT_HPP
