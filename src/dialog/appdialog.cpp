@@ -17,12 +17,11 @@ AppDialog::AppDialog(QWidget *parent) :
   });
 
   QObject::connect(ui->save, &QPushButton::clicked, this, [this]() {
-    emit appRequest(KApplication{
-      .name = ui->nameText->text(),
-      .path = ui->pathText->text(),
-      .data = ui->dataText->text(),
-      .mask = ui->maskText->text()
-    });
+    emit appRequest(readFields(), constants::RequestType::REGISTER);
+  });
+
+  QObject::connect(ui->deleteApp, &QPushButton::clicked, this, [this]() {
+    emit appRequest(readFields(), constants::RequestType::DELETE);
   });
 
   QObject::connect(ui->appList, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -38,6 +37,7 @@ AppDialog::~AppDialog()
 }
 
 void AppDialog::showEvent(QShowEvent *) {
+  ui->appList->clear();
   for (const auto& app : m_applications) {
     ui->appList->addItem(app.name);
   }
@@ -96,5 +96,13 @@ void AppDialog::toggleInputMode() {
         "}"
         );
   }
+}
 
+KApplication AppDialog::readFields() {
+  return KApplication{
+    .name = ui->nameText->text(),
+    .path = ui->pathText->text(),
+    .data = ui->dataText->text(),
+    .mask = ui->maskText->text()
+  };
 }

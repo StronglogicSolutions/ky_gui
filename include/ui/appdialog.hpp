@@ -4,6 +4,15 @@
 #include <QDialog>
 #include "headers/util.hpp"
 
+namespace constants {
+enum RequestType {
+  REGISTER = 0x00,
+  UPDATE   = 0x01,
+  DELETE   = 0x02,
+  GET      = 0x03
+};
+}
+
 namespace Ui {
 class AppDialog;
 }
@@ -18,14 +27,15 @@ class AppDialog : public QDialog
   ~AppDialog();
 
  signals:
-  void appRequest(KApplication application);
+  void appRequest(KApplication application, constants::RequestType type);
 
  protected:
   virtual void showEvent(QShowEvent *) override;
 
  private:
-  void toggleInputMode();
-  void setFields(QString app_name);
+  void         toggleInputMode();
+  void         setFields(QString app_name);
+  KApplication readFields();
 
   Ui::AppDialog*        ui;
   QVector<KApplication> m_applications;

@@ -330,16 +330,18 @@ padding: 4px;</string>
         </property>
        </widget>
       </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
       <item>
-       <widget class="QPushButton" name="revert">
+       <widget class="QPushButton" name="deleteApp">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>100</width>
-          <height>30</height>
+          <height>25</height>
          </size>
         </property>
         <property name="maximumSize">
@@ -349,7 +351,7 @@ padding: 4px;</string>
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(0, 58, 70);
+         <string notr="true">background-color: rgb(170, 0, 0);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
 font-weight: 700;
@@ -362,14 +364,18 @@ min-width: 4em;
 padding: 4px;</string>
         </property>
         <property name="text">
-         <string>Revert</string>
+         <string>Delete</string>
         </property>
         <property name="icon">
          <iconset resource="kres.qrc">
-          <normaloff>:/icons/icons/revert.png</normaloff>:/icons/icons/revert.png</iconset>
+          <normaloff>:/icons/icons/trash.png</normaloff>:/icons/icons/trash.png</iconset>
         </property>
        </widget>
       </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
       <item>
        <widget class="QPushButton" name="close">
         <property name="minimumSize">
@@ -385,7 +391,7 @@ padding: 4px;</string>
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(170, 0, 0);
+         <string notr="true">background-color: rgb(255, 85, 0);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
 font-weight: 700;

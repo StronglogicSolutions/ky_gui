@@ -564,17 +564,15 @@ void Client::sendFiles(Scheduler::Task* task) {
   }
 }
 
-void Client::registerApp(KApplication application) {
-  uint8_t REGISTER_REQUEST_BYTE{0x00};
-
+void Client::appRequest(KApplication application, uint8_t request_code) {
   std::vector<std::string> operation_args{
-    std::to_string(REGISTER_REQUEST_BYTE),
+    std::to_string(request_code),
     application.name.toUtf8().constData(),
     application.path.toUtf8().constData(),
     application.data.toUtf8().constData(),
     application.mask.toUtf8().constData()
   };
-  std::string operation_string = createOperation("RegisterApp", operation_args);
+  std::string operation_string = createOperation("AppRequest", operation_args);
 
   sendEncoded(operation_string);
 }

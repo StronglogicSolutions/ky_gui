@@ -84,8 +84,8 @@ void MainWindow::Controller::handleCommands(StringVec args,
  * @param v
  */
 void MainWindow::Controller::handleMessage(QString message, StringVec v) {
-  window->ui->messages->append(
-    utils::timestampPrefix() + parseMessage(message, v)
+  window->message_ui.append(
+    utils::timestampPrefix() + parseMessage(message, v), true
   );
 }
 

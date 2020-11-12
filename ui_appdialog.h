@@ -46,8 +46,8 @@ public:
     QLineEdit *maskText;
     QHBoxLayout *horizontalLayout_7;
     QPushButton *save;
+    QPushButton *deleteApp;
     QHBoxLayout *horizontalLayout;
-    QPushButton *revert;
     QPushButton *close;
 
     void setupUi(QDialog *AppDialog)
@@ -240,16 +240,13 @@ public:
 
         horizontalLayout_7->addWidget(save);
 
-
-        verticalLayout->addLayout(horizontalLayout_7);
-
-        horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        revert = new QPushButton(verticalLayoutWidget);
-        revert->setObjectName(QString::fromUtf8("revert"));
-        revert->setMinimumSize(QSize(100, 30));
-        revert->setMaximumSize(QSize(420, 16777215));
-        revert->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 58, 70);\n"
+        deleteApp = new QPushButton(verticalLayoutWidget);
+        deleteApp->setObjectName(QString::fromUtf8("deleteApp"));
+        sizePolicy2.setHeightForWidth(deleteApp->sizePolicy().hasHeightForWidth());
+        deleteApp->setSizePolicy(sizePolicy2);
+        deleteApp->setMinimumSize(QSize(100, 25));
+        deleteApp->setMaximumSize(QSize(420, 16777215));
+        deleteApp->setStyleSheet(QString::fromUtf8("background-color: rgb(170, 0, 0);\n"
 "font: 87 11pt \"Noto Sans\";\n"
 "color: rgb(0, 0, 0);\n"
 "font-weight: 700;\n"
@@ -261,16 +258,21 @@ public:
 "min-width: 4em;\n"
 "padding: 4px;"));
         QIcon icon2;
-        icon2.addFile(QString::fromUtf8(":/icons/icons/revert.png"), QSize(), QIcon::Normal, QIcon::Off);
-        revert->setIcon(icon2);
+        icon2.addFile(QString::fromUtf8(":/icons/icons/trash.png"), QSize(), QIcon::Normal, QIcon::Off);
+        deleteApp->setIcon(icon2);
 
-        horizontalLayout->addWidget(revert);
+        horizontalLayout_7->addWidget(deleteApp);
 
+
+        verticalLayout->addLayout(horizontalLayout_7);
+
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         close = new QPushButton(verticalLayoutWidget);
         close->setObjectName(QString::fromUtf8("close"));
         close->setMinimumSize(QSize(100, 30));
         close->setMaximumSize(QSize(420, 16777215));
-        close->setStyleSheet(QString::fromUtf8("background-color: rgb(170, 0, 0);\n"
+        close->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 85, 0);\n"
 "font: 87 11pt \"Noto Sans\";\n"
 "color: rgb(0, 0, 0);\n"
 "font-weight: 700;\n"
@@ -311,7 +313,7 @@ public:
         dataLabel->setText(QCoreApplication::translate("AppDialog", "Data", nullptr));
         maskLabel->setText(QCoreApplication::translate("AppDialog", "Mask", nullptr));
         save->setText(QCoreApplication::translate("AppDialog", "Submit", nullptr));
-        revert->setText(QCoreApplication::translate("AppDialog", "Revert", nullptr));
+        deleteApp->setText(QCoreApplication::translate("AppDialog", "Delete", nullptr));
         close->setText(QCoreApplication::translate("AppDialog", "Close", nullptr));
     } // retranslateUi
 

@@ -86,7 +86,7 @@ class Client : public QDialog {
     }
     return false;
   }
-  void registerApp(KApplication application);
+  void appRequest(KApplication application, uint8_t request_code);
   int getSelectedApp();
   // Move this to private after moving responsibilities to Client
   void scheduleTask(Scheduler::Task* task);

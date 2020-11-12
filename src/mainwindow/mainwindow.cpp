@@ -137,12 +137,17 @@ MainWindow::~MainWindow() {
  */
 void MainWindow::setConnectScreen(bool visible) {
   if (visible) {
-    ui->startScreen->setMaximumSize(1366, 825);
-    ui->startScreen->setMinimumSize(1366, 825);
-    ui->connect->    setMaximumSize(1366, 725);
-    ui->connect->    setMinimumSize(1366, 725);
-    ui->kyConfig->   setMaximumSize(1366, 75);
-    ui->kyConfig->   setMinimumSize(1366, 75);
+    ui->startScreen->activateWindow();
+    ui->startScreen->raise();
+    ui->kyConfig->activateWindow();
+    ui->kyConfig->raise();
+    ui->startScreen->setMaximumSize(1080, 675);
+    ui->startScreen->setMinimumSize(1080, 675);
+    ui->connect->setMaximumSize(1080, 500);
+    ui->connect->setMinimumSize(1080, 500);
+    ui->kyConfig->setMaximumSize(1080, 175);
+    ui->kyConfig->setMinimumSize(1080, 175);
+    ui->logo->raise();
 
     QFile file(QCoreApplication::applicationDirPath() + "/config/config.json");
     file.open(QIODevice::ReadOnly | QFile::ReadOnly);
@@ -220,6 +225,10 @@ void MainWindow::connectClient() {
     }
   });
 
+  QObject::connect(ui->openMessages, &QPushButton::clicked, this, [this]() {
+    message_ui.show();
+  });
+
   QObject::connect(arg_ui, &ArgDialog::taskRequestReady, this,
     [this](Task* task) {
       auto mask = q_client->getSelectedApp();
@@ -230,13 +239,13 @@ void MainWindow::connectClient() {
   );
 
   QObject::connect(&app_ui, &AppDialog::appRequest, this,
-    [this](KApplication application) {
-      if (q_client->hasApp(application)) {
-       QMessageBox::warning(this, tr("Application request"),
+    [this](KApplication application, constants::RequestType type) {
+      if (type == constants::REGISTER && q_client->hasApp(application)) {
+        QMessageBox::warning(this, tr("Application request"),
                             tr("An application with that name already exists"));
-       return;
+        return;
       }
-      q_client->registerApp(application);
+      q_client->appRequest(application, type);
     }
   );
 
