@@ -254,7 +254,7 @@ void ArgDialog::setTaskArguments() {
   if (type == TaskType::GENERIC) {
     QString runtime_string{};
     for (const auto& arg : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("runtime"))) {
-      runtime_string += "--" + arg + " ";
+      runtime_string += arg + " ";
     }
     runtime_string.chop(1);
     m_task->setArgument("runtime_string", runtime_string);

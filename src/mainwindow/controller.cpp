@@ -178,7 +178,17 @@ QString MainWindow::Controller::handleEventMessage(QString message,
         if (error) {
           event_message += "\n Error: " + v.at(3);
         }
-      } else if (QString::compare(message, "Message Received") == 0) {
+      }
+      else
+      if (QString::compare(message, "Application was registered") == 0) {
+        window->app_ui.addApplication(KApplication{.name = v.at(0)});
+      }
+      else
+      if (QString::compare(message, "Application was deleted") == 0) {
+        window->app_ui.removeApplication(KApplication{.name = v.at(0)});
+      }
+      else
+      if (QString::compare(message, "Message Received") == 0) {
         event_message += "\n" + v.at(1) + ": " + v.at(2);
       }
     }

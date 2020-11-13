@@ -24,6 +24,8 @@ class AppDialog : public QDialog
  public:
   explicit AppDialog(QWidget *parent = nullptr);
   void     setApplications(QVector<KApplication> applications) { m_applications = applications; }
+  void     addApplication(KApplication application);
+  void     removeApplication(KApplication application);
   ~AppDialog();
 
  signals:

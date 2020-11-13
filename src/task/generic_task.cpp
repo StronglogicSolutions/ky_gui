@@ -256,14 +256,7 @@ const QVector<Scheduler::KFileData> GenericTask::getFiles() {
  *                      perform the task have been met.
  */
 bool GenericTask::isReady() {
-  auto header_size      = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("header")).size();
-  auto description_size = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("description")).size();
-  auto datetime_size    = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("datetime")).size();
-  auto hasFiles         = std::get<VariantIndex::FILEVEC>(getTaskArgumentValue("files")).size();
-  auto user_size        = std::get<VariantIndex::QSTRING>(getTaskArgumentValue("user")).size();
-
-  return header_size > 0 && description_size > 0 && datetime_size > 0 &&
-         hasFiles && user_size > 0;
+  return !std::get<VariantIndex::QSTRING>(getTaskArgumentValue("datetime")).isEmpty();
 }
 
 /**

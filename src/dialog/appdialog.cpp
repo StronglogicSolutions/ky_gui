@@ -106,3 +106,18 @@ KApplication AppDialog::readFields() {
     .mask = ui->maskText->text()
   };
 }
+
+void AppDialog::addApplication(KApplication application) {
+  m_applications.push_back(application);
+  ui->appList->addItem(application.name);
+}
+
+void AppDialog::removeApplication(KApplication application) {
+  ui->appList->removeItem(ui->appList->findText(application.name));
+  for (auto it = m_applications.begin(); it != m_applications.end(); it++) {
+    if (application.name.compare(it->name) == 0) {
+      m_applications.erase(it);
+      return;
+    }
+  }
+}
