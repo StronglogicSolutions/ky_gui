@@ -266,10 +266,11 @@ void MainWindow::connectClient() {
       });
 
   QObject::connect(ui->eventList, &QListView::clicked, this,
-                   [this](const QModelIndex& index) {
-                     auto event = m_events.at(index.row());
-                     utils::infoMessageBox(event, "Event");
-                   });
+    [this](const QModelIndex& index) {
+      utils::infoMessageBox(
+        m_event_model->item(index.row(), index.column())->text(), "Event"
+      );
+    });
 
   QObject::connect(m_event_model, &QAbstractItemModel::rowsAboutToBeInserted,
                    this, [this]() {
