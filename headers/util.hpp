@@ -156,12 +156,21 @@ bool isUploadCompleteEvent(const char* event) {
 }
 
 bool isEvent(const char* data) {
-    Document d;
-    d.Parse(data);
-    if (d.HasMember("type")); {
-      return strcmp(d["type"].GetString(), "event") == 0;
-    }
-    return false;
+  Document d;
+  d.Parse(data);
+  if (d.HasMember("type")); {
+    return strcmp(d["type"].GetString(), "event") == 0;
+  }
+  return false;
+}
+
+bool isSchedule(const char* data) {
+  Document d;
+  d.Parse(data);
+  if (d.HasMember("type")); {
+    return strcmp(d["type"].GetString(), "schedule") == 0;
+  }
+  return false;
 }
 
 template <typename T>
