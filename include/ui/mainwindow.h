@@ -18,6 +18,7 @@
 #include <include/ui/argdialog.h>
 #include <include/ui/messagedialog.hpp>
 #include <include/ui/appdialog.hpp>
+#include <include/ui/scheduledialog.hpp>
 
 #include "ui_mainwindow.h"
 
@@ -104,6 +105,7 @@ public:
     Ui::MainWindow*       ui;
     ArgDialog*            arg_ui;
     AppDialog             app_ui;
+    ScheduleDialog        schedule_ui;
     MessageDialog         message_ui;
 
     /** Client member */
