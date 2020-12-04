@@ -291,6 +291,10 @@ void MainWindow::connectClient() {
     app_ui.show();
   });
 
+  QObject::connect(ui->tasks, &QPushButton::clicked, this, [this]() {
+    schedule_ui.show();
+  });
+
   QTimer* timer = new QTimer(this);
   connect(timer, &QTimer::timeout, q_client, &Client::ping);
   timer->start(10000);
