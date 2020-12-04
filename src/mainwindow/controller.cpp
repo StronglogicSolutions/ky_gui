@@ -62,7 +62,6 @@ void MainWindow::Controller::handleCommands(StringVec args,
     else
     if (arg_index == DATA_INDEX) {
       application.data = arg;
-      app_index++;
       arg_index = 0;
       app_list->addItem(application.name);
       if (application.name.toLower() == default_command.toLower()) {
@@ -71,6 +70,7 @@ void MainWindow::Controller::handleCommands(StringVec args,
         window->q_client->setSelectedApp(selected);
       }
       k_applications.push_back(application);
+      app_index++;
       continue;
     }
     arg_index++;
@@ -186,6 +186,18 @@ QString MainWindow::Controller::handleEventMessage(QString message,
       else
       if (QString::compare(message, "Application was deleted") == 0) {
         window->app_ui.removeApplication(KApplication{.name = v.at(0)});
+      }
+      else
+      if (QString::compare(message, "Scheduled Tasks") == 0) {
+        auto details = v.at(0);
+        if (details.compare("Schedule") == 0) {
+          window->schedule_ui.clear();
+          window->schedule_ui.insert_tasks(v);
+        }
+        else
+        if (details.compare("Schedule more") == 0) {
+          window->schedule_ui.insert_tasks(v);
+        }
       }
       else
       if (QString::compare(message, "Message Received") == 0) {
