@@ -148,7 +148,10 @@ std::string createMessage(const char* data, std::string args = "") {
 bool isOperation(const char* data) {
     Document d;
     d.Parse(data);
-    return strcmp(d["type"].GetString(), "operation") == 0;
+    if (!d.Parse(data).HasParseError()) {
+      return strcmp(d["type"].GetString(), "operation") == 0;
+    }
+    return false;
 }
 
 bool isUploadCompleteEvent(const char* event) {
@@ -157,18 +160,20 @@ bool isUploadCompleteEvent(const char* event) {
 
 bool isEvent(const char* data) {
   Document d;
-  d.Parse(data);
-  if (d.HasMember("type")); {
-    return strcmp(d["type"].GetString(), "event") == 0;
+  if (!d.Parse(data).HasParseError()) {
+    if (d.HasMember("type")); {
+      return strcmp(d["type"].GetString(), "event") == 0;
+    }
   }
   return false;
 }
 
 bool isSchedule(const char* data) {
   Document d;
-  d.Parse(data);
-  if (d.HasMember("type")); {
-    return strcmp(d["type"].GetString(), "schedule") == 0;
+  if (!d.Parse(data).HasParseError()) {
+    if (d.HasMember("type")); {
+      return strcmp(d["type"].GetString(), "schedule") == 0;
+    }
   }
   return false;
 }

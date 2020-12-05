@@ -12,11 +12,11 @@
 #include <QtCore/QVariant>
 #include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
-#include <QtWidgets/QListView>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -30,31 +30,31 @@ public:
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout_2;
     QLabel *appsLabel;
-    QListView *taskList;
+    QComboBox *taskList;
     QHBoxLayout *horizontalLayout_4;
     QLabel *nameLabel;
-    QLineEdit *nameText;
+    QLineEdit *appText;
     QHBoxLayout *horizontalLayout_10;
     QLabel *maskLabel_4;
-    QLineEdit *maskText_4;
+    QLineEdit *flagsText;
     QHBoxLayout *horizontalLayout_3;
     QLabel *pathLabel;
-    QLineEdit *pathText;
+    QLineEdit *timeText;
     QHBoxLayout *horizontalLayout_6;
     QLabel *dataLabel;
-    QLineEdit *dataText;
+    QLineEdit *completedText;
     QHBoxLayout *horizontalLayout_5;
     QLabel *maskLabel;
-    QLineEdit *maskText;
+    QLineEdit *recurringText;
     QHBoxLayout *horizontalLayout_9;
     QLabel *maskLabel_3;
-    QLineEdit *maskText_3;
+    QLineEdit *notifyText;
     QHBoxLayout *horizontalLayout_8;
     QLabel *maskLabel_2;
-    QLineEdit *maskText_2;
+    QLineEdit *runtimeText;
     QHBoxLayout *horizontalLayout_11;
     QLabel *maskLabel_5;
-    QLineEdit *maskText_5;
+    QLineEdit *filesText;
     QHBoxLayout *horizontalLayout_7;
     QPushButton *save;
     QPushButton *deleteApp;
@@ -93,7 +93,7 @@ public:
 
         horizontalLayout_2->addWidget(appsLabel);
 
-        taskList = new QListView(verticalLayoutWidget);
+        taskList = new QComboBox(verticalLayoutWidget);
         taskList->setObjectName(QString::fromUtf8("taskList"));
 
         horizontalLayout_2->addWidget(taskList);
@@ -116,10 +116,10 @@ public:
 
         horizontalLayout_4->addWidget(nameLabel);
 
-        nameText = new QLineEdit(verticalLayoutWidget);
-        nameText->setObjectName(QString::fromUtf8("nameText"));
+        appText = new QLineEdit(verticalLayoutWidget);
+        appText->setObjectName(QString::fromUtf8("appText"));
 
-        horizontalLayout_4->addWidget(nameText);
+        horizontalLayout_4->addWidget(appText);
 
 
         verticalLayout->addLayout(horizontalLayout_4);
@@ -139,10 +139,10 @@ public:
 
         horizontalLayout_10->addWidget(maskLabel_4);
 
-        maskText_4 = new QLineEdit(verticalLayoutWidget);
-        maskText_4->setObjectName(QString::fromUtf8("maskText_4"));
+        flagsText = new QLineEdit(verticalLayoutWidget);
+        flagsText->setObjectName(QString::fromUtf8("flagsText"));
 
-        horizontalLayout_10->addWidget(maskText_4);
+        horizontalLayout_10->addWidget(flagsText);
 
 
         verticalLayout->addLayout(horizontalLayout_10);
@@ -162,10 +162,10 @@ public:
 
         horizontalLayout_3->addWidget(pathLabel);
 
-        pathText = new QLineEdit(verticalLayoutWidget);
-        pathText->setObjectName(QString::fromUtf8("pathText"));
+        timeText = new QLineEdit(verticalLayoutWidget);
+        timeText->setObjectName(QString::fromUtf8("timeText"));
 
-        horizontalLayout_3->addWidget(pathText);
+        horizontalLayout_3->addWidget(timeText);
 
 
         verticalLayout->addLayout(horizontalLayout_3);
@@ -185,10 +185,10 @@ public:
 
         horizontalLayout_6->addWidget(dataLabel);
 
-        dataText = new QLineEdit(verticalLayoutWidget);
-        dataText->setObjectName(QString::fromUtf8("dataText"));
+        completedText = new QLineEdit(verticalLayoutWidget);
+        completedText->setObjectName(QString::fromUtf8("completedText"));
 
-        horizontalLayout_6->addWidget(dataText);
+        horizontalLayout_6->addWidget(completedText);
 
 
         verticalLayout->addLayout(horizontalLayout_6);
@@ -208,10 +208,10 @@ public:
 
         horizontalLayout_5->addWidget(maskLabel);
 
-        maskText = new QLineEdit(verticalLayoutWidget);
-        maskText->setObjectName(QString::fromUtf8("maskText"));
+        recurringText = new QLineEdit(verticalLayoutWidget);
+        recurringText->setObjectName(QString::fromUtf8("recurringText"));
 
-        horizontalLayout_5->addWidget(maskText);
+        horizontalLayout_5->addWidget(recurringText);
 
 
         verticalLayout->addLayout(horizontalLayout_5);
@@ -231,10 +231,10 @@ public:
 
         horizontalLayout_9->addWidget(maskLabel_3);
 
-        maskText_3 = new QLineEdit(verticalLayoutWidget);
-        maskText_3->setObjectName(QString::fromUtf8("maskText_3"));
+        notifyText = new QLineEdit(verticalLayoutWidget);
+        notifyText->setObjectName(QString::fromUtf8("notifyText"));
 
-        horizontalLayout_9->addWidget(maskText_3);
+        horizontalLayout_9->addWidget(notifyText);
 
 
         verticalLayout->addLayout(horizontalLayout_9);
@@ -254,10 +254,10 @@ public:
 
         horizontalLayout_8->addWidget(maskLabel_2);
 
-        maskText_2 = new QLineEdit(verticalLayoutWidget);
-        maskText_2->setObjectName(QString::fromUtf8("maskText_2"));
+        runtimeText = new QLineEdit(verticalLayoutWidget);
+        runtimeText->setObjectName(QString::fromUtf8("runtimeText"));
 
-        horizontalLayout_8->addWidget(maskText_2);
+        horizontalLayout_8->addWidget(runtimeText);
 
 
         verticalLayout->addLayout(horizontalLayout_8);
@@ -277,10 +277,10 @@ public:
 
         horizontalLayout_11->addWidget(maskLabel_5);
 
-        maskText_5 = new QLineEdit(verticalLayoutWidget);
-        maskText_5->setObjectName(QString::fromUtf8("maskText_5"));
+        filesText = new QLineEdit(verticalLayoutWidget);
+        filesText->setObjectName(QString::fromUtf8("filesText"));
 
-        horizontalLayout_11->addWidget(maskText_5);
+        horizontalLayout_11->addWidget(filesText);
 
 
         verticalLayout->addLayout(horizontalLayout_11);
@@ -365,7 +365,6 @@ public:
 
         verticalLayout->addLayout(horizontalLayout);
 
-        verticalLayout->setStretch(0, 1);
 
         retranslateUi(ScheduleDialog);
 

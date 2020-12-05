@@ -37,6 +37,7 @@ SOURCES += \
         src/dialog/appdialog.cpp \
         src/dialog/argdialog.cpp \
         src/dialog/messagedialog.cpp \
+        src/dialog/scheduledialog.cpp \
         src/component/connection_indicator.cpp \
         src/component/kfiledialog.cpp
 
@@ -45,6 +46,7 @@ HEADERS += \
         include/ui/appdialog.hpp \
         include/ui/argdialog.h \
         include/ui/messagedialog.hpp \
+        include/ui/scheduledialog.hpp \
         include/ui/mainwindow.h \
         include/ui/connection_indicator.h \
         include/ui/kfiledialog.h \
@@ -67,7 +69,8 @@ FORMS += \
         argdialog.ui \
         consoledialog.ui \
         mainwindow.ui \
-        messagedialog.ui
+        messagedialog.ui \
+        scheduledialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

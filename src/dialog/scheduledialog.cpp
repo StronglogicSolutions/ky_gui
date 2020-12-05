@@ -1,32 +1,60 @@
 ﻿#include "include/ui/scheduledialog.hpp"
 #include "ui_scheduledialog.h"
+#include <QDebug>
 
-static bool input_mode{false};
+const QString completed_string(QString s) {
+  if (s.compare("0") == 0)
+    return "Scheduled";
+  else
+  if (s.compare("1") == 0)
+    return "Success";
+  else
+  if (s.compare("2") == 0)
+    return "Failed";
+  else
+  if (s.compare("3") == 0)
+    return "Retry Failed";
+  return s;
+}
+
+const QString recurring_string(QString s) {
+  if (s.compare("0") == 0)
+    return "No";
+  else
+  if (s.compare("1") == 0)
+    return "Hourly";
+  else
+  if (s.compare("2") == 0)
+    return "Daily";
+  else
+  if (s.compare("3") == 0)
+    return "Weekly";
+  else
+  if (s.compare("4") == 0)
+    return "Monthly";
+  else
+  if (s.compare("5") == 0)
+    return "Yearly";
+  return s;
+}
 
 ScheduleDialog::ScheduleDialog(QWidget *parent) :
                                         QDialog(parent),
                                         ui(new Ui::ScheduleDialog)
 {
   ui->setupUi(this);
+
   QObject::connect(ui->close, &QPushButton::clicked, this, [this]() {
     this->close();
   });
 
-//  QObject::connect(ui->addApp, &QPushButton::clicked, this, [this]() {
-//    toggleInputMode();
-//  });
-
-  /*QObject::connect(ui->save, &QPushButton::clicked, this, [this]() {
-    emit appRequest(readFields(), constants::RequestType::REGISTER);
-  });
-
-  QObject::connect(ui->deleteApp, &QPushButton::clicked, this, [this]() {
-    emit appRequest(readFields(), constants::RequestType::DELETE);
-  });*/
-
-  QObject::connect(ui->taskList, &QListView::clicked,
-    this, [this](const QModelIndex& index) {
-//                     setFields(ui->taskList->currentIndex());
+  QObject::connect(
+    ui->taskList,
+    static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+    this,
+    [this]() {
+      if (!m_tasks.empty())
+        setFields(m_tasks.at(ui->taskList->currentIndex()));
     }
   );
 }
@@ -37,32 +65,25 @@ ScheduleDialog::~ScheduleDialog()
 }
 
 void ScheduleDialog::showEvent(QShowEvent *) {
-  ui->taskList->reset();
-//  for (const auto& app : m_applications) {
-//    ui->appList->addItem(app.name);
-//  }
+  for (const auto& task : m_tasks) {
+    ui->taskList->addItem(QString{task.id + ": " + task.time.toString()});
+  }
 }
 
-void ScheduleDialog::setFields(QString id) {
-  for (const auto& task : m_tasks) {
-    if (task.id.compare(id) == 0) {
-
-    }
-  }
+void ScheduleDialog::setFields(ScheduledTask task) {
+  ui->appText->setText(task.app);
+  ui->timeText->setText(task.time.toString());
+  ui->flagsText->setText(task.flags);
+  ui->completedText->setText(completed_string(task.completed));
+  ui->notifyText->setText((task.notify.compare("0") == 0) ? "No" : "Yes");
+  ui->recurringText->setText(recurring_string(task.recurring));
+  ui->runtimeText->setText(task.runtime);
+  ui->filesText->setText(task.files.at(0));
 }
 
 
 void ScheduleDialog::insert_tasks(QVector<QString> task_arguments) {
   uint16_t arg_num = task_arguments.size();
-  /*
-   * QString          id;
-     QString          app;
-     QDateTime        time;
-     QString          flags;
-     QString          completed;
-     QString          recurring;
-     QString          notify;
-     QString          runtime;*/
 QVector<QString> files;
   for (uint16_t i = 1; i < arg_num; i += 9) {
     m_tasks.push_back(ScheduledTask{
@@ -80,51 +101,28 @@ QVector<QString> files;
 }
 
 void ScheduleDialog::clear() {
-  m_tasks.clear();
-  ui->taskList->reset();
-  ui->dataText->clear();
-  ui->maskText->clear();
-  ui->nameText->clear();
-  ui->pathText->clear();
-}
-
-void ScheduleDialog::toggleInputMode() {
-  input_mode = !input_mode;
-  if (input_mode) {
-    ui->taskList->setStyleSheet("QComboBox { color: #33383c }");
-
-    ui->nameText->setText("");
-    ui->pathText->setText("");
-    ui->dataText->setText("");
-    ui->maskText->setText("");
-  } else {
-//    setFields(ui->appList->currentText());
-//    ui->appList->setStyleSheet("QComboBox { color: rgb(131, 148, 150); background-color: #2f535f; }");
-//    ui->addApp->setStyleSheet(
-//        "QPushButton { "
-//        "background-color: rgb(0, 58, 70);"
-//        "font: 87 11pt \"Noto Sans\";"
-//        "color: rgb(0, 0, 0);"
-//        "font-weight: 700;"
-//        "padding: 4px;"
-//        "border-style: outset;"
-//        "border-width: 2px;"
-//        "border-radius: 4px;"
-//        "border-color: #00000f;"
-//        "min-width: 4em;"
-//        "padding: 4px;"
-//        "}"
-//        );
-  }
-}
-
-KApplication ScheduleDialog::readFields() {
-  return KApplication{
-    .name = ui->nameText->text(),
-    .path = ui->pathText->text(),
-    .data = ui->dataText->text(),
-    .mask = ui->maskText->text()
-  };
+  m_tasks          .clear();
+  ui->taskList     ->clear();
+  ui->appText      ->clear();
+  ui->timeText     ->clear();
+  ui->completedText->clear();
+  ui->flagsText    ->clear();
+  ui->notifyText   ->clear();
+  ui->recurringText->clear();
+  ui->runtimeText  ->clear();
+  ui->filesText    ->clear();
 }
 
 
+
+
+//QStandardItem* create_task_list_item(ScheduledTask task) {
+
+//  QString task_item_text{"ID: %0 - Time: %1"};
+
+//  return new QStandardItem{
+//    task_item_text
+//      .arg(task.id)
+//      .arg(task.time.toString())
+//  };
+//}

@@ -154,35 +154,39 @@ void Client::handleMessages() {
             continue;
         }
 
-        if (isNewSession(data_string.c_str())) { // Session Start
-//            m_commands = getArgMap(data_string.c_str());
-//            for (const auto& [k, v] : m_commands) { // Receive available commands
-//                s_v.push_back(v.data());
-//            }
-          StringVec s_v = getArgs(data_string.c_str());
-          emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", s_v); // Update UI
-        } else if (serverWaitingForFile(data_string.c_str())) { // Server expects a file
-          processFileQueue();
-        } else if (isEvent(data_string.c_str())) { // Receiving event
-          QString event = getEvent(data_string.c_str());
-          QVector<QString> args = getArgs(data_string.c_str());
-          emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args); // Update UI (event)
-          if (isUploadCompleteEvent(event.toUtf8().constData())) { // Upload complete
-            if (!args.isEmpty()) {
-              sent_files.at(sent_files.size() - 1).timestamp =
-                  std::stoi(args.at(0).toUtf8().constData()); // mark file with server-generated timestamp
-              if (outgoing_files.isEmpty()) { // Task files are all sent
-                sendTaskEncoded(m_outbound_task); // Send remaining task data to complete scheduling
-                file_was_sent = false;
-              } else { // Begin file upload operation. Task will be sent after all outgoing files are sent.
-                sendEncoded(
-                    createOperation("FileUpload", {"Subsequent file"}));
+        try {
+          if (isNewSession(data_string.c_str())) { // Session Start
+            //            m_commands = getArgMap(data_string.c_str());
+            //            for (const auto& [k, v] : m_commands) { // Receive available commands
+            //                s_v.push_back(v.data());
+            //            }
+            StringVec s_v = getArgs(data_string.c_str());
+            emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", s_v); // Update UI
+          } else if (serverWaitingForFile(data_string.c_str())) { // Server expects a file
+            processFileQueue();
+          } else if (isEvent(data_string.c_str())) { // Receiving event
+            QString event = getEvent(data_string.c_str());
+            QVector<QString> args = getArgs(data_string.c_str());
+            emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args); // Update UI (event)
+            if (isUploadCompleteEvent(event.toUtf8().constData())) { // Upload complete
+              if (!args.isEmpty()) {
+                sent_files.at(sent_files.size() - 1).timestamp =
+                    std::stoi(args.at(0).toUtf8().constData()); // mark file with server-generated timestamp
+                if (outgoing_files.isEmpty()) { // Task files are all sent
+                  sendTaskEncoded(m_outbound_task); // Send remaining task data to complete scheduling
+                  file_was_sent = false;
+                } else { // Begin file upload operation. Task will be sent after all outgoing files are sent.
+                  sendEncoded(
+                      createOperation("FileUpload", {"Subsequent file"}));
+                }
               }
             }
           }
+          std::string formatted_json = getJsonString(data_string);
+          emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(formatted_json.data(), formatted_json.size()), {});
+        } catch (const std::exception& e) {
+          QString error{e.what()};
         }
-        std::string formatted_json = getJsonString(data_string);
-        emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(formatted_json.data(), formatted_json.size()), {});
     }
     memset(receive_buffer, 0, 2048);
     ::close(m_client_socket_fd);

@@ -26,7 +26,7 @@ color: rgb(161, 164, 167);</string>
      <height>851</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0,0,0,0,0,0,0,0">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0,0,0,0,0">
     <property name="spacing">
      <number>18</number>
     </property>
@@ -78,7 +78,7 @@ font-weight: 700;</string>
        </widget>
       </item>
       <item>
-       <widget class="QListView" name="taskList"/>
+       <widget class="QComboBox" name="taskList"/>
       </item>
      </layout>
     </item>
@@ -118,7 +118,7 @@ font-weight: 700;</string>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="nameText"/>
+       <widget class="QLineEdit" name="appText"/>
       </item>
      </layout>
     </item>
@@ -158,7 +158,7 @@ font-weight: 700;</string>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="maskText_4"/>
+       <widget class="QLineEdit" name="flagsText"/>
       </item>
      </layout>
     </item>
@@ -198,7 +198,7 @@ font-weight: 700;</string>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="pathText"/>
+       <widget class="QLineEdit" name="timeText"/>
       </item>
      </layout>
     </item>
@@ -238,7 +238,7 @@ font-weight: 700;</string>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="dataText"/>
+       <widget class="QLineEdit" name="completedText"/>
       </item>
      </layout>
     </item>
@@ -278,7 +278,7 @@ font-weight: 700;</string>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="maskText"/>
+       <widget class="QLineEdit" name="recurringText"/>
       </item>
      </layout>
     </item>
@@ -318,7 +318,7 @@ font-weight: 700;</string>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="maskText_3"/>
+       <widget class="QLineEdit" name="notifyText"/>
       </item>
      </layout>
     </item>
@@ -358,7 +358,7 @@ font-weight: 700;</string>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="maskText_2"/>
+       <widget class="QLineEdit" name="runtimeText"/>
       </item>
      </layout>
     </item>
@@ -398,7 +398,7 @@ font-weight: 700;</string>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="maskText_5"/>
+       <widget class="QLineEdit" name="filesText"/>
       </item>
      </layout>
     </item>

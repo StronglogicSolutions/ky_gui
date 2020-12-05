@@ -2,7 +2,6 @@
 #define SCHEDULEDIALOG_HPP
 
 #include <QDialog>
-#include <QListView>
 #include "headers/util.hpp"
 
 
@@ -43,9 +42,7 @@ class ScheduleDialog : public QDialog
   virtual void showEvent(QShowEvent *) override;
 
  private:
-  void         toggleInputMode();
-  void         setFields(QString app_name);
-  KApplication readFields();
+  void         setFields(ScheduledTask task);
 
   Ui::ScheduleDialog*        ui;
   QVector<ScheduledTask> m_tasks;
