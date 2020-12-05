@@ -35,8 +35,8 @@ class ScheduleDialog : public QDialog
   ~ScheduleDialog();
   void     clear();
 
-// signals:
-//  void appRequest(KApplication application, constants::RequestType type);
+ signals:
+  void updateSchedule();
 
  protected:
   virtual void showEvent(QShowEvent *) override;

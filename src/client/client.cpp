@@ -552,7 +552,8 @@ void Client::scheduleTask(Scheduler::Task* task) {
 
 /**
  * @brief Client::sendFiles
- * @param [in] {QVector<const QByteArray} files The files to be sent
+ *
+ * @param [in] {Task*}    A pointer to the task with files to be sent
  */
 void Client::sendFiles(Scheduler::Task* task) {
   if (outgoing_files.isEmpty()) {
@@ -568,6 +569,12 @@ void Client::sendFiles(Scheduler::Task* task) {
   }
 }
 
+/**
+ * @brief Client::appRequest
+ *
+ * @param [in] {KApplication}  application
+ * @param [in] {uint8_t}       request_code
+ */
 void Client::appRequest(KApplication application, uint8_t request_code) {
   std::vector<std::string> operation_args{
     std::to_string(request_code),
@@ -579,4 +586,14 @@ void Client::appRequest(KApplication application, uint8_t request_code) {
   std::string operation_string = createOperation("AppRequest", operation_args);
 
   sendEncoded(operation_string);
+}
+
+/**
+ * @brief Client::fetchSchedule
+ */
+void Client::fetchSchedule() {
+  sendEncoded(createOperation(
+    "Schedule",
+    {std::to_string(constants::RequestType::SCHEDULE)}
+  ));
 }

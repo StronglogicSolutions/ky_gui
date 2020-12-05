@@ -80,6 +80,7 @@ class Client : public QDialog {
   void start();
   void closeConnection();
   void execute();
+  void fetchSchedule();
   QString getAppName(int mask);
   bool    hasApp(KApplication application) {
     for (const auto& app : m_commands) {

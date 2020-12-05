@@ -57,6 +57,10 @@ ScheduleDialog::ScheduleDialog(QWidget *parent) :
         setFields(m_tasks.at(ui->taskList->currentIndex()));
     }
   );
+
+  QObject::connect(ui->fetchSchedule, &QPushButton::clicked, this, [this]() {
+    updateSchedule();
+  });
 }
 
 ScheduleDialog::~ScheduleDialog()
@@ -65,9 +69,7 @@ ScheduleDialog::~ScheduleDialog()
 }
 
 void ScheduleDialog::showEvent(QShowEvent *) {
-  for (const auto& task : m_tasks) {
-    ui->taskList->addItem(QString{task.id + ": " + task.time.toString()});
-  }
+
 }
 
 void ScheduleDialog::setFields(ScheduledTask task) {
@@ -97,6 +99,10 @@ QVector<QString> files;
       .runtime   = task_arguments.at(i + 7),
       .files     = QVector<QString>{task_arguments.at(i + 8)} // parse
     });
+  }
+  // TODO: Do this in the loop above
+  for (const auto& task : m_tasks) {
+    ui->taskList->addItem(QString{task.id + ": " + task.time.toString()});
   }
 }
 

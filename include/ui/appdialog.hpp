@@ -4,15 +4,6 @@
 #include <QDialog>
 #include "headers/util.hpp"
 
-namespace constants {
-enum RequestType {
-  REGISTER = 0x00,
-  UPDATE   = 0x01,
-  DELETE   = 0x02,
-  GET      = 0x03
-};
-}
-
 namespace Ui {
 class AppDialog;
 }

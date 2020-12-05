@@ -57,6 +57,7 @@ public:
     QLineEdit *filesText;
     QHBoxLayout *horizontalLayout_7;
     QPushButton *save;
+    QPushButton *fetchSchedule;
     QPushButton *deleteApp;
     QHBoxLayout *horizontalLayout;
     QPushButton *close;
@@ -313,6 +314,29 @@ public:
 
         horizontalLayout_7->addWidget(save);
 
+        fetchSchedule = new QPushButton(verticalLayoutWidget);
+        fetchSchedule->setObjectName(QString::fromUtf8("fetchSchedule"));
+        sizePolicy1.setHeightForWidth(fetchSchedule->sizePolicy().hasHeightForWidth());
+        fetchSchedule->setSizePolicy(sizePolicy1);
+        fetchSchedule->setMinimumSize(QSize(100, 25));
+        fetchSchedule->setMaximumSize(QSize(420, 16777215));
+        fetchSchedule->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 85, 0);\n"
+"font: 87 11pt \"Noto Sans\";\n"
+"color: rgb(0, 0, 0);\n"
+"font-weight: 700;\n"
+"padding: 4px;\n"
+"border-style: outset;\n"
+"border-width: 2px;\n"
+"border-radius: 4px;\n"
+"border-color: #00000f;\n"
+"min-width: 4em;\n"
+"padding: 4px;"));
+        QIcon icon1;
+        icon1.addFile(QString::fromUtf8(":/icons/icons/refresh.png"), QSize(), QIcon::Normal, QIcon::Off);
+        fetchSchedule->setIcon(icon1);
+
+        horizontalLayout_7->addWidget(fetchSchedule);
+
         deleteApp = new QPushButton(verticalLayoutWidget);
         deleteApp->setObjectName(QString::fromUtf8("deleteApp"));
         sizePolicy1.setHeightForWidth(deleteApp->sizePolicy().hasHeightForWidth());
@@ -330,9 +354,9 @@ public:
 "border-color: #00000f;\n"
 "min-width: 4em;\n"
 "padding: 4px;"));
-        QIcon icon1;
-        icon1.addFile(QString::fromUtf8(":/icons/icons/trash.png"), QSize(), QIcon::Normal, QIcon::Off);
-        deleteApp->setIcon(icon1);
+        QIcon icon2;
+        icon2.addFile(QString::fromUtf8(":/icons/icons/trash.png"), QSize(), QIcon::Normal, QIcon::Off);
+        deleteApp->setIcon(icon2);
 
         horizontalLayout_7->addWidget(deleteApp);
 
@@ -356,9 +380,9 @@ public:
 "border-color: #00000f;\n"
 "min-width: 4em;\n"
 "padding: 4px;"));
-        QIcon icon2;
-        icon2.addFile(QString::fromUtf8(":/icons/icons/cancel.png"), QSize(), QIcon::Normal, QIcon::Off);
-        close->setIcon(icon2);
+        QIcon icon3;
+        icon3.addFile(QString::fromUtf8(":/icons/icons/cancel.png"), QSize(), QIcon::Normal, QIcon::Off);
+        close->setIcon(icon3);
 
         horizontalLayout->addWidget(close);
 
@@ -384,6 +408,7 @@ public:
         maskLabel_2->setText(QCoreApplication::translate("ScheduleDialog", "Runtime Arguments", nullptr));
         maskLabel_5->setText(QCoreApplication::translate("ScheduleDialog", "Files", nullptr));
         save->setText(QCoreApplication::translate("ScheduleDialog", "Update", nullptr));
+        fetchSchedule->setText(QCoreApplication::translate("ScheduleDialog", "Fetch", nullptr));
         deleteApp->setText(QCoreApplication::translate("ScheduleDialog", "Delete", nullptr));
         close->setText(QCoreApplication::translate("ScheduleDialog", "Close", nullptr));
     } // retranslateUi

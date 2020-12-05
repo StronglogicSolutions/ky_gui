@@ -249,6 +249,10 @@ void MainWindow::connectClient() {
     }
   );
 
+  QObject::connect(&schedule_ui, &ScheduleDialog::updateSchedule, this, [this]() {
+    q_client->fetchSchedule();
+  });
+
   QObject::connect(
       ui->processList, &QListView::clicked, this,
       [this](const QModelIndex& index) {
@@ -323,6 +327,9 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
         auto app_name = q_client->getAppName(q_client->getSelectedApp());
         arg_ui->setConfig(configObject(app_name, m_config, true));
         arg_ui->show();
+      }
+      if (configBoolValue("fetchSchedule", m_config)) {
+        q_client->fetchSchedule();
       }
     }
   } else if (t == PROCESS_REQUEST_TYPE) {  // Sent execution request to server

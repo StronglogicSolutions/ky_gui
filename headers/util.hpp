@@ -27,6 +27,16 @@ struct KApplication {
   QString mask;
 };
 
+namespace constants {
+enum RequestType {
+  REGISTER = 0x00,
+  UPDATE   = 0x01,
+  DELETE   = 0x02,
+  GET      = 0x03,
+  SCHEDULE = 0x04
+};
+}
+
 namespace {
 using namespace rapidjson;
 
@@ -120,6 +130,7 @@ bool configBoolValue(QString key, QJsonObject config) {
   if (config.contains(key)) {
     return bool{config.value(key).toString().compare("true") == 0};
   }
+  return false;
 }
 
 std::string getJsonString(std::string s) {
