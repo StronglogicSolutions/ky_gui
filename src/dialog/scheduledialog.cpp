@@ -88,7 +88,7 @@ void ScheduleDialog::insert_tasks(QVector<QString> task_arguments) {
   uint16_t arg_num = task_arguments.size();
 QVector<QString> files;
   for (uint16_t i = 1; i < arg_num; i += 9) {
-    m_tasks.push_back(ScheduledTask{
+    ScheduledTask task{
       .id        = task_arguments.at(i + 0),
       .app       = task_arguments.at(i + 1),
       .time      = QDateTime::fromSecsSinceEpoch(task_arguments.at(i + 2).toLongLong()),
@@ -98,11 +98,9 @@ QVector<QString> files;
       .notify    = task_arguments.at(i + 6),
       .runtime   = task_arguments.at(i + 7),
       .files     = QVector<QString>{task_arguments.at(i + 8)} // parse
-    });
-  }
-  // TODO: Do this in the loop above
-  for (const auto& task : m_tasks) {
+    };
     ui->taskList->addItem(QString{task.id + ": " + task.time.toString()});
+    m_tasks.push_back(task);
   }
 }
 
