@@ -206,13 +206,11 @@ bool isPong(const char* data) {
 
 // TODO: This should be "message", no?
 bool isMessage(const char* data) {
-    Document d;
-    d.Parse(data);
-    if (d.HasMember("message")) {
-        return true;
-    } else {
-        return false;
-    }
+  Document d;
+  if (!(d.Parse(data).HasParseError())) {
+    return (d.HasMember("message"));
+  }
+  return false;
 }
 
 std::string createOperation(const char* op, std::vector<std::string> args) {
