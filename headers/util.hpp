@@ -169,6 +169,14 @@ bool isUploadCompleteEvent(const char* event) {
     return strcmp(event, "File Transfer Complete") == 0;
 }
 
+bool isValidJson(const QString& s) {
+  return !(Document{}.Parse(s.toUtf8().constData()).HasParseError());
+}
+
+bool isValidJson(const std::string& s) {
+  return !(Document{}.Parse(s.c_str()).HasParseError());
+}
+
 bool isEvent(const char* data) {
   Document d;
   if (!d.Parse(data).HasParseError()) {

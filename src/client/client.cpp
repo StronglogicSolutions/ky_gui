@@ -141,30 +141,38 @@ void Client::handleMessages() {
     uint8_t receive_buffer[MAX_PACKET_SIZE];
     for (;;) {
         memset(receive_buffer, 0, MAX_PACKET_SIZE);
-        ssize_t bytes_received = 0;
+        ssize_t bytes_received{0};
         bytes_received = recv(m_client_socket_fd, receive_buffer, MAX_PACKET_SIZE, 0);
-        if (bytes_received < 1) { // Finish message loop
-            break;
-        }
+
+        if (bytes_received < 1)
+          break;                // Finish message loop
+
         size_t end_idx = findNullIndex(receive_buffer);
         std::string data_string{receive_buffer, receive_buffer + end_idx};
+
         qDebug() << "Received data from KServer: \n" << data_string.c_str();
+
         if (isPong(data_string.c_str())) {
             qDebug() << "Server returned pong";
             continue;
         }
 
         try {
+          if (!isValidJson(data_string)) {
+            qDebug() << "Attempted to parse incoming message with invalid JSON:\n" << data_string.c_str();
+            continue;
+          }
+          else
           if (isNewSession(data_string.c_str())) { // Session Start
-            //            m_commands = getArgMap(data_string.c_str());
-            //            for (const auto& [k, v] : m_commands) { // Receive available commands
-            //                s_v.push_back(v.data());
-            //            }
             StringVec s_v = getArgs(data_string.c_str());
             emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", s_v); // Update UI
-          } else if (serverWaitingForFile(data_string.c_str())) { // Server expects a file
+          }
+          else
+          if (serverWaitingForFile(data_string.c_str())) { // Server expects a file
             processFileQueue();
-          } else if (isEvent(data_string.c_str())) { // Receiving event
+          }
+          else
+          if (isEvent(data_string.c_str())) { // Receiving event
             QString event = getEvent(data_string.c_str());
             QVector<QString> args = getArgs(data_string.c_str());
             emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args); // Update UI (event)
