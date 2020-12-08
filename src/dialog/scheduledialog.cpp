@@ -44,6 +44,14 @@ ScheduleDialog::ScheduleDialog(QWidget *parent) :
 {
   ui->setupUi(this);
 
+  QObject::connect(ui->saveTask, &QPushButton::clicked, this, [this]() {
+    scheduleRequest(RequestType::UPDATE_SCHEDULE, readFields());
+  });
+
+  QObject::connect(ui->deleteTask, &QPushButton::clicked, this, [this]() {
+    this->close();
+  });
+
   QObject::connect(ui->close, &QPushButton::clicked, this, [this]() {
     this->close();
   });
@@ -69,7 +77,13 @@ ScheduleDialog::~ScheduleDialog()
 }
 
 void ScheduleDialog::showEvent(QShowEvent *) {
-
+  if (!m_tasks.empty()) {
+    std::sort(m_tasks.begin(), m_tasks.end(), [](ScheduledTask a, ScheduledTask b) {
+      return a.id.toUInt() > b.id.toUInt();
+    });
+    ui->taskList->setCurrentIndex(0);
+    setFields(m_tasks.front());
+  }
 }
 
 void ScheduleDialog::setFields(ScheduledTask task) {
@@ -117,16 +131,16 @@ void ScheduleDialog::clear() {
   ui->filesText    ->clear();
 }
 
-
-
-
-//QStandardItem* create_task_list_item(ScheduledTask task) {
-
-//  QString task_item_text{"ID: %0 - Time: %1"};
-
-//  return new QStandardItem{
-//    task_item_text
-//      .arg(task.id)
-//      .arg(task.time.toString())
-//  };
-//}
+ScheduledTask ScheduleDialog::readFields() {
+  return ScheduledTask {
+      .id        = m_tasks.at(ui->taskList->currentIndex()).id,
+      .app       = ui->appText->text(),
+      .time      = QDateTime::fromString(ui->timeText->text()),
+      .flags     = ui->flagsText->text(),
+      .completed = ui->completedText->text(),
+      .recurring = ui->recurringText->text(),
+      .notify    = ui->notifyText->text(),
+      .runtime   = ui->runtimeText->text(),
+      .files     = {ui->filesText->text()}  // files need to be an actual array
+  };
+}

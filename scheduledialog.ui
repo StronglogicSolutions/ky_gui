@@ -405,7 +405,7 @@ font-weight: 700;</string>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_7">
       <item>
-       <widget class="QPushButton" name="save">
+       <widget class="QPushButton" name="saveTask">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -489,7 +489,7 @@ padding: 4px;</string>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="deleteApp">
+       <widget class="QPushButton" name="deleteTask">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>

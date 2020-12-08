@@ -4,31 +4,14 @@
 #include <QDialog>
 #include "headers/util.hpp"
 
-
-struct ScheduledTask {
-QString          id;
-QString          app;
-QDateTime        time;
-QString          flags;
-QString          completed;
-QString          recurring;
-QString          notify;
-QString          runtime;
-QVector<QString> files;
-};
-
-namespace constants {
-
-}
-
 namespace Ui {
 class ScheduleDialog;
 }
 
+using namespace constants;
 class ScheduleDialog : public QDialog
 {
   Q_OBJECT
-
  public:
   explicit ScheduleDialog(QWidget *parent = nullptr);
   void     insert_tasks(QVector<QString> tasks);
@@ -37,12 +20,14 @@ class ScheduleDialog : public QDialog
 
  signals:
   void updateSchedule();
+  void scheduleRequest(constants::RequestType type, ScheduledTask task);
 
  protected:
   virtual void showEvent(QShowEvent *) override;
 
  private:
-  void         setFields(ScheduledTask task);
+  void           setFields(ScheduledTask task);
+  ScheduledTask  readFields();
 
   Ui::ScheduleDialog*        ui;
   QVector<ScheduledTask> m_tasks;

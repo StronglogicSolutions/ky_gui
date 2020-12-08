@@ -56,9 +56,9 @@ public:
     QLabel *maskLabel_5;
     QLineEdit *filesText;
     QHBoxLayout *horizontalLayout_7;
-    QPushButton *save;
+    QPushButton *saveTask;
     QPushButton *fetchSchedule;
-    QPushButton *deleteApp;
+    QPushButton *deleteTask;
     QHBoxLayout *horizontalLayout;
     QPushButton *close;
 
@@ -288,16 +288,16 @@ public:
 
         horizontalLayout_7 = new QHBoxLayout();
         horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
-        save = new QPushButton(verticalLayoutWidget);
-        save->setObjectName(QString::fromUtf8("save"));
+        saveTask = new QPushButton(verticalLayoutWidget);
+        saveTask->setObjectName(QString::fromUtf8("saveTask"));
         QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(save->sizePolicy().hasHeightForWidth());
-        save->setSizePolicy(sizePolicy1);
-        save->setMinimumSize(QSize(100, 25));
-        save->setMaximumSize(QSize(420, 16777215));
-        save->setStyleSheet(QString::fromUtf8("background-color: rgb(2, 180, 43);\n"
+        sizePolicy1.setHeightForWidth(saveTask->sizePolicy().hasHeightForWidth());
+        saveTask->setSizePolicy(sizePolicy1);
+        saveTask->setMinimumSize(QSize(100, 25));
+        saveTask->setMaximumSize(QSize(420, 16777215));
+        saveTask->setStyleSheet(QString::fromUtf8("background-color: rgb(2, 180, 43);\n"
 "font: 87 11pt \"Noto Sans\";\n"
 "color: rgb(0, 0, 0);\n"
 "font-weight: 700;\n"
@@ -310,9 +310,9 @@ public:
 "padding: 4px;"));
         QIcon icon;
         icon.addFile(QString::fromUtf8(":/icons/send-button.png"), QSize(), QIcon::Normal, QIcon::Off);
-        save->setIcon(icon);
+        saveTask->setIcon(icon);
 
-        horizontalLayout_7->addWidget(save);
+        horizontalLayout_7->addWidget(saveTask);
 
         fetchSchedule = new QPushButton(verticalLayoutWidget);
         fetchSchedule->setObjectName(QString::fromUtf8("fetchSchedule"));
@@ -337,13 +337,13 @@ public:
 
         horizontalLayout_7->addWidget(fetchSchedule);
 
-        deleteApp = new QPushButton(verticalLayoutWidget);
-        deleteApp->setObjectName(QString::fromUtf8("deleteApp"));
-        sizePolicy1.setHeightForWidth(deleteApp->sizePolicy().hasHeightForWidth());
-        deleteApp->setSizePolicy(sizePolicy1);
-        deleteApp->setMinimumSize(QSize(100, 25));
-        deleteApp->setMaximumSize(QSize(420, 16777215));
-        deleteApp->setStyleSheet(QString::fromUtf8("background-color: rgb(170, 0, 0);\n"
+        deleteTask = new QPushButton(verticalLayoutWidget);
+        deleteTask->setObjectName(QString::fromUtf8("deleteTask"));
+        sizePolicy1.setHeightForWidth(deleteTask->sizePolicy().hasHeightForWidth());
+        deleteTask->setSizePolicy(sizePolicy1);
+        deleteTask->setMinimumSize(QSize(100, 25));
+        deleteTask->setMaximumSize(QSize(420, 16777215));
+        deleteTask->setStyleSheet(QString::fromUtf8("background-color: rgb(170, 0, 0);\n"
 "font: 87 11pt \"Noto Sans\";\n"
 "color: rgb(0, 0, 0);\n"
 "font-weight: 700;\n"
@@ -356,9 +356,9 @@ public:
 "padding: 4px;"));
         QIcon icon2;
         icon2.addFile(QString::fromUtf8(":/icons/icons/trash.png"), QSize(), QIcon::Normal, QIcon::Off);
-        deleteApp->setIcon(icon2);
+        deleteTask->setIcon(icon2);
 
-        horizontalLayout_7->addWidget(deleteApp);
+        horizontalLayout_7->addWidget(deleteTask);
 
 
         verticalLayout->addLayout(horizontalLayout_7);
@@ -407,9 +407,9 @@ public:
         maskLabel_3->setText(QCoreApplication::translate("ScheduleDialog", "Notify", nullptr));
         maskLabel_2->setText(QCoreApplication::translate("ScheduleDialog", "Runtime Arguments", nullptr));
         maskLabel_5->setText(QCoreApplication::translate("ScheduleDialog", "Files", nullptr));
-        save->setText(QCoreApplication::translate("ScheduleDialog", "Update", nullptr));
+        saveTask->setText(QCoreApplication::translate("ScheduleDialog", "Update", nullptr));
         fetchSchedule->setText(QCoreApplication::translate("ScheduleDialog", "Fetch", nullptr));
-        deleteApp->setText(QCoreApplication::translate("ScheduleDialog", "Delete", nullptr));
+        deleteTask->setText(QCoreApplication::translate("ScheduleDialog", "Delete", nullptr));
         close->setText(QCoreApplication::translate("ScheduleDialog", "Close", nullptr));
     } // retranslateUi
 

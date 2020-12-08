@@ -169,6 +169,8 @@ void MainWindow::setConnectScreen(bool visible) {
  * @brief MainWindow::connectClient
  */
 void MainWindow::connectClient() {
+  using namespace constants;
+
   auto text = ui->kyConfig->toPlainText();
   qDebug() << text;
   m_config = loadJsonConfig(ui->kyConfig->toPlainText());
@@ -239,18 +241,24 @@ void MainWindow::connectClient() {
   );
 
   QObject::connect(&app_ui, &AppDialog::appRequest, this,
-    [this](KApplication application, constants::RequestType type) {
-      if (type == constants::REGISTER && q_client->hasApp(application)) {
+    [this](KApplication application, RequestType type) {
+      if (type == REGISTER && q_client->hasApp(application)) {
         QMessageBox::warning(this, tr("Application request"),
                             tr("An application with that name already exists"));
         return;
       }
-      q_client->appRequest(application, type);
+      q_client->request(type, application);
     }
   );
 
-  QObject::connect(&schedule_ui, &ScheduleDialog::updateSchedule, this, [this]() {
-    q_client->fetchSchedule();
+  QObject::connect(&schedule_ui, &ScheduleDialog::scheduleRequest, this,
+    [this](RequestType type, ScheduledTask task) {
+      q_client->request(type, task);
+  });
+
+  QObject::connect(&schedule_ui, &ScheduleDialog::updateSchedule, this,
+    [this]() {
+      q_client->request(RequestType::FETCH_SCHEDULE);
   });
 
   QObject::connect(
@@ -329,7 +337,7 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
         arg_ui->show();
       }
       if (configBoolValue("fetchSchedule", m_config)) {
-        q_client->fetchSchedule();
+        q_client->request(RequestType::FETCH_SCHEDULE);
       }
     }
   } else if (t == PROCESS_REQUEST_TYPE) {  // Sent execution request to server
