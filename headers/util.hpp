@@ -27,13 +27,26 @@ struct KApplication {
   QString mask;
 };
 
+struct ScheduledTask {
+  QString          id;
+  QString          app;
+  QDateTime        time;
+  QString          flags;
+  QString          completed;
+  QString          recurring;
+  QString          notify;
+  QString          runtime;
+  QVector<QString> files;
+};
+
 namespace constants {
 enum RequestType {
-  REGISTER = 0x00,
-  UPDATE   = 0x01,
-  DELETE   = 0x02,
-  GET      = 0x03,
-  SCHEDULE = 0x04
+  REGISTER        = 0x00,
+  UPDATE          = 0x01,
+  DELETE          = 0x02,
+  GET             = 0x03,
+  FETCH_SCHEDULE  = 0x04,
+  UPDATE_SCHEDULE = 0x05
 };
 }
 
