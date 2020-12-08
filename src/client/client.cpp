@@ -585,11 +585,11 @@ void Client::sendFiles(Scheduler::Task* task) {
  */
 void Client::appRequest(KApplication application, uint8_t request_code) {
   std::vector<std::string> operation_args{
-    std::to_string(request_code),
-    application.name.toUtf8().constData(),
-    application.path.toUtf8().constData(),
-    application.data.toUtf8().constData(),
-    application.mask.toUtf8().constData()
+      std::to_string(request_code),
+      application.name.toUtf8().constData(),
+      application.path.toUtf8().constData(),
+      application.data.toUtf8().constData(),
+      application.mask.toUtf8().constData()
   };
   std::string operation_string = createOperation("AppRequest", operation_args);
 
@@ -597,11 +597,76 @@ void Client::appRequest(KApplication application, uint8_t request_code) {
 }
 
 /**
- * @brief Client::fetchSchedule
+ * @brief Client::request
+ *
+ * @param [in] {uint8_t}       request_code
+ * @param [in] {T}             payload
  */
-void Client::fetchSchedule() {
-  sendEncoded(createOperation(
-    "Schedule",
-    {std::to_string(constants::RequestType::SCHEDULE)}
-  ));
+template <typename T>
+void Client::request(uint8_t request_code, T payload) {
+  using namespace constants;
+  try {
+    std::string operation_string{};
+
+    if (request_code == RequestType::REGISTER ||
+        request_code == RequestType::DELETE     )
+    {
+      if constexpr (std::is_same_v<T, KApplication>) {
+        std::vector<std::string> operation_args{
+            std::to_string(request_code),
+            payload.name.toUtf8().constData(),
+            payload.path.toUtf8().constData(),
+            payload.data.toUtf8().constData(),
+            payload.mask.toUtf8().constData()
+        };
+        operation_string = createOperation("AppRequest", operation_args);
+      }
+      else
+        throw std::invalid_argument{
+          "Register payload must be KApplication object"
+        };
+    }
+    else
+    if (request_code == RequestType::FETCH_SCHEDULE) {
+      operation_string = createOperation(
+          "Schedule",
+          {std::to_string(RequestType::FETCH_SCHEDULE)}
+      );
+    }
+    else
+    if (request_code == RequestType::UPDATE_SCHEDULE) {
+      if constexpr (std::is_same_v<T, ScheduledTask>) {
+//        operation_string = createOperation(
+//            "UpdateSchedule",
+//            {
+//              std::to_string(RequestType::UPDATE_SCHEDULE),
+
+//            } );
+        UI::infoMessageBox("Need to implement schedule update!");
+      }
+    }
+    else {
+      qDebug() << "Client is unable to process request";
+    }
+
+    sendEncoded(operation_string);
+  } catch (const std::exception& e) {
+    qDebug() << "Exception caught:\n" << e.what();
+  }
 }
+
+template void  Client::request(uint8_t request_code, ScheduledTask payload);
+template void  Client::request(uint8_t request_code, KApplication payload);
+
+/**
+ * @brief Client::request
+ *
+ * Generic interface
+ *
+ * @param request_code
+ */
+void Client::request(uint8_t request_code) {
+  request(request_code, std::vector<std::string>{});
+}
+
+

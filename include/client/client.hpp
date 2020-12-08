@@ -77,60 +77,63 @@ class Client : public QDialog {
   Client(QWidget* parent = nullptr);
   Client(QWidget* parent, int count, char** arguments);
   ~Client();
-  void start();
-  void closeConnection();
-  void execute();
-  void fetchSchedule();
-  QString getAppName(int mask);
-  bool    hasApp(KApplication application) {
+  void           start();
+  void           closeConnection();
+  void           execute();
+  QString        getAppName(int mask);
+  bool           hasApp(KApplication application) {
     for (const auto& app : m_commands) {
       if (app.name == application.name) return true;
     }
     return false;
   }
-  void appRequest(KApplication application, uint8_t request_code);
-  int getSelectedApp();
+  template <typename T>
+  void           request(uint8_t request_code, T payload);
+  void           request(uint8_t request_code);
+  void           appRequest(KApplication application, uint8_t request_code);
+  int            getSelectedApp();
   // Move this to private after moving responsibilities to Client
-  void scheduleTask(Scheduler::Task* task);
+  void           scheduleTask(Scheduler::Task* task);
   MessageHandler createMessageHandler(std::function<void()> cb);
 
  public slots:
-  void sendMessage(const QString& s);
-  void setSelectedApp(std::vector<QString> app_names);
-  void setCommands(Commands commands) {
+  void           sendMessage(const QString& s);
+  void           setSelectedApp(std::vector<QString> app_names);
+  void           setCommands(Commands commands) {
     if (selected_commands.empty()) {
       auto first_command = commands.front();
       selected_commands = {first_command.mask.toInt()};
     }
     m_commands = commands;
   }
-  void sendFiles(Scheduler::Task* task);
-  void ping();
+  void           sendFiles(Scheduler::Task* task);
+  void           ping();
 
  signals:
-  void messageReceived(int t, QString s, QVector<QString> args);
-  void eventReceived(int t, std::string event, StringVec args);
+  void           messageReceived(int t, QString s, QVector<QString> args);
+  void           eventReceived(int t, std::string event, StringVec args);
 
  private:
-  void sendEncoded(std::string message);
-  void sendFileEncoded(QByteArray bytes);
-  void sendTaskEncoded(Scheduler::Task* task);
-  void processFileQueue();
-  void handleMessages();
-  void handleEvent(std::string data);
-  void sendPackets(uint8_t* data, int size);
-  int argc;
-  char** argv;
-  int m_client_socket_fd;
-  Task* m_outbound_task;
-  bool executing;
-  bool file_was_sent;
-  Commands      m_commands;
-  CommandArgMap m_command_arg_map;
-  std::vector<int> selected_commands;
+  void           sendEncoded(std::string message);
+  void           sendFileEncoded(QByteArray bytes);
+  void           sendTaskEncoded(Scheduler::Task* task);
+  void           processFileQueue();
+  void           handleMessages();
+  void           handleEvent(std::string data);
+  void           sendPackets(uint8_t* data, int size);
+
+  int                          argc;
+  char**                       argv;
+  int                          m_client_socket_fd;
+  Task*                        m_outbound_task;
+  bool                         executing;
+  bool                         file_was_sent;
+  Commands                     m_commands;
+  CommandArgMap                m_command_arg_map;
+  std::vector<int>             selected_commands;
   QQueue<Scheduler::KFileData> outgoing_files;
-  std::vector<SentFile> sent_files;
-  Scheduler::TaskQueue m_task_queue;
+  std::vector<SentFile>        sent_files;
+  Scheduler::TaskQueue         m_task_queue;
 
 };
 #endif // CLIENT_HPP
