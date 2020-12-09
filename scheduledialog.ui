@@ -163,7 +163,7 @@ font-weight: 700;</string>
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0">
       <item>
        <widget class="QLabel" name="pathLabel">
         <property name="sizePolicy">
@@ -199,6 +199,9 @@ font-weight: 700;</string>
       </item>
       <item>
        <widget class="QLineEdit" name="timeText"/>
+      </item>
+      <item>
+       <widget class="QDateTimeEdit" name="dateTime"/>
       </item>
      </layout>
     </item>
@@ -238,7 +241,28 @@ font-weight: 700;</string>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="completedText"/>
+       <widget class="QComboBox" name="completed">
+        <item>
+         <property name="text">
+          <string>Completed</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Scheduled</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Failed</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Retry Failed</string>
+         </property>
+        </item>
+       </widget>
       </item>
      </layout>
     </item>

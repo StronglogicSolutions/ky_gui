@@ -13,6 +13,7 @@
 #include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QDateTimeEdit>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
@@ -40,9 +41,10 @@ public:
     QHBoxLayout *horizontalLayout_3;
     QLabel *pathLabel;
     QLineEdit *timeText;
+    QDateTimeEdit *dateTime;
     QHBoxLayout *horizontalLayout_6;
     QLabel *dataLabel;
-    QLineEdit *completedText;
+    QComboBox *completed;
     QHBoxLayout *horizontalLayout_5;
     QLabel *maskLabel;
     QLineEdit *recurringText;
@@ -168,6 +170,11 @@ public:
 
         horizontalLayout_3->addWidget(timeText);
 
+        dateTime = new QDateTimeEdit(verticalLayoutWidget);
+        dateTime->setObjectName(QString::fromUtf8("dateTime"));
+
+        horizontalLayout_3->addWidget(dateTime);
+
 
         verticalLayout->addLayout(horizontalLayout_3);
 
@@ -186,10 +193,14 @@ public:
 
         horizontalLayout_6->addWidget(dataLabel);
 
-        completedText = new QLineEdit(verticalLayoutWidget);
-        completedText->setObjectName(QString::fromUtf8("completedText"));
+        completed = new QComboBox(verticalLayoutWidget);
+        completed->addItem(QString());
+        completed->addItem(QString());
+        completed->addItem(QString());
+        completed->addItem(QString());
+        completed->setObjectName(QString::fromUtf8("completed"));
 
-        horizontalLayout_6->addWidget(completedText);
+        horizontalLayout_6->addWidget(completed);
 
 
         verticalLayout->addLayout(horizontalLayout_6);
@@ -403,6 +414,11 @@ public:
         maskLabel_4->setText(QCoreApplication::translate("ScheduleDialog", "Flags", nullptr));
         pathLabel->setText(QCoreApplication::translate("ScheduleDialog", "Time", nullptr));
         dataLabel->setText(QCoreApplication::translate("ScheduleDialog", "Completed", nullptr));
+        completed->setItemText(0, QCoreApplication::translate("ScheduleDialog", "Completed", nullptr));
+        completed->setItemText(1, QCoreApplication::translate("ScheduleDialog", "Scheduled", nullptr));
+        completed->setItemText(2, QCoreApplication::translate("ScheduleDialog", "Failed", nullptr));
+        completed->setItemText(3, QCoreApplication::translate("ScheduleDialog", "Retry Failed", nullptr));
+
         maskLabel->setText(QCoreApplication::translate("ScheduleDialog", "Recurring", nullptr));
         maskLabel_3->setText(QCoreApplication::translate("ScheduleDialog", "Notify", nullptr));
         maskLabel_2->setText(QCoreApplication::translate("ScheduleDialog", "Runtime Arguments", nullptr));

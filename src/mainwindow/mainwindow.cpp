@@ -125,6 +125,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
  * @brief MainWindow::~MainWindow
  */
 MainWindow::~MainWindow() {
+  q_client->closeConnection();
+  usleep(100000);
   delete q_client;
   delete ui;
   delete arg_ui;

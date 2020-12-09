@@ -32,6 +32,21 @@ const QString completed_num_string(QString s) {
   return s;
 }
 
+uint8_t completed_integer(QString s) {
+  if (s.compare("Scheduled") == 0)
+    return 0;
+  else
+      if (s.compare("Success") == 0)
+    return 1;
+  else
+      if (s.compare("Failed") == 0)
+    return 2;
+  else
+      if (s.compare("Retry Failed") == 0)
+    return 3;
+  return 10;
+}
+
 const QString recurring_string(QString s) {
   if (s.compare("0") == 0)
     return "No";
@@ -105,6 +120,12 @@ ScheduleDialog::ScheduleDialog(QWidget *parent) :
   QObject::connect(ui->fetchSchedule, &QPushButton::clicked, this, [this]() {
     updateSchedule();
   });
+
+  ui->dateTime->setDateTime(QDateTime::currentDateTime());
+
+  QObject::connect(ui->dateTime, &QDateTimeEdit::dateTimeChanged, this, [this]() {
+    ui->timeText->setText(ui->dateTime->dateTime().toString());
+  });
 }
 
 ScheduleDialog::~ScheduleDialog()
@@ -126,7 +147,7 @@ void ScheduleDialog::setFields(ScheduledTask task) {
   ui->appText->setText(task.app);
   ui->timeText->setText(task.time.toString());
   ui->flagsText->setText(task.flags);
-  ui->completedText->setText(completed_string(task.completed));
+  ui->completed->setCurrentIndex(task.completed.toUInt());
   ui->notifyText->setText((task.notify.compare("0") == 0) ? "No" : "Yes");
   ui->recurringText->setText(recurring_string(task.recurring));
   ui->runtimeText->setText(task.runtime);
@@ -159,7 +180,7 @@ void ScheduleDialog::clear() {
   ui->taskList     ->clear();
   ui->appText      ->clear();
   ui->timeText     ->clear();
-  ui->completedText->clear();
+  ui->completed->setCurrentText("Unknown");
   ui->flagsText    ->clear();
   ui->notifyText   ->clear();
   ui->recurringText->clear();
@@ -174,7 +195,7 @@ ScheduledTask ScheduleDialog::readFields() {
       .app       = ui->appText->text(),
       .time      = QDateTime::fromString(ui->timeText->text()),
       .flags     = ui->flagsText->text(),
-      .completed = completed_num_string(ui->completedText->text()),
+      .completed = completed_num_string(ui->completed->currentText()),
       .recurring = recurring_num_string(ui->recurringText->text()),
       .notify    = ui->notifyText->text().compare("Yes") == 0 ? "1" : "0",
       .runtime   = ui->runtimeText->text(),
