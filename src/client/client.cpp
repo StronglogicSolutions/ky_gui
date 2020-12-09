@@ -310,10 +310,10 @@ void Client::sendEncoded(std::string message) {
 
   uint8_t send_buffer[MAX_PACKET_SIZE];
   memset(send_buffer, 0, MAX_PACKET_SIZE);
-  send_buffer[0] = (size & 0xFF) >> 24;
-  send_buffer[1] = (size & 0xFF) >> 16;
-  send_buffer[2] = (size & 0xFF) >> 8;
-  send_buffer[3] = (size & 0xFF);
+  send_buffer[0] = (size >> 24)          & 0xFF;
+  send_buffer[1] = (size >> 16)          & 0xFF;
+  send_buffer[2] = (size >> 8)           & 0xFF;
+  send_buffer[3] = size                  & 0xFF;
   send_buffer[4] = (TaskCode::GENMSGBYTE & 0xFF);
   std::memcpy(send_buffer + 5, encoded_message_buffer, size);
   qDebug() << "Sending encoded message";
@@ -636,13 +636,21 @@ void Client::request(uint8_t request_code, T payload) {
     else
     if (request_code == RequestType::UPDATE_SCHEDULE) {
       if constexpr (std::is_same_v<T, ScheduledTask>) {
-//        operation_string = createOperation(
-//            "UpdateSchedule",
-//            {
-//              std::to_string(RequestType::UPDATE_SCHEDULE),
+        std::vector<std::string> operation_args{
+          std::to_string(RequestType::UPDATE_SCHEDULE),
+          payload.id.toUtf8().constData(),
+          payload.app.toUtf8().constData(),
+          std::to_string(payload.time.toTime_t()),
+          payload.flags.toUtf8().constData(),
+          payload.completed.toUtf8().constData(),
+          payload.recurring.toUtf8().constData(),
+          payload.notify.toUtf8().constData(),
+          payload.runtime.toUtf8().constData(),
+          (payload.files.isEmpty()) ? "" : payload.files.front().toUtf8().constData()
+        };
+        operation_string = createOperation("Schedule", operation_args);
 
-//            } );
-        UI::infoMessageBox("Need to implement schedule update!");
+        qDebug() << "Update Schedule string:\n" << operation_string.c_str();
       }
     }
     else {

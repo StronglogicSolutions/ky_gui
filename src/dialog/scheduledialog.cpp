@@ -144,3 +144,11 @@ ScheduledTask ScheduleDialog::readFields() {
       .files     = {ui->filesText->text()}  // files need to be an actual array
   };
 }
+
+
+void ScheduleDialog::receive_response(QVector<QString> v) {
+  auto id = v.at(0);
+  auto message = v.at(1);
+  UI::infoMessageBox("Notification of response for request");
+
+}

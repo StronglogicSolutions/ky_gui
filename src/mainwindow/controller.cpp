@@ -198,6 +198,9 @@ QString MainWindow::Controller::handleEventMessage(QString message,
         if (details.compare("Schedule more") == 0) {
           window->schedule_ui.insert_tasks(v);
         }
+        else if (details.compare("Schedule PUT") == 0) {
+          window->schedule_ui.receive_response(v);
+        }
       }
       else
       if (QString::compare(message, "Message Received") == 0) {

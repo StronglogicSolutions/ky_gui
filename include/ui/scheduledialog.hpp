@@ -15,6 +15,7 @@ class ScheduleDialog : public QDialog
  public:
   explicit ScheduleDialog(QWidget *parent = nullptr);
   void     insert_tasks(QVector<QString> tasks);
+  void     receive_response(QVector<QString> v);
   ~ScheduleDialog();
   void     clear();
 

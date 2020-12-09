@@ -39,6 +39,8 @@ struct ScheduledTask {
   QVector<QString> files;
 };
 
+
+
 namespace constants {
 enum RequestType {
   REGISTER        = 0x00,
@@ -48,6 +50,16 @@ enum RequestType {
   FETCH_SCHEDULE  = 0x04,
   UPDATE_SCHEDULE = 0x05
 };
+
+const uint8_t SCHEDULED_TASK_ID_INDEX        = 0x00;
+const uint8_t SCHEDULED_TASK_NAME_INDEX      = 0x01;
+const uint8_t SCHEDULED_TASK_TIME_INDEX      = 0x02;
+const uint8_t SCHEDULED_TASK_FLAGS_INDEX     = 0x03;
+const uint8_t SCHEDULED_TASK_COMPLETED_INDEX = 0x04;
+const uint8_t SCHEDULED_TASK_RECURRING_INDEX = 0x05;
+const uint8_t SCHEDULED_TASK_NOTIFY_INDEX    = 0x06;
+const uint8_t SCHEDULED_TASK_RUNTIME_INDEX   = 0x07;
+const uint8_t SCHEDULED_TASK_FILES_INDEX     = 0x08;
 }
 
 namespace {
