@@ -17,24 +17,60 @@ const QString completed_string(QString s) {
   return s;
 }
 
+const QString completed_num_string(QString s) {
+  if (s.compare("Scheduled") == 0)
+    return "0";
+  else
+      if (s.compare("Success") == 0)
+    return "1";
+  else
+      if (s.compare("Failed") == 0)
+    return "2";
+  else
+      if (s.compare("Retry Failed") == 0)
+    return "3";
+  return s;
+}
+
 const QString recurring_string(QString s) {
   if (s.compare("0") == 0)
     return "No";
   else
-  if (s.compare("1") == 0)
+      if (s.compare("1") == 0)
     return "Hourly";
   else
-  if (s.compare("2") == 0)
+      if (s.compare("2") == 0)
     return "Daily";
   else
-  if (s.compare("3") == 0)
+      if (s.compare("3") == 0)
     return "Weekly";
   else
-  if (s.compare("4") == 0)
+      if (s.compare("4") == 0)
     return "Monthly";
   else
-  if (s.compare("5") == 0)
+      if (s.compare("5") == 0)
     return "Yearly";
+  return s;
+}
+
+const QString recurring_num_string(QString s) {
+  if (s.compare("No") == 0)
+    return "0";
+  else
+      if (s.compare("Hourly") == 0)
+    return "1";
+  else
+      if (s.compare("Daily") == 0)
+    return "2";
+  else
+      if (s.compare("Weekly") == 0)
+    return "3";
+  else
+      if (s.compare("Monthly") == 0)
+    return "4";
+  else
+      if (s.compare("Yearly") == 0)
+    return "5";
   return s;
 }
 
@@ -131,15 +167,16 @@ void ScheduleDialog::clear() {
   ui->filesText    ->clear();
 }
 
+
 ScheduledTask ScheduleDialog::readFields() {
   return ScheduledTask {
       .id        = m_tasks.at(ui->taskList->currentIndex()).id,
       .app       = ui->appText->text(),
       .time      = QDateTime::fromString(ui->timeText->text()),
       .flags     = ui->flagsText->text(),
-      .completed = ui->completedText->text(),
-      .recurring = ui->recurringText->text(),
-      .notify    = ui->notifyText->text(),
+      .completed = completed_num_string(ui->completedText->text()),
+      .recurring = recurring_num_string(ui->recurringText->text()),
+      .notify    = ui->notifyText->text().compare("Yes") == 0 ? "1" : "0",
       .runtime   = ui->runtimeText->text(),
       .files     = {ui->filesText->text()}  // files need to be an actual array
   };
