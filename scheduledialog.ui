@@ -302,7 +302,38 @@ font-weight: 700;</string>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="recurringText"/>
+       <widget class="QComboBox" name="recurring">
+        <item>
+         <property name="text">
+          <string>No</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Hourly</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Daily</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Weekly</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Monthly</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Yearly</string>
+         </property>
+        </item>
+       </widget>
       </item>
      </layout>
     </item>
@@ -342,7 +373,11 @@ font-weight: 700;</string>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="notifyText"/>
+       <widget class="QCheckBox" name="notifyCheck">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>

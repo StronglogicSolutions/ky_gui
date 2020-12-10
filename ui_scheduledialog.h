@@ -12,6 +12,7 @@
 #include <QtCore/QVariant>
 #include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDateTimeEdit>
 #include <QtWidgets/QDialog>
@@ -47,10 +48,10 @@ public:
     QComboBox *completed;
     QHBoxLayout *horizontalLayout_5;
     QLabel *maskLabel;
-    QLineEdit *recurringText;
+    QComboBox *recurring;
     QHBoxLayout *horizontalLayout_9;
     QLabel *maskLabel_3;
-    QLineEdit *notifyText;
+    QCheckBox *notifyCheck;
     QHBoxLayout *horizontalLayout_8;
     QLabel *maskLabel_2;
     QLineEdit *runtimeText;
@@ -220,10 +221,16 @@ public:
 
         horizontalLayout_5->addWidget(maskLabel);
 
-        recurringText = new QLineEdit(verticalLayoutWidget);
-        recurringText->setObjectName(QString::fromUtf8("recurringText"));
+        recurring = new QComboBox(verticalLayoutWidget);
+        recurring->addItem(QString());
+        recurring->addItem(QString());
+        recurring->addItem(QString());
+        recurring->addItem(QString());
+        recurring->addItem(QString());
+        recurring->addItem(QString());
+        recurring->setObjectName(QString::fromUtf8("recurring"));
 
-        horizontalLayout_5->addWidget(recurringText);
+        horizontalLayout_5->addWidget(recurring);
 
 
         verticalLayout->addLayout(horizontalLayout_5);
@@ -243,10 +250,10 @@ public:
 
         horizontalLayout_9->addWidget(maskLabel_3);
 
-        notifyText = new QLineEdit(verticalLayoutWidget);
-        notifyText->setObjectName(QString::fromUtf8("notifyText"));
+        notifyCheck = new QCheckBox(verticalLayoutWidget);
+        notifyCheck->setObjectName(QString::fromUtf8("notifyCheck"));
 
-        horizontalLayout_9->addWidget(notifyText);
+        horizontalLayout_9->addWidget(notifyCheck);
 
 
         verticalLayout->addLayout(horizontalLayout_9);
@@ -420,7 +427,15 @@ public:
         completed->setItemText(3, QCoreApplication::translate("ScheduleDialog", "Retry Failed", nullptr));
 
         maskLabel->setText(QCoreApplication::translate("ScheduleDialog", "Recurring", nullptr));
+        recurring->setItemText(0, QCoreApplication::translate("ScheduleDialog", "No", nullptr));
+        recurring->setItemText(1, QCoreApplication::translate("ScheduleDialog", "Hourly", nullptr));
+        recurring->setItemText(2, QCoreApplication::translate("ScheduleDialog", "Daily", nullptr));
+        recurring->setItemText(3, QCoreApplication::translate("ScheduleDialog", "Weekly", nullptr));
+        recurring->setItemText(4, QCoreApplication::translate("ScheduleDialog", "Monthly", nullptr));
+        recurring->setItemText(5, QCoreApplication::translate("ScheduleDialog", "Yearly", nullptr));
+
         maskLabel_3->setText(QCoreApplication::translate("ScheduleDialog", "Notify", nullptr));
+        notifyCheck->setText(QString());
         maskLabel_2->setText(QCoreApplication::translate("ScheduleDialog", "Runtime Arguments", nullptr));
         maskLabel_5->setText(QCoreApplication::translate("ScheduleDialog", "Files", nullptr));
         saveTask->setText(QCoreApplication::translate("ScheduleDialog", "Update", nullptr));

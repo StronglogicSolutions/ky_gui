@@ -89,6 +89,27 @@ const QString recurring_num_string(QString s) {
   return s;
 }
 
+uint8_t recurring_integer(QString s) {
+  if (s.compare("No") == 0)
+    return 0;
+  else
+      if (s.compare("Hourly") == 0)
+    return 1;
+  else
+      if (s.compare("Daily") == 0)
+    return 2;
+  else
+      if (s.compare("Weekly") == 0)
+    return 3;
+  else
+      if (s.compare("Monthly") == 0)
+    return 4;
+  else
+      if (s.compare("Yearly") == 0)
+    return 5;
+  return 10;
+}
+
 ScheduleDialog::ScheduleDialog(QWidget *parent) :
                                         QDialog(parent),
                                         ui(new Ui::ScheduleDialog)
@@ -148,8 +169,8 @@ void ScheduleDialog::setFields(ScheduledTask task) {
   ui->timeText->setText(task.time.toString());
   ui->flagsText->setText(task.flags);
   ui->completed->setCurrentIndex(task.completed.toUInt());
-  ui->notifyText->setText((task.notify.compare("0") == 0) ? "No" : "Yes");
-  ui->recurringText->setText(recurring_string(task.recurring));
+  ui->notifyCheck->setChecked((task.notify.compare("0") == 0) ? false : true);
+  ui->recurring->setCurrentIndex(task.recurring.toUInt());
   ui->runtimeText->setText(task.runtime);
   ui->filesText->setText(task.files.at(0));
 }
@@ -182,8 +203,8 @@ void ScheduleDialog::clear() {
   ui->timeText     ->clear();
   ui->completed->setCurrentText("Unknown");
   ui->flagsText    ->clear();
-  ui->notifyText   ->clear();
-  ui->recurringText->clear();
+  ui->notifyCheck->setChecked(false);
+  ui->recurring->setCurrentText("Unknown");
   ui->runtimeText  ->clear();
   ui->filesText    ->clear();
 }
@@ -196,8 +217,8 @@ ScheduledTask ScheduleDialog::readFields() {
       .time      = QDateTime::fromString(ui->timeText->text()),
       .flags     = ui->flagsText->text(),
       .completed = completed_num_string(ui->completed->currentText()),
-      .recurring = recurring_num_string(ui->recurringText->text()),
-      .notify    = ui->notifyText->text().compare("Yes") == 0 ? "1" : "0",
+      .recurring = recurring_num_string(ui->recurring->currentText()),
+      .notify    = ui->notifyCheck->isChecked() ? "1" : "0",
       .runtime   = ui->runtimeText->text(),
       .files     = {ui->filesText->text()}  // files need to be an actual array
   };
