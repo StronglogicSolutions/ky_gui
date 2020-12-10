@@ -408,3 +408,19 @@ QString MainWindow::parseTaskInfo(StringVec v) {
   }
   return task_info;
 }
+
+/**
+ * @brief ArgDialog::keyPressEvent
+ * @param e
+ */
+void MainWindow::keyPressEvent(QKeyEvent *e) {
+  if (Qt::ControlModifier) {
+    if (e->key()==Qt::Key_Return || e->key()==Qt::Key_Enter) {
+      const auto text = ui->inputText->toPlainText();
+      if (!text.isEmpty()) {
+        q_client->sendMessage(text);
+      }
+      ui->inputText->clear();
+    }
+  }
+}

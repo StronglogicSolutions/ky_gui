@@ -17,474 +17,467 @@
    <string notr="true">background-color: rgb(36, 41, 46);
 color: rgb(161, 164, 167);</string>
   </property>
-  <widget class="QWidget" name="verticalLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>951</width>
-     <height>851</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0,0,0,0,0">
-    <property name="spacing">
-     <number>18</number>
-    </property>
-    <property name="leftMargin">
-     <number>16</number>
-    </property>
-    <property name="topMargin">
-     <number>16</number>
-    </property>
-    <property name="rightMargin">
-     <number>16</number>
-    </property>
-    <property name="bottomMargin">
-     <number>16</number>
-    </property>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
-      <item>
-       <widget class="QLabel" name="appsLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>2</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>196</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>196</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0,0,0,0,0">
+     <property name="spacing">
+      <number>18</number>
+     </property>
+     <property name="leftMargin">
+      <number>16</number>
+     </property>
+     <property name="topMargin">
+      <number>16</number>
+     </property>
+     <property name="rightMargin">
+      <number>16</number>
+     </property>
+     <property name="bottomMargin">
+      <number>16</number>
+     </property>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
+       <item>
+        <widget class="QLabel" name="appsLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>2</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>196</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>196</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
 color: rgb(131, 148, 150);
 font-weight: 700;</string>
-        </property>
-        <property name="text">
-         <string>Tasks</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="taskList"/>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0">
-      <item>
-       <widget class="QLabel" name="nameLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>2</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>196</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>196</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+         </property>
+         <property name="text">
+          <string>Tasks</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="taskList"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0">
+       <item>
+        <widget class="QLabel" name="nameLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>2</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>196</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>196</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
 color: rgb(131, 148, 150);
 font-weight: 700;</string>
-        </property>
-        <property name="text">
-         <string>App</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="appText"/>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="0,0">
-      <item>
-       <widget class="QLabel" name="maskLabel_4">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>2</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>196</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>196</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+         </property>
+         <property name="text">
+          <string>App</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="appText"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="0,0">
+       <item>
+        <widget class="QLabel" name="maskLabel_4">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>2</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>196</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>196</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
 color: rgb(131, 148, 150);
 font-weight: 700;</string>
-        </property>
-        <property name="text">
-         <string>Flags</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="flagsText"/>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0">
-      <item>
-       <widget class="QLabel" name="pathLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>2</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>196</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>196</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+         </property>
+         <property name="text">
+          <string>Flags</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="flagsText"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0">
+       <item>
+        <widget class="QLabel" name="pathLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>2</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>196</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>196</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
 color: rgb(131, 148, 150);
 font-weight: 700;</string>
-        </property>
-        <property name="text">
-         <string>Time</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="timeText"/>
-      </item>
-      <item>
-       <widget class="QDateTimeEdit" name="dateTime"/>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0">
-      <item>
-       <widget class="QLabel" name="dataLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>2</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>196</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>196</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+         </property>
+         <property name="text">
+          <string>Time</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="timeText"/>
+       </item>
+       <item>
+        <widget class="QDateTimeEdit" name="dateTime"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0">
+       <item>
+        <widget class="QLabel" name="dataLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>2</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>196</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>196</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
 color: rgb(131, 148, 150);
 font-weight: 700;</string>
-        </property>
-        <property name="text">
-         <string>Completed</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="completed">
-        <item>
+         </property>
          <property name="text">
           <string>Completed</string>
          </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Scheduled</string>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Failed</string>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="completed">
+         <item>
+          <property name="text">
+           <string>Completed</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Scheduled</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Failed</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Retry Failed</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,0">
+       <item>
+        <widget class="QLabel" name="maskLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>2</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Retry Failed</string>
+         <property name="minimumSize">
+          <size>
+           <width>196</width>
+           <height>0</height>
+          </size>
          </property>
-        </item>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,0">
-      <item>
-       <widget class="QLabel" name="maskLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>2</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>196</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>196</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+         <property name="maximumSize">
+          <size>
+           <width>196</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
 color: rgb(131, 148, 150);
 font-weight: 700;</string>
-        </property>
-        <property name="text">
-         <string>Recurring</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="recurring">
-        <item>
-         <property name="text">
-          <string>No</string>
          </property>
-        </item>
-        <item>
          <property name="text">
-          <string>Hourly</string>
+          <string>Recurring</string>
          </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Daily</string>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Weekly</string>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="recurring">
+         <item>
+          <property name="text">
+           <string>No</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Hourly</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Daily</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Weekly</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Monthly</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Yearly</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="0,0">
+       <item>
+        <widget class="QLabel" name="maskLabel_3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>2</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Monthly</string>
+         <property name="minimumSize">
+          <size>
+           <width>196</width>
+           <height>0</height>
+          </size>
          </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Yearly</string>
+         <property name="maximumSize">
+          <size>
+           <width>196</width>
+           <height>16777215</height>
+          </size>
          </property>
-        </item>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="0,0">
-      <item>
-       <widget class="QLabel" name="maskLabel_3">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>2</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>196</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>196</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+         <property name="styleSheet">
+          <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
 color: rgb(131, 148, 150);
 font-weight: 700;</string>
-        </property>
-        <property name="text">
-         <string>Notify</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="notifyCheck">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0">
-      <item>
-       <widget class="QLabel" name="maskLabel_2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>2</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>196</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>196</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+         </property>
+         <property name="text">
+          <string>Notify</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="notifyCheck">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0">
+       <item>
+        <widget class="QLabel" name="maskLabel_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>2</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>196</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>196</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
 color: rgb(131, 148, 150);
 font-weight: 700;</string>
-        </property>
-        <property name="text">
-         <string>Runtime Arguments</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="runtimeText"/>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="0,0">
-      <item>
-       <widget class="QLabel" name="maskLabel_5">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>2</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>196</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>196</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+         </property>
+         <property name="text">
+          <string>Runtime Arguments</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="runtimeText"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="0,0">
+       <item>
+        <widget class="QLabel" name="maskLabel_5">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>2</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>196</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>196</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
 color: rgb(131, 148, 150);
 font-weight: 700;</string>
-        </property>
-        <property name="text">
-         <string>Files</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="filesText"/>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_7">
-      <item>
-       <widget class="QPushButton" name="saveTask">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>25</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>420</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(2, 180, 43);
+         </property>
+         <property name="text">
+          <string>Files</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="filesText"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <item>
+        <widget class="QPushButton" name="saveTask">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>420</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(2, 180, 43);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
 font-weight: 700;
@@ -495,38 +488,38 @@ border-radius: 4px;
 border-color: #00000f;
 min-width: 4em;
 padding: 4px;</string>
-        </property>
-        <property name="text">
-         <string>Update</string>
-        </property>
-        <property name="icon">
-         <iconset resource="kres.qrc">
-          <normaloff>:/icons/send-button.png</normaloff>:/icons/send-button.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="fetchSchedule">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>25</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>420</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 85, 0);
+         </property>
+         <property name="text">
+          <string>Update</string>
+         </property>
+         <property name="icon">
+          <iconset resource="kres.qrc">
+           <normaloff>:/icons/send-button.png</normaloff>:/icons/send-button.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="fetchSchedule">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>420</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 85, 0);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
 font-weight: 700;
@@ -537,38 +530,38 @@ border-radius: 4px;
 border-color: #00000f;
 min-width: 4em;
 padding: 4px;</string>
-        </property>
-        <property name="text">
-         <string>Fetch</string>
-        </property>
-        <property name="icon">
-         <iconset resource="kres.qrc">
-          <normaloff>:/icons/icons/refresh.png</normaloff>:/icons/icons/refresh.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="deleteTask">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>25</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>420</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(170, 0, 0);
+         </property>
+         <property name="text">
+          <string>Fetch</string>
+         </property>
+         <property name="icon">
+          <iconset resource="kres.qrc">
+           <normaloff>:/icons/icons/refresh.png</normaloff>:/icons/icons/refresh.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="deleteTask">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>420</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(170, 0, 0);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
 font-weight: 700;
@@ -579,36 +572,36 @@ border-radius: 4px;
 border-color: #00000f;
 min-width: 4em;
 padding: 4px;</string>
-        </property>
-        <property name="text">
-         <string>Delete</string>
-        </property>
-        <property name="icon">
-         <iconset resource="kres.qrc">
-          <normaloff>:/icons/icons/trash.png</normaloff>:/icons/icons/trash.png</iconset>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
-      <item>
-       <widget class="QPushButton" name="close">
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>420</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 85, 0);
+         </property>
+         <property name="text">
+          <string>Delete</string>
+         </property>
+         <property name="icon">
+          <iconset resource="kres.qrc">
+           <normaloff>:/icons/icons/trash.png</normaloff>:/icons/icons/trash.png</iconset>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
+       <item>
+        <widget class="QPushButton" name="close">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>420</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 85, 0);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
 font-weight: 700;
@@ -619,20 +612,21 @@ border-radius: 4px;
 border-color: #00000f;
 min-width: 4em;
 padding: 4px;</string>
-        </property>
-        <property name="text">
-         <string>Close</string>
-        </property>
-        <property name="icon">
-         <iconset resource="kres.qrc">
-          <normaloff>:/icons/icons/cancel.png</normaloff>:/icons/icons/cancel.png</iconset>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-   </layout>
-  </widget>
+         </property>
+         <property name="text">
+          <string>Close</string>
+         </property>
+         <property name="icon">
+          <iconset resource="kres.qrc">
+           <normaloff>:/icons/icons/cancel.png</normaloff>:/icons/icons/cancel.png</iconset>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
  <resources>
   <include location="kres.qrc"/>

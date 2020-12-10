@@ -14,10 +14,10 @@ using namespace Scheduler;
 ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), m_task(nullptr) {
   ui->setupUi(this);
 
-//  m_loader = new QMovie{":/icons/loader.gif"};
-//  m_loader_layout.addWidget(ui->loaderMovie);
-//  m_loader_layout.addWidget(ui->loaderText);
-//  m_loader_widget.setLayout(&m_loader_layout);
+  m_loader = new QMovie{":/icons/loader.gif"};
+  m_loader_layout.addWidget(ui->loaderMovie);
+  m_loader_layout.addWidget(ui->loaderText);
+  m_loader_widget.setLayout(&m_loader_layout);
 
   ui->argCommandButtons->button(QDialogButtonBox::Close)
       ->setStyleSheet(QString("background:%1").arg("#2f535f"));
@@ -152,6 +152,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
     auto arg_text = ui->runtimeArgEdit->text();
     addOrReplaceInArgList(arg_text, Args::RUNTIME_ARG_TYPE);
     m_task->addArgument("runtime", arg_text);
+    ui->runtimeArgEdit->clear();
     qDebug() << "Added process runtime argument: " << arg_text;
   });
 
@@ -173,7 +174,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
                          m_task = nullptr;
                          m_task = createTask(m_app_name);
                          clearPost();
-                         // displayLoader(true);
+                          displayLoader(true);
                        } else {
                          UI::infoMessageBox("Task is still missing arguments", "Task Verification Error");
                        }
@@ -423,15 +424,21 @@ void ArgDialog::addHashtag(QString tag) {
  * @param e
  */
 void ArgDialog::keyPressEvent(QKeyEvent *e) {
-    if (Qt::ControlModifier) {
-        if(e->key()==Qt::Key_Return || e->key()==Qt::Key_Enter) {
-            ui->addArgument->clicked();
-            auto idx = ui->argType->currentIndex();
-            if (idx != (ui->argType->count() - 1)) {
-                ui->argType->setCurrentIndex(idx + 1);
-            }
+  if (Qt::ControlModifier) {
+      if (e->key()==Qt::Key_Return || e->key()==Qt::Key_Enter) {
+        if (ui->argInput->hasFocus()) {
+          ui->addArgument->clicked();
+          auto idx = ui->argType->currentIndex();
+          if (idx != (ui->argType->count() - 1)) {
+            ui->argType->setCurrentIndex(idx + 1);
+          }
         }
-    }
+        else
+        if (ui->runtimeArgEdit->hasFocus()) {
+          (*(ui->addRuntimeArg)).clicked();
+        }
+      }
+  }
 }
 
 /**
@@ -460,7 +467,7 @@ ArgDialog::~ArgDialog() {
   if (m_pending_task == nullptr) {
     delete m_pending_task;
   }
-//  delete m_loader;
+  delete m_loader;
   delete ui;
 }
 
@@ -474,7 +481,7 @@ void ArgDialog::setArgTypes() {
 }
 
 void ArgDialog::notifyClientSuccess() {
-  // displayLoader(false);
+   displayLoader(false);
   if (m_pending_task != nullptr) {
     delete m_pending_task;
   } else {

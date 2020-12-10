@@ -92,6 +92,10 @@ public:
       MainWindow* window;
     };
 
+   protected:
+    void keyPressEvent(QKeyEvent *e);
+
+   private:
     /** UI & Messages */
     void connectUi();
     void setConnectScreen(bool visible = true);
