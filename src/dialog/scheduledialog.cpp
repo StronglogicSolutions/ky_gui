@@ -2,6 +2,11 @@
 #include "ui_scheduledialog.h"
 #include <QDebug>
 
+/**
+*   ┌──────────────────────────────────────────────────┐
+*   │░░░░░░░░░░░░░░░ HELPERS ░░░░░░░░░░░░░░░░░│
+*   └──────────────────────────────────────────────────┘
+*/
 const QString completed_string(QString s) {
   if (s.compare("0") == 0)
     return "Scheduled";
@@ -110,60 +115,95 @@ uint8_t recurring_integer(QString s) {
   return 10;
 }
 
-ScheduleDialog::ScheduleDialog(QWidget *parent) :
-                                        QDialog(parent),
-                                        ui(new Ui::ScheduleDialog)
+/**
+*   ┌─────────────────────────────────────────────────────────────────────────┐
+*   │░░░░░░░░░░░░░░░░ ScheduleDialog Definitions ░░░░░░░░░░░░░░░░░│
+*   └─────────────────────────────────────────────────────────────────────────┘
+*/
+
+/**
+ * constructor
+ *
+ * @brief ScheduleDialog::ScheduleDialog
+ * @param parent
+ */
+ScheduleDialog::ScheduleDialog(QWidget *parent)
+: QDialog(parent),
+  ui(new Ui::ScheduleDialog)
 {
   ui->setupUi(this);
+  ui->dateTime->setDateTime(QDateTime::currentDateTime());
 
+/**
+*   ┌──────────────────────────────────────────────────┐
+*   │░░░░░░░░░░░░░░░░ SLOTS ░░░░░░░░░░░░░░░░░│
+*   └──────────────────────────────────────────────────┘
+*/
+  /** Fetch **/
+  QObject::connect(ui->fetchSchedule, &QPushButton::clicked, this, [this]() {
+    updateSchedule();
+  });
+  /** Save **/
   QObject::connect(ui->saveTask, &QPushButton::clicked, this, [this]() {
     scheduleRequest(RequestType::UPDATE_SCHEDULE, readFields());
   });
-
+  /** Delete **/
   QObject::connect(ui->deleteTask, &QPushButton::clicked, this, [this]() {
     this->close();
   });
-
+  /** Close **/
   QObject::connect(ui->close, &QPushButton::clicked, this, [this]() {
     this->close();
   });
-
+  /** Select **/
   QObject::connect(
     ui->taskList,
     static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
     this,
-    [this]() {
+    [this](int index) {
       if (!m_tasks.empty())
-        setFields(m_tasks.at(ui->taskList->currentIndex()));
+        setFields(m_tasks.at(index));
     }
   );
-
-  QObject::connect(ui->fetchSchedule, &QPushButton::clicked, this, [this]() {
-    updateSchedule();
-  });
-
-  ui->dateTime->setDateTime(QDateTime::currentDateTime());
-
+  /** Date select **/
   QObject::connect(ui->dateTime, &QDateTimeEdit::dateTimeChanged, this, [this]() {
     ui->timeText->setText(ui->dateTime->dateTime().toString());
   });
 }
 
+/**
+ * destructor
+ *
+ * @brief ScheduleDialog::~ScheduleDialog
+ */
 ScheduleDialog::~ScheduleDialog()
 {
   delete ui;
 }
 
+/**
+ * @brief ScheduleDialog::showEvent
+ */
 void ScheduleDialog::showEvent(QShowEvent *) {
   if (!m_tasks.empty()) {
     std::sort(m_tasks.begin(), m_tasks.end(), [](ScheduledTask a, ScheduledTask b) {
       return a.id.toUInt() > b.id.toUInt();
     });
-    ui->taskList->setCurrentIndex(0);
+
     setFields(m_tasks.front());
+    ui->taskList->clear();
+
+    for (const auto& task : m_tasks)
+      ui->taskList->addItem(QString{task.id + ": " + task.time.toString()});
+
+    ui->taskList->setCurrentIndex(0);
   }
 }
 
+/**
+ * @brief ScheduleDialog::setFields
+ * @param task
+ */
 void ScheduleDialog::setFields(ScheduledTask task) {
   ui->appText->setText(task.app);
   ui->timeText->setText(task.time.toString());
@@ -175,7 +215,10 @@ void ScheduleDialog::setFields(ScheduledTask task) {
   ui->filesText->setText(task.files.at(0));
 }
 
-
+/**
+ * @brief ScheduleDialog::insert_tasks
+ * @param task_arguments
+ */
 void ScheduleDialog::insert_tasks(QVector<QString> task_arguments) {
   uint16_t arg_num = task_arguments.size();
 QVector<QString> files;
@@ -191,11 +234,14 @@ QVector<QString> files;
       .runtime   = task_arguments.at(i + 7),
       .files     = QVector<QString>{task_arguments.at(i + 8)} // parse
     };
-    ui->taskList->addItem(QString{task.id + ": " + task.time.toString()});
+//    ui->taskList->addItem(QString{task.id + ": " + task.time.toString()});
     m_tasks.push_back(task);
   }
 }
 
+/**
+ * @brief ScheduleDialog::clear
+ */
 void ScheduleDialog::clear() {
   m_tasks          .clear();
   ui->taskList     ->clear();
@@ -209,7 +255,10 @@ void ScheduleDialog::clear() {
   ui->filesText    ->clear();
 }
 
-
+/**
+ * @brief ScheduleDialog::readFields
+ * @return
+ */
 ScheduledTask ScheduleDialog::readFields() {
   return ScheduledTask {
       .id        = m_tasks.at(ui->taskList->currentIndex()).id,
@@ -224,10 +273,10 @@ ScheduledTask ScheduleDialog::readFields() {
   };
 }
 
-
+/**
+ * @brief ScheduleDialog::receive_response
+ * @param v
+ */
 void ScheduleDialog::receive_response(QVector<QString> v) {
-  auto id = v.at(0);
-  auto message = v.at(1);
-  UI::infoMessageBox("Notification of response for request");
-
+  UI::infoMessageBox(QString("Request for task %0: %1").arg(v.at(0)).arg(v.at(1)), "Schedule Response");
 }

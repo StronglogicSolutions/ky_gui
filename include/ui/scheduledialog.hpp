@@ -2,6 +2,7 @@
 #define SCHEDULEDIALOG_HPP
 
 #include <QDialog>
+#include <QThread>
 #include "headers/util.hpp"
 
 namespace Ui {
@@ -29,6 +30,7 @@ class ScheduleDialog : public QDialog
  private:
   void           setFields(ScheduledTask task);
   ScheduledTask  readFields();
+  void           run_thread(QString string);
 
   Ui::ScheduleDialog*        ui;
   QVector<ScheduledTask> m_tasks;

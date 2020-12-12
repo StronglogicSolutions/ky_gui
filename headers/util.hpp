@@ -6,6 +6,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QQueue>
+#include <QTimer>
 #include <QString>
 #include <QMessageBox>
 #include <QDateTime>
@@ -38,8 +39,6 @@ struct ScheduledTask {
   QString          runtime;
   QVector<QString> files;
 };
-
-
 
 namespace constants {
 enum RequestType {
@@ -497,6 +496,11 @@ inline void infoMessageBox(QString text, QString title = "KYGUI") {
   box.setButtonText(0, "Close");
   box.exec();
 }
+
+//inline void toast(QString text, QString title = "Notification") {
+
+//}
+
 } // namespace UI
 namespace TimeUtils {
 inline QString getTime() { return QDateTime::currentDateTime().toString("hh:mm:ss"); }
