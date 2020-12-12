@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 
 
-IMAGE_NAME="logicp/ky_gui:production"
+IMAGE_BASE="logicp/ky_gui:"
 CWD=$(cd $(dirname $0) && pwd)
+PARAM=$1
+IMAGE_TAG="production"
+if [[ $PARAM == "DEV" ]]; then
+  IMAGE_TAG="develop"
+fi
+IMAGE_NAME=$IMAGE_BASE$IMAGE_TAG
+echo $IMAGE_NAME
 
 function rebuild_docker_image() {
   if [[ ! -f Dockerfile ]]; then
