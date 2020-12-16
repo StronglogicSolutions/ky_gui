@@ -634,10 +634,11 @@ void Client::request(uint8_t request_code, T payload) {
       );
     }
     else
-    if (request_code == RequestType::UPDATE_SCHEDULE) {
+    if (request_code == RequestType::UPDATE_SCHEDULE        ||
+        request_code == RequestType::FETCH_SCHEDULE_TOKENS) {
       if constexpr (std::is_same_v<T, ScheduledTask>) {
         std::vector<std::string> operation_args{
-          std::to_string(RequestType::UPDATE_SCHEDULE),
+          std::to_string(request_code),
           payload.id.toUtf8().constData(),
           payload.app.toUtf8().constData(),
           std::to_string(payload.time.toTime_t()),
@@ -646,7 +647,9 @@ void Client::request(uint8_t request_code, T payload) {
           payload.recurring.toUtf8().constData(),
           payload.notify.toUtf8().constData(),
           payload.runtime.toUtf8().constData(),
-          (payload.files.isEmpty()) ? "" : payload.files.front().toUtf8().constData()
+          (payload.files.isEmpty()) ?
+                                      "" :
+                                      payload.files.front().toUtf8().constData()
         };
         operation_string = createOperation("Schedule", operation_args);
 

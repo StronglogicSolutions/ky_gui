@@ -200,7 +200,11 @@ QString MainWindow::Controller::handleEventMessage(QString message,
         }
       }
       else
-      if (message.compare("Schedule PUT") == 0) {
+          if (message.compare("Schedule PUT") == 0) {
+        window->schedule_ui.receive_response(v);
+      }
+      else
+      if (message.compare("Schedule Tokens") == 0) {
         window->schedule_ui.receive_response(v);
       }
       else

@@ -161,8 +161,10 @@ ScheduleDialog::ScheduleDialog(QWidget *parent)
     static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
     this,
     [this](int index) {
-      if (!m_tasks.empty())
+        if ((index > -1) && !m_tasks.empty()) {
+        scheduleRequest(RequestType::FETCH_SCHEDULE_TOKENS, readFields());
         setFields(m_tasks.at(index));
+      }
     }
   );
   /** Date select **/
@@ -278,5 +280,7 @@ ScheduledTask ScheduleDialog::readFields() {
  * @param v
  */
 void ScheduleDialog::receive_response(QVector<QString> v) {
-  UI::infoMessageBox(QString("Request for task %0: %1").arg(v.at(0)).arg(v.at(1)), "Schedule Response");
+  QString display_s{};
+  for (const auto& e : v) display_s += e + "\n";
+  UI::infoMessageBox(display_s, "Schedule Response");
 }

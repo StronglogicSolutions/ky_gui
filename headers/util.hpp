@@ -42,12 +42,13 @@ struct ScheduledTask {
 
 namespace constants {
 enum RequestType {
-  REGISTER        = 0x00,
-  UPDATE          = 0x01,
-  DELETE          = 0x02,
-  GET             = 0x03,
-  FETCH_SCHEDULE  = 0x04,
-  UPDATE_SCHEDULE = 0x05
+  REGISTER              = 0x00,
+  UPDATE                = 0x01,
+  DELETE                = 0x02,
+  GET                   = 0x03,
+  FETCH_SCHEDULE        = 0x04,
+  UPDATE_SCHEDULE       = 0x05,
+  FETCH_SCHEDULE_TOKENS = 0x06
 };
 
 const uint8_t SCHEDULED_TASK_ID_INDEX        = 0x00;
