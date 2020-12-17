@@ -293,7 +293,7 @@ void ScheduleDialog::receive_response(RequestType type, QVector<QString> v) {
   if (type == RequestType::FETCH_SCHEDULE_TOKENS) {
     QList<QString> keys = m_tasks.at(ui->taskList->currentIndex()).flags.split(' ');
     ui->paramTable->setRowCount(0);
-    auto row_count = (keys.size() > v.size()) ? (v.size() - 1) : keys.size();
+    auto row_count = (keys.size() < v.size()) ? keys.size() : (v.size() - 1);
     for (int i = 0; i < row_count; i++) {
       auto row = ui->paramTable->rowCount(); // insert row
       auto key = keys.at(i);
