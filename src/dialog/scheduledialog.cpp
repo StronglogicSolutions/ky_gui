@@ -291,14 +291,10 @@ void ScheduleDialog::receive_response(RequestType type, QVector<QString> v) {
   }
   else
   if (type == RequestType::FETCH_SCHEDULE_TOKENS) {
-    QString display_s{};
-    for (const auto& e : v) display_s += e + "\n";
-    UI::infoMessageBox(display_s, "Schedule Response");
-
     QList<QString> keys = m_tasks.at(ui->taskList->currentIndex()).flags.split(' ');
-//    m_model->clear();
     ui->paramTable->setRowCount(0);
-    for (int i = 0; i < keys.size(); i++) {
+    auto row_count = (keys.size() > v.size()) ? (v.size() - 1) : keys.size();
+    for (int i = 0; i < row_count; i++) {
       auto row = ui->paramTable->rowCount(); // insert row
       auto key = keys.at(i);
       auto value = v.at(i + 1);
