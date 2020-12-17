@@ -19,9 +19,9 @@ color: rgb(161, 164, 167);</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0">
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0,0">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0,0,0">
      <property name="spacing">
-      <number>18</number>
+      <number>36</number>
      </property>
      <property name="leftMargin">
       <number>16</number>
@@ -509,6 +509,22 @@ font-weight: 700;</string>
         <widget class="QLineEdit" name="filesText"/>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QTableWidget" name="paramTable">
+       <property name="styleSheet">
+        <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: #2f535f;
+color: rgb(131, 148, 150);
+font-weight: 700;
+padding-left: 2px;</string>
+       </property>
+       <property name="columnCount">
+        <number>2</number>
+       </property>
+       <column/>
+       <column/>
+      </widget>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_7">

@@ -18,9 +18,11 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QTableWidget>
 #include <QtWidgets/QVBoxLayout>
 
 QT_BEGIN_NAMESPACE
@@ -57,6 +59,7 @@ public:
     QHBoxLayout *horizontalLayout_11;
     QLabel *maskLabel_5;
     QLineEdit *filesText;
+    QTableWidget *paramTable;
     QHBoxLayout *horizontalLayout_7;
     QPushButton *deleteTask;
     QPushButton *saveTask;
@@ -72,7 +75,7 @@ public:
         gridLayout = new QGridLayout(ScheduleDialog);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         verticalLayout = new QVBoxLayout();
-        verticalLayout->setSpacing(18);
+        verticalLayout->setSpacing(36);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(16, 16, 16, 16);
         horizontalLayout_12 = new QHBoxLayout();
@@ -328,6 +331,19 @@ public:
 
 
         verticalLayout->addLayout(horizontalLayout_11);
+
+        paramTable = new QTableWidget(ScheduleDialog);
+        if (paramTable->columnCount() < 2)
+            paramTable->setColumnCount(2);
+        paramTable->setObjectName(QString::fromUtf8("paramTable"));
+        paramTable->setStyleSheet(QString::fromUtf8("font: 87 11pt \"Noto Sans\";\n"
+"background-color: #2f535f;\n"
+"color: rgb(131, 148, 150);\n"
+"font-weight: 700;\n"
+"padding-left: 2px;"));
+        paramTable->setColumnCount(2);
+
+        verticalLayout->addWidget(paramTable);
 
         horizontalLayout_7 = new QHBoxLayout();
         horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));

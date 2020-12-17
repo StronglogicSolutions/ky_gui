@@ -201,11 +201,11 @@ QString MainWindow::Controller::handleEventMessage(QString message,
       }
       else
           if (message.compare("Schedule PUT") == 0) {
-        window->schedule_ui.receive_response(v);
+        window->schedule_ui.receive_response(RequestType::UPDATE_SCHEDULE, v);
       }
       else
       if (message.compare("Schedule Tokens") == 0) {
-        window->schedule_ui.receive_response(v);
+        window->schedule_ui.receive_response(RequestType::FETCH_SCHEDULE_TOKENS, v);
       }
       else
       if (QString::compare(message, "Message Received") == 0) {

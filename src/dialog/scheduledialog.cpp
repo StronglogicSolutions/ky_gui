@@ -134,6 +134,10 @@ ScheduleDialog::ScheduleDialog(QWidget *parent)
   ui->setupUi(this);
   ui->dateTime->setDateTime(QDateTime::currentDateTime());
 
+  ui->paramTable->setHorizontalHeaderLabels(QStringList{"Param Map", "Value"});
+  ui->paramTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+
 /**
 *   ┌──────────────────────────────────────────────────┐
 *   │░░░░░░░░░░░░░░░░ SLOTS ░░░░░░░░░░░░░░░░░│
@@ -279,8 +283,30 @@ ScheduledTask ScheduleDialog::readFields() {
  * @brief ScheduleDialog::receive_response
  * @param v
  */
-void ScheduleDialog::receive_response(QVector<QString> v) {
-  QString display_s{};
-  for (const auto& e : v) display_s += e + "\n";
-  UI::infoMessageBox(display_s, "Schedule Response");
+void ScheduleDialog::receive_response(RequestType type, QVector<QString> v) {
+  if (type == RequestType::UPDATE) {
+    QString display_s{};
+    for (const auto& e : v) display_s += e + "\n";
+    UI::infoMessageBox(display_s, "Schedule Response");
+  }
+  else
+  if (type == RequestType::FETCH_SCHEDULE_TOKENS) {
+    QString display_s{};
+    for (const auto& e : v) display_s += e + "\n";
+    UI::infoMessageBox(display_s, "Schedule Response");
+
+    QList<QString> keys = m_tasks.at(ui->taskList->currentIndex()).flags.split(' ');
+//    m_model->clear();
+    ui->paramTable->setRowCount(0);
+    for (int i = 0; i < keys.size(); i++) {
+      auto row = ui->paramTable->rowCount(); // insert row
+      auto key = keys.at(i);
+      auto value = v.at(i + 1);
+      ui->paramTable->insertRow(row);
+      QTableWidgetItem *item = new QTableWidgetItem(key);
+      QTableWidgetItem *item2 = new QTableWidgetItem(value);
+      ui->paramTable->setItem(row, 0, item);
+      ui->paramTable->setItem(row, 1, item2);
+    }
+  }
 }

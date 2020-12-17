@@ -3,6 +3,8 @@
 
 #include <QDialog>
 #include <QThread>
+#include <QTableWidget>
+#include <QTableWidgetItem>
 #include "headers/util.hpp"
 
 namespace Ui {
@@ -16,7 +18,7 @@ class ScheduleDialog : public QDialog
  public:
   explicit ScheduleDialog(QWidget *parent = nullptr);
   void     insert_tasks(QVector<QString> tasks);
-  void     receive_response(QVector<QString> v);
+  void     receive_response(RequestType type, QVector<QString> v);
   ~ScheduleDialog();
   void     clear();
 
