@@ -331,13 +331,21 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
     qDebug() << "Updating commands";
     QString default_app = configValue("defaultApp", m_config);
     m_controller.handleCommands(v, default_app);
+
     if (message == "New Session") {  // Session has started
       ui->led->setState(true);
+      arg_ui->setConfig(
+        configObject(
+          q_client->getAppName(q_client->getSelectedApp()),
+          m_config, true
+        )
+      );
+
       if (configBoolValue("schedulerMode", std::ref(m_config))) {
-        auto app_name = q_client->getAppName(q_client->getSelectedApp());
-        arg_ui->setConfig(configObject(app_name, m_config, true));
+
         arg_ui->show();
       }
+
       if (configBoolValue("fetchSchedule", m_config)) {
         q_client->request(RequestType::FETCH_SCHEDULE);
       }
@@ -348,6 +356,7 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
                                   .state = ProcessState::PENDING,
                                   .start = TimeUtils::getTime(),
                                   .id = v.at(2)});
+
     int row = 0;
     for (const auto& process : m_processes) {
       m_process_model->setItem(row, utils::createProcessListItem(process));
@@ -355,16 +364,21 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
     }
   } else if (t == EVENT_UPDATE_TYPE) {  // Received event from server
     QString event_message = m_controller.handleEventMessage(message, v);
+
     if (m_events.size() > 1) {  // Group repeating event messages
       auto last_event = m_events[m_events.size() - 1];
+
       if (utils::isSameEvent(message, last_event.remove(0, 11))) {
         m_consecutive_events++;
         auto count = utils::getLikeEventNum(event_message, m_events);
         QString clean_event_message =
             event_message + " (" + QString::number(count) + ")";
         m_events.push_back(event_message);
-        m_event_model->setItem(m_event_model->rowCount() - 1,
-                               utils::createEventListItem(clean_event_message));
+
+        m_event_model->setItem(
+          m_event_model->rowCount() - 1,
+          utils::createEventListItem(clean_event_message)
+        );
         return;  // It was not a unique message, we can return
       }
       m_consecutive_events = 0;
