@@ -174,7 +174,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
                          m_task = nullptr;
                          m_task = createTask(m_app_name);
                          clearPost();
-                          displayLoader(true);
+//                          displayLoader(true);
                        } else {
                          UI::infoMessageBox("Task is still missing arguments", "Task Verification Error");
                        }
@@ -481,7 +481,7 @@ void ArgDialog::setArgTypes() {
 }
 
 void ArgDialog::notifyClientSuccess() {
-   displayLoader(false);
+//   displayLoader(false);
   if (m_pending_task != nullptr) {
     delete m_pending_task;
   } else {

@@ -191,19 +191,7 @@ ScheduleDialog::~ScheduleDialog()
  * @brief ScheduleDialog::showEvent
  */
 void ScheduleDialog::showEvent(QShowEvent *) {
-  if (!m_tasks.empty()) {
-    std::sort(m_tasks.begin(), m_tasks.end(), [](ScheduledTask a, ScheduledTask b) {
-      return a.id.toUInt() > b.id.toUInt();
-    });
-
-    setFields(m_tasks.front());
-    ui->taskList->clear();
-
-    for (const auto& task : m_tasks)
-      ui->taskList->addItem(QString{task.id + ": " + task.time.toString()});
-
-    ui->taskList->setCurrentIndex(0);
-  }
+  refreshUI();
 }
 
 /**
@@ -219,6 +207,7 @@ void ScheduleDialog::setFields(ScheduledTask task) {
   ui->recurring->setCurrentIndex(task.recurring.toUInt());
   ui->runtimeText->setText(task.runtime);
   ui->filesText->setText(task.files.at(0));
+  ui->dateTime->setDateTime(task.time);
 }
 
 /**
@@ -240,7 +229,7 @@ QVector<QString> files;
       .runtime   = task_arguments.at(i + 7),
       .files     = QVector<QString>{task_arguments.at(i + 8)} // parse
     };
-//    ui->taskList->addItem(QString{task.id + ": " + task.time.toString()});
+
     m_tasks.push_back(task);
   }
 }
@@ -259,6 +248,7 @@ void ScheduleDialog::clear() {
   ui->recurring->setCurrentText("Unknown");
   ui->runtimeText  ->clear();
   ui->filesText    ->clear();
+  ui->dateTime->setDateTime(QDateTime::currentDateTime());
 }
 
 /**
@@ -290,6 +280,10 @@ void ScheduleDialog::receive_response(RequestType type, QVector<QString> v) {
     UI::infoMessageBox(display_s, "Schedule Response");
   }
   else
+  if (type == RequestType::FETCH_SCHEDULE) {
+    refreshUI();
+  }
+  else
   if (type == RequestType::FETCH_SCHEDULE_TOKENS) {
     QList<QString> keys = m_tasks.at(ui->taskList->currentIndex()).flags.split(' ');
     ui->paramTable->setRowCount(0);
@@ -304,5 +298,21 @@ void ScheduleDialog::receive_response(RequestType type, QVector<QString> v) {
       ui->paramTable->setItem(row, 0, item);
       ui->paramTable->setItem(row, 1, item2);
     }
+  }
+}
+
+void ScheduleDialog::refreshUI() {
+  if (!m_tasks.empty()) {
+    std::sort(m_tasks.begin(), m_tasks.end(), [](ScheduledTask a, ScheduledTask b) {
+      return a.id.toUInt() > b.id.toUInt();
+    });
+
+    setFields(m_tasks.front());
+    ui->taskList->clear();
+
+    for (const auto& task : m_tasks)
+      ui->taskList->addItem(QString{task.id + ": " + task.time.toString()});
+
+    ui->taskList->setCurrentIndex(0);
   }
 }

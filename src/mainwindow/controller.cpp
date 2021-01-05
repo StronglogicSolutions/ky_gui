@@ -143,6 +143,7 @@ QString MainWindow::Controller::handleEventMessage(QString message,
                                                       StringVec v) {
   QString event_message = utils::timestampPrefix();
   if (!v.empty()) {
+    // TODO: Why do we rely on this weird circumstance?
     if (v.size() == 1) {
       event_message += message + "\n" + v.at(0);
     } else {
@@ -198,9 +199,13 @@ QString MainWindow::Controller::handleEventMessage(QString message,
         if (details.compare("Schedule more") == 0) {
           window->schedule_ui.insert_tasks(v);
         }
+        else
+        if (details.compare("Schedule end") == 0) {
+          window->schedule_ui.receive_response(RequestType::FETCH_SCHEDULE, v);
+        }
       }
       else
-          if (message.compare("Schedule PUT") == 0) {
+      if (message.compare("Schedule PUT") == 0) {
         window->schedule_ui.receive_response(RequestType::UPDATE_SCHEDULE, v);
       }
       else

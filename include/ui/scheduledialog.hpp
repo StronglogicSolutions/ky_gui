@@ -32,7 +32,7 @@ class ScheduleDialog : public QDialog
  private:
   void           setFields(ScheduledTask task);
   ScheduledTask  readFields();
-  void           run_thread(QString string);
+  void           refreshUI();
 
   Ui::ScheduleDialog*        ui;
   QVector<ScheduledTask> m_tasks;
