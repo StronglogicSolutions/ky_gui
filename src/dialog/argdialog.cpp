@@ -11,6 +11,10 @@
 
 using namespace Scheduler;
 
+bool isSave(QString s) {
+  return (s.compare("Save") == 0 || s.compare("&Save") == 0);
+}
+
 ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), m_task(nullptr) {
   ui->setupUi(this);
 
@@ -160,7 +164,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
                    static_cast<void (QDialogButtonBox::*)(QAbstractButton *)>(
                        &QDialogButtonBox::clicked),
                    this, [this](QAbstractButton *button) {
-                     if (button->text() == "Save") {
+                     if (isSave(button->text())) {
                        setTaskArguments();
                        uint task_date_time = std::get<Scheduler::VariantIndex::QSTRING>(
                                                  m_task->getTaskArgumentValue("datetime")).toUInt();
