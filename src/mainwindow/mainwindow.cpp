@@ -334,15 +334,8 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
 
     if (message == "New Session") {  // Session has started
       ui->led->setState(true);
-      arg_ui->setConfig(
-        configObject(
-          q_client->getAppName(q_client->getSelectedApp()),
-          m_config, true
-        )
-      );
 
       if (configBoolValue("schedulerMode", std::ref(m_config))) {
-
         arg_ui->show();
       }
 
