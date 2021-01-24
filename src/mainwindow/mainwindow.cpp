@@ -125,6 +125,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
  * @brief MainWindow::~MainWindow
  */
 MainWindow::~MainWindow() {
+  q_client->closeConnection();
+  usleep(100000);
   delete q_client;
   delete ui;
   delete arg_ui;
@@ -169,6 +171,8 @@ void MainWindow::setConnectScreen(bool visible) {
  * @brief MainWindow::connectClient
  */
 void MainWindow::connectClient() {
+  using namespace constants;
+
   auto text = ui->kyConfig->toPlainText();
   qDebug() << text;
   m_config = loadJsonConfig(ui->kyConfig->toPlainText());
@@ -239,15 +243,25 @@ void MainWindow::connectClient() {
   );
 
   QObject::connect(&app_ui, &AppDialog::appRequest, this,
-    [this](KApplication application, constants::RequestType type) {
-      if (type == constants::REGISTER && q_client->hasApp(application)) {
+    [this](KApplication application, RequestType type) {
+      if (type == REGISTER && q_client->hasApp(application)) {
         QMessageBox::warning(this, tr("Application request"),
                             tr("An application with that name already exists"));
         return;
       }
-      q_client->appRequest(application, type);
+      q_client->request(type, application);
     }
   );
+
+  QObject::connect(&schedule_ui, &ScheduleDialog::scheduleRequest, this,
+    [this](RequestType type, ScheduledTask task) {
+      q_client->request(type, task);
+  });
+
+  QObject::connect(&schedule_ui, &ScheduleDialog::updateSchedule, this,
+    [this]() {
+      q_client->request(RequestType::FETCH_SCHEDULE);
+  });
 
   QObject::connect(
       ui->processList, &QListView::clicked, this,
@@ -291,6 +305,10 @@ void MainWindow::connectClient() {
     app_ui.show();
   });
 
+  QObject::connect(ui->tasks, &QPushButton::clicked, this, [this]() {
+    schedule_ui.show();
+  });
+
   QTimer* timer = new QTimer(this);
   connect(timer, &QTimer::timeout, q_client, &Client::ping);
   timer->start(10000);
@@ -313,12 +331,16 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
     qDebug() << "Updating commands";
     QString default_app = configValue("defaultApp", m_config);
     m_controller.handleCommands(v, default_app);
+
     if (message == "New Session") {  // Session has started
       ui->led->setState(true);
+
       if (configBoolValue("schedulerMode", std::ref(m_config))) {
-        auto app_name = q_client->getAppName(q_client->getSelectedApp());
-        arg_ui->setConfig(configObject(app_name, m_config, true));
         arg_ui->show();
+      }
+
+      if (configBoolValue("fetchSchedule", m_config)) {
+        q_client->request(RequestType::FETCH_SCHEDULE);
       }
     }
   } else if (t == PROCESS_REQUEST_TYPE) {  // Sent execution request to server
@@ -327,6 +349,7 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
                                   .state = ProcessState::PENDING,
                                   .start = TimeUtils::getTime(),
                                   .id = v.at(2)});
+
     int row = 0;
     for (const auto& process : m_processes) {
       m_process_model->setItem(row, utils::createProcessListItem(process));
@@ -334,16 +357,21 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
     }
   } else if (t == EVENT_UPDATE_TYPE) {  // Received event from server
     QString event_message = m_controller.handleEventMessage(message, v);
+
     if (m_events.size() > 1) {  // Group repeating event messages
       auto last_event = m_events[m_events.size() - 1];
+
       if (utils::isSameEvent(message, last_event.remove(0, 11))) {
         m_consecutive_events++;
         auto count = utils::getLikeEventNum(event_message, m_events);
         QString clean_event_message =
             event_message + " (" + QString::number(count) + ")";
         m_events.push_back(event_message);
-        m_event_model->setItem(m_event_model->rowCount() - 1,
-                               utils::createEventListItem(clean_event_message));
+
+        m_event_model->setItem(
+          m_event_model->rowCount() - 1,
+          utils::createEventListItem(clean_event_message)
+        );
         return;  // It was not a unique message, we can return
       }
       m_consecutive_events = 0;
@@ -386,4 +414,20 @@ QString MainWindow::parseTaskInfo(StringVec v) {
     }
   }
   return task_info;
+}
+
+/**
+ * @brief ArgDialog::keyPressEvent
+ * @param e
+ */
+void MainWindow::keyPressEvent(QKeyEvent *e) {
+  if (Qt::ControlModifier) {
+    if (e->key()==Qt::Key_Return || e->key()==Qt::Key_Enter) {
+      const auto text = ui->inputText->toPlainText();
+      if (!text.isEmpty()) {
+        q_client->sendMessage(text);
+      }
+      ui->inputText->clear();
+    }
+  }
 }

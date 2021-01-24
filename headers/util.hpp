@@ -6,6 +6,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QQueue>
+#include <QTimer>
 #include <QString>
 #include <QMessageBox>
 #include <QDateTime>
@@ -26,6 +27,40 @@ struct KApplication {
   QString data;
   QString mask;
 };
+
+struct ScheduledTask {
+  QString          id;
+  QString          app;
+  QDateTime        time;
+  QString          flags;
+  QString          completed;
+  QString          recurring;
+  QString          notify;
+  QString          runtime;
+  QVector<QString> files;
+};
+
+namespace constants {
+enum RequestType {
+  REGISTER              = 0x00,
+  UPDATE                = 0x01,
+  DELETE                = 0x02,
+  GET                   = 0x03,
+  FETCH_SCHEDULE        = 0x04,
+  UPDATE_SCHEDULE       = 0x05,
+  FETCH_SCHEDULE_TOKENS = 0x06
+};
+
+const uint8_t SCHEDULED_TASK_ID_INDEX        = 0x00;
+const uint8_t SCHEDULED_TASK_NAME_INDEX      = 0x01;
+const uint8_t SCHEDULED_TASK_TIME_INDEX      = 0x02;
+const uint8_t SCHEDULED_TASK_FLAGS_INDEX     = 0x03;
+const uint8_t SCHEDULED_TASK_COMPLETED_INDEX = 0x04;
+const uint8_t SCHEDULED_TASK_RECURRING_INDEX = 0x05;
+const uint8_t SCHEDULED_TASK_NOTIFY_INDEX    = 0x06;
+const uint8_t SCHEDULED_TASK_RUNTIME_INDEX   = 0x07;
+const uint8_t SCHEDULED_TASK_FILES_INDEX     = 0x08;
+}
 
 namespace {
 using namespace rapidjson;
@@ -120,6 +155,7 @@ bool configBoolValue(QString key, QJsonObject config) {
   if (config.contains(key)) {
     return bool{config.value(key).toString().compare("true") == 0};
   }
+  return false;
 }
 
 std::string getJsonString(std::string s) {
@@ -148,20 +184,42 @@ std::string createMessage(const char* data, std::string args = "") {
 bool isOperation(const char* data) {
     Document d;
     d.Parse(data);
-    return strcmp(d["type"].GetString(), "operation") == 0;
+    if (!d.Parse(data).HasParseError()) {
+      return strcmp(d["type"].GetString(), "operation") == 0;
+    }
+    return false;
 }
 
 bool isUploadCompleteEvent(const char* event) {
     return strcmp(event, "File Transfer Complete") == 0;
 }
 
+bool isValidJson(const QString& s) {
+  return !(Document{}.Parse(s.toUtf8().constData()).HasParseError());
+}
+
+bool isValidJson(const std::string& s) {
+  return !(Document{}.Parse(s.c_str()).HasParseError());
+}
+
 bool isEvent(const char* data) {
-    Document d;
-    d.Parse(data);
+  Document d;
+  if (!d.Parse(data).HasParseError()) {
     if (d.HasMember("type")); {
       return strcmp(d["type"].GetString(), "event") == 0;
     }
-    return false;
+  }
+  return false;
+}
+
+bool isSchedule(const char* data) {
+  Document d;
+  if (!d.Parse(data).HasParseError()) {
+    if (d.HasMember("type")); {
+      return strcmp(d["type"].GetString(), "schedule") == 0;
+    }
+  }
+  return false;
 }
 
 template <typename T>
@@ -181,13 +239,11 @@ bool isPong(const char* data) {
 
 // TODO: This should be "message", no?
 bool isMessage(const char* data) {
-    Document d;
-    d.Parse(data);
-    if (d.HasMember("message")) {
-        return true;
-    } else {
-        return false;
-    }
+  Document d;
+  if (!(d.Parse(data).HasParseError())) {
+    return (d.HasMember("message"));
+  }
+  return false;
 }
 
 std::string createOperation(const char* op, std::vector<std::string> args) {
@@ -441,6 +497,11 @@ inline void infoMessageBox(QString text, QString title = "KYGUI") {
   box.setButtonText(0, "Close");
   box.exec();
 }
+
+//inline void toast(QString text, QString title = "Notification") {
+
+//}
+
 } // namespace UI
 namespace TimeUtils {
 inline QString getTime() { return QDateTime::currentDateTime().toString("hh:mm:ss"); }

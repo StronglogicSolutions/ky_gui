@@ -312,6 +312,61 @@ padding: 4px;</string>
               </widget>
              </item>
              <item>
+              <widget class="QPushButton" name="tasks">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                 <horstretch>100</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Noto Sans</family>
+                 <pointsize>11</pointsize>
+                 <weight>87</weight>
+                 <italic>false</italic>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="autoFillBackground">
+                <bool>false</bool>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(255, 85, 0);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 43, 54);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+               </property>
+               <property name="text">
+                <string>Tasks</string>
+               </property>
+               <property name="icon">
+                <iconset resource="kres.qrc">
+                 <normaloff>:/icons/icons/task.png</normaloff>:/icons/icons/task.png</iconset>
+               </property>
+               <property name="checkable">
+                <bool>false</bool>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+               <property name="default">
+                <bool>false</bool>
+               </property>
+               <property name="flat">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QPushButton" name="execute">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
