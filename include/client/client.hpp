@@ -1,6 +1,19 @@
 ﻿#ifndef CLIENT_HPP
 #define CLIENT_HPP
 
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <math.h>
+#include <netdb.h>
+#include <cstring>
+#include <QByteArray>
+#include <algorithm>
+#include <functional>
+#include <thread>
+#include <utility>
+
 #include <QComboBox>
 #include <QDialog>
 #include <QLabel>
@@ -8,36 +21,37 @@
 #include <QMessageBox>
 #include <QMetaType>
 #include <QPushButton>
-#include <QQueue>
-#include <QString>
 #include <QThread>
 #include <QUuid>
-#include <QVector>
-#include <headers/util.hpp>
-#include <include/task/task.hpp>
-#include <string>
-#include <thread>
-#include <utility>
 
-static constexpr int MESSAGE_UPDATE_TYPE = 1;
+#include <headers/kmessage_codec.hpp>
+#include <headers/instatask_generated.h>
+#include <headers/generictask_generated.h>
+#include <headers/util.hpp>
+
+#include <include/task/task.hpp>
+
+static constexpr int MESSAGE_UPDATE_TYPE  = 1;
 static constexpr int COMMANDS_UPDATE_TYPE = 2;
-static constexpr int EVENT_UPDATE_TYPE = 3;
+static constexpr int EVENT_UPDATE_TYPE    = 3;
 static constexpr int PROCESS_REQUEST_TYPE = 4;
 
-//using namespace Scheduler;
+using namespace Scheduler;
 
 namespace TaskCode {
-static constexpr uint32_t GENMSGBYTE = 0xFE;
-static constexpr uint32_t PINGBYTE = 0xFD;
+static constexpr int IGTASKBYTE  = 0xFF;
+static constexpr int GENMSGBYTE  = 0xFE;
+static constexpr int GENTASKBYTE = 0xFC;
+static constexpr int PINGBYTE    = 0xFD;
 }  // namespace TaskCode
 
-typedef std::map<int, std::string> CommandMap;
+typedef QVector<KApplication> Commands;
 typedef std::map<int, std::vector<std::string>> CommandArgMap;
 typedef QVector<QString> StringVec;
 
 struct SentFile {
-    int timestamp;
-    QString name;
+    int                 timestamp;
+    QString             name;
     Scheduler::FileType type;
 };
 
@@ -66,6 +80,13 @@ class Client : public QDialog {
   void closeConnection();
   void execute();
   QString getAppName(int mask);
+  bool    hasApp(KApplication application) {
+    for (const auto& app : m_commands) {
+      if (app.name == application.name) return true;
+    }
+    return false;
+  }
+  void appRequest(KApplication application, uint8_t request_code);
   int getSelectedApp();
   // Move this to private after moving responsibilities to Client
   void scheduleTask(Scheduler::Task* task);
@@ -74,6 +95,13 @@ class Client : public QDialog {
  public slots:
   void sendMessage(const QString& s);
   void setSelectedApp(std::vector<QString> app_names);
+  void setCommands(Commands commands) {
+    if (selected_commands.empty()) {
+      auto first_command = commands.front();
+      selected_commands = {first_command.mask.toInt()};
+    }
+    m_commands = commands;
+  }
   void sendFiles(Scheduler::Task* task);
   void ping();
 
@@ -89,19 +117,18 @@ class Client : public QDialog {
   void handleMessages();
   void handleEvent(std::string data);
   void sendPackets(uint8_t* data, int size);
+  int argc;
+  char** argv;
+  int m_client_socket_fd;
+  Task* m_outbound_task;
+  bool executing;
+  bool file_was_sent;
+  Commands      m_commands;
+  CommandArgMap m_command_arg_map;
+  std::vector<int> selected_commands;
+  QQueue<Scheduler::KFileData> outgoing_files;
+  std::vector<SentFile> sent_files;
+  Scheduler::TaskQueue m_task_queue;
 
-  int                           argc;
-  char**                        argv;
-  int                           m_client_socket_fd;
-  bool                          executing;
-  bool                          file_was_sent;
-
-  Scheduler::Task*                         m_outbound_task;
-  CommandMap                    m_commands;
-  CommandArgMap                 m_command_arg_map;
-  std::vector<int>              selected_commands;
-  std::vector<SentFile>         sent_files;
-  Scheduler::TaskQueue          m_task_queue;
-  QQueue<Scheduler::KFileData>  outgoing_files;
 };
 #endif // CLIENT_HPP

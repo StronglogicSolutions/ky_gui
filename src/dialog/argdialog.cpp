@@ -97,21 +97,33 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
     if (text.size() > 0) {
       if (type == Args::HASHTAG_TYPE) {
         addHashtag(text);
-      } else if (type == Args::DESCRIPTION_TYPE) {
+      }
+      else
+      if (type == Args::DESCRIPTION_TYPE) {
         addItem(text, type);
         m_task->setArgument(Args::DESCRIPTION_TYPE, escapeText(text));
-      } else if (type == Args::PROMOTE_TYPE) {
+      }
+      else
+      if (type == Args::PROMOTE_TYPE) {
         addOrReplaceInArgList(text, Args::PROMOTE_TYPE);
         m_task->setArgument(Args::PROMOTE_TYPE, text);
-      } else if (type == Args::LINK_BIO_TYPE) {
+      }
+      else
+      if (type == Args::LINK_BIO_TYPE) {
         addOrReplaceInArgList(text, Args::LINK_BIO_TYPE);
         m_task->setArgument(Args::LINK_BIO_TYPE, text);
-      } else if (type == Args::REQUESTED_BY_TYPE) {
+      }
+      else
+      if (type == Args::REQUESTED_BY_TYPE) {
         addRequestedBy(text);
-      } else if (type == Args::HEADER_TYPE) {
+      }
+      else
+      if (type == Args::HEADER_TYPE) {
         addItem(text, type);
         m_task->setArgument(Args::HEADER_TYPE, text);
-      } else if (type == Args::REQUESTED_BY_PHRASE) {
+      }
+      else
+      if (type == Args::REQUESTED_BY_PHRASE) {
         addItem(text, type);
         m_task->setArgument(Args::REQUESTED_BY_PHRASE, text);
       }
@@ -123,6 +135,24 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
 
   QObject::connect(ui->dateTime, &QDateTimeEdit::dateTimeChanged, this, [this]() {
     m_task->setArgument("datetime", QString::number(ui->dateTime->dateTime().toTime_t()));
+  });
+
+  QObject::connect(ui->addRuntimeArg, &QPushButton::clicked, this, [this]() {
+    if (m_task->getType() == TaskType::INSTAGRAM) {
+      const char* message{"Runtime arguments are not available for Instagram tasks"};
+      qDebug() << message;
+      QMessageBox::warning(
+        this,
+        tr("Requested By"),
+        tr(message)
+      );
+      return;
+    }
+
+    auto arg_text = ui->runtimeArgEdit->text();
+    addOrReplaceInArgList(arg_text, Args::RUNTIME_ARG_TYPE);
+    m_task->addArgument("runtime", arg_text);
+    qDebug() << "Added process runtime argument: " << arg_text;
   });
 
   QObject::connect(ui->argCommandButtons,
@@ -206,7 +236,8 @@ void ArgDialog::showEvent(QShowEvent* event) {
  * @brief ArgDialog::setTaskArguments
  */
 void ArgDialog::setTaskArguments() {
-  if (m_task->getType() == TaskType::INSTAGRAM) {
+  auto type = m_task->getType();
+  if (type == TaskType::INSTAGRAM) {
     QString hashtags{};
     for (const auto &tag : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("hashtags"))) {
       hashtags += "#" + tag + " ";
@@ -218,6 +249,15 @@ void ArgDialog::setTaskArguments() {
     }
     m_task->setArgument("hashtags_string", hashtags);
     m_task->setArgument("requested_by_string", requested_by);
+  }
+  else
+  if (type == TaskType::GENERIC) {
+    QString runtime_string{};
+    for (const auto& arg : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("runtime"))) {
+      runtime_string += arg + " ";
+    }
+    runtime_string.chop(1);
+    m_task->setArgument("runtime_string", runtime_string);
   }
 }
 

@@ -1,6 +1,6 @@
 ﻿#ifndef UTIL_HPP
 #define UTIL_HPP
-#pragma GCC system_header
+
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -20,17 +20,12 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-namespace Kontainer {
-/** Reverse Iterator */
-template <class T>
-class ReverseIterator {
-    T& _obj;
-public:
-    ReverseIterator(T &obj) : _obj(obj) {}
-    auto begin() {return _obj.rbegin();}
-    auto end() {return _obj.rend();}
+struct KApplication {  
+  QString name;
+  QString path;
+  QString data;
+  QString mask;
 };
-}  // namespace Kontainer
 
 namespace {
 using namespace rapidjson;
@@ -40,6 +35,8 @@ typedef std::string KOperation;
 typedef std::vector<std::pair<std::string, std::string>> TupVec;
 typedef std::vector<std::map<int, std::string>> MapVec;
 typedef std::map<int, std::string> CommandMap;
+
+
 
 struct KSession {
     int id;

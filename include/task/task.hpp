@@ -9,14 +9,18 @@
 #include <vector>
 #include <map>
 
-namespace Scheduler {
-
-enum TaskType { INSTAGRAM = 1, GENERIC = 2, OTHER = 3 };
-
 namespace TaskCode {
 static constexpr uint32_t GENTASKCODE = 0xFC;
 static constexpr uint32_t IGTASKCODE  = 0xFF;
 }
+
+namespace Scheduler {
+namespace Args {
+const QString RUNTIME_ARG_TYPE = "runtime_arg";
+} // namespace Args
+
+enum TaskType { INSTAGRAM = 1, GENERIC = 2, OTHER = 3 };
+
 
 static constexpr uint32_t GENERIC_TASK_ID   = 96;
 static constexpr uint32_t INSTAGRAM_TASK_ID = 97;

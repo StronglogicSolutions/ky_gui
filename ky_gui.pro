@@ -29,17 +29,20 @@ QMAKE_CXXFLAGS += "-fno-sized-deallocation"
 
 SOURCES += \
         src/main.cpp \
-        src/mainwindow.cpp \
-        src/client.cpp \
-        src/instagram_task.cpp \
-        src/generic_task.cpp \
-        src/argdialog.cpp \
-        src/messagedialog.cpp \
-        src/connection_indicator.cpp \
-        src/kfiledialog.cpp \
+        src/mainwindow/mainwindow.cpp \
+        src/mainwindow/controller.cpp \
+        src/client/client.cpp \
+        src/task/instagram_task.cpp \
+        src/task/generic_task.cpp \
+        src/dialog/appdialog.cpp \
+        src/dialog/argdialog.cpp \
+        src/dialog/messagedialog.cpp \
+        src/component/connection_indicator.cpp \
+        src/component/kfiledialog.cpp
 
-        src/connection_indicator.cpp
+
 HEADERS += \
+        include/ui/appdialog.hpp \
         include/ui/argdialog.h \
         include/ui/messagedialog.hpp \
         include/ui/mainwindow.h \
@@ -60,6 +63,7 @@ HEADERS += \
 
 
 FORMS += \
+        appdialog.ui \
         argdialog.ui \
         consoledialog.ui \
         mainwindow.ui \

@@ -30,7 +30,7 @@ background-color: rgb(0, 43, 54);</string>
      <height>891</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0,0,0,0,3,0">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0,0,0,0,0,3,0">
     <item>
      <widget class="QLabel" name="argDialogTitle">
       <property name="font">
@@ -243,6 +243,86 @@ padding: 4px;</string>
      </widget>
     </item>
     <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <item alignment="Qt::AlignVCenter">
+       <widget class="QLabel" name="runtimeArgLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>196</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(131, 148, 150);
+font-weight: 700;</string>
+        </property>
+        <property name="text">
+         <string>Add runtime argument</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="runtimeArgEdit">
+        <property name="styleSheet">
+         <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: #2f535f;
+color: rgb(131, 148, 150);
+font-weight: 700;
+</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="addRuntimeArg">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: #2f535f;
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(149, 155, 156);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+        </property>
+        <property name="text">
+         <string>Add</string>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item alignment="Qt::AlignVCenter">
        <widget class="QLabel" name="label_4">
@@ -390,7 +470,7 @@ font-weight: 700;
          <string>Email notification</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignHCenter</set>
         </property>
        </widget>
       </item>
@@ -581,6 +661,12 @@ padding: 4px;</string>
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>30</height>
+         </size>
         </property>
         <property name="layoutDirection">
          <enum>Qt::LeftToRight</enum>

@@ -1,19 +1,34 @@
 ﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <include/ui/argdialog.h>
-#include <include/ui/messagedialog.hpp>
 #include <QList>
 #include <QListView>
 #include <QListWidgetItem>
 #include <QMainWindow>
 #include <QStandardItem>
 #include <QStandardItemModel>
-#include <QString>
 #include <QTableView>
 #include <QTimer>
+#include <QDateTime>
+#include <QLayout>
+#include <QScrollBar>
+#include <QTextEdit>
+#include <QTextStream>
+
+#include <include/ui/argdialog.h>
+#include <include/ui/messagedialog.hpp>
+#include <include/ui/appdialog.hpp>
+
+#include "ui_mainwindow.h"
+
 #include <headers/kiq_types.hpp>
 #include <include/client/client.hpp>
+
+const QString KYGUI_STYLESHEET{
+  "QListView { font: 87 11pt \"Noto Sans\"; background-color: #2f535f;"
+  "alternate-background-color: #616161; color: rgb(131, 148, 150); "
+  "font-weight: 700; background-color: rgb(29, 51, 59);"
+  "color: rgb(223, 252, 255);}"};
 
 namespace ProcessState {
     static constexpr int READY = 1;
@@ -44,7 +59,12 @@ struct Process {
     }
 };
 
-// struct Event {};
+namespace utils {
+QString getTime();
+QString timestampPrefix();
+QStandardItem* createProcessListItem(Process process);
+QStandardItem* createEventListItem(QString event);
+} // namespace utils
 
 namespace Ui {
 class MainWindow;
@@ -58,7 +78,7 @@ public:
     explicit MainWindow(int argc = 0, char** argv = nullptr, QWidget* parent = nullptr);
     ~MainWindow();
 
-    class MessageParser {
+    class Controller {
      public:
       void init(MainWindow* window);
       void handleCommands(StringVec commands, QString default_app);
@@ -80,10 +100,12 @@ public:
     int                   cli_argc;
     char**                cli_argv;
     /** UI Members */
-    MessageParser         message_parser;
+    Controller            m_controller;
     Ui::MainWindow*       ui;
     ArgDialog*            arg_ui;
+    AppDialog             app_ui;
     MessageDialog         message_ui;
+
     /** Client member */
     Client*               q_client;
     /** Models */

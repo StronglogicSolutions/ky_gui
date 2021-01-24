@@ -19,7 +19,7 @@ const QString REQUESTED_BY_PHRASE = "requested_by_phrase";
 static constexpr const char* INSTAGRAM_NAME = "Instagram";
 
 namespace TaskCode {
-  static constexpr int IGTASKBYTE = 0xFF;
+  static const uint32_t IGTASKBYTE = 0xFF;
 }
 }  // namespace Scheduler
 

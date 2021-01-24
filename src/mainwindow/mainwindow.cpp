@@ -1,19 +1,18 @@
 ﻿#include <include/ui/mainwindow.h>
-#include <QDebug>
-#include <QLayout>
-#include <QScrollBar>
-#include <QString>
-#include <QTextEdit>
-#include <QTextStream>
-#include <headers/util.hpp>
-#include <vector>
-
-#include "ui_mainwindow.h"
 
 /**
  * Helper functions
  */
-namespace {
+
+namespace utils {
+void infoMessageBox(QString text, QString title = "KYGUI") {
+  QMessageBox box;
+  box.setWindowTitle(title);
+  box.setText(text);
+  box.setButtonText(0, "Close");
+  box.exec();
+}
+
 bool isSameEvent(QString event1, QString event2) {
   auto event_size =
       event1.size() > event2.size() ? event2.size() : event1.size();
@@ -93,7 +92,7 @@ QStandardItem* createProcessListItem(Process process) {
 QStandardItem* createEventListItem(QString event) {
   return new QStandardItem(event);
 }
-}  // namespace
+}  // namespace utils
 
 /**
  *\mainpage The KYGUI application interface begins with the MainWindow
@@ -112,14 +111,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   m_event_model = new QStandardItemModel(this);
   m_process_model = new QStandardItemModel(this);
   q_client = new Client(this, cli_argc, cli_argv);
-  message_parser.init(this);
+  m_controller.init(this);
   ui->setupUi(this);
   this->setWindowTitle("KYGUI");
-  setStyleSheet(
-      "QListView { font: 87 11pt \"Noto Sans\"; background-color: #2f535f;"
-      "alternate-background-color: #616161; color: rgb(131, 148, 150); "
-      "font-weight: 700; background-color: rgb(29, 51, 59);"
-      "color: rgb(223, 252, 255);}");
+  setStyleSheet(KYGUI_STYLESHEET);
   setConnectScreen();
   connect(ui->connect, &QPushButton::clicked, this, &MainWindow::connectClient);
   ui->eventList->setModel(m_event_model);
@@ -153,11 +148,15 @@ void MainWindow::setConnectScreen(bool visible) {
     ui->kyConfig->setMaximumSize(1080, 175);
     ui->kyConfig->setMinimumSize(1080, 175);
     ui->logo->raise();
+
     QFile file(QCoreApplication::applicationDirPath() + "/config/config.json");
     file.open(QIODevice::ReadOnly | QFile::ReadOnly);
+
     QString config_json = QString::fromUtf8(file.readAll());
     ui->kyConfig->setText(config_json);
+
     qDebug() << "Set config json: \n" << ui->kyConfig->toPlainText();
+
     file.close();
   } else {
     ui->connect->hide();
@@ -230,14 +229,25 @@ void MainWindow::connectClient() {
     message_ui.show();
   });
 
-  QObject::connect(
-      arg_ui, &ArgDialog::taskRequestReady, this,
-      [this](Task* task) {
-        auto mask = q_client->getSelectedApp();
-        if (mask > -1) {
-            q_client->scheduleTask(task);
-        }
-      });
+  QObject::connect(arg_ui, &ArgDialog::taskRequestReady, this,
+    [this](Task* task) {
+      auto mask = q_client->getSelectedApp();
+      if (mask > -1) {
+          q_client->scheduleTask(task);
+      }
+    }
+  );
+
+  QObject::connect(&app_ui, &AppDialog::appRequest, this,
+    [this](KApplication application, constants::RequestType type) {
+      if (type == constants::REGISTER && q_client->hasApp(application)) {
+        QMessageBox::warning(this, tr("Application request"),
+                            tr("An application with that name already exists"));
+        return;
+      }
+      q_client->appRequest(application, type);
+    }
+  );
 
   QObject::connect(
       ui->processList, &QListView::clicked, this,
@@ -252,13 +262,15 @@ void MainWindow::connectClient() {
         if (process.end.size() > 0 || process.id == "Scheduled task") {
           process_info_text += "\n\nResult: \n" + process.result;
         }
-        UI::infoMessageBox(process_info_text, "Process");
+        utils::infoMessageBox(process_info_text, "Process");
       });
 
   QObject::connect(ui->eventList, &QListView::clicked, this,
-                   [this](const QModelIndex& index) {
-                     UI::infoMessageBox(m_event_model->item(index.row(), index.column())->text(), "Event");
-                   });
+    [this](const QModelIndex& index) {
+      utils::infoMessageBox(
+        m_event_model->item(index.row(), index.column())->text(), "Event"
+      );
+    });
 
   QObject::connect(m_event_model, &QAbstractItemModel::rowsAboutToBeInserted,
                    this, [this]() {
@@ -275,6 +287,10 @@ void MainWindow::connectClient() {
                      }
                    });
 
+  QObject::connect(ui->editApps, &QPushButton::clicked, this, [this]() {
+    app_ui.show();
+  });
+
   QTimer* timer = new QTimer(this);
   connect(timer, &QTimer::timeout, q_client, &Client::ping);
   timer->start(10000);
@@ -287,15 +303,16 @@ void MainWindow::connectClient() {
  * @param v
  */
 void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
-  QString timestamp_prefix = timestampPrefix();
+  QString timestamp_prefix = utils::timestampPrefix();
   if (t == MESSAGE_UPDATE_TYPE) {  // Normal message
     qDebug() << "Updating message area";
-    message_parser.handleMessage(message, v);
+    m_controller.handleMessage(message, v);
     message_ui.append(message);
   } else if (t == COMMANDS_UPDATE_TYPE) {  // Received app list from server
+    // TODO: Parse arg map -> every 4 elements is a data set for one command
     qDebug() << "Updating commands";
     QString default_app = configValue("defaultApp", m_config);
-    message_parser.handleCommands(v, default_app);
+    m_controller.handleCommands(v, default_app);
     if (message == "New Session") {  // Session has started
       ui->led->setState(true);
       if (configBoolValue("schedulerMode", std::ref(m_config))) {
@@ -312,21 +329,21 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
                                   .id = v.at(2)});
     int row = 0;
     for (const auto& process : m_processes) {
-      m_process_model->setItem(row, createProcessListItem(process));
+      m_process_model->setItem(row, utils::createProcessListItem(process));
       row++;
     }
   } else if (t == EVENT_UPDATE_TYPE) {  // Received event from server
-    QString event_message = message_parser.handleEventMessage(message, v);
+    QString event_message = m_controller.handleEventMessage(message, v);
     if (m_events.size() > 1) {  // Group repeating event messages
       auto last_event = m_events[m_events.size() - 1];
-      if (isSameEvent(message, last_event.remove(0, 11))) {
+      if (utils::isSameEvent(message, last_event.remove(0, 11))) {
         m_consecutive_events++;
-        auto count = getLikeEventNum(event_message, m_events);
+        auto count = utils::getLikeEventNum(event_message, m_events);
         QString clean_event_message =
             event_message + " (" + QString::number(count) + ")";
         m_events.push_back(event_message);
         m_event_model->setItem(m_event_model->rowCount() - 1,
-                               createEventListItem(clean_event_message));
+                               utils::createEventListItem(clean_event_message));
         return;  // It was not a unique message, we can return
       }
       m_consecutive_events = 0;
@@ -339,7 +356,7 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
     }
     m_events.push_back(event_message);
     m_event_model->setItem(m_event_model->rowCount(),
-                           createEventListItem(event_message));
+                           utils::createEventListItem(event_message));
   } else {
     qDebug() << "Unknown update type. Cannot update UI";
   }
@@ -369,147 +386,4 @@ QString MainWindow::parseTaskInfo(StringVec v) {
     }
   }
   return task_info;
-}
-
-/**
- * MessageParser
- *
- * \note We use the MessageParser class to do the heavy lifting of parsing
- * incoming messages and updating the UI accordingly
- */
-
-/**
- * @brief MainWindow::MessageParser::init
- * @param window
- */
-void MainWindow::MessageParser::init(MainWindow* window) {
-  this->window = window;
-}
-
-/**
- * @brief MainWindow::MessageParser::handleCommands
- * @param commands
- * @param default_command
- */
-void MainWindow::MessageParser::handleCommands(StringVec commands,
-                                               QString default_command) {
-  QComboBox* app_list = window->ui->appList;
-  app_list->clear();
-  int app_index = 0;
-  for (const auto& s : commands) {
-    app_list->addItem(s);
-    if (s.toLower() == default_command.toLower()) {
-      window->ui->appList->setCurrentIndex(app_index);
-      std::vector<QString> selected{std::move(default_command)};
-      window->q_client->setSelectedApp(std::move(selected));
-    }
-    app_index++;
-  }
-}
-/**
- * @brief MainWindow::MessageParser::handleMessage
- * @param message
- * @param v
- */
-void MainWindow::MessageParser::handleMessage(QString message, StringVec v) {
-  window->message_ui.append(timestampPrefix() + parseMessage(message, v), true);
-}
-
-/**
- * @brief MainWindow::MessageParser::parseMessage
- * @param message
- * @param v
- * @return
- */
-QString MainWindow::MessageParser::parseMessage(const QString& message,
-                                                StringVec v) {
-  QString simplified_message{};
-  if (isMessage(message.toUtf8())) {
-    simplified_message += "Message: " + getMessage(message.toUtf8());
-  } else if (isEvent(message.toUtf8())) {
-    simplified_message += "Event: " + getEvent(message.toUtf8());
-  } else if (isOperation(message.toUtf8())) {
-    simplified_message += "Operation: ";
-    simplified_message += getOperation(message.toUtf8()).c_str();
-  }
-  return simplified_message;
-}
-
-/**
- * @brief MainWindow::MessageParser::updateProcessResult
- * @param id
- * @param result
- * @param error
- */
-void MainWindow::MessageParser::updateProcessResult(
-    QString id, QString result,
-    bool error = false) {  // We need to start matching processes with a
-  // unique identifier
-  for (int i = window->m_processes.size() - 1; i >= 0; i--) {
-    if (window->m_processes.at(i).id == id) {
-      window->m_processes.at(i).end = TimeUtils::getTime();
-      window->m_processes.at(i).state =
-          !error ? ProcessState::SUCCEEDED : ProcessState::FAILED;
-      window->m_processes.at(i).result = result;
-      window->m_process_model->setItem(
-          i, 0, createProcessListItem(window->m_processes.at(i)));
-      return;
-    }
-  }
-  // If we didn't return, it's a new process:
-}
-
-/**
- * @brief MainWindow::MessageParser::handleEventMessage
- * @param message
- * @param v
- * @return
- */
-QString MainWindow::MessageParser::handleEventMessage(QString message,
-                                                      StringVec v) {
-  QString event_message = timestampPrefix();
-  if (!v.empty()) {
-    if (v.size() == 1) {
-      event_message += message + "\n" + v.at(0);
-    } else {
-      event_message += message;
-      if (message == "Process Result") {
-        auto error = v.size() > 3 ? true : false;
-        event_message += "\n";
-        auto app_name = window->q_client->getAppName(
-            std::stoi(v.at(0).toUtf8().constData()));
-        auto process_it = std::find_if(
-            window->m_processes.begin(), window->m_processes.end(),
-            [v](const Process& process) { return process.id == v.at(1); });
-        if (process_it != window->m_processes.end()) {
-          updateProcessResult(v.at(1), v.at(2), error);
-        } else {  // new process, from scheduled task
-          Process new_process{
-              .name = app_name,
-              .state = !error ? ProcessState::SUCCEEDED : ProcessState::FAILED,
-              .start = TimeUtils::getTime(),
-              .id = "Scheduled task",
-              .error = error ? v.at(3) : ""};
-          if (v.count() > 2 && !v.at(2).isEmpty()) {
-            new_process.result = v.at(2);
-            new_process.end = new_process.start;
-          }
-          window->m_processes.push_back(new_process);
-          window->m_process_model->setItem(window->m_process_model->rowCount(),
-                                           createProcessListItem(new_process));
-        }
-        event_message += app_name;
-        event_message += ": ";
-        event_message += v.at(2);
-        if (error) {
-          event_message += "\n Error: " + v.at(3);
-        }
-      } else if (QString::compare(message, "Message Received") == 0) {
-        event_message += "\n" + v.at(1) + ": " + v.at(2);
-      }
-    }
-  } else {
-    event_message += message;
-  }
-  return event_message;
 }
