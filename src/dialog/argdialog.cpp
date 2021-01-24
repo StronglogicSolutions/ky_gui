@@ -429,19 +429,19 @@ void ArgDialog::addHashtag(QString tag) {
  */
 void ArgDialog::keyPressEvent(QKeyEvent *e) {
   if (Qt::ControlModifier) {
-      if (e->key()==Qt::Key_Return || e->key()==Qt::Key_Enter) {
-        if (ui->argInput->hasFocus()) {
-          ui->addArgument->clicked();
-          auto idx = ui->argType->currentIndex();
-          if (idx != (ui->argType->count() - 1)) {
-            ui->argType->setCurrentIndex(idx + 1);
-          }
-        }
-        else
-        if (ui->runtimeArgEdit->hasFocus()) {
-          (*(ui->addRuntimeArg)).clicked();
+    if (e->key()==Qt::Key_Return || e->key()==Qt::Key_Enter) {
+      if (ui->argInput->hasFocus()) {
+        ui->addArgument->clicked();
+        auto idx = ui->argType->currentIndex();
+        if (idx != (ui->argType->count() - 1)) {
+          ui->argType->setCurrentIndex(idx + 1);
         }
       }
+      else
+      if (ui->runtimeArgEdit->hasFocus()) {
+        (*(ui->addRuntimeArg)).clicked();
+      }
+    }
   }
 }
 
