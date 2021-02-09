@@ -119,6 +119,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   connect(ui->connect, &QPushButton::clicked, this, &MainWindow::connectClient);
   ui->eventList->setModel(m_event_model);
   ui->processList->setModel(m_process_model);
+  ui->serverIp->setText(argv[1]);
 }
 
 /**
@@ -143,12 +144,25 @@ void MainWindow::setConnectScreen(bool visible) {
     ui->startScreen->raise();
     ui->kyConfig->activateWindow();
     ui->kyConfig->raise();
+    ui->serverIp->activateWindow();
+    ui->serverIp->raise();
+    ui->configLabel->activateWindow();
+    ui->configLabel->raise();
+    ui->ipLabel->activateWindow();
+    ui->ipLabel->raise();
     ui->startScreen->setMaximumSize(1080, 675);
     ui->startScreen->setMinimumSize(1080, 675);
     ui->connect->setMaximumSize(1080, 500);
     ui->connect->setMinimumSize(1080, 500);
     ui->kyConfig->setMaximumSize(1080, 175);
     ui->kyConfig->setMinimumSize(1080, 175);
+    ui->serverIp->setMaximumSize(960, 30);
+    ui->serverIp->setMinimumSize(960, 30);
+    ui->ipLabel->setMaximumSize(120, 30);
+    ui->ipLabel->setMinimumSize(120, 30);
+    ui->ipLabel->setMaximumSize(120, 30);
+    ui->configLabel->setMinimumSize(1080, 30);
+    ui->configLabel->setMaximumSize(1080, 30);
     ui->logo->raise();
 
     QFile file(QCoreApplication::applicationDirPath() + "/config/config.json");
@@ -163,6 +177,9 @@ void MainWindow::setConnectScreen(bool visible) {
   } else {
     ui->connect->hide();
     ui->kyConfig->hide();
+    ui->ipLabel->hide();
+    ui->configLabel->hide();
+    ui->serverIp->hide();
     ui->startScreen->setVisible(false);
   }
 }
@@ -186,7 +203,7 @@ void MainWindow::connectClient() {
                    &MainWindow::onMessageReceived);
 
   QProgressBar* progressBar = ui->progressBar;
-  q_client->start();
+  q_client->start(ui->serverIp->toPlainText());
 
   for (int i = 1; i < 101; i++) {
     progressBar->setValue(i);
@@ -307,6 +324,10 @@ void MainWindow::connectClient() {
 
   QObject::connect(ui->tasks, &QPushButton::clicked, this, [this]() {
     schedule_ui.show();
+  });
+
+  QObject::connect(ui->ipc, &QPushButton::clicked, this, [this]() {
+    q_client->sendIPCMessage(ui->ipcList->currentText());
   });
 
   QTimer* timer = new QTimer(this);

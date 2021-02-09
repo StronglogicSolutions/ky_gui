@@ -77,7 +77,7 @@ class Client : public QDialog {
   Client(QWidget* parent = nullptr);
   Client(QWidget* parent, int count, char** arguments);
   ~Client();
-  void           start();
+  void           start(QString ip = "", QString port = "");
   void           closeConnection();
   void           execute();
   QString        getAppName(int mask);
@@ -107,7 +107,8 @@ class Client : public QDialog {
     m_commands = commands;
   }
   void           sendFiles(Scheduler::Task* task);
-  void           ping();
+  void           ping();  
+  void           sendIPCMessage(const QString& s);
 
  signals:
   void           messageReceived(int t, QString s, QVector<QString> args);
@@ -134,6 +135,8 @@ class Client : public QDialog {
   QQueue<Scheduler::KFileData> outgoing_files;
   std::vector<SentFile>        sent_files;
   Scheduler::TaskQueue         m_task_queue;
+  QString                      m_server_ip;
+  QString                      m_server_port;
 
 };
 #endif // CLIENT_HPP
