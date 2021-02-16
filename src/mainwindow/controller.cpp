@@ -188,6 +188,16 @@ QString MainWindow::Controller::handleEventMessage(QString message,
         }
       }
       else
+      if (message == "Platform Post")
+      {
+        if (v.size() < 5)
+          event_message += "\nEvent occurred, but data is missing";
+        else
+          event_message += '\n';
+          event_message += "ID: " + v.at(2);
+          event_message += "\nOutput: " + v.at(4);
+      }
+      else
       if (QString::compare(message, "Application was registered") == 0) {
         window->app_ui.addApplication(KApplication{.name = v.at(0)});
       }
