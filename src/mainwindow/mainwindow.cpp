@@ -327,7 +327,8 @@ void MainWindow::connectClient() {
   });
 
   QObject::connect(ui->ipc, &QPushButton::clicked, this, [this]() {
-    q_client->sendIPCMessage(ui->ipcList->currentText());
+    q_client->sendIPCMessage(ui->ipcList->currentText(), ui->inputText->toPlainText());
+    ui->inputText->clear();
   });
 
   QTimer* timer = new QTimer(this);
