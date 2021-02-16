@@ -108,7 +108,7 @@ class Client : public QDialog {
   }
   void           sendFiles(Scheduler::Task* task);
   void           ping();  
-  void           sendIPCMessage(const QString& s);
+  void           sendIPCMessage(const QString& type, const QString& message);
 
  signals:
   void           messageReceived(int t, QString s, QVector<QString> args);
