@@ -40,7 +40,7 @@ void MainWindow::Controller::handleCommands(StringVec args,
 
   QComboBox* app_list = window->ui->appList;
   app_list->clear();
-  int app_index{0};
+
   int arg_index{0};
 
   QVector<KApplication> k_applications{};
@@ -64,18 +64,25 @@ void MainWindow::Controller::handleCommands(StringVec args,
       application.data = arg;
       arg_index = 0;
       app_list->addItem(application.name);
-      if (application.name.toLower() == default_command.toLower()) {
-        window->ui->appList->setCurrentIndex(app_index);
-        std::vector<QString> selected{default_command};
-        window->q_client->setSelectedApp(selected);
-      }
       k_applications.push_back(application);
-      app_index++;
+
       continue;
     }
     arg_index++;
   }
   window->q_client->setCommands(k_applications);
+
+  int app_index{0};
+
+  for (const auto& application : k_applications)
+  {
+    if (application.name.toLower() == default_command.toLower()) {
+      window->ui->appList->setCurrentIndex(app_index);
+      std::vector<QString> selected{default_command};
+      window->q_client->setSelectedApp(selected);
+    }
+    app_index++;
+  }
   window->app_ui.setApplications(k_applications);
 }
 /**
@@ -178,6 +185,17 @@ QString MainWindow::Controller::handleEventMessage(QString message,
         event_message += v.at(2);
         if (error) {
           event_message += "\n Error: " + v.at(3);
+        }
+      }
+      else
+      if (message == "Platform Post")
+      {
+        if (v.size() < 6)
+          event_message += "\nEvent occurred, but data is missing";
+        else
+        {
+          event_message += "\nContent: "   + v.at(3);
+          event_message += "\nCompleted: " + v.at(5);
         }
       }
       else

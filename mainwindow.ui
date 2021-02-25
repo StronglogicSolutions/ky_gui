@@ -72,11 +72,17 @@ QPushButton::hover:
      <rect>
       <x>0</x>
       <y>30</y>
-      <width>12</width>
-      <height>12</height>
+      <width>0</width>
+      <height>0</height>
      </rect>
     </property>
     <property name="minimumSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="maximumSize">
      <size>
       <width>0</width>
       <height>0</height>
@@ -90,7 +96,7 @@ QPushButton::hover:
       <enum>QLayout::SetDefaultConstraint</enum>
      </property>
      <item>
-      <layout class="QVBoxLayout" name="connectLayout" stretch="0,0">
+      <layout class="QVBoxLayout" name="connectLayout" stretch="0,0,0,0">
        <property name="spacing">
         <number>4</number>
        </property>
@@ -160,6 +166,55 @@ opacity: 0.3;</string>
         </widget>
        </item>
        <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="1,3">
+         <item>
+          <widget class="QLabel" name="ipLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Server IP</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QTextEdit" name="serverIp">
+           <property name="maximumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="configLabel">
+         <property name="maximumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>ConfigJSON</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QTextEdit" name="kyConfig">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
@@ -216,7 +271,7 @@ font-weight: 700;</string>
           <number>0</number>
          </property>
          <item row="0" column="0">
-          <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,2">
+          <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,0,2">
            <property name="spacing">
             <number>4</number>
            </property>
@@ -234,13 +289,13 @@ font-weight: 700;</string>
               <bool>false</bool>
              </property>
              <property name="alignment">
-              <set>Qt::AlignCenter</set>
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
              </property>
              <property name="margin">
-              <number>0</number>
+              <number>2</number>
              </property>
              <property name="indent">
-              <number>-1</number>
+              <number>4</number>
              </property>
             </widget>
            </item>
@@ -265,6 +320,71 @@ font-weight: 700;
                <property name="icon">
                 <iconset resource="kres.qrc">
                  <normaloff>:/icons/icons/gear.png</normaloff>:/icons/icons/gear.png</iconset>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QLabel" name="selectProcessTitle_2">
+             <property name="styleSheet">
+              <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
+color: rgb(131, 148, 150);
+font-weight: 700;</string>
+             </property>
+             <property name="text">
+              <string>Select IPC</string>
+             </property>
+             <property name="scaledContents">
+              <bool>false</bool>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             </property>
+             <property name="margin">
+              <number>2</number>
+             </property>
+             <property name="indent">
+              <number>4</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="3,0">
+             <item>
+              <widget class="QComboBox" name="ipcList">
+               <property name="styleSheet">
+                <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: #2f535f;
+color: rgb(131, 148, 150);
+font-weight: 700;
+</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>discord:messages</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>mastodon:comments</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>youtube:livestream</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="editIpc">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="kres.qrc">
+                 <normaloff>:/icons/icons/arguments.png</normaloff>:/icons/icons/arguments.png</iconset>
                </property>
               </widget>
              </item>
@@ -434,7 +554,10 @@ font-weight: 700;</string>
               <string>Processes</string>
              </property>
              <property name="margin">
-              <number>0</number>
+              <number>2</number>
+             </property>
+             <property name="indent">
+              <number>4</number>
              </property>
             </widget>
            </item>
@@ -485,6 +608,15 @@ font-weight: 700;</string>
                  </property>
                  <property name="text">
                   <string>Events</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                 </property>
+                 <property name="margin">
+                  <number>2</number>
+                 </property>
+                 <property name="indent">
+                  <number>4</number>
                  </property>
                 </widget>
                </item>
@@ -551,6 +683,12 @@ font-weight: 700;</string>
                  <property name="text">
                   <string>Input</string>
                  </property>
+                 <property name="margin">
+                  <number>2</number>
+                 </property>
+                 <property name="indent">
+                  <number>4</number>
+                 </property>
                 </widget>
                </item>
                <item>
@@ -586,7 +724,7 @@ color: rgb(223, 252, 255);</string>
               </layout>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0">
+              <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0,0">
                <property name="spacing">
                 <number>4</number>
                </property>
@@ -666,6 +804,36 @@ padding: 4px;</string>
                 </widget>
                </item>
                <item>
+                <widget class="QPushButton" name="ipc">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">background-color: rgb(2, 180, 43);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+                 </property>
+                 <property name="text">
+                  <string>IPC</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="kres.qrc">
+                   <normaloff>:/icons/send-button.png</normaloff>:/icons/send-button.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QPushButton" name="sendMessage">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
@@ -677,8 +845,7 @@ padding: 4px;</string>
                   <bool>false</bool>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">background-color: rgb(130, 255, 121);
-background-color: rgb(2, 180, 43);
+                  <string notr="true">background-color: rgb(2, 180, 43);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
 font-weight: 700;
@@ -748,6 +915,10 @@ color: rgb(0, 0, 0);</string>
      </item>
     </layout>
    </widget>
+   <zorder>logo</zorder>
+   <zorder>led</zorder>
+   <zorder>horizontalLayoutWidget_2</zorder>
+   <zorder>startScreen</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

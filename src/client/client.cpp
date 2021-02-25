@@ -120,7 +120,10 @@ Client::Client(QWidget *parent, int count, char** arguments)
   m_client_socket_fd(-1),
   m_outbound_task(nullptr),
   executing(false),
-  m_commands({}) {
+  m_commands({}),
+  m_server_ip(arguments[1]),
+  m_server_port((arguments[2]))
+{
 
   // Register metadata type for passing data over slots/signals
   qRegisterMetaType<QVector<QString>>("QVector<QString>");
@@ -236,15 +239,23 @@ void Client::processFileQueue() {
 /**
  * @brief Client::start
  */
-void Client::start() {
+void Client::start(QString ip, QString port) {
+  const char* server_ip = ip.isEmpty() ?
+                            m_server_ip.toUtf8().constData() :
+                            ip.toUtf8().constData();
+
+  const char* server_port = port.isEmpty() ?
+                              m_server_port.toUtf8().constData() :
+                              port.toUtf8().constData();
+
   if (m_client_socket_fd == -1) {
     m_client_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (m_client_socket_fd != -1) {
       sockaddr_in server_socket;
       char* end;
       server_socket.sin_family = AF_INET;
-      auto port_value = strtol(argv[2], &end, 10);
-      if (port_value < 0 || end == argv[2]) {
+      auto port_value = strtol(server_port, &end, 10);
+      if (port_value < 0 || end == server_port) {
           return;
       }
       int socket_option = 1;
@@ -255,7 +266,7 @@ void Client::start() {
       );
 
       server_socket.sin_port = htons(port_value);
-      inet_pton(AF_INET, argv[1], &server_socket.sin_addr.s_addr);
+      inet_pton(AF_INET, server_ip, &server_socket.sin_addr.s_addr);
 
       if (::connect(m_client_socket_fd, reinterpret_cast<sockaddr*>(&server_socket),
                     sizeof(server_socket)) != -1) {
@@ -680,4 +691,14 @@ void Client::request(uint8_t request_code) {
   request(request_code, std::vector<std::string>{});
 }
 
-
+/**
+ */
+void Client::sendIPCMessage(const QString& type, const QString& message) {
+  sendEncoded(createOperation(
+      "ipc",
+      {
+        type.toUtf8().constData(),
+        message.toUtf8().constData()
+      }
+  ));
+}
