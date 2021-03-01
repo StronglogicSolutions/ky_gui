@@ -105,7 +105,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
       else
       if (type == Args::DESCRIPTION_TYPE) {
         addItem(text, type);
-        m_task->setArgument(Args::DESCRIPTION_TYPE, escapeText(text));
+        m_task->setArgument(Args::DESCRIPTION_TYPE, text);
       }
       else
       if (type == Args::PROMOTE_TYPE) {
