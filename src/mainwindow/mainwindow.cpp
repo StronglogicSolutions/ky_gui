@@ -116,6 +116,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   this->setWindowTitle("KYGUI");
   setStyleSheet(KYGUI_STYLESHEET);
   setConnectScreen();
+  setWindowTitle(windowTitle() + " kiq://" + argv[1]);
   connect(ui->connect, &QPushButton::clicked, this, &MainWindow::connectClient);
   ui->eventList->setModel(m_event_model);
   ui->processList->setModel(m_process_model);
