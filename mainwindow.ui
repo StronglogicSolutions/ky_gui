@@ -54,8 +54,8 @@ QPushButton::hover:
    <widget class="ConnectionIndicator" name="led">
     <property name="geometry">
      <rect>
-      <x>830</x>
-      <y>110</y>
+      <x>1020</x>
+      <y>10</y>
       <width>40</width>
       <height>20</height>
      </rect>
@@ -916,9 +916,9 @@ color: rgb(0, 0, 0);</string>
     </layout>
    </widget>
    <zorder>logo</zorder>
-   <zorder>led</zorder>
    <zorder>horizontalLayoutWidget_2</zorder>
    <zorder>startScreen</zorder>
+   <zorder>led</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
