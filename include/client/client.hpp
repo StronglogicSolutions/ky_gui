@@ -100,7 +100,7 @@ class Client : public QDialog {
   void           sendMessage(const QString& s);
   void           setSelectedApp(std::vector<QString> app_names);
   void           setCommands(Commands commands) {
-    if (selected_commands.empty()) {
+    if (!commands.empty() && selected_commands.empty()) {
       auto first_command = commands.front();
       selected_commands = {first_command.mask.toInt()};
     }
