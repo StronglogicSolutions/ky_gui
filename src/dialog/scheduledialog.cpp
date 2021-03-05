@@ -274,7 +274,7 @@ ScheduledTask ScheduleDialog::readFields() {
  * @param v
  */
 void ScheduleDialog::receive_response(RequestType type, QVector<QString> v) {
-  if (type == RequestType::UPDATE) {
+  if (type == RequestType::UPDATE_SCHEDULE) {
     QString display_s{};
     for (const auto& e : v) display_s += e + "\n";
     UI::infoMessageBox(display_s, "Schedule Response");
