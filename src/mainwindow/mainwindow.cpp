@@ -116,11 +116,11 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   this->setWindowTitle("KYGUI");
   setStyleSheet(KYGUI_STYLESHEET);
   setConnectScreen();
-  setWindowTitle(windowTitle() + " kiq://" + argv[1]);
   connect(ui->connect, &QPushButton::clicked, this, &MainWindow::connectClient);
   ui->eventList->setModel(m_event_model);
   ui->processList->setModel(m_process_model);
   ui->serverIp->setText(argv[1]);
+  ui->serverPort->setText(argv[2]);
 }
 
 /**
@@ -147,10 +147,14 @@ void MainWindow::setConnectScreen(bool visible) {
     ui->kyConfig->raise();
     ui->serverIp->activateWindow();
     ui->serverIp->raise();
+    ui->serverPort->activateWindow();
+    ui->serverPort->raise();
     ui->configLabel->activateWindow();
     ui->configLabel->raise();
     ui->ipLabel->activateWindow();
     ui->ipLabel->raise();
+    ui->portLabel->activateWindow();
+    ui->portLabel->raise();
     ui->startScreen->setMaximumSize(1080, 675);
     ui->startScreen->setMinimumSize(1080, 675);
     ui->connect->setMaximumSize(1080, 500);
@@ -161,7 +165,10 @@ void MainWindow::setConnectScreen(bool visible) {
     ui->serverIp->setMinimumSize(960, 30);
     ui->ipLabel->setMaximumSize(120, 30);
     ui->ipLabel->setMinimumSize(120, 30);
-    ui->ipLabel->setMaximumSize(120, 30);
+    ui->serverPort->setMaximumSize(960, 30);
+    ui->serverPort->setMinimumSize(960, 30);
+    ui->portLabel->setMaximumSize(120, 30);
+    ui->portLabel->setMinimumSize(120, 30);
     ui->configLabel->setMinimumSize(1080, 30);
     ui->configLabel->setMaximumSize(1080, 30);
     ui->logo->raise();
@@ -181,6 +188,8 @@ void MainWindow::setConnectScreen(bool visible) {
     ui->ipLabel->hide();
     ui->configLabel->hide();
     ui->serverIp->hide();
+    ui->portLabel->hide();
+    ui->serverPort->hide();
     ui->startScreen->setVisible(false);
   }
 }
@@ -204,7 +213,10 @@ void MainWindow::connectClient() {
                    &MainWindow::onMessageReceived);
 
   QProgressBar* progressBar = ui->progressBar;
-  q_client->start(ui->serverIp->toPlainText());
+  auto server_ip   = ui->serverIp->toPlainText();
+  auto server_port = ui->serverPort->toPlainText();
+  setWindowTitle(windowTitle() + " kiq://" + server_ip + ":" + server_port);
+  q_client->start(server_ip, server_port);
 
   for (int i = 1; i < 101; i++) {
     progressBar->setValue(i);
