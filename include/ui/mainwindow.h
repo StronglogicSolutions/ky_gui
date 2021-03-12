@@ -9,6 +9,7 @@
 #include <QStandardItemModel>
 #include <QTableView>
 #include <QTimer>
+#include <QElapsedTimer>
 #include <QDateTime>
 #include <QLayout>
 #include <QScrollBar>
@@ -114,6 +115,7 @@ public:
 
     /** Client member */
     Client*               q_client;
+    QElapsedTimer         m_pong_timer;
     /** Models */
     std::vector<Process>  m_processes;
     QList<QString>        m_events;

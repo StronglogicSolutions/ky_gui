@@ -347,6 +347,8 @@ void MainWindow::connectClient() {
   QTimer* timer = new QTimer(this);
   connect(timer, &QTimer::timeout, q_client, &Client::ping);
   timer->start(10000);
+
+  m_pong_timer.start();
 }
 
 /**
@@ -357,7 +359,10 @@ void MainWindow::connectClient() {
  */
 void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
   QString timestamp_prefix = utils::timestampPrefix();
-  if (t == MESSAGE_UPDATE_TYPE) {  // Normal message
+  if (t == PONG_REPLY_TYPE) {
+    ui->lastPing->setText(QString::number(m_pong_timer.elapsed()) + " ms");
+    m_pong_timer.restart();
+  } else if (t == MESSAGE_UPDATE_TYPE) {  // Normal message
     qDebug() << "Updating message area";
     m_controller.handleMessage(message, v);
     message_ui.append(message);

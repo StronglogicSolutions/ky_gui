@@ -36,6 +36,7 @@ static constexpr int COMMANDS_UPDATE_TYPE = 2;
 static constexpr int EVENT_UPDATE_TYPE    = 3;
 static constexpr int PROCESS_REQUEST_TYPE = 4;
 static constexpr int SCHEDULED_TASKS_TYPE = 5;
+static constexpr int PONG_REPLY_TYPE      = 6;
 
 using namespace Scheduler;
 

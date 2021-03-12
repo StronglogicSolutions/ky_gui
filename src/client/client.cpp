@@ -157,6 +157,7 @@ void Client::handleMessages() {
 
         if (isPong(data_string.c_str())) {
             qDebug() << "Server returned pong";
+            emit Client::messageReceived(PONG_REPLY_TYPE, "Pong", {data_string.c_str()}); // Update UI
             continue;
         }
 
