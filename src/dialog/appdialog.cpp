@@ -110,6 +110,7 @@ KApplication AppDialog::readFields() {
 void AppDialog::addApplication(KApplication application) {
   m_applications.push_back(application);
   ui->appList->addItem(application.name);
+  toggleInputMode();
 }
 
 void AppDialog::removeApplication(KApplication application) {
