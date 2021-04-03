@@ -171,7 +171,6 @@ void MainWindow::setConnectScreen(bool visible) {
     ui->portLabel->setMinimumSize(120, 30);
     ui->configLabel->setMinimumSize(1080, 30);
     ui->configLabel->setMaximumSize(1080, 30);
-    ui->logo->raise();
 
     QFile file(QCoreApplication::applicationDirPath() + "/config/config.json");
     file.open(QIODevice::ReadOnly | QFile::ReadOnly);
@@ -182,6 +181,7 @@ void MainWindow::setConnectScreen(bool visible) {
     qDebug() << "Set config json: \n" << ui->kyConfig->toPlainText();
 
     file.close();
+    ui->outerLayer->setVisible(false);
   } else {
     ui->connect->hide();
     ui->kyConfig->hide();
@@ -191,6 +191,7 @@ void MainWindow::setConnectScreen(bool visible) {
     ui->portLabel->hide();
     ui->serverPort->hide();
     ui->startScreen->setVisible(false);
+    ui->outerLayer->setVisible(true);
   }
 }
 
@@ -221,6 +222,22 @@ void MainWindow::connectClient() {
   for (int i = 1; i < 101; i++) {
     progressBar->setValue(i);
   }
+
+  QObject::connect(ui->actionDefault, &QAction::triggered, this, [this]()
+  {
+    ui->centralWidget->setStyleSheet(KYGUI_DEFAULT_THEME);
+  });
+
+  QObject::connect(ui->actionBlack, &QAction::triggered, this, [this]()
+  {
+    ui->centralWidget->setStyleSheet(KYGUI_BLACK_THEME);
+  });
+
+  QObject::connect(ui->actionBlue, &QAction::triggered, this, [this]()
+  {
+    ui->centralWidget->setStyleSheet(KYGUI_BLUE_THEME);
+  });
+
 
   QPushButton* send_message_button =
       this->findChild<QPushButton*>("sendMessage");
