@@ -32,6 +32,33 @@ const QString KYGUI_STYLESHEET{
   "font-weight: 700; background-color: rgb(29, 51, 59);"
   "color: rgb(223, 252, 255);}"};
 
+const QString KYGUI_DEFAULT_THEME{
+                                "border-color: rgb(0, 0, 0);"
+                                "background-color: rgb(0, 43, 54);"
+                                "QPushButton::hover:"
+                                "{"
+                                "   opacity: 0.7;"
+                                "}"
+};
+
+const QString KYGUI_BLACK_THEME{
+                                "border-color: rgb(0, 0, 0);"
+                                "background-color: rgb(30, 30, 30);"
+                                "QPushButton::hover:"
+                                "{"
+                                "   opacity: 0.7;"
+                                "}"
+};
+
+const QString KYGUI_BLUE_THEME{
+                                "border-color: rgb(0, 0, 0);"
+                                "background-color: rgb(20, 0, 125);"
+                                "QPushButton::hover:"
+                                "{"
+                                "   opacity: 0.7;"
+                                "}"
+};
+
 namespace ProcessState {
     static constexpr int READY = 1;
     static constexpr int PENDING = 2;
