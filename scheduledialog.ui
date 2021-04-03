@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="kres.qrc">
+    <normaloff>:/icons/favicon.ico</normaloff>:/icons/favicon.ico</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(36, 41, 46);
 color: rgb(161, 164, 167);</string>
