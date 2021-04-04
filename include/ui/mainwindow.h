@@ -27,36 +27,64 @@
 #include <include/client/client.hpp>
 
 const QString KYGUI_STYLESHEET{
-  "QListView { font: 87 11pt \"Noto Sans\"; background-color: #2f535f;"
-  "alternate-background-color: #616161; color: rgb(131, 148, 150); "
-  "font-weight: 700; background-color: rgb(29, 51, 59);"
-  "color: rgb(223, 252, 255);}"};
+"QListView { font: 87 11pt \"Noto Sans\"; background-color: #2f535f;"
+"alternate-background-color: #616161; color: rgb(131, 148, 150); "
+"font-weight: 700; background-color: rgb(29, 51, 59);"
+"color: rgb(223, 252, 255);}"
+};
 
 const QString KYGUI_DEFAULT_THEME{
-                                "border-color: rgb(0, 0, 0);"
-                                "background-color: rgb(0, 43, 54);"
-                                "QPushButton::hover:"
-                                "{"
-                                "   opacity: 0.7;"
-                                "}"
+"border-color: rgb(0, 0, 0);"
+"background-color: rgb(0, 43, 54);"
+"QPushButton::hover:"
+"{"
+"   opacity: 0.7;"
+"}"
 };
 
 const QString KYGUI_BLACK_THEME{
-                                "border-color: rgb(0, 0, 0);"
-                                "background-color: rgb(30, 30, 30);"
-                                "QPushButton::hover:"
-                                "{"
-                                "   opacity: 0.7;"
-                                "}"
+"border-color: rgb(0, 0, 0);"
+"background-color: rgb(30, 30, 30);"
+"QPushButton::hover:"
+"{"
+"   opacity: 0.7;"
+"}"
 };
 
 const QString KYGUI_BLUE_THEME{
-                                "border-color: rgb(0, 0, 0);"
-                                "background-color: rgb(20, 0, 125);"
-                                "QPushButton::hover:"
-                                "{"
-                                "   opacity: 0.7;"
-                                "}"
+"border-color: rgb(0, 0, 0);"
+"background-color: rgb(4, 0, 29);"
+"QPushButton::hover:"
+"{"
+"   opacity: 0.7;"
+"}"
+};
+
+const QString KYGUI_DEFAULT_LIST_THEME{
+"font: 87 11pt \"Noto Sans\";"
+"font-weight: 700;"
+"background-color: rgb(29, 51, 59);"
+"color: rgb(223, 252, 255);"
+"padding: 4px;"
+"item { border-bottom: 1px solid black; padding: 16px;} "
+};
+
+const QString KYGUI_BLACK_LIST_THEME{
+"font: 87 11pt \"Noto Sans\";"
+"font-weight: 700;"
+"background-color: rgb(75, 75, 75);"
+"color: rgb(223, 252, 255);"
+"padding: 4px;"
+"item { border-bottom: 1px solid black; padding: 16px;} "
+};
+
+const QString KYGUI_BLUE_LIST_THEME{
+"font: 87 11pt \"Noto Sans\";"
+"font-weight: 700;"
+"background-color: rgb(0, 6, 120);"
+"color: rgb(223, 252, 255);"
+"padding: 4px;"
+"item { border-bottom: 1px solid black; padding: 16px;} "
 };
 
 namespace ProcessState {

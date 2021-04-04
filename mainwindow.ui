@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>783</width>
-    <height>501</height>
+    <height>517</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -340,7 +340,7 @@ color: rgb(0, 0, 0);</string>
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,0,0,2">
+            <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,0,2">
              <property name="spacing">
               <number>4</number>
              </property>
@@ -431,20 +431,7 @@ font-weight: 700;</string>
               </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,3,0">
-               <item>
-                <spacer name="horizontalSpacer">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
+              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="3,0">
                <item>
                 <widget class="QComboBox" name="ipcList">
                  <property name="sizePolicy">
@@ -511,7 +498,7 @@ font-weight: 700;
                  </property>
                  <property name="minimumSize">
                   <size>
-                   <width>0</width>
+                   <width>100</width>
                    <height>0</height>
                   </size>
                  </property>
@@ -553,7 +540,7 @@ padding: 4px;</string>
                  </property>
                  <property name="minimumSize">
                   <size>
-                   <width>0</width>
+                   <width>100</width>
                    <height>0</height>
                   </size>
                  </property>
@@ -614,7 +601,7 @@ padding: 4px;</string>
                  </property>
                  <property name="minimumSize">
                   <size>
-                   <width>0</width>
+                   <width>100</width>
                    <height>0</height>
                   </size>
                  </property>
@@ -668,19 +655,6 @@ padding: 4px;</string>
               </layout>
              </item>
              <item>
-              <spacer name="horizontalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>10</width>
-                 <height>10</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
               <widget class="QLabel" name="processListTitle">
                <property name="styleSheet">
                 <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
@@ -706,13 +680,22 @@ font-weight: 700;</string>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="minimumSize">
+                <size>
+                 <width>150</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="cursor" stdset="0">
+                <cursorShape>BusyCursor</cursorShape>
+               </property>
                <property name="styleSheet">
                 <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-background-color: #2f535f;
-color: rgb(131, 148, 150);
 font-weight: 700;
 background-color: rgb(29, 51, 59);
-color: rgb(223, 252, 255);</string>
+color: rgb(223, 252, 255);
+padding: 4px;
+item { border-bottom: 1px solid black; padding: 16px;} </string>
                </property>
                <property name="spacing">
                 <number>2</number>
@@ -768,11 +751,14 @@ font-weight: 700;</string>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>150</width>
+                     <height>0</height>
+                    </size>
+                   </property>
                    <property name="styleSheet">
                     <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-background-color: #2f535f;
-alternate-background-color: #616161;
-color: rgb(131, 148, 150);
 font-weight: 700;
 background-color: rgb(29, 51, 59);
 color: rgb(223, 252, 255);
@@ -881,7 +867,7 @@ color: rgb(223, 252, 255);</string>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>0</width>
+                     <width>100</width>
                      <height>0</height>
                     </size>
                    </property>
@@ -923,7 +909,7 @@ padding: 4px;</string>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>0</width>
+                     <width>100</width>
                      <height>0</height>
                     </size>
                    </property>
@@ -965,7 +951,7 @@ padding: 4px;</string>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>0</width>
+                     <width>100</width>
                      <height>0</height>
                     </size>
                    </property>
@@ -1001,7 +987,7 @@ padding: 4px;</string>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>0</width>
+                     <width>100</width>
                      <height>0</height>
                     </size>
                    </property>

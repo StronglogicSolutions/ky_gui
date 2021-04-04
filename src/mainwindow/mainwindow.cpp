@@ -226,16 +226,22 @@ void MainWindow::connectClient() {
   QObject::connect(ui->actionDefault, &QAction::triggered, this, [this]()
   {
     ui->centralWidget->setStyleSheet(KYGUI_DEFAULT_THEME);
+    ui->processList->setStyleSheet(KYGUI_DEFAULT_LIST_THEME);
+    ui->eventList->setStyleSheet(KYGUI_DEFAULT_LIST_THEME);
   });
 
   QObject::connect(ui->actionBlack, &QAction::triggered, this, [this]()
   {
     ui->centralWidget->setStyleSheet(KYGUI_BLACK_THEME);
+    ui->processList->setStyleSheet(KYGUI_BLACK_LIST_THEME);
+    ui->eventList->setStyleSheet(KYGUI_BLACK_LIST_THEME);
   });
 
   QObject::connect(ui->actionBlue, &QAction::triggered, this, [this]()
   {
     ui->centralWidget->setStyleSheet(KYGUI_BLUE_THEME);
+    ui->processList->setStyleSheet(KYGUI_BLUE_LIST_THEME);
+    ui->eventList->setStyleSheet(KYGUI_BLUE_LIST_THEME);
   });
 
 
