@@ -107,6 +107,10 @@ class Client : public QDialog {
     }
     m_commands = commands;
   }
+  void           addCommand(KApplication command)
+  {
+    m_commands.append(command);
+  }
   void           sendFiles(Scheduler::Task* task);
   void           ping();  
   void           sendIPCMessage(const QString& type, const QString& message);

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'scheduledialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.13.0
+** Created by: Qt User Interface Compiler version 5.14.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -70,6 +70,9 @@ public:
         if (ScheduleDialog->objectName().isEmpty())
             ScheduleDialog->setObjectName(QString::fromUtf8("ScheduleDialog"));
         ScheduleDialog->resize(970, 864);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/icons/favicon.ico"), QSize(), QIcon::Normal, QIcon::Off);
+        ScheduleDialog->setWindowIcon(icon);
         ScheduleDialog->setStyleSheet(QString::fromUtf8("background-color: rgb(36, 41, 46);\n"
 "color: rgb(161, 164, 167);"));
         gridLayout = new QGridLayout(ScheduleDialog);
@@ -123,9 +126,9 @@ public:
 "border-color: #00000f;\n"
 "min-width: 4em;\n"
 "padding: 4px;"));
-        QIcon icon;
-        icon.addFile(QString::fromUtf8(":/icons/icons/refresh.png"), QSize(), QIcon::Normal, QIcon::Off);
-        fetchSchedule->setIcon(icon);
+        QIcon icon1;
+        icon1.addFile(QString::fromUtf8(":/icons/icons/refresh.png"), QSize(), QIcon::Normal, QIcon::Off);
+        fetchSchedule->setIcon(icon1);
 
         horizontalLayout_12->addWidget(fetchSchedule);
 
@@ -364,9 +367,9 @@ public:
 "border-color: #00000f;\n"
 "min-width: 4em;\n"
 "padding: 4px;"));
-        QIcon icon1;
-        icon1.addFile(QString::fromUtf8(":/icons/icons/trash.png"), QSize(), QIcon::Normal, QIcon::Off);
-        deleteTask->setIcon(icon1);
+        QIcon icon2;
+        icon2.addFile(QString::fromUtf8(":/icons/icons/trash.png"), QSize(), QIcon::Normal, QIcon::Off);
+        deleteTask->setIcon(icon2);
 
         horizontalLayout_7->addWidget(deleteTask);
 
@@ -387,9 +390,9 @@ public:
 "border-color: #00000f;\n"
 "min-width: 4em;\n"
 "padding: 4px;"));
-        QIcon icon2;
-        icon2.addFile(QString::fromUtf8(":/icons/send-button.png"), QSize(), QIcon::Normal, QIcon::Off);
-        saveTask->setIcon(icon2);
+        QIcon icon3;
+        icon3.addFile(QString::fromUtf8(":/icons/send-button.png"), QSize(), QIcon::Normal, QIcon::Off);
+        saveTask->setIcon(icon3);
 
         horizontalLayout_7->addWidget(saveTask);
 
@@ -408,9 +411,9 @@ public:
 "border-color: #00000f;\n"
 "min-width: 4em;\n"
 "padding: 4px;"));
-        QIcon icon3;
-        icon3.addFile(QString::fromUtf8(":/icons/icons/cancel.png"), QSize(), QIcon::Normal, QIcon::Off);
-        close->setIcon(icon3);
+        QIcon icon4;
+        icon4.addFile(QString::fromUtf8(":/icons/icons/cancel.png"), QSize(), QIcon::Normal, QIcon::Off);
+        close->setIcon(icon4);
 
         horizontalLayout_7->addWidget(close);
 

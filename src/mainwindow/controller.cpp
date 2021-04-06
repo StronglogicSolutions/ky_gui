@@ -200,11 +200,18 @@ QString MainWindow::Controller::handleEventMessage(QString message,
       }
       else
       if (QString::compare(message, "Application was registered") == 0) {
-        window->app_ui.addApplication(KApplication{.name = v.at(0)});
+        KApplication application{.name = v.at(0), .path = v.at(1), .data = v.at(2), .mask = v.at(3)};
+        window->app_ui.addApplication(application);
+        window->q_client->addCommand (application);
+        window->ui->appList->addItem(application.name);
       }
       else
       if (QString::compare(message, "Application was deleted") == 0) {
-        window->app_ui.removeApplication(KApplication{.name = v.at(0)});
+        auto name = v.at(0);
+        window->app_ui.removeApplication(KApplication{.name = name});
+        auto i = window->ui->appList->findText(name);
+        if (i != -1)
+            window->ui->appList->removeItem(i);
       }
       else
       if (QString::compare(message, "Scheduled Tasks") == 0) {
