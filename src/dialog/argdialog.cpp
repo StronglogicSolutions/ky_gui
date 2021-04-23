@@ -262,12 +262,12 @@ void ArgDialog::setTaskArguments() {
   if (type == TaskType::INSTAGRAM) {
     QString hashtags{};
     for (const auto &tag : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("hashtags"))) {
-      hashtags += "#" + tag + " ";
+      hashtags += '#' + tag + ' ';
     }
     hashtags.chop(1);
     QString requested_by{};
     for (const auto &name : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("requested_by"))) {
-      requested_by += "@" + name + "";
+      requested_by += '@' + name + ' ';
     }
     m_task->setArgument("hashtags_string", hashtags);
     m_task->setArgument("requested_by_string", requested_by);
@@ -416,13 +416,22 @@ void ArgDialog::addOrReplaceInArgList(QString value, QString type) {
     addItem(value, type);
 }
 
+static const char findSplitChar(const QString& s)
+{
+  if (s.contains('\n'))
+    return '\n';
+  else if (s.contains(' '))
+    return ' ';
+  else
+    throw std::invalid_argument{"No split character"};
+}
+
 /**
  * @brief ArgDialog::addHashtag
  * @param tag
  */
 void ArgDialog::addHashtag(QString tag) {
-  // Need to be able to handle line breaks!!
-    QStringList tags = tag.split(" ");
+    QStringList tags = tag.split(findSplitChar(tag));
     for (const auto& tag : tags) {
       QVector<QString> hashtags = std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue(Args::HASHTAG_TYPE));
         if (std::find(hashtags.begin(), hashtags.end(), tag.toUtf8().constData()) == hashtags.end()) {
