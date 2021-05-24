@@ -76,8 +76,9 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
           auto   width       = image_size.width();
           if (m_task->getType() == TaskType::INSTAGRAM && image_size.height() != image_size.width())
           {
-            int min_size = (height > width) ? width : height;
-            QImage processed_image = image.copy(QRect{0, 0, min_size, min_size});
+            QImage processed_image = (height > width) ?
+              image.copy(QRect{0, (height - width / 2), width, width}) :
+              image.copy(QRect{(width - height / 2), 0, height, height});
             processed_image.save(&buffer, mime_type.preferredSuffix().toUtf8().constData());
           }
           else
@@ -360,7 +361,7 @@ void ArgDialog::addRequestedBy(QString value) {
 
   for (const auto &name : names) {
     if (std::find(
-            requested_by_names.begin(), requested_by_names.end(),  value.toUtf8().constData()) == requested_by_names.end()) {
+          requested_by_names.begin(), requested_by_names.end(),  value.toUtf8().constData()) == requested_by_names.end()) {
       m_task->addArgument("requested_by", name);
       addToArgList(name, "requested_by");
     } else {
@@ -423,7 +424,12 @@ static const char findSplitChar(const QString& s)
   else if (s.contains(' '))
     return ' ';
   else
-    throw std::invalid_argument{"No split character"};
+    return 'x';
+}
+
+static bool noSplit(const char& c)
+{
+  return c == 'x';
 }
 
 /**
@@ -431,7 +437,8 @@ static const char findSplitChar(const QString& s)
  * @param tag
  */
 void ArgDialog::addHashtag(QString tag) {
-    QStringList tags = tag.split(findSplitChar(tag));
+  const char split_char = findSplitChar(tag);
+    QStringList tags = noSplit(split_char) ? QStringList{tag} : tag.split(split_char);
     for (const auto& tag : tags) {
       QVector<QString> hashtags = std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue(Args::HASHTAG_TYPE));
         if (std::find(hashtags.begin(), hashtags.end(), tag.toUtf8().constData()) == hashtags.end()) {
