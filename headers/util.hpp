@@ -134,6 +134,27 @@ QList<QString> configValueToQList(QString key, QJsonObject config) {
   return list;
 }
 
+QList<QString> configUsers(QString section, QJsonObject config)
+{
+  QList<QString> list{};
+  if (config.contains(section))
+  {
+    QJsonObject sub_object = config.value(section).toObject();
+    if (sub_object.contains("users"))
+    {
+      for (auto&& item : sub_object.value("users").toArray())
+        list.append(item.toString());
+    }
+  }
+  return list;
+}
+
+QString defaultConfigUser(QJsonObject config)
+{
+  auto users = configUsers("default", config);
+  return users.isEmpty() ? "" : users.front();
+}
+
 QJsonObject configObject(QString key, QJsonObject config, bool use_default = false) {
   auto key_value = key.toLower();
   if (!config.contains(key_value) && use_default) {

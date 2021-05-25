@@ -363,7 +363,7 @@ void MainWindow::connectClient() {
   });
 
   QObject::connect(ui->ipc, &QPushButton::clicked, this, [this]() {
-    q_client->sendIPCMessage(ui->ipcList->currentText(), ui->inputText->toPlainText());
+    q_client->sendIPCMessage(ui->ipcList->currentText(), ui->inputText->toPlainText(), defaultConfigUser(m_config));
     ui->inputText->clear();
   });
 

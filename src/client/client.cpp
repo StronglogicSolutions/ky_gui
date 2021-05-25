@@ -694,12 +694,13 @@ void Client::request(uint8_t request_code) {
 
 /**
  */
-void Client::sendIPCMessage(const QString& type, const QString& message) {
+void Client::sendIPCMessage(const QString& type, const QString& message, const QString& user) {
   sendEncoded(createOperation(
       "ipc",
       {
         type.toUtf8().constData(),
-        message.toUtf8().constData()
+        message.toUtf8().constData(),
+        user.toUtf8().constData()
       }
   ));
 }

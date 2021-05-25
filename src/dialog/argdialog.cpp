@@ -3,6 +3,7 @@
 #include <QCalendarWidget>
 #include <QDebug>
 #include <QIODevice>
+#include <QBuffer>
 #include <QMimeDatabase>
 #include <QStringList>
 #include <QTableWidgetItem>
@@ -38,14 +39,13 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
       QFile file(file_path);
 
       if (file.open(QIODevice::ReadOnly)) {
-        QMimeDatabase db;
-        auto is_video = db.mimeTypeForFile(file_path).name().contains("video");
+        QByteArray    bytes{};
+        QBuffer       buffer{&bytes};
+        QMimeDatabase db{};
+        QMimeType     mime_type = db.mimeTypeForFile(file_path);
+        auto          is_video  = mime_type.name().contains("video");
         addItem(file_name, "file");
-        m_task->addArgument("files", Scheduler::KFileData{
-                                         .name = file_name,
-                                         .type = is_video ? FileType::VIDEO : FileType::IMAGE,
-                                         .path = file_path,
-                                         .bytes = file.readAll()});
+        buffer.open(QIODevice::WriteOnly);
 
         if (is_video) {
           qDebug() << "File discovered to be video";
@@ -70,8 +70,26 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
             QMessageBox::warning(this, tr("File Error"), tr("Could not add preview image for video"));
           }
         } else {
+          QImage image{file_path};
+          QSize  image_size = image.size();
+          auto   height      = image_size.height();
+          auto   width       = image_size.width();
+          if (m_task->getType() == TaskType::INSTAGRAM && image_size.height() != image_size.width())
+          {
+            QImage processed_image = (height > width) ?
+              image.copy(QRect{0, ((height - width) / 2), width, width}) :
+              image.copy(QRect{((width - height) / 2), 0, height, height});
+            processed_image.save(&buffer, mime_type.preferredSuffix().toUtf8().constData());
+          }
+          else
+            image.save(&buffer, mime_type.preferredSuffix().toUtf8().constData());
           addFile(file_path);
         }
+        m_task->addArgument("files", Scheduler::KFileData{
+                                         .name = file_name,
+                                         .type = is_video ? FileType::VIDEO : FileType::IMAGE,
+                                         .path = file_path,
+                                         .bytes = bytes});
       } else {
         qDebug() << "Unable to open selected file";
         QMessageBox::warning(this, tr("File Error"), tr("Unable to open selected file"));
@@ -245,12 +263,12 @@ void ArgDialog::setTaskArguments() {
   if (type == TaskType::INSTAGRAM) {
     QString hashtags{};
     for (const auto &tag : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("hashtags"))) {
-      hashtags += "#" + tag + " ";
+      hashtags += '#' + tag + ' ';
     }
     hashtags.chop(1);
     QString requested_by{};
     for (const auto &name : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("requested_by"))) {
-      requested_by += "@" + name + "";
+      requested_by += '@' + name + ' ';
     }
     m_task->setArgument("hashtags_string", hashtags);
     m_task->setArgument("requested_by_string", requested_by);
@@ -343,7 +361,7 @@ void ArgDialog::addRequestedBy(QString value) {
 
   for (const auto &name : names) {
     if (std::find(
-            requested_by_names.begin(), requested_by_names.end(),  value.toUtf8().constData()) == requested_by_names.end()) {
+          requested_by_names.begin(), requested_by_names.end(),  value.toUtf8().constData()) == requested_by_names.end()) {
       m_task->addArgument("requested_by", name);
       addToArgList(name, "requested_by");
     } else {
@@ -399,13 +417,28 @@ void ArgDialog::addOrReplaceInArgList(QString value, QString type) {
     addItem(value, type);
 }
 
+static const char findSplitChar(const QString& s)
+{
+  if (s.contains('\n'))
+    return '\n';
+  else if (s.contains(' '))
+    return ' ';
+  else
+    return 'x';
+}
+
+static bool noSplit(const char& c)
+{
+  return c == 'x';
+}
+
 /**
  * @brief ArgDialog::addHashtag
  * @param tag
  */
 void ArgDialog::addHashtag(QString tag) {
-  // Need to be able to handle line breaks!!
-    QStringList tags = tag.split(" ");
+  const char split_char = findSplitChar(tag);
+    QStringList tags = noSplit(split_char) ? QStringList{tag} : tag.split(split_char);
     for (const auto& tag : tags) {
       QVector<QString> hashtags = std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue(Args::HASHTAG_TYPE));
         if (std::find(hashtags.begin(), hashtags.end(), tag.toUtf8().constData()) == hashtags.end()) {
