@@ -77,8 +77,8 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
           if (m_task->getType() == TaskType::INSTAGRAM && image_size.height() != image_size.width())
           {
             QImage processed_image = (height > width) ?
-              image.copy(QRect{0, (height - width / 2), width, width}) :
-              image.copy(QRect{(width - height / 2), 0, height, height});
+              image.copy(QRect{0, ((height - width) / 2), width, width}) :
+              image.copy(QRect{((width - height) / 2), 0, height, height});
             processed_image.save(&buffer, mime_type.preferredSuffix().toUtf8().constData());
           }
           else
