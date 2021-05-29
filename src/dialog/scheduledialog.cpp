@@ -2,6 +2,7 @@
 #include "ui_scheduledialog.h"
 #include <QDebug>
 
+const char ARG_DELIM{'\x1f'};
 /**
 *   ┌──────────────────────────────────────────────────┐
 *   │░░░░░░░░░░░░░░░ HELPERS ░░░░░░░░░░░░░░░░░│
@@ -256,6 +257,27 @@ void ScheduleDialog::clear() {
  * @return
  */
 ScheduledTask ScheduleDialog::readFields() {
+  const auto read_env_string = [&]() -> QString
+  {
+    QString               env_s{};
+    const QTableWidget&   table        = *(ui->paramTable);
+    const auto            row_count    = table.rowCount();
+
+    for (int i = 0; i < row_count; i++)
+    {
+      auto key   = table.item(i, 0)->text();
+      auto value = table.item(i, 1)->text();
+      auto index = key.indexOf('=');
+      auto key_name = key.rightRef(key.size() - index - 2);
+
+      env_s += key_name + '=' + '"' + value + '"' + ARG_DELIM + '\n';
+    }
+
+  return env_s;
+  };
+
+  const QString environment_string = read_env_string();
+
   return ScheduledTask {
       .id        = m_tasks.at(ui->taskList->currentIndex()).id,
       .app       = ui->appText->text(),
@@ -265,7 +287,8 @@ ScheduledTask ScheduleDialog::readFields() {
       .recurring = recurring_num_string(ui->recurring->currentText()),
       .notify    = ui->notifyCheck->isChecked() ? "1" : "0",
       .runtime   = ui->runtimeText->text(),
-      .files     = {ui->filesText->text()}  // files need to be an actual array
+      .files     = {ui->filesText->text()},  // files need to be an actual array
+      .envfile   = environment_string
   };
 }
 
@@ -289,8 +312,11 @@ void ScheduleDialog::receive_response(RequestType type, QVector<QString> v) {
     ui->paramTable->setRowCount(0);
     auto row_count = (keys.size() < v.size()) ? keys.size() : (v.size() - 1);
     for (int i = 0; i < row_count; i++) {
-      auto row = ui->paramTable->rowCount(); // insert row
       auto key = keys.at(i);
+      if (key.isEmpty())
+        continue;
+
+      auto row = ui->paramTable->rowCount(); // insert row
       auto value = v.at(i + 1);
       ui->paramTable->insertRow(row);
       QTableWidgetItem *item = new QTableWidgetItem(key);
