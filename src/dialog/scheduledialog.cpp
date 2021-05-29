@@ -276,6 +276,8 @@ ScheduledTask ScheduleDialog::readFields() {
   return env_s;
   };
 
+  // TODO: update ScheduledTask::flags by rebuilding the flags in the read_env_string function
+
   const QString environment_string = read_env_string();
 
   return ScheduledTask {
