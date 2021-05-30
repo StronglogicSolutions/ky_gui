@@ -257,40 +257,46 @@ void ScheduleDialog::clear() {
  * @return
  */
 ScheduledTask ScheduleDialog::readFields() {
-  const auto read_env_string = [&]() -> QString
+  struct EnvData
   {
-    QString               env_s{};
+    QString file;
+    QString flags;
+  };
+
+  const auto read_env_data = [&]() -> EnvData
+  {
+    EnvData               env{};
     const QTableWidget&   table        = *(ui->paramTable);
     const auto            row_count    = table.rowCount();
 
     for (int i = 0; i < row_count; i++)
     {
-      auto key   = table.item(i, 0)->text();
+      auto flag  = table.item(i, 0)->text();
       auto value = table.item(i, 1)->text();
-      auto index = key.indexOf('=');
-      auto key_name = key.rightRef(key.size() - index - 2);
-
-      env_s += key_name + '=' + '"' + value + '"' + ARG_DELIM + '\n';
+      auto index = flag.indexOf('=');
+      auto key   = flag.rightRef(flag.size() - index - 2);
+      env.file  += '\n' + key + '=' + '"' + value + '"' + ARG_DELIM;
+      env.flags += key  + ' ';
     }
 
-  return env_s;
+    return env;
   };
 
   // TODO: update ScheduledTask::flags by rebuilding the flags in the read_env_string function
 
-  const QString environment_string = read_env_string();
+  const EnvData env_data = read_env_data();
 
   return ScheduledTask {
       .id        = m_tasks.at(ui->taskList->currentIndex()).id,
       .app       = ui->appText->text(),
       .time      = QDateTime::fromString(ui->timeText->text()),
-      .flags     = ui->flagsText->text(),
+      .flags     = env_data.flags.trimmed(),
       .completed = completed_num_string(ui->completed->currentText()),
       .recurring = recurring_num_string(ui->recurring->currentText()),
       .notify    = ui->notifyCheck->isChecked() ? "1" : "0",
       .runtime   = ui->runtimeText->text(),
       .files     = {ui->filesText->text()},  // files need to be an actual array
-      .envfile   = environment_string
+      .envfile   = env_data.file
   };
 }
 
