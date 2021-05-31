@@ -2,7 +2,9 @@
 #include "ui_scheduledialog.h"
 #include <QDebug>
 
-const char ARG_DELIM{'\x1f'};
+static const char    ARG_DELIM  {'\x1f'};
+static const QString R_ARGS_FLAG{"R_ARGS"};
+
 /**
 *   ┌──────────────────────────────────────────────────┐
 *   │░░░░░░░░░░░░░░░ HELPERS ░░░░░░░░░░░░░░░░░│
@@ -268,16 +270,23 @@ ScheduledTask ScheduleDialog::readFields() {
     EnvData               env{};
     const QTableWidget&   table        = *(ui->paramTable);
     const auto            row_count    = table.rowCount();
+    const auto            r_args       = ui->runtimeText->text();
 
     for (int i = 0; i < row_count; i++)
     {
       auto flag  = table.item(i, 0)->text();
-      auto value = table.item(i, 1)->text();
+      auto value = table.item(i, 1)->text();      
+
+      if (value.isEmpty()) continue;
+
       auto index = flag.indexOf('=');
       auto key   = flag.rightRef(flag.size() - index - 2);
       env.file  += '\n' + key + '=' + '"' + value + '"' + ARG_DELIM;
-      env.flags += key  + ' ';
+      env.flags += flag  + ' ';
     }
+
+    if (!r_args.isEmpty())
+      env.file += '\n' + R_ARGS_FLAG + '=' + '"' + r_args + '"' + ARG_DELIM;
 
     return env;
   };
