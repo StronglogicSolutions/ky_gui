@@ -2,6 +2,9 @@
 #include "ui_scheduledialog.h"
 #include <QDebug>
 
+static const char    ARG_DELIM  {'\x1f'};
+static const QString R_ARGS_FLAG{"R_ARGS"};
+
 /**
 *   ┌──────────────────────────────────────────────────┐
 *   │░░░░░░░░░░░░░░░ HELPERS ░░░░░░░░░░░░░░░░░│
@@ -256,16 +259,53 @@ void ScheduleDialog::clear() {
  * @return
  */
 ScheduledTask ScheduleDialog::readFields() {
+  struct EnvData
+  {
+    QString file;
+    QString flags;
+  };
+
+  const auto read_env_data = [&]() -> EnvData
+  {
+    EnvData               env{};
+    const QTableWidget&   table        = *(ui->paramTable);
+    const auto            row_count    = table.rowCount();
+    const auto            r_args       = ui->runtimeText->text();
+
+    for (int i = 0; i < row_count; i++)
+    {
+      auto flag  = table.item(i, 0)->text();
+      auto value = table.item(i, 1)->text();      
+
+      if (value.isEmpty()) continue;
+
+      auto index = flag.indexOf('=');
+      auto key   = flag.rightRef(flag.size() - index - 2);
+      env.file  += '\n' + key + '=' + '"' + value + '"' + ARG_DELIM;
+      env.flags += flag  + ' ';
+    }
+
+    if (!r_args.isEmpty())
+      env.file += '\n' + R_ARGS_FLAG + '=' + '"' + r_args + '"' + ARG_DELIM;
+
+    return env;
+  };
+
+  // TODO: update ScheduledTask::flags by rebuilding the flags in the read_env_string function
+
+  const EnvData env_data = read_env_data();
+
   return ScheduledTask {
       .id        = m_tasks.at(ui->taskList->currentIndex()).id,
       .app       = ui->appText->text(),
       .time      = QDateTime::fromString(ui->timeText->text()),
-      .flags     = ui->flagsText->text(),
+      .flags     = env_data.flags.trimmed(),
       .completed = completed_num_string(ui->completed->currentText()),
       .recurring = recurring_num_string(ui->recurring->currentText()),
       .notify    = ui->notifyCheck->isChecked() ? "1" : "0",
       .runtime   = ui->runtimeText->text(),
-      .files     = {ui->filesText->text()}  // files need to be an actual array
+      .files     = {ui->filesText->text()},  // files need to be an actual array
+      .envfile   = env_data.file
   };
 }
 
@@ -289,8 +329,11 @@ void ScheduleDialog::receive_response(RequestType type, QVector<QString> v) {
     ui->paramTable->setRowCount(0);
     auto row_count = (keys.size() < v.size()) ? keys.size() : (v.size() - 1);
     for (int i = 0; i < row_count; i++) {
-      auto row = ui->paramTable->rowCount(); // insert row
       auto key = keys.at(i);
+      if (key.isEmpty())
+        continue;
+
+      auto row = ui->paramTable->rowCount(); // insert row
       auto value = v.at(i + 1);
       ui->paramTable->insertRow(row);
       QTableWidgetItem *item = new QTableWidgetItem(key);

@@ -38,6 +38,7 @@ struct ScheduledTask {
   QString          notify;
   QString          runtime;
   QVector<QString> files;
+  QString          envfile;
 };
 
 namespace constants {

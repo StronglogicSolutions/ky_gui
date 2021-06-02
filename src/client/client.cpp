@@ -661,7 +661,8 @@ void Client::request(uint8_t request_code, T payload) {
           payload.runtime.toUtf8().constData(),
           (payload.files.isEmpty()) ?
                                       "" :
-                                      payload.files.front().toUtf8().constData()
+                                      payload.files.front().toUtf8().constData(),
+          payload.envfile.toUtf8().constData()
         };
         operation_string = createOperation("Schedule", operation_args);
 

@@ -12,6 +12,8 @@
 
 using namespace Scheduler;
 
+static const char JPG_FORMAT[]{"JPG"};
+
 bool isSave(QString s) {
   return (s.compare("Save") == 0 || s.compare("&Save") == 0);
 }
@@ -79,7 +81,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
             QImage processed_image = (height > width) ?
               image.copy(QRect{0, ((height - width) / 2), width, width}) :
               image.copy(QRect{((width - height) / 2), 0, height, height});
-            processed_image.save(&buffer, mime_type.preferredSuffix().toUtf8().constData());
+            processed_image.save(&buffer, JPG_FORMAT);
           }
           else
             image.save(&buffer, mime_type.preferredSuffix().toUtf8().constData());
