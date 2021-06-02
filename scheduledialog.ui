@@ -23,7 +23,7 @@ color: rgb(161, 164, 167);</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0">
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0,0,0">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0,0,0,0">
      <property name="spacing">
       <number>36</number>
      </property>
@@ -299,12 +299,12 @@ font-weight: 700;</string>
         <widget class="QComboBox" name="completed">
          <item>
           <property name="text">
-           <string>Completed</string>
+           <string>Scheduled</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Scheduled</string>
+           <string>Success</string>
           </property>
          </item>
          <item>
@@ -473,6 +473,9 @@ font-weight: 700;</string>
         <widget class="QLineEdit" name="runtimeText"/>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QTableView" name="tableView"/>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="0,0">
