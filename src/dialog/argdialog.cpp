@@ -41,13 +41,15 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
       QFile file(file_path);
 
       if (file.open(QIODevice::ReadOnly)) {
-        QByteArray    bytes{};
-        QBuffer       buffer{&bytes};
         QMimeDatabase db{};
         QMimeType     mime_type = db.mimeTypeForFile(file_path);
         auto          is_video  = mime_type.name().contains("video");
         addItem(file_name, "file");
-        buffer.open(QIODevice::WriteOnly);
+        m_task->addArgument("files", Scheduler::KFileData{
+                                         .name  = file_name,
+                                         .type  = is_video ? FileType::VIDEO : FileType::IMAGE,
+                                         .path  = file_path,
+                                         .bytes = file.readAll()});
 
         if (is_video) {
           qDebug() << "File discovered to be video";
@@ -63,22 +65,23 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
             addItem(preview_filename, "file");
             addFile("assets/previews/" + preview_filename);
             m_task->addArgument("files", Scheduler::KFileData{
-                                             .name = preview_filename,
-                                             .type = is_video ? FileType::VIDEO : FileType::IMAGE,
-                                             .path = preview_file_path,
+                                             .name  = preview_filename,
+                                             .type  = is_video ? FileType::VIDEO : FileType::IMAGE,
+                                             .path  = preview_file_path,
                                              .bytes = file.readAll()});
           } else {
             qDebug() << "Could not add preview image for video";
             QMessageBox::warning(this, tr("File Error"), tr("Could not add preview image for video"));
           }
         } else {
-          QImage image{file_path};
-          QSize  image_size = image.size();
-          auto   height      = image_size.height();
-          auto   width       = image_size.width();
+          QBuffer buffer{};
+          QImage  image{file_path};
+          QSize   image_size  = image.size();
+          auto    height      = image_size.height();
+          auto    width       = image_size.width();
           if (m_task->getType() == TaskType::INSTAGRAM && image_size.height() != image_size.width())
           {
-            QImage processed_image = (height > width) ?
+            QImage  processed_image = (height > width) ?
               image.copy(QRect{0, ((height - width) / 2), width, width}) :
               image.copy(QRect{((width - height) / 2), 0, height, height});
             processed_image.save(&buffer, JPG_FORMAT);
@@ -87,11 +90,6 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
             image.save(&buffer, mime_type.preferredSuffix().toUtf8().constData());
           addFile(file_path);
         }
-        m_task->addArgument("files", Scheduler::KFileData{
-                                         .name = file_name,
-                                         .type = is_video ? FileType::VIDEO : FileType::IMAGE,
-                                         .path = file_path,
-                                         .bytes = bytes});
       } else {
         qDebug() << "Unable to open selected file";
         QMessageBox::warning(this, tr("File Error"), tr("Unable to open selected file"));
