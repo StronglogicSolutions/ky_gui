@@ -438,8 +438,8 @@ public:
         maskLabel_4->setText(QCoreApplication::translate("ScheduleDialog", "Flags", nullptr));
         pathLabel->setText(QCoreApplication::translate("ScheduleDialog", "Time", nullptr));
         dataLabel->setText(QCoreApplication::translate("ScheduleDialog", "Status", nullptr));
-        completed->setItemText(0, QCoreApplication::translate("ScheduleDialog", "Completed", nullptr));
-        completed->setItemText(1, QCoreApplication::translate("ScheduleDialog", "Scheduled", nullptr));
+        completed->setItemText(0, QCoreApplication::translate("ScheduleDialog", "Scheduled", nullptr));
+        completed->setItemText(1, QCoreApplication::translate("ScheduleDialog", "Success", nullptr));
         completed->setItemText(2, QCoreApplication::translate("ScheduleDialog", "Failed", nullptr));
         completed->setItemText(3, QCoreApplication::translate("ScheduleDialog", "Retry Failed", nullptr));
 
