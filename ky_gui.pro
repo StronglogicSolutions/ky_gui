@@ -28,6 +28,7 @@ CONFIG += static
 QMAKE_CXXFLAGS += "-fno-sized-deallocation"
 
 SOURCES += \
+        documentdialog.cpp \
         src/main.cpp \
         src/mainwindow/mainwindow.cpp \
         src/mainwindow/controller.cpp \
@@ -43,6 +44,7 @@ SOURCES += \
 
 
 HEADERS += \
+        documentdialog.h \
         include/ui/appdialog.hpp \
         include/ui/argdialog.h \
         include/ui/messagedialog.hpp \
@@ -68,6 +70,7 @@ FORMS += \
         appdialog.ui \
         argdialog.ui \
         consoledialog.ui \
+        documentdialog.ui \
         mainwindow.ui \
         messagedialog.ui \
         scheduledialog.ui

@@ -41,40 +41,16 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
       QFile file(file_path);
 
       if (file.open(QIODevice::ReadOnly)) {
+        QByteArray    bytes{};
         QMimeDatabase db{};
         QMimeType     mime_type = db.mimeTypeForFile(file_path);
+        FileType      file_type{};
         auto          is_video  = mime_type.name().contains("video");
         addItem(file_name, "file");
-        m_task->addArgument("files", Scheduler::KFileData{
-                                         .name  = file_name,
-                                         .type  = is_video ? FileType::VIDEO : FileType::IMAGE,
-                                         .path  = file_path,
-                                         .bytes = file.readAll()});
 
-        if (is_video) {
-          qDebug() << "File discovered to be video";
-          m_task->setArgument("is_video", true);
-          QString preview_filename = FileUtils::generatePreview(file_path, file_name);
-
-          QString preview_file_path = QCoreApplication::applicationDirPath()
-                                   + "/assets/previews/" + preview_filename;
-          file.setFileName(preview_file_path);
-          if (file.open(QIODevice::ReadOnly)) {
-            // TODO: create some way of verifying preview generation was successful
-            addFile("assets/previews/" + preview_filename);
-            addItem(preview_filename, "file");
-            addFile("assets/previews/" + preview_filename);
-            m_task->addArgument("files", Scheduler::KFileData{
-                                             .name  = preview_filename,
-                                             .type  = is_video ? FileType::VIDEO : FileType::IMAGE,
-                                             .path  = preview_file_path,
-                                             .bytes = file.readAll()});
-          } else {
-            qDebug() << "Could not add preview image for video";
-            QMessageBox::warning(this, tr("File Error"), tr("Could not add preview image for video"));
-          }
-        } else {
-          QBuffer buffer{};
+        if (!is_video)
+        {
+          QBuffer buffer{&bytes};
           QImage  image{file_path};
           QSize   image_size  = image.size();
           auto    height      = image_size.height();
@@ -89,6 +65,42 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
           else
             image.save(&buffer, mime_type.preferredSuffix().toUtf8().constData());
           addFile(file_path);
+          file_type = FileType::IMAGE;
+        } else
+        {
+          file_type = FileType::VIDEO;
+          bytes = file.readAll();
+        }
+        m_task->addArgument("files", Scheduler::KFileData{
+                                         .name  = file_name,
+                                         .type  = file_type,
+                                         .path  = file_path,
+                                         .bytes = bytes});
+
+        if (is_video)
+        {
+          qDebug() << "File discovered to be video";
+          m_task->setArgument("is_video", true);
+          QString preview_filename = FileUtils::generatePreview(file_path, file_name);
+
+          QString preview_file_path = QCoreApplication::applicationDirPath()
+                                   + "/assets/previews/" + preview_filename;
+          file.setFileName(preview_file_path);
+
+          if (file.open(QIODevice::ReadOnly)) {
+            // TODO: create some way of verifying preview generation was successful
+            addFile("assets/previews/" + preview_filename);
+            addItem(preview_filename, "file");
+            addFile("assets/previews/" + preview_filename);
+            m_task->addArgument("files", Scheduler::KFileData{
+                                             .name  = preview_filename,
+                                             .type  = is_video ? FileType::VIDEO : FileType::IMAGE,
+                                             .path  = preview_file_path,
+                                             .bytes = file.readAll()});
+          } else {
+            qDebug() << "Could not add preview image for video";
+            QMessageBox::warning(this, tr("File Error"), tr("Could not add preview image for video"));
+          }
         }
       } else {
         qDebug() << "Unable to open selected file";
