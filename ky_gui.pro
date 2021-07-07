@@ -28,10 +28,10 @@ CONFIG += static
 QMAKE_CXXFLAGS += "-fno-sized-deallocation"
 
 SOURCES += \
-        documentdialog.cpp \
         src/main.cpp \
-        src/mainwindow/mainwindow.cpp \
-        src/mainwindow/controller.cpp \
+        src/window/main/mainwindow.cpp \
+        src/window/main/controller.cpp \
+        src/window/document/documentwindow.cpp \
         src/client/client.cpp \
         src/task/instagram_task.cpp \
         src/task/generic_task.cpp \
@@ -44,7 +44,7 @@ SOURCES += \
 
 
 HEADERS += \
-        documentdialog.h \
+        include/ui/documentwindow.hpp \
         include/ui/appdialog.hpp \
         include/ui/argdialog.h \
         include/ui/messagedialog.hpp \
@@ -70,7 +70,7 @@ FORMS += \
         appdialog.ui \
         argdialog.ui \
         consoledialog.ui \
-        documentdialog.ui \
+        documentwindow.ui \
         mainwindow.ui \
         messagedialog.ui \
         scheduledialog.ui

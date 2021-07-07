@@ -53,11 +53,12 @@ QString timestampPrefix() {
  */
 QStandardItem* createProcessListItem(Process process) {
 
-  QString processResultText{"%0 requested for execution. "
-      "ID: %1\n"
-      "Status: %2\n"
-      "Time: %3   "
-      "Done: %4\n"
+  QString processResultText{
+    "%0 requested for execution. "
+    "ID: %1\n"
+    "Status: %2\n"
+    "Time: %3   "
+    "Done: %4\n"
   };
 
   auto error = !process.error.isEmpty();
@@ -132,7 +133,7 @@ MainWindow::~MainWindow() {
   delete q_client;
   delete ui;
   delete arg_ui;
-  delete m_event_model;
+  delete m_event_model;  
 }
 
 /**
@@ -365,6 +366,10 @@ void MainWindow::connectClient() {
   QObject::connect(ui->ipc, &QPushButton::clicked, this, [this]() {
     q_client->sendIPCMessage(ui->ipcList->currentText(), ui->inputText->toPlainText(), defaultConfigUser(m_config));
     ui->inputText->clear();
+  });
+
+  QObject::connect(ui->makeDoc, &QPushButton::clicked, this, [this]() {
+    doc_window.show();
   });
 
   QTimer* timer = new QTimer(this);
