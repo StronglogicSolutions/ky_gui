@@ -108,16 +108,20 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
       cli_argv(argv),
       ui(new Ui::MainWindow),
       arg_ui(new ArgDialog),
-      q_client(nullptr) {
+      q_client(nullptr),
+      m_client_time_remaining(DEFAULT_TIMEOUT)
+{
   m_event_model = new QStandardItemModel(this);
   m_process_model = new QStandardItemModel(this);
   q_client = new Client(this, cli_argc, cli_argv);
   m_controller.init(this);
   ui->setupUi(this);
   this->setWindowTitle("KYGUI");
-  setStyleSheet(KYGUI_STYLESHEET);
+  setStyleSheet(get_stylesheet());
   setConnectScreen();
   connect(ui->connect, &QPushButton::clicked, this, &MainWindow::connectClient);
+  ui->progressBar->setMinimum(0);
+  ui->progressBar->setMaximum(DEFAULT_TIMEOUT);
   ui->eventList->setModel(m_event_model);
   ui->processList->setModel(m_process_model);
   ui->serverIp->setText(argv[1]);
@@ -214,15 +218,10 @@ void MainWindow::connectClient() {
   QObject::connect(q_client, &Client::messageReceived, this,
                    &MainWindow::onMessageReceived);
 
-  QProgressBar* progressBar = ui->progressBar;
   auto server_ip   = ui->serverIp->toPlainText();
   auto server_port = ui->serverPort->toPlainText();
   setWindowTitle(windowTitle() + " kiq://" + server_ip + ":" + server_port);
   q_client->start(server_ip, server_port);
-
-  for (int i = 1; i < 101; i++) {
-    progressBar->setValue(i);
-  }
 
   QObject::connect(ui->actionDefault, &QAction::triggered, this, [this]()
   {
@@ -368,15 +367,31 @@ void MainWindow::connectClient() {
     ui->inputText->clear();
   });
 
-  QObject::connect(ui->makeDoc, &QPushButton::clicked, this, [this]() {
-    doc_window.show();
-  });
+  QObject::connect(ui->makeDoc, &QPushButton::clicked, this,
+    [this]()
+    {
+      doc_window.show();
+    }
+  );
 
-  QTimer* timer = new QTimer(this);
-  connect(timer, &QTimer::timeout, q_client, &Client::ping);
-  timer->start(10000);
+  QTimer* ping_timer = new QTimer(this);
 
-  m_pong_timer.start();
+  QObject::connect(&m_progress_timer, &QTimer::timeout, q_client, [this]() -> void
+  {
+    if (--m_client_time_remaining > 0)
+    {
+      ui->progressBar->setValue(m_client_time_remaining);
+      m_progress_timer.start(10);
+    }
+    else
+      ui->led->setState(false);
+  }
+  );
+  connect(ping_timer, &QTimer::timeout, q_client, &Client::ping);
+
+  m_progress_timer.start(10);
+  m_pong_timer    .start();
+  ping_timer     ->start(10000);
 }
 
 /**
@@ -387,31 +402,50 @@ void MainWindow::connectClient() {
  */
 void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
   QString timestamp_prefix = utils::timestampPrefix();
-  if (t == PONG_REPLY_TYPE) {
-    ui->lastPing->setText(QString::number(m_pong_timer.elapsed()) + " ms");
-    m_pong_timer.restart();
-  } else if (t == MESSAGE_UPDATE_TYPE) {  // Normal message
+  switch (t)
+  {
+  case(PONG_REPLY_TYPE):
+  {
+
+    qint64 elapsed_time = m_pong_timer.elapsed();
+    if (elapsed_time < (1000 * 60))
+    {
+      ui->lastPing->setText(QString::number(elapsed_time) + " ms");
+      m_pong_timer.restart();
+      m_client_time_remaining = DEFAULT_TIMEOUT;
+    }
+    else
+    {
+      m_progress_timer.stop();
+      qDebug() << "Server timeout";
+    }
+    break;
+  }
+
+  case(MESSAGE_UPDATE_TYPE):      // Normal message
     qDebug() << "Updating message area";
     m_controller.handleMessage(message, v);
     message_ui.append(message);
-  } else if (t == COMMANDS_UPDATE_TYPE) {  // Received app list from server
-    // TODO: Parse arg map -> every 4 elements is a data set for one command
+    break;
+
+  case(COMMANDS_UPDATE_TYPE):     // Received apps from server
     qDebug() << "Updating commands";
-    QString default_app = configValue("defaultApp", m_config);
-    m_controller.handleCommands(v, default_app);
 
-    if (message == "New Session") {  // Session has started
+    m_controller.handleCommands(v, configValue("defaultApp", m_config));
+
+    if (message == "New Session") // Session has started
+    {
       ui->led->setState(true);
-
-      if (configBoolValue("schedulerMode", std::ref(m_config))) {
+      if (configBoolValue("schedulerMode", std::ref(m_config)))
         arg_ui->show();
-      }
 
-      if (configBoolValue("fetchSchedule", m_config)) {
-        q_client->request(RequestType::FETCH_SCHEDULE);
-      }
+      if (configBoolValue("fetchSchedule", m_config))
+        q_client->request(RequestType::FETCH_SCHEDULE);      
     }
-  } else if (t == PROCESS_REQUEST_TYPE) {  // Sent execution request to server
+    break;
+
+  case(PROCESS_REQUEST_TYPE):   // Sent execution request to server
+  {
     qDebug() << "Updating process list";
     m_processes.push_back(Process{.name = v.at(1),
                                   .state = ProcessState::PENDING,
@@ -423,29 +457,30 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
       m_process_model->setItem(row, utils::createProcessListItem(process));
       row++;
     }
-  } else if (t == EVENT_UPDATE_TYPE) {  // Received event from server
+    break;
+  }
+
+  case(EVENT_UPDATE_TYPE):      // Received event from server
+  {
     QString event_message = m_controller.handleEventMessage(message, v);
 
-    if (m_events.size() > 1) {  // Group repeating event messages
+    if (m_events.size() > 1)    // Group repeating event messages
+    {
       auto last_event = m_events[m_events.size() - 1];
-
       if (utils::isSameEvent(message, last_event.remove(0, 11))) {
         m_consecutive_events++;
         auto count = utils::getLikeEventNum(event_message, m_events);
-        QString clean_event_message =
-            event_message + " (" + QString::number(count) + ")";
+        auto clean_event_message = event_message + " (" + QString::number(count) + ")";
         m_events.push_back(event_message);
 
-        m_event_model->setItem(
-          m_event_model->rowCount() - 1,
-          utils::createEventListItem(clean_event_message)
-        );
+        m_event_model->setItem(m_event_model->rowCount() - 1,
+                               utils::createEventListItem(clean_event_message));
         return;  // It was not a unique message, we can return
       }
       m_consecutive_events = 0;
     }
-    if (isKEvent<QString>(message,
-                          Event::TASK_SCHEDULED)) {  // Event was scheduled task
+    if (isKEvent<QString>(message, Event::TASK_SCHEDULED))    // Event was scheduled task
+    {
       event_message += ". Details:\n" + parseTaskInfo(v);
       UI::infoMessageBox(event_message, "Schedule request succeeded");
       arg_ui->notifyClientSuccess(); // Update ArgDialog accordingly
@@ -453,7 +488,9 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
     m_events.push_back(event_message);
     m_event_model->setItem(m_event_model->rowCount(),
                            utils::createEventListItem(event_message));
-  } else {
+    break;
+  }
+  default:
     qDebug() << "Unknown update type. Cannot update UI";
   }
 }

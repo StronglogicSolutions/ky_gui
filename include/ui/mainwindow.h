@@ -27,12 +27,8 @@
 #include <headers/kiq_types.hpp>
 #include <include/client/client.hpp>
 
-const QString KYGUI_STYLESHEET{
-"QListView { font: 87 11pt \"Noto Sans\"; background-color: #2f535f;"
-"alternate-background-color: #616161; color: rgb(131, 148, 150); "
-"font-weight: 700; background-color: rgb(29, 51, 59);"
-"color: rgb(223, 252, 255);}"
-};
+static const uint32_t DEFAULT_TIMEOUT{1000};
+static const char* stylesheet_path{"style/style.css"};
 
 const QString KYGUI_DEFAULT_THEME{
 "border-color: rgb(0, 0, 0);"
@@ -86,6 +82,15 @@ const QString KYGUI_BLUE_LIST_THEME{
 "color: rgb(223, 252, 255);"
 "padding: 4px;"
 "item { border-bottom: 1px solid black; padding: 16px;} "
+};
+
+const auto get_stylesheet = []() -> QString
+{
+    QFile file{stylesheet_path};
+    file.open(QFile::ReadOnly |
+              QFile::Text);
+
+    return QString{file.readAll()};
 };
 
 namespace ProcessState {
@@ -182,6 +187,8 @@ public:
     /** Misc */
     QJsonObject           m_config;
     uint16_t              m_consecutive_events;
+    quint64               m_client_time_remaining;
+    QTimer                m_progress_timer;
 
    private slots:
     /** Receivers */

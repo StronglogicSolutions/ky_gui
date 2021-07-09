@@ -118,6 +118,7 @@ class Client : public QDialog {
  signals:
   void           messageReceived(int t, QString s, QVector<QString> args);
   void           eventReceived(int t, std::string event, StringVec args);
+  void           clientDisconnected();
 
  private:
   void           sendEncoded(std::string message);

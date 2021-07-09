@@ -1,13 +1,12 @@
-﻿QPushButton {
-      border-style: outset;
-      border-width: 2px;
-      border-radius: 10px;
-      border-color: beige;
-      min-width: 10em;
-      padding: 6px;
-}
-
-QPushButton:hover
-{
-   opacity: 0.7;
-}
+﻿QListView { font: 87 11pt "Noto Sans"; background-color: #2f535f;
+alternate-background-color: #616161; color: rgb(131, 148, 150);
+font-weight: 700; background-color: rgb(29, 51, 59);
+color: rgb(223, 252, 255);}
+QComboBox QAbstractItemView
+  {
+    selection-color: #0e191d;
+    selection-background-color: rgb(29, 51, 59);
+  }
+  QProgressBar::chunk {
+     background-color: rgb(147, 147, 147);
+ }
