@@ -238,6 +238,9 @@ QString MainWindow::Controller::handleEventMessage(QString message,
         window->schedule_ui.receive_response(RequestType::FETCH_SCHEDULE_TOKENS, v);
       }
       else
+      if (message == "Application Flags")
+        window->doc_window.set_flags(v);
+      else
       if (QString::compare(message, "Message Received") == 0) {
         event_message += "\n" + v.at(1) + ": " + v.at(2);
       }

@@ -370,6 +370,7 @@ void MainWindow::connectClient() {
   QObject::connect(ui->makeDoc, &QPushButton::clicked, this,
     [this]()
     {
+      q_client->request(RequestType::FETCH_TASK_FLAGS);
       doc_window.show();
     }
   );

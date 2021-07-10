@@ -648,30 +648,31 @@ void Client::request(uint8_t request_code, T payload) {
     else
     if (request_code == RequestType::UPDATE_SCHEDULE        ||
         request_code == RequestType::FETCH_SCHEDULE_TOKENS) {
-      if constexpr (std::is_same_v<T, ScheduledTask>) {
-        std::vector<std::string> operation_args{
-          std::to_string(request_code),
-          payload.id.toUtf8().constData(),
-          payload.app.toUtf8().constData(),
-          std::to_string(payload.time.toTime_t()),
-          payload.flags.toUtf8().constData(),
-          payload.completed.toUtf8().constData(),
-          payload.recurring.toUtf8().constData(),
-          payload.notify.toUtf8().constData(),
-          payload.runtime.toUtf8().constData(),
-          (payload.files.isEmpty()) ?
-                                      "" :
-                                      payload.files.front().toUtf8().constData(),
-          payload.envfile.toUtf8().constData()
-        };
-        operation_string = createOperation("Schedule", operation_args);
+      if constexpr (std::is_same_v<T, ScheduledTask>)
+        operation_string = createOperation(
+          "Schedule", std::vector<std::string>{
+             std::to_string(request_code),
+             payload.id.toUtf8().constData(),
+             payload.app.toUtf8().constData(),
+             std::to_string(payload.time.toTime_t()),
+             payload.flags.toUtf8().constData(),
+             payload.completed.toUtf8().constData(),
+             payload.recurring.toUtf8().constData(),
+             payload.notify.toUtf8().constData(),
+             payload.runtime.toUtf8().constData(),
+             (payload.files.isEmpty()) ?
+                                         "" :
+                                         payload.files.front().toUtf8().constData(),
+             payload.envfile.toUtf8().constData()});
+    }
 
-        qDebug() << "Update Schedule string:\n" << operation_string.c_str();
-      }
-    }
-    else {
+    else
+    if (request_code == RequestType::FETCH_TASK_FLAGS)
+      operation_string = createOperation(
+        "TaskOperation",
+        std::vector<std::string>{std::to_string(request_code), std::to_string(getSelectedApp())});
+    else
       qDebug() << "Client is unable to process request";
-    }
 
     sendEncoded(operation_string);
   } catch (const std::exception& e) {

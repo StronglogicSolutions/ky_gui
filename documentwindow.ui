@@ -23,7 +23,7 @@
       <height>581</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0" columnstretch="3,0">
+    <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0" columnstretch="3,1">
      <item row="1" column="0">
       <widget class="QComboBox" name="tokens"/>
      </item>

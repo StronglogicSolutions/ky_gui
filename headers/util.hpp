@@ -49,7 +49,9 @@ enum RequestType {
   GET                   = 0x03,
   FETCH_SCHEDULE        = 0x04,
   UPDATE_SCHEDULE       = 0x05,
-  FETCH_SCHEDULE_TOKENS = 0x06
+  FETCH_SCHEDULE_TOKENS = 0x06,
+  TRIGGER_CREATE        = 0x07,
+  FETCH_TASK_FLAGS        = 0x08
 };
 
 const uint8_t SCHEDULED_TASK_ID_INDEX        = 0x00;
