@@ -144,13 +144,13 @@ public:
     class Controller {
      public:
       void init(MainWindow* window);
-      void handleCommands(StringVec commands, QString default_app);
-      void handleMessage(QString message, StringVec v);
-      QString handleEventMessage(QString message, StringVec v);
+      void handleCommands(const StringVec& commands, const QString& default_app);
+      void handleMessage(const QString& message, const StringVec& v);
+      QString handleEventMessage(const QString& message, const StringVec& v);
 
      private:
-      QString parseMessage(const QString& s, StringVec v);
-      void updateProcessResult(QString id, QString result, bool error);
+      QString parseMessage(const QString& message, const StringVec& v);
+      void updateProcessResult(const QString& id, const QString& result, const bool error);
       MainWindow* window;
     };
 

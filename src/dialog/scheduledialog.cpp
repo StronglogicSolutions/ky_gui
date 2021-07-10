@@ -282,7 +282,7 @@ ScheduledTask ScheduleDialog::readFields() {
       auto index = flag.indexOf('=');
       auto key   = flag.rightRef(flag.size() - index - 2);
       env.file  += '\n' + key + '=' + '"' + value.trimmed() + '"' + ARG_DELIM;
-      env.flags += flag  + ' ';
+      env.flags += flag + ' ';
     }
 
     if (!r_args.isEmpty())

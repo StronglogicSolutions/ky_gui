@@ -22,10 +22,11 @@ protected:
   void mouseReleaseEvent(QMouseEvent* e);
 
 private:
-  void set_inserting(const int32_t& index);
+  void set_inserting(const bool inserting, const int32_t& index = -1);
   Ui::DocumentWindow *ui;
   QVector<QString>   m_flags;
-  int32_t            m_inserting;
+  int32_t            m_flag_index;
+  bool               m_inserting;
 };
 
 #endif // DOCUMENTWINDOW_H

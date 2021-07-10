@@ -31,8 +31,9 @@ void MainWindow::Controller::init(MainWindow* window) {
  * @param commands
  * @param default_command
  */
-void MainWindow::Controller::handleCommands(StringVec args,
-                                            QString default_command) {
+void MainWindow::Controller::handleCommands(const StringVec& args,
+                                            const QString&   default_command)
+{
   uint8_t MASK_INDEX = 0;
   uint8_t NAME_INDEX = 1;
   uint8_t PATH_INDEX = 2;
@@ -90,7 +91,8 @@ void MainWindow::Controller::handleCommands(StringVec args,
  * @param message
  * @param v
  */
-void MainWindow::Controller::handleMessage(QString message, StringVec v) {
+void MainWindow::Controller::handleMessage(const QString& message, const StringVec& v)
+{
   window->message_ui.append(
     utils::timestampPrefix() + parseMessage(message, v), true
   );
@@ -102,17 +104,23 @@ void MainWindow::Controller::handleMessage(QString message, StringVec v) {
  * @param v
  * @return
  */
-QString MainWindow::Controller::parseMessage(const QString& message,
-                                                StringVec v) {
+QString MainWindow::Controller::parseMessage(const QString&   message,
+                                             const StringVec& v)
+{
   QString simplified_message{};
-  if (isMessage(message.toUtf8())) {
-    simplified_message += "Message: " + getMessage(message.toUtf8());
-  } else if (isEvent(message.toUtf8())) {
-    simplified_message += "Event: " + getEvent(message.toUtf8());
-  } else if (isOperation(message.toUtf8())) {
-    simplified_message += "Operation: ";
-    simplified_message += getOperation(message.toUtf8()).c_str();
-  }
+
+  if      (isMessage  (message.toUtf8()))
+    simplified_message += "Message: "   + getMessage(message);
+  else if (isEvent    (message.toUtf8()))
+    simplified_message += "Event: "     + getEvent(message);
+  else if (isOperation(message.toUtf8()))
+    simplified_message += "Operation: " + getOperation(message);
+
+  if (!v.empty())
+    simplified_message += "\nArguments:";
+
+  for (const auto& arg : v) simplified_message += "\n" + arg;
+
   return simplified_message;
 }
 
@@ -123,21 +131,23 @@ QString MainWindow::Controller::parseMessage(const QString& message,
  * @param error
  */
 void MainWindow::Controller::updateProcessResult(
-    QString id, QString result,
-    bool error = false) {  // We need to start matching processes with a
-  // unique identifier
-  for (int i = window->m_processes.size() - 1; i >= 0; i--) {
-    if (window->m_processes.at(i).id == id) {
-      window->m_processes.at(i).end = TimeUtils::getTime();
-      window->m_processes.at(i).state =
-          !error ? ProcessState::SUCCEEDED : ProcessState::FAILED;
+    const QString& id,
+    const QString& result,
+    const bool     error = false)
+{
+  for (int i = window->m_processes.size() - 1; i >= 0; i--)
+  {
+    if (window->m_processes.at(i).id == id)
+    {
+      window->m_processes.at(i).end    = TimeUtils::getTime();
+      window->m_processes.at(i).state  = !error ?
+                                           ProcessState::SUCCEEDED :
+                                           ProcessState::FAILED;
       window->m_processes.at(i).result = result;
-      window->m_process_model->setItem(
-          i, 0, utils::createProcessListItem(window->m_processes.at(i)));
+      window->m_process_model->setItem(i, 0, utils::createProcessListItem(window->m_processes.at(i)));
       return;
     }
   }
-  // If we didn't return, it's a new process:
 }
 
 /**
@@ -146,46 +156,54 @@ void MainWindow::Controller::updateProcessResult(
  * @param v
  * @return
  */
-QString MainWindow::Controller::handleEventMessage(QString message,
-                                                      StringVec v) {
+QString MainWindow::Controller::handleEventMessage(const QString&   message,
+                                                   const StringVec& v)
+{
   QString event_message = utils::timestampPrefix();
   if (!v.empty()) {
     // TODO: Why do we rely on this weird circumstance?
-    if (v.size() == 1) {
+    if (v.size() == 1)
       event_message += message + "\n" + v.at(0);
-    } else {
+    else
+    {
       event_message += message;
-      if (message == "Process Result") {
-        auto error = v.size() > 3 ? true : false;
-        event_message += "\n";
-        auto app_name = window->q_client->getAppName(
-            std::stoi(v.at(0).toUtf8().constData()));
-        auto process_it = std::find_if(
-            window->m_processes.begin(), window->m_processes.end(),
-            [v](const Process& process) { return process.id == v.at(1); });
-        if (process_it != window->m_processes.end()) {
+
+      if (message == "Process Result")
+      {
+        const auto error = v.size() > 3;
+        const auto app_name = window->q_client->getAppName(std::stoi(v.at(0).toUtf8().constData()));
+        event_message += '\n';
+        event_message += app_name;
+        event_message += ": ";
+        event_message += v.at(2);
+
+        const auto process_it = std::find_if(window->m_processes.begin(), window->m_processes.end(),
+          [v](const Process& process) { return process.id == v.at(1); });
+
+        if (process_it != window->m_processes.end())
           updateProcessResult(v.at(1), v.at(2), error);
-        } else {  // new process, from scheduled task
+        else // new process, from scheduled task
+        {
           Process new_process{
-              .name  = app_name,
-              .state = !error ? ProcessState::SUCCEEDED : ProcessState::FAILED,
-              .start = TimeUtils::getTime(),
-              .id    = "Scheduled task",
-              .error = error ? v.at(3) : "No errors reported"};
-          if (v.count() > 2 && !v.at(2).isEmpty()) {
-            new_process.result = v.at(2);
-            new_process.end = new_process.start;
-          }
+            .name  = app_name,
+            .state = !error ? ProcessState::SUCCEEDED : ProcessState::FAILED,
+            .start = TimeUtils::getTime(),
+            .id    = "Scheduled task",
+            .error = error ? v.at(3) : "No errors reported"};
+
+            if (v.count() > 2 && !v.at(2).isEmpty())
+            {
+              new_process.result = v.at(2);
+              new_process.end = new_process.start;
+            }
+
           window->m_processes.push_back(new_process);
           window->m_process_model->setItem(window->m_process_model->rowCount(),
                                            utils::createProcessListItem(new_process));
         }
-        event_message += app_name;
-        event_message += ": ";
-        event_message += v.at(2);
-        if (error) {
+
+        if (error)
           event_message += "\n Error: " + v.at(3);
-        }
       }
       else
       if (message == "Platform Post")
@@ -193,60 +211,56 @@ QString MainWindow::Controller::handleEventMessage(QString message,
         if (v.size() < 6)
           event_message += "\nEvent occurred, but data is missing";
         else
-        {
-          event_message += "\nContent: "   + v.at(3);
-          event_message += "\nCompleted: " + v.at(5);
-        }
+          event_message += "\nContent: " + v.at(3) + "\nCompleted: " + v.at(5);
       }
       else
       if (QString::compare(message, "Application was registered") == 0) {
-        KApplication application{.name = v.at(0), .path = v.at(1), .data = v.at(2), .mask = v.at(3)};
-        window->app_ui.addApplication(application);
-        window->q_client->addCommand (application);
-        window->ui->appList->addItem(application.name);
+        const KApplication application{.name = v.at(0), .path = v.at(1), .data = v.at(2), .mask = v.at(3)};
+        window->app_ui.      addApplication(application);
+        window->q_client->   addCommand    (application);
+        window->ui->appList->addItem       (application.name);
       }
       else
-      if (QString::compare(message, "Application was deleted") == 0) {
-        auto name = v.at(0);
+      if (message == "Application was deleted")
+      {
+        const auto name = v.at(0);
+        const auto i   = window->ui->appList->findText(name);
         window->app_ui.removeApplication(KApplication{.name = name});
-        auto i = window->ui->appList->findText(name);
         if (i != -1)
-            window->ui->appList->removeItem(i);
+          window->ui->appList->removeItem(i);
       }
       else
-      if (QString::compare(message, "Scheduled Tasks") == 0) {
-        auto details = v.at(0);
-        if (details.compare("Schedule") == 0) {
+      if (message =="Scheduled Tasks")
+      {
+        const auto details = v.at(0);
+        if (details == "Schedule")
+        {
           window->schedule_ui.clear();
           window->schedule_ui.insert_tasks(v);
         }
         else
-        if (details.compare("Schedule more") == 0) {
+        if (details == "Schedule more")
           window->schedule_ui.insert_tasks(v);
-        }
         else
-        if (details.compare("Schedule end") == 0) {
+        if (details == "Schedule end")
           window->schedule_ui.receive_response(RequestType::FETCH_SCHEDULE, v);
-        }
       }
       else
-      if (message.compare("Schedule PUT") == 0) {
+      if (message == "Schedule PUT")
         window->schedule_ui.receive_response(RequestType::UPDATE_SCHEDULE, v);
-      }
       else
-      if (message.compare("Schedule Tokens") == 0) {
+      if (message == "Schedule Tokens")
         window->schedule_ui.receive_response(RequestType::FETCH_SCHEDULE_TOKENS, v);
-      }
       else
       if (message == "Application Flags")
         window->doc_window.set_flags(v);
       else
-      if (QString::compare(message, "Message Received") == 0) {
+      if (message == "Message Received")
         event_message += "\n" + v.at(1) + ": " + v.at(2);
-      }
     }
-  } else {
-    event_message += message;
   }
+  else
+    event_message += message;  // Unknown event
+
   return event_message;
 }

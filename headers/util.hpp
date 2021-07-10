@@ -299,6 +299,15 @@ std::string getOperation(const char* data) {
     return "";
 }
 
+QString getOperation(const QString& data) {
+    Document d;
+    d.Parse(data.toUtf8());
+    if (d.HasMember("command")) {
+        return d["command"].GetString();
+    }
+    return "";
+}
+
 QString getEvent(const char* data) {
     Document d;
     d.Parse(data);
@@ -308,9 +317,27 @@ QString getEvent(const char* data) {
     return "";
 }
 
+QString getEvent(const QString& data) {
+    Document d;
+    d.Parse(data.toUtf8());
+    if (d.HasMember("event")) {
+        return d["event"].GetString();
+    }
+    return "";
+}
+
 QString getMessage(const char* data) {
     Document d;
     d.Parse(data);
+    if (d.HasMember("message")) {
+        return d["message"].GetString();
+    }
+    return "";
+}
+
+QString getMessage(const QString& data) {
+    Document d;
+    d.Parse(data.toUtf8());
     if (d.HasMember("message")) {
         return d["message"].GetString();
     }
