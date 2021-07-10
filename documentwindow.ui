@@ -23,11 +23,11 @@
       <height>581</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0" columnstretch="3,1">
-     <item row="1" column="0">
-      <widget class="QComboBox" name="tokens"/>
+    <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0" columnstretch="3,1,0">
+     <item row="0" column="1">
+      <widget class="QFontComboBox" name="fontComboBox"/>
      </item>
-     <item row="2" column="1">
+     <item row="2" column="2">
       <widget class="QFrame" name="frame">
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
@@ -67,10 +67,7 @@
        </widget>
       </widget>
      </item>
-     <item row="0" column="0">
-      <widget class="QFontComboBox" name="fontComboBox"/>
-     </item>
-     <item row="3" column="0">
+     <item row="3" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QPushButton" name="pushButton_2">
@@ -95,8 +92,40 @@
        </item>
       </layout>
      </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="tokens"/>
+     </item>
      <item row="2" column="0">
-      <widget class="QTableView" name="rowContent"/>
+      <widget class="QTableWidget" name="rowContent">
+       <property name="rowCount">
+        <number>16</number>
+       </property>
+       <property name="columnCount">
+        <number>6</number>
+       </property>
+       <row/>
+       <row/>
+       <row/>
+       <row/>
+       <row/>
+       <row/>
+       <row/>
+       <row/>
+       <row/>
+       <row/>
+       <row/>
+       <row/>
+       <row/>
+       <row/>
+       <row/>
+       <row/>
+       <column/>
+       <column/>
+       <column/>
+       <column/>
+       <column/>
+       <column/>
+      </widget>
      </item>
     </layout>
    </widget>
