@@ -541,7 +541,7 @@ QString generatePreview(QString video_path, QString video_name) {
 }; // namespace FileUtils
 
 namespace UI {
-inline void infoMessageBox(QString text, QString title = "KYGUI") {
+static void infoMessageBox(QString text, QString title = "KYGUI") {
   QMessageBox box;
   box.setWindowTitle(title);
   box.setText(text);

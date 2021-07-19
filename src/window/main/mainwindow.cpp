@@ -266,7 +266,7 @@ void MainWindow::connectClient() {
   QPushButton* disconnect_button = this->findChild<QPushButton*>("disconnect");
   QObject::connect(disconnect_button, &QPushButton::clicked, this, [this]() {
     q_client->closeConnection();
-    QApplication::exit(9);
+    QApplication::exit(CLIENT_EXIT);
   });
 
   QObject::connect(ui->execute, &QPushButton::clicked, this,

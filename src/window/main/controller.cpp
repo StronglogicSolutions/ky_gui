@@ -253,7 +253,12 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
         window->schedule_ui.receive_response(RequestType::FETCH_SCHEDULE_TOKENS, v);
       else
       if (message == "Application Flags")
-        window->doc_window.set_flags(v);
+      {
+        if (v.front().toInt() != window->q_client->getSelectedApp())
+          qDebug() << "do not match";
+        else
+          window->doc_window.set_flags(QList<QString>{v.begin() + 1, v.end()});
+      }
       else
       if (message == "Message Received")
         event_message += "\n" + v.at(1) + ": " + v.at(2);

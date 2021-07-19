@@ -27,6 +27,7 @@
 #include <headers/kiq_types.hpp>
 #include <include/client/client.hpp>
 
+static const uint8_t  CLIENT_EXIT{9};
 static const uint32_t DEFAULT_TIMEOUT{1000};
 static const char* stylesheet_path{"style/style.css"};
 
