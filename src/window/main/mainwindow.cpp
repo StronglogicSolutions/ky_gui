@@ -205,16 +205,19 @@ void MainWindow::setConnectScreen(bool visible) {
  */
 void MainWindow::connectClient() {
   using namespace constants;
-
-  auto text = ui->kyConfig->toPlainText();
-  qDebug() << text;
   m_config = loadJsonConfig(ui->kyConfig->toPlainText());
   QString file_path = configValue("fileDirectory", m_config);
-  if (file_path != NULL) {
-    arg_ui->setFilePath(file_path);
+
+  if (!file_path.isEmpty())
+  {
+    arg_ui    ->setFilePath(file_path);
+    doc_window .setFilePath(file_path);
   }
+
   setConnectScreen(false);
+
   qDebug() << "Connecting to KServer";
+
   QObject::connect(q_client, &Client::messageReceived, this,
                    &MainWindow::onMessageReceived);
 

@@ -57,6 +57,19 @@ struct SentFile {
     Scheduler::FileType type;
 };
 
+struct DownloadConsole
+{
+  using Files = QVector<Scheduler::KFileData>;
+  int32_t wt_count;
+  int32_t rx_count;
+  Files   files;
+
+  bool is_downloading()
+  {
+    return (wt_count == 0);
+  }
+};
+
 Q_DECLARE_METATYPE(StringVec)
 Q_DECLARE_METATYPE(QVector<QByteArray>);
 
@@ -114,6 +127,7 @@ class Client : public QDialog {
   void           sendFiles(Scheduler::Task* task);
   void           ping();  
   void           sendIPCMessage(const QString& type, const QString& message, const QString& user);
+  void           setIncomingFile(const StringVec& files);
 
  signals:
   void           messageReceived(int t, QString s, QVector<QString> args);
@@ -127,22 +141,25 @@ class Client : public QDialog {
   void           processFileQueue();
   void           handleMessages();
   void           handleEvent(std::string data);
-  void           sendPackets(uint8_t* data, int size);
+  void           handleDownload(uint8_t* data, ssize_t size);
+  void           sendPackets(uint8_t* data, uint32_t size);
 
-  int                          argc;
-  char**                       argv;
-  int                          m_client_socket_fd;
-  Task*                        m_outbound_task;
-  bool                         executing;
-  bool                         file_was_sent;
-  Commands                     m_commands;
-  CommandArgMap                m_command_arg_map;
-  std::vector<int>             selected_commands;
-  QQueue<Scheduler::KFileData> outgoing_files;
-  std::vector<SentFile>        sent_files;
-  Scheduler::TaskQueue         m_task_queue;
-  QString                      m_server_ip;
-  QString                      m_server_port;
+  int                           argc;
+  char**                        argv;
+  int                           m_client_socket_fd;
+  Task*                         m_outbound_task;
+  bool                          executing;
+  bool                          file_was_sent;
+  bool                          m_downloading;
+  Commands                      m_commands;
+  CommandArgMap                 m_command_arg_map;
+  std::vector<int>              selected_commands;
+  QQueue<Scheduler::KFileData>  outgoing_files;
+  DownloadConsole               m_download_console;
+  std::vector<SentFile>         sent_files;
+  Scheduler::TaskQueue          m_task_queue;
+  QString                       m_server_ip;
+  QString                       m_server_port;
 
 };
 #endif // CLIENT_HPP

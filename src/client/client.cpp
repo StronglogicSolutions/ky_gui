@@ -6,8 +6,8 @@ using namespace KData;
 using namespace IGData;
 using namespace GenericData;
 
-static const int MAX_PACKET_SIZE = 4096;
-static const int HEADER_SIZE     = 4;
+static const uint32_t MAX_PACKET_SIZE = 4096;
+static const uint32_t HEADER_SIZE     = 4;
 
 flatbuffers::FlatBufferBuilder builder(1024);
 
@@ -120,6 +120,7 @@ Client::Client(QWidget *parent, int count, char** arguments)
   m_client_socket_fd(-1),
   m_outbound_task(nullptr),
   executing(false),
+  m_downloading(false),
   m_commands({}),
   m_server_ip(arguments[1]),
   m_server_port((arguments[2]))
@@ -149,6 +150,9 @@ void Client::handleMessages() {
 
         if (bytes_received < 1)
           break;                // Finish message loop
+
+        if (m_downloading)
+          handleDownload(receive_buffer, bytes_received);
 
         size_t end_idx = findNullIndex(receive_buffer);
         std::string data_string{receive_buffer, receive_buffer + end_idx};
@@ -391,51 +395,44 @@ void Client::sendTaskEncoded(Scheduler::Task* task) {
  * @param [in] {uint8_t*} data A pointer to a buffer of bytes
  * @param [in] {int}      size The size of the buffer to be packetized and sent
  */
-void Client::sendPackets(uint8_t* data, int size) {
-  uint32_t total_size = static_cast<uint32_t>(size + HEADER_SIZE);
-  uint32_t total_packets = static_cast<uint32_t>(ceil(
-    static_cast<double>(
-        static_cast<double>(total_size) / static_cast<double>(MAX_PACKET_SIZE)) // total size / packet
-    )
-  );
-  uint32_t idx = 0;
-  for (; idx < total_packets; idx++) {
-    bool is_first_packet = (idx == 0);
-    bool is_last_packet = (idx == (total_packets - 1));
-    if (is_first_packet) {
-      uint32_t first_packet_size =
-          std::min(size + HEADER_SIZE, MAX_PACKET_SIZE);
-      uint8_t packet[first_packet_size];
+void Client::sendPackets(uint8_t* data, uint32_t size)
+{
+  uint32_t total_size    = static_cast<uint32_t>(size + HEADER_SIZE);
+  uint32_t total_packets = static_cast<uint32_t>(ceil(static_cast<double>(
+        static_cast<double>(total_size) / static_cast<double>(MAX_PACKET_SIZE))));
 
+  for (uint32_t idx = 0; idx < total_packets; idx++)
+  {
+    bool is_first_packet = (idx == 0);
+    bool is_last_packet  = (idx == (total_packets - 1));
+
+    if (is_first_packet)
+    {
+      uint32_t first_packet_size = std::min(size + HEADER_SIZE, MAX_PACKET_SIZE);
+      uint8_t  packet[first_packet_size];
       packet[0] = (total_size >> 24) & 0xFF;
       packet[1] = (total_size >> 16) & 0xFF;
-      packet[2] = (total_size >> 8) & 0xFF;
-      packet[3] = (total_size) & 0xFF;
+      packet[2] = (total_size >> 8)  & 0xFF;
+      packet[3] = (total_size)       & 0xFF;
 
       std::memcpy(packet + HEADER_SIZE, data, first_packet_size - HEADER_SIZE);
-      /**
-       * SEND PACKET !!!
-       */
+
       ::send(m_client_socket_fd, packet, first_packet_size, 0);
-      if (is_last_packet) {
+
+      if (is_last_packet)
         break;
-      }
       continue;
     }
-    int offset = (idx * MAX_PACKET_SIZE) - HEADER_SIZE;
+
+    uint32_t offset      = (idx * MAX_PACKET_SIZE) - HEADER_SIZE;
     uint32_t packet_size = std::min(size - offset, MAX_PACKET_SIZE);
-    uint8_t packet[packet_size];
+    uint8_t  packet[packet_size];
 
     std::memcpy(packet, data + offset, packet_size);
-    /**
-     * SEND PACKET !!!
-     */
     ::send(m_client_socket_fd, packet, packet_size, 0);
-    if (is_last_packet) {
-        // cleanup
-        qDebug() << "Last packet of file sent";
-        file_was_sent = true;
-    }
+
+    if (is_last_packet)
+      file_was_sent = true;
   }
 }
 
@@ -705,4 +702,38 @@ void Client::sendIPCMessage(const QString& type, const QString& message, const Q
         user.toUtf8().constData()
       }
   ));
+}
+
+/**
+ * @brief Client::setIncomingFile
+ * @param files
+ */
+void Client::setIncomingFile(const StringVec& files)
+{
+  if (m_download_console.is_downloading())
+  {
+    qDebug() << "Client already has incoming pending. Ignoring request.";
+    return;
+  }
+
+  m_download_console.files.clear();
+  m_download_console.wt_count = files.front().toUInt();
+
+  if (m_download_console.wt_count == (files.size() - 1))
+    for (int32_t i = 1; i <= m_download_console.wt_count; i++)
+      m_download_console.files.push_back(Scheduler::KFileData{.path = files.at(i)});
+
+  sendEncoded(createOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
+
+}
+
+void Client::handleDownload(uint8_t* data, ssize_t size)
+{
+  if (m_download_console.is_downloading())
+  {
+    (void)(69); //no_op
+
+
+  }
+
 }

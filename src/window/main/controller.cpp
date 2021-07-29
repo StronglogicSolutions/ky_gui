@@ -260,6 +260,9 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
           window->doc_window.set_flags(QList<QString>{v.begin() + 1, v.end()});
       }
       else
+      if (message == "File Upload")
+        window->q_client->setIncomingFile(v);
+      else
       if (message == "Message Received")
         event_message += "\n" + v.at(1) + ": " + v.at(2);
     }

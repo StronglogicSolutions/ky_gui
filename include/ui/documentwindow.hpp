@@ -3,6 +3,12 @@
 
 #include <QMainWindow>
 #include <QMouseEvent>
+#include <include/ui/kfiledialog.h>
+#include <QDialog>
+#include <QFile>
+#include <QFileDialog>
+#include <QBuffer>
+#include <QMimeDatabase>
 
 enum class RowType
 {
@@ -23,6 +29,7 @@ public:
   ~DocumentWindow();
 
   void set_flags(const QList<QString>& flags);
+  void setFilePath(QString path) { m_file_path = path; }
 
 protected:
   void mouseReleaseEvent(QMouseEvent* e);
@@ -36,6 +43,7 @@ private:
   int32_t            m_flag_index;
   bool               m_inserting;
   QList<RowType>     m_row_types;
+  QString            m_file_path;
 };
 
 #endif // DOCUMENTWINDOW_H
