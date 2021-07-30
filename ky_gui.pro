@@ -57,6 +57,8 @@ HEADERS += \
         include/task/task.hpp \
         include/task/instagram_task.hpp\
         include/task/generic_task.hpp\
+        third_party/kiqoder/kiqoder.hpp\
+        third_party/kiqoder/file_iterator.hpp\
         headers/kmessage_codec.hpp \
         headers/instatask_generated.h \
         headers/generictask_generated.h \
