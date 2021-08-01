@@ -211,15 +211,23 @@ void MainWindow::connectClient() {
   if (!file_path.isEmpty())
   {
     arg_ui    ->setFilePath(file_path);
-    doc_window .setFilePath(file_path);
+    doc_window .SetFilePath(file_path);
   }
 
   setConnectScreen(false);
 
   qDebug() << "Connecting to KServer";
 
-  QObject::connect(q_client, &Client::messageReceived, this,
-                   &MainWindow::onMessageReceived);
+  QObject::connect(q_client, &Client::messageReceived, this, &MainWindow::onMessageReceived);
+  QObject::connect(&doc_window, &DocumentWindow::RequestFiles, this, [this](const uint32_t id) {
+    q_client->request<uint32_t>(constants::RequestType::FETCH_FILE, id);
+  });
+  QObject::connect(q_client, &Client::onDownload, this,
+    [this](const DownloadConsole::Files& files) -> void
+    {
+      doc_window.Receive(files);
+    }
+  );
 
   auto server_ip   = ui->serverIp->toPlainText();
   auto server_port = ui->serverPort->toPlainText();

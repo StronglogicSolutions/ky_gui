@@ -28,6 +28,7 @@
 #include <headers/instatask_generated.h>
 #include <headers/generictask_generated.h>
 #include <headers/util.hpp>
+#include <third_party/kiqoder/kiqoder.hpp>
 
 #include <include/task/task.hpp>
 
@@ -59,14 +60,23 @@ struct SentFile {
 
 struct DownloadConsole
 {
-  using Files = QVector<Scheduler::KFileData>;
-  int32_t wt_count;
-  int32_t rx_count;
-  Files   files;
+  using Files = QVector<FileWrap>;
+  Kiqoder::FileHandler handler;
+  int32_t              wt_count;
+  int32_t              rx_count;
+  Files                files;
+
+  DownloadConsole(Kiqoder::FileHandler f_handler)
+  : handler(f_handler) {}
 
   bool is_downloading()
   {
     return (wt_count == 0);
+  }
+
+  void Write(uint8_t* data, size_t size)
+  {
+    files.push_back(FileWrap{.buffer = QByteArray{reinterpret_cast<char*>(data), static_cast<int>(size)}});
   }
 };
 
@@ -133,6 +143,7 @@ class Client : public QDialog {
   void           messageReceived(int t, QString s, QVector<QString> args);
   void           eventReceived(int t, std::string event, StringVec args);
   void           clientDisconnected();
+  void           onDownload(const QVector<FileWrap>& files);
 
  private:
   void           sendEncoded(std::string message);
@@ -150,7 +161,6 @@ class Client : public QDialog {
   Task*                         m_outbound_task;
   bool                          executing;
   bool                          file_was_sent;
-  bool                          m_downloading;
   Commands                      m_commands;
   CommandArgMap                 m_command_arg_map;
   std::vector<int>              selected_commands;
@@ -160,6 +170,5 @@ class Client : public QDialog {
   Scheduler::TaskQueue          m_task_queue;
   QString                       m_server_ip;
   QString                       m_server_port;
-
 };
 #endif // CLIENT_HPP

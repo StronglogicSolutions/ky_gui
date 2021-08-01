@@ -41,6 +41,12 @@ struct ScheduledTask {
   QString          envfile;
 };
 
+struct FileWrap
+{
+  int32_t    id;
+  QByteArray buffer;
+};
+
 namespace constants {
 enum RequestType {
   REGISTER              = 0x00,
@@ -338,35 +344,35 @@ QString getMessage(const char* data) {
 }
 
 QString getMessage(const QString& data) {
-    Document d;
-    d.Parse(data.toUtf8());
-    if (d.HasMember("message")) {
-        return d["message"].GetString();
-    }
-    return "";
+  Document d;
+  d.Parse(data.toUtf8());
+  if (d.HasMember("message")) {
+      return d["message"].GetString();
+  }
+  return "";
 }
 
 QVector<QString> getShortArgs(const char* data) {
-    Document d;
-    d.Parse(data);
-    QVector<QString> args{};
-    if (d.HasMember("args")) {
-        if (d["args"].IsArray()) {
-            for (const auto& m : d["args"].GetArray()) {
-                if (m.GetStringLength() < 100) {
-                    args.push_back(m.GetString());
-                }
-            }
-        } else {
-            for (const auto& m : d["args"].GetObject()) {
-                QString arg = m.name.GetString();
-                arg +=  ": ";
-                arg += m.value.GetString();
-                args.push_back(arg);
-            }
+  Document d;
+  d.Parse(data);
+  QVector<QString> args{};
+  if (d.HasMember("args")) {
+    if (d["args"].IsArray()) {
+      for (const auto& m : d["args"].GetArray()) {
+        if (m.GetStringLength() < 100) {
+            args.push_back(m.GetString());
         }
+      }
+    } else {
+      for (const auto& m : d["args"].GetObject()) {
+        QString arg = m.name.GetString();
+        arg +=  ": ";
+        arg += m.value.GetString();
+        args.push_back(arg);
+      }
     }
-    return args;
+  }
+  return args;
 }
 
 QVector<QString> getArgs(const char* data) {
@@ -413,7 +419,7 @@ CommandMap getArgMap(const char* data) {
   return cm;
 }
 
-std::string createMessage(const char* data,
+std::string createMessage(const char*                data,
                           std::map<int, std::string> map = {}) {
     StringBuffer s;
     Writer<StringBuffer> w(s);

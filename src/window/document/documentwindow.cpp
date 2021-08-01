@@ -57,7 +57,7 @@ static void SaveTableAsPDF(QTableWidget* t)
       QTableWidgetItem *item = t->item(i, j);
       if (!item || item->text().isEmpty())
         t->setItem(i, j, new QTableWidgetItem("0"));
-
+      // TODO: if text is file token, download the file
       text.append("<td>")
           .append(t->item(i, j)->text())
           .append("</td>");
@@ -71,8 +71,8 @@ static void SaveTableAsPDF(QTableWidget* t)
   QPrinter      printer{QPrinter::PrinterResolution};
 
   printer.setOutputFormat(QPrinter::PdfFormat);
-  printer.setPaperSize(QPrinter::A4);
-  printer.setOrientation(QPrinter::Landscape);
+  printer.setPageSize(QPageSize{QPageSize::PageSizeId::A4});
+  printer.setPageOrientation(QPageLayout::Landscape);
   printer.setOutputFileName("test.pdf");
 
   doc.setPageSize(printer.pageRect().size());
@@ -113,7 +113,7 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
   QObject::connect(ui->tokens, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
     [this](int index)
     {
-      set_inserting(true, index);
+      SetInserting(true, index);
     }
   );
 
@@ -141,7 +141,7 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
         widget->setText(flag.right(flag.size() - flag.indexOf('=') - 1));
         ui->rowContent->setItem(row, col, widget);
         ui->rowContent->item(row, col)->setBackground(GetBrushForType(m_row_types.at(row)));
-        set_inserting(false);
+        SetInserting(false);
       }
     }
   );
@@ -187,7 +187,7 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
   QObject::connect(ui->addRow, &QPushButton::clicked, this,
     [this]()
   {
-    add_row();
+    AddRow();
   });
 
   QObject::connect(ui->removeRow, &QPushButton::clicked, this,
@@ -204,7 +204,7 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
   QObject::connect(ui->addColumn, &QPushButton::clicked, this,
     [this]()
   {
-    add_column();
+    AddColumn();
   });
 
   QObject::connect(ui->removeColumn, &QPushButton::clicked, this,
@@ -235,7 +235,7 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
            return;
          }
          m_file_path = file_path;
-         set_inserting(true);
+         SetInserting(true);
        } else {
          qDebug() << "Unable to open selected file";
          QMessageBox::warning(this, tr("File Error"), tr("Unable to open selected file"));
@@ -253,7 +253,7 @@ DocumentWindow::~DocumentWindow()
   delete ui;
 }
 
-void DocumentWindow::set_flags(const QList<QString>& flags)
+void DocumentWindow::SetFlags(const QList<QString>& flags)
 {
   qDebug() << "Setting flags in Document Window";
   m_flags = flags;
@@ -261,7 +261,7 @@ void DocumentWindow::set_flags(const QList<QString>& flags)
   setCursor(Qt::CursorShape::ArrowCursor);
 }
 
-void DocumentWindow::set_inserting(const bool inserting, const int32_t& index)
+void DocumentWindow::SetInserting(const bool inserting, const int32_t& index)
 {
   if (m_file_path.isEmpty())
   {
@@ -272,7 +272,7 @@ void DocumentWindow::set_inserting(const bool inserting, const int32_t& index)
 }
 
 
-void DocumentWindow::add_row()
+void DocumentWindow::AddRow()
 {
   auto count = ui->rowContent->rowCount();
   ui->rowContent->setRowCount(count + 1);
@@ -284,7 +284,7 @@ void DocumentWindow::add_row()
   m_row_types.push_back(RowType::REPEAT);
 }
 
-void DocumentWindow::add_column()
+void DocumentWindow::AddColumn()
 {
   auto count = ui->rowContent->columnCount();
   ui->rowContent->setColumnCount(count + 1);
@@ -301,6 +301,6 @@ void DocumentWindow::mouseReleaseEvent(QMouseEvent* e)
   {
     qDebug() << "Mouse pressed";
     if (m_inserting)
-      set_inserting(false);
+      SetInserting(false);
   }
 }

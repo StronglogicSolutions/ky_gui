@@ -3,12 +3,14 @@
 
 #include <QMainWindow>
 #include <QMouseEvent>
-#include <include/ui/kfiledialog.h>
 #include <QDialog>
 #include <QFile>
 #include <QFileDialog>
 #include <QBuffer>
 #include <QMimeDatabase>
+
+#include <include/ui/kfiledialog.h>
+#include <headers/util.hpp>
 
 enum class RowType
 {
@@ -28,16 +30,20 @@ public:
   explicit DocumentWindow(QWidget *parent = nullptr);
   ~DocumentWindow();
 
-  void set_flags(const QList<QString>& flags);
-  void setFilePath(QString path) { m_file_path = path; }
+  void SetFlags(const QList<QString>& flags);
+  void SetFilePath(QString path) { m_file_path = path; }
+  void Receive(const QVector<FileWrap>& files);
+
+signals:
+  void RequestFiles(const uint32_t id);
 
 protected:
-  void mouseReleaseEvent(QMouseEvent* e);
+  virtual void mouseReleaseEvent(QMouseEvent* e) override;
 
 private:
-  void set_inserting(const bool inserting, const int32_t& index = -1);
-  void add_row();
-  void add_column();
+  void SetInserting(const bool inserting, const int32_t& index = -1);
+  void AddRow();
+  void AddColumn();
   Ui::DocumentWindow *ui;
   QList<QString>     m_flags;
   int32_t            m_flag_index;

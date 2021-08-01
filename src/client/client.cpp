@@ -120,13 +120,19 @@ Client::Client(QWidget *parent, int count, char** arguments)
   m_client_socket_fd(-1),
   m_outbound_task(nullptr),
   executing(false),
-  m_downloading(false),
   m_commands({}),
+  m_download_console(Kiqoder::FileHandler{
+    [this](int32_t id, uint8_t* buffer, size_t size) -> void
+    {
+      int32_t    index = (m_download_console.files.size() - 1);
+//      QByteArray bytes{reinterpret_cast<char*>(buffer), static_cast<int>(size)};
+      m_download_console.files.at(index).SetBuffer(buffer, size);
+//      onDownload(bytes);
+    }
+  }),
   m_server_ip(arguments[1]),
   m_server_port((arguments[2]))
 {
-
-  // Register metadata type for passing data over slots/signals
   qRegisterMetaType<QVector<QString>>("QVector<QString>");
 }
 
@@ -151,7 +157,7 @@ void Client::handleMessages() {
         if (bytes_received < 1)
           break;                // Finish message loop
 
-        if (m_downloading)
+        if (m_download_console.is_downloading())
           handleDownload(receive_buffer, bytes_received);
 
         size_t end_idx = findNullIndex(receive_buffer);
@@ -617,61 +623,63 @@ void Client::request(uint8_t request_code, T payload) {
   try {
     std::string operation_string{};
 
-    if (request_code == RequestType::REGISTER ||
-        request_code == RequestType::DELETE     )
+    switch (request_code)
     {
-      if constexpr (std::is_same_v<T, KApplication>) {
-        std::vector<std::string> operation_args{
-            std::to_string(request_code),
-            payload.name.toUtf8().constData(),
-            payload.path.toUtf8().constData(),
-            payload.data.toUtf8().constData(),
-            payload.mask.toUtf8().constData()
-        };
-        operation_string = createOperation("AppRequest", operation_args);
-      }
-      else
-        throw std::invalid_argument{
-          "Register payload must be KApplication object"
-        };
-    }
-    else
-    if (request_code == RequestType::FETCH_SCHEDULE) {
-      operation_string = createOperation(
-          "Schedule",
-          {std::to_string(RequestType::FETCH_SCHEDULE)}
-      );
-    }
-    else
-    if (request_code == RequestType::UPDATE_SCHEDULE        ||
-        request_code == RequestType::FETCH_SCHEDULE_TOKENS) {
-      if constexpr (std::is_same_v<T, ScheduledTask>)
-        operation_string = createOperation(
-          "Schedule", std::vector<std::string>{
-             std::to_string(request_code),
-             payload.id.toUtf8().constData(),
-             payload.app.toUtf8().constData(),
-             std::to_string(payload.time.toTime_t()),
-             payload.flags.toUtf8().constData(),
-             payload.completed.toUtf8().constData(),
-             payload.recurring.toUtf8().constData(),
-             payload.notify.toUtf8().constData(),
-             payload.runtime.toUtf8().constData(),
-             (payload.files.isEmpty()) ?
-                                         "" :
-                                         payload.files.front().toUtf8().constData(),
-             payload.envfile.toUtf8().constData()});
-    }
+      case (RequestType::REGISTER):
+      case (RequestType::DELETE):
+        if constexpr (std::is_same_v<T, KApplication>) {
+          std::vector<std::string> operation_args{
+              std::to_string(request_code),
+              payload.name.toUtf8().constData(),
+              payload.path.toUtf8().constData(),
+              payload.data.toUtf8().constData(),
+              payload.mask.toUtf8().constData()
+          };
+          operation_string = createOperation("AppRequest", operation_args);
+        }
+        else
+          throw std::invalid_argument{
+            "Register payload must be KApplication object"
+          };
+      break;
+      case (RequestType::FETCH_SCHEDULE):
+        operation_string = createOperation("Schedule", {std::to_string(RequestType::FETCH_SCHEDULE)});
+      break;
+      case (RequestType::UPDATE_SCHEDULE):
+      case (RequestType::FETCH_SCHEDULE_TOKENS):
+        if constexpr (std::is_same_v<T, ScheduledTask>)
+          operation_string = createOperation(
+            "Schedule", std::vector<std::string>{
+               std::to_string(request_code),
+               payload.id.toUtf8().constData(),
+               payload.app.toUtf8().constData(),
+               std::to_string(payload.time.toTime_t()),
+               payload.flags.toUtf8().constData(),
+               payload.completed.toUtf8().constData(),
+               payload.recurring.toUtf8().constData(),
+               payload.notify.toUtf8().constData(),
+               payload.runtime.toUtf8().constData(),
+               (payload.files.isEmpty()) ?
+                                           "" :
+                                           payload.files.front().toUtf8().constData(),
+               payload.envfile.toUtf8().constData()});
+      break;
+      case (RequestType::FETCH_TASK_FLAGS):
+        operation_string = createOperation("TaskOperation",
+          std::vector<std::string>{std::to_string(request_code), std::to_string(getSelectedApp())});
+      break;
+      case (RequestType::FETCH_FILE):
+        if constexpr (std::is_same_v<T, uint32_t>)
+          operation_string = createOperation("FetchFileOperation",
+            std::vector<std::string>{std::to_string(request_code), std::to_string(payload)});
 
-    else
-    if (request_code == RequestType::FETCH_TASK_FLAGS)
-      operation_string = createOperation(
-        "TaskOperation",
-        std::vector<std::string>{std::to_string(request_code), std::to_string(getSelectedApp())});
-    else
+    default:
       qDebug() << "Client is unable to process request";
+      return;
 
     sendEncoded(operation_string);
+  }
+
   } catch (const std::exception& e) {
     qDebug() << "Exception caught:\n" << e.what();
   }
@@ -721,7 +729,7 @@ void Client::setIncomingFile(const StringVec& files)
 
   if (m_download_console.wt_count == (files.size() - 1))
     for (int32_t i = 1; i <= m_download_console.wt_count; i++)
-      m_download_console.files.push_back(Scheduler::KFileData{.path = files.at(i)});
+      m_download_console.files.push_back(FileWrap{});
 
   sendEncoded(createOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
 
@@ -730,10 +738,5 @@ void Client::setIncomingFile(const StringVec& files)
 void Client::handleDownload(uint8_t* data, ssize_t size)
 {
   if (m_download_console.is_downloading())
-  {
-    (void)(69); //no_op
-
-
-  }
-
+    m_download_console.handler.processPacket(data, size);
 }

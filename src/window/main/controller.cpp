@@ -257,7 +257,7 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
         if (v.front().toInt() != window->q_client->getSelectedApp())
           qDebug() << "do not match";
         else
-          window->doc_window.set_flags(QList<QString>{v.begin() + 1, v.end()});
+          window->doc_window.SetFlags(QList<QString>{v.begin() + 1, v.end()});
       }
       else
       if (message == "File Upload")
