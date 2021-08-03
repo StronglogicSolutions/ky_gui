@@ -304,3 +304,8 @@ void DocumentWindow::mouseReleaseEvent(QMouseEvent* e)
       SetInserting(false);
   }
 }
+
+void DocumentWindow::Receive(const QVector<FileWrap> &files)
+{
+  (void)(files);
+}

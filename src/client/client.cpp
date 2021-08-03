@@ -124,10 +124,11 @@ Client::Client(QWidget *parent, int count, char** arguments)
   m_download_console(Kiqoder::FileHandler{
     [this](int32_t id, uint8_t* buffer, size_t size) -> void
     {
-      int32_t    index = (m_download_console.files.size() - 1);
-//      QByteArray bytes{reinterpret_cast<char*>(buffer), static_cast<int>(size)};
-      m_download_console.files.at(index).SetBuffer(buffer, size);
-//      onDownload(bytes);
+      m_download_console.Write(id, buffer, size);
+
+      if (  ++m_download_console.rx_count &&
+          !(--m_download_console.wt_count))
+        onDownload(m_download_console.files);
     }
   }),
   m_server_ip(arguments[1]),
@@ -686,7 +687,8 @@ void Client::request(uint8_t request_code, T payload) {
 }
 
 template void  Client::request(uint8_t request_code, ScheduledTask payload);
-template void  Client::request(uint8_t request_code, KApplication payload);
+template void  Client::request(uint8_t request_code, KApplication  payload);
+template void  Client::request(uint8_t request_code, uint32_t      payload);
 
 /**
  * @brief Client::request
@@ -695,7 +697,8 @@ template void  Client::request(uint8_t request_code, KApplication payload);
  *
  * @param request_code
  */
-void Client::request(uint8_t request_code) {
+void Client::request(uint8_t request_code)
+{
   request(request_code, std::vector<std::string>{});
 }
 
@@ -732,7 +735,11 @@ void Client::setIncomingFile(const StringVec& files)
       m_download_console.files.push_back(FileWrap{});
 
   sendEncoded(createOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
+}
 
+void Client::setIncomingID(const QString& id)
+{
+  m_download_console.handler.setID(id.toUInt());
 }
 
 void Client::handleDownload(uint8_t* data, ssize_t size)

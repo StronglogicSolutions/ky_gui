@@ -263,6 +263,8 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
       if (message == "File Upload")
         window->q_client->setIncomingFile(v);
       else
+      if (message == "File Upload ID")
+        window->q_client->setIncomingID(v.front());
       if (message == "Message Received")
         event_message += "\n" + v.at(1) + ": " + v.at(2);
     }

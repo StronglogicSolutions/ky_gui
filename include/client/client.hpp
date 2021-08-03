@@ -74,9 +74,9 @@ struct DownloadConsole
     return (wt_count == 0);
   }
 
-  void Write(uint8_t* data, size_t size)
+  void Write(const int32_t id, uint8_t* data, const size_t size)
   {
-    files.push_back(FileWrap{.buffer = QByteArray{reinterpret_cast<char*>(data), static_cast<int>(size)}});
+    files.push_back(FileWrap{.id = id, .buffer = QByteArray{reinterpret_cast<char*>(data), static_cast<int>(size)}});
   }
 };
 
@@ -138,6 +138,7 @@ class Client : public QDialog {
   void           ping();  
   void           sendIPCMessage(const QString& type, const QString& message, const QString& user);
   void           setIncomingFile(const StringVec& files);
+  void           setIncomingID(const QString& id);
 
  signals:
   void           messageReceived(int t, QString s, QVector<QString> args);
