@@ -78,6 +78,8 @@ struct DownloadConsole
   {
     files.push_back(FileWrap{.id = id, .buffer = QByteArray{reinterpret_cast<char*>(data), static_cast<int>(size)}});
   }
+
+  void SetIncoming()
 };
 
 Q_DECLARE_METATYPE(StringVec)

@@ -43,8 +43,10 @@ struct ScheduledTask {
 
 struct FileWrap
 {
-  int32_t    id;
+  QString    id;
   QByteArray buffer;
+  QString    name;
+  QString    type;
 };
 
 namespace constants {

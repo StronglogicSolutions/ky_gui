@@ -125,9 +125,11 @@ Client::Client(QWidget *parent, int count, char** arguments)
     [this](int32_t id, uint8_t* buffer, size_t size) -> void
     {
       m_download_console.Write(id, buffer, size);
+      m_download_console.rx_count++;
 
-      if (  ++m_download_console.rx_count &&
-          !(--m_download_console.wt_count))
+      if (--m_download_console.wt_count)
+        sendEncoded(createOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
+      else
         onDownload(m_download_console.files);
     }
   }),
@@ -731,8 +733,10 @@ void Client::setIncomingFile(const StringVec& files)
   m_download_console.wt_count = files.front().toUInt();
 
   if (m_download_console.wt_count == (files.size() - 1))
-    for (int32_t i = 1; i <= m_download_console.wt_count; i++)
-      m_download_console.files.push_back(FileWrap{});
+    for (int32_t i = 0; i < m_download_console.wt_count; i++)
+      m_download_console.files.push_back(FileWrap{.id   = files[1 + (3 * i)],
+                                                  .name = files[2 + (3 * i)],
+                                                  .type = files[3 + (3 * i)]});
 
   sendEncoded(createOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
 }
