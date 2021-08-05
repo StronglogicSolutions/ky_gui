@@ -219,8 +219,9 @@ void MainWindow::connectClient() {
   qDebug() << "Connecting to KServer";
 
   QObject::connect(q_client, &Client::messageReceived, this, &MainWindow::onMessageReceived);
-  QObject::connect(&doc_window, &DocumentWindow::RequestFiles, this, [this](const uint32_t id) {
-    q_client->request<uint32_t>(constants::RequestType::FETCH_FILE, id);
+  QObject::connect(&doc_window, &DocumentWindow::RequestData, this, [this](const QVector<QString>& argv)
+  {
+    q_client->request<const QVector<QString>&>(constants::RequestType::FETCH_FILE, argv);
   });
   QObject::connect(q_client, &Client::onDownload, this,
     [this](const DownloadConsole::Files& files) -> void

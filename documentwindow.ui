@@ -122,6 +122,45 @@
         </layout>
        </item>
        <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Order</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="order">
+           <item>
+            <property name="text">
+             <string>asc</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>desc</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Last ID</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLCDNumber" name="lastID"/>
+         </item>
+        </layout>
+       </item>
+       <item>
         <widget class="QPushButton" name="addFile">
          <property name="text">
           <string>Add file</string>

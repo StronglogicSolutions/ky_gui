@@ -190,30 +190,34 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
     qDebug() << "Added process runtime argument: " << arg_text;
   });
 
-  QObject::connect(ui->argCommandButtons,
-                   static_cast<void (QDialogButtonBox::*)(QAbstractButton *)>(
-                       &QDialogButtonBox::clicked),
-                   this, [this](QAbstractButton *button) {
-                     if (isSave(button->text())) {
-                       setTaskArguments();
-                       uint task_date_time = std::get<Scheduler::VariantIndex::QSTRING>(
-                                                 m_task->getTaskArgumentValue("datetime")).toUInt();
-                       if (task_date_time <= TimeUtils::unixtime()) {
-                         UI::infoMessageBox("Unable to schedule tasks in the past!", "DateTime Error");
-                         return;
-                       }
-                       if (m_task->isReady()) {
-                         emit ArgDialog::taskRequestReady(m_task);
-                         m_pending_task = m_task;
-                         m_task = nullptr;
-                         m_task = createTask(m_app_name);
-                         clearPost();
-//                          displayLoader(true);
-                       } else {
-                         UI::infoMessageBox("Task is still missing arguments", "Task Verification Error");
-                       }
-                     }
-                   });
+  QObject::connect(ui->argCommandButtons, static_cast<void (QDialogButtonBox::*)(QAbstractButton *)>(&QDialogButtonBox::clicked), this,
+    [this](QAbstractButton *button)
+    {
+      if (isSave(button->text()))
+      {
+        setTaskArguments();
+        uint task_date_time = std::get<Scheduler::VariantIndex::QSTRING>(
+                                 m_task->getTaskArgumentValue("datetime")).toUInt();
+        if (task_date_time <= TimeUtils::unixtime())
+        {
+         UI::infoMessageBox("Unable to schedule tasks in the past!", "DateTime Error");
+         return;
+        }
+
+        if (m_task->isReady())
+        {
+         emit ArgDialog::taskRequestReady(m_task);
+         m_pending_task = m_task;
+         m_task = nullptr;
+         m_task = createTask(m_app_name);
+         clearPost();
+        //                          displayLoader(true);
+        }
+        else
+         UI::infoMessageBox("Task is still missing arguments", "Task Verification Error");
+      }
+    }
+  );
 
   QObject::connect(ui->clear, &QPushButton::clicked, this, [this]() {
     clearPost();

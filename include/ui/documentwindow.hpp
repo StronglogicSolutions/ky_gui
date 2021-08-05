@@ -35,7 +35,7 @@ public:
   void Receive(const QVector<FileWrap>& files);
 
 signals:
-  void RequestFiles(const uint32_t id);
+  void RequestData(const QVector<QString>& argv);
 
 protected:
   virtual void mouseReleaseEvent(QMouseEvent* e) override;

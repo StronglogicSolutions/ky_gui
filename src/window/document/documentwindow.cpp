@@ -174,14 +174,7 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
   QObject::connect(ui->createPDF, &QPushButton::clicked, this,
     [this]()
   {
-    if (!ui->rowCountActive->isChecked() && !ui->dateRangeActive->isChecked())
-    {
-      ui->mandatoryLabel->setStyleSheet("color: red");
-      UI::infoMessageBox("Results must be filtered by date or rowcount");
-      QTimer::singleShot(5000, this, [this]() -> void { ui->mandatoryLabel->setStyleSheet("color: #FFF;"); });
-    }
-    else
-      SaveTableAsPDF(ui->rowContent);
+//      SaveTableAsPDF(ui->rowContent);
   });
 
   QObject::connect(ui->addRow, &QPushButton::clicked, this,
@@ -244,7 +237,40 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
        qDebug() << "Could not read the file path";
        QMessageBox::warning(this, tr("File Error"), tr("Could not read the file path"));
       }
-    });
+    }
+  );
+
+  QObject::connect(ui->saveTable, &QPushButton::clicked, this,
+    [this]()
+    {
+      const bool row_count_active = ui->rowCountActive->isChecked();
+      const bool date_range_active = !ui->dateRangeActive->isChecked();
+      if (row_count_active && date_range_active)
+      {
+        ui->mandatoryLabel->setStyleSheet("color: red");
+        UI::infoMessageBox("Results must be filtered by date or rowcount");
+        QTimer::singleShot(5000, this, [this]() -> void { ui->mandatoryLabel->setStyleSheet("color: #FFF;"); });
+      }
+      else
+        // Row count
+        // Date range
+        // send request for data / files
+        // onDataArriva => add to vector of QString html
+      {
+        const auto date_range = (date_range_active) ?
+                                  QString{QString::number(ui->startDateTime->dateTime().toTime_t()) + 'TO' + QString::number(ui->endDateTime->dateTime().toTime_t())} :
+                                  "0TO0";
+        const auto row_count  = (row_count_active) ?
+                                  ui->rowCount->text() :
+                                  "0";
+        const auto max_id     = QString::number(ui->lastID->intValue());
+        const auto order      = ui->order->currentText();
+        QVector<QString> argv{date_range, row_count, max_id, order};
+        emit RequestData(argv);
+      }
+    }
+  );
+
 }
 
 

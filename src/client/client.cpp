@@ -124,7 +124,7 @@ Client::Client(QWidget *parent, int count, char** arguments)
   m_download_console(Kiqoder::FileHandler{
     [this](int32_t id, uint8_t* buffer, size_t size) -> void
     {
-      m_download_console.Write(id, buffer, size);
+      m_download_console.Write(QString::number(id), buffer, size);
       m_download_console.rx_count++;
 
       if (--m_download_console.wt_count)
@@ -675,7 +675,17 @@ void Client::request(uint8_t request_code, T payload) {
         if constexpr (std::is_same_v<T, uint32_t>)
           operation_string = createOperation("FetchFileOperation",
             std::vector<std::string>{std::to_string(request_code), std::to_string(payload)});
-
+      break;
+      case (RequestType::FETCH_TASK_DATA):
+        if constexpr (std::is_same_v<T, const QVector<QString>&>)
+        {
+          std::vector<std::string> op_payload{};
+          op_payload.reserve((payload.size() + 1));
+          op_payload.emplace_back(std::to_string(getSelectedApp()));
+          for (const QString& chunk : payload) op_payload.emplace_back(chunk.toStdString());
+          operation_string = createOperation("FetchTaskData", op_payload);
+        }
+      break;
     default:
       qDebug() << "Client is unable to process request";
       return;
@@ -688,9 +698,10 @@ void Client::request(uint8_t request_code, T payload) {
   }
 }
 
-template void  Client::request(uint8_t request_code, ScheduledTask payload);
-template void  Client::request(uint8_t request_code, KApplication  payload);
-template void  Client::request(uint8_t request_code, uint32_t      payload);
+template void  Client::request(uint8_t request_code, ScheduledTask    payload);
+template void  Client::request(uint8_t request_code, KApplication     payload);
+template void  Client::request(uint8_t request_code, uint32_t         payload);
+template void  Client::request(uint8_t request_code, const QVector<QString>& payload);
 
 /**
  * @brief Client::request
