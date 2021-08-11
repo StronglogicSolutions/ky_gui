@@ -26,8 +26,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
   m_loader_layout.addWidget(ui->loaderText);
   m_loader_widget.setLayout(&m_loader_layout);
 
-  ui->argCommandButtons->button(QDialogButtonBox::Close)
-      ->setStyleSheet(QString("background:%1").arg("#2f535f"));
+  ui->argCommandButtons->button(QDialogButtonBox::Close)->setStyleSheet(QString("background:%1").arg("#2f535f"));
 
   QObject::connect(ui->addFile, &QPushButton::clicked, this, [this]() {
     KFileDialog file_dialog{};
@@ -50,27 +49,35 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
 
         if (!is_video)
         {
-          QBuffer buffer{&bytes};
-          QImage  image{file_path};
-          QSize   image_size  = image.size();
-          auto    height      = image_size.height();
-          auto    width       = image_size.width();
-          if (m_task->getType() == TaskType::INSTAGRAM && image_size.height() != image_size.width())
+                QBuffer buffer{&bytes};
+                QImage  processed_image;
+          const QImage  image{file_path};
+                QSize   image_size  = image.size();
+          const auto    height      = image_size.height();
+          const auto    width       = image_size.width();
+          const bool    is_IG       = (m_task->getType() == TaskType::INSTAGRAM);
+          const char*   format      = (is_IG) ? JPG_FORMAT :
+                                                mime_type.preferredSuffix().toUtf8().constData();
+
+          if (is_IG && height != width)
           {
-            QImage  processed_image = (height > width) ?
-              image.copy(QRect{0, ((height - width) / 2), width, width}) :
-              image.copy(QRect{((width - height) / 2), 0, height, height});
-            processed_image.save(&buffer, JPG_FORMAT);
+            processed_image = (height > width) ?
+              image.copy(QRect{                   0, (height - width) / 2, width,  width}) :
+              image.copy(QRect{(width - height) / 2,                    0, height, height});
           }
           else
-            image.save(&buffer, mime_type.preferredSuffix().toUtf8().constData());
+            processed_image = image;
+
+          processed_image.save(&buffer, format);
           addFile(file_path);
           file_type = FileType::IMAGE;
-        } else
+        }
+        else
         {
           file_type = FileType::VIDEO;
           bytes = file.readAll();
         }
+
         m_task->addArgument("files", Scheduler::KFileData{
                                          .name  = file_name,
                                          .type  = file_type,
@@ -79,50 +86,55 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
 
         if (is_video)
         {
-          qDebug() << "File discovered to be video";
-          m_task->setArgument("is_video", true);
-          QString preview_filename = FileUtils::generatePreview(file_path, file_name);
+          qDebug() << "File is video";
 
-          QString preview_file_path = QCoreApplication::applicationDirPath()
-                                   + "/assets/previews/" + preview_filename;
+          QString preview_filename  = FileUtils::generatePreview(file_path, file_name);
+          QString preview_file_path = QCoreApplication::applicationDirPath() + "/assets/previews/" + preview_filename;
           file.setFileName(preview_file_path);
+          m_task->setArgument("is_video", true);
 
-          if (file.open(QIODevice::ReadOnly)) {
+          if (file.open(QIODevice::ReadOnly))
+          {
             // TODO: create some way of verifying preview generation was successful
             addFile("assets/previews/" + preview_filename);
             addItem(preview_filename, "file");
             addFile("assets/previews/" + preview_filename);
             m_task->addArgument("files", Scheduler::KFileData{
-                                             .name  = preview_filename,
-                                             .type  = is_video ? FileType::VIDEO : FileType::IMAGE,
-                                             .path  = preview_file_path,
-                                             .bytes = file.readAll()});
-          } else {
+                                           .name  = preview_filename,
+                                           .type  = is_video ? FileType::VIDEO : FileType::IMAGE,
+                                           .path  = preview_file_path,
+                                           .bytes = file.readAll()});
+          }
+          else
+          {
             qDebug() << "Could not add preview image for video";
             QMessageBox::warning(this, tr("File Error"), tr("Could not add preview image for video"));
           }
         }
-      } else {
+      }
+      else
+      {
         qDebug() << "Unable to open selected file";
         QMessageBox::warning(this, tr("File Error"), tr("Unable to open selected file"));
       }
-    } else {
+    }
+    else
+    {
       qDebug() << "Could not read the file path";
       QMessageBox::warning(this, tr("File Error"), tr("Could not read the file path"));
     }
   });
 
   QObject::connect(ui->user, &QComboBox::currentTextChanged, this,
-                   [this](const QString &username) {
-                     m_task->setArgument("user", username);
-                   });
+    [this](const QString &username) {
+      m_task->setArgument("user", username);
+    });
 
-  ui->argList->setHorizontalHeaderLabels(
-      QStringList{"Type", "Value", "Preview", "Delete"});
   ui->argList->setColumnWidth(0, 40);
   ui->argList->setColumnWidth(1, 520);
   ui->argList->setColumnWidth(2, 220);
   ui->argList->setColumnWidth(3, 30);
+  ui->argList->setHorizontalHeaderLabels(QStringList{"Type", "Value", "Preview", "Delete"});
   ui->argList->verticalHeader()->setDefaultSectionSize(100);
 
   QObject::connect(ui->addArgument, &QPushButton::clicked, this, [this]() {

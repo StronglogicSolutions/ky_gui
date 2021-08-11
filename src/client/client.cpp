@@ -689,11 +689,12 @@ void Client::request(uint8_t request_code, T payload) {
     default:
       qDebug() << "Client is unable to process request";
       return;
+    }
 
     sendEncoded(operation_string);
   }
-
-  } catch (const std::exception& e) {
+  catch (const std::exception& e)
+  {
     qDebug() << "Exception caught:\n" << e.what();
   }
 }

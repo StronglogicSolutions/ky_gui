@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QMouseEvent>
+#include <QTextDocument>
+#include <QPrinter>
 #include <QDialog>
 #include <QFile>
 #include <QFileDialog>
@@ -50,6 +52,8 @@ private:
   bool               m_inserting;
   QList<RowType>     m_row_types;
   QString            m_file_path;
+  QTextDocument      m_doc;
+  QPrinter           m_printer;
 };
 
 #endif // DOCUMENTWINDOW_H

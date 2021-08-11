@@ -3,8 +3,9 @@
 #include <QDebug>
 #include <QList>
 #include <QTableWidget>
-#include <QTextDocument>
 #include <QPrinter>
+#include <QTextDecoder>
+#include <QTextCursor>
 #include <QTimer>
 #include "headers/util.hpp"
 
@@ -15,9 +16,9 @@ static QBrush GetBrushForType(const RowType& type)
     QBrush{QColor{"red"}};
 }
 
-static void SaveTableAsPDF(QTableWidget* t)
+static void SaveTableAsPDF(QTableWidget* t, QTextDocument* doc_ptr, QPrinter* printer_ptr)
 {
-  QTextDocument doc;
+//  QTextDocument doc;
 
   QString text("<table><thead>");
   text.append("<tr>");
@@ -66,18 +67,12 @@ static void SaveTableAsPDF(QTableWidget* t)
   }
 
   text.append("</tbody></table>");
-  doc.setHtml(text);
 
-  QPrinter      printer{QPrinter::PrinterResolution};
+  QTextCursor cursor{doc_ptr};
+  cursor.movePosition(QTextCursor::End);
+  cursor.insertHtml(text);
 
-  printer.setOutputFormat(QPrinter::PdfFormat);
-  printer.setPageSize(QPageSize{QPageSize::PageSizeId::A4});
-  printer.setPageOrientation(QPageLayout::Landscape);
-  printer.setOutputFileName("test.pdf");
-
-  doc.setPageSize(printer.pageRect().size());
-
-  doc.print(&printer);
+  doc_ptr->print(printer_ptr);
 }
 
 DocumentWindow::DocumentWindow(QWidget *parent) :
@@ -85,7 +80,8 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
   ui(new Ui::DocumentWindow),
   m_flag_index(-1),
   m_inserting(false),
-  m_row_types(QList<RowType>{RowType::REPEAT})
+  m_row_types(QList<RowType>{RowType::REPEAT}),
+  m_printer(QPrinter::PrinterResolution)
 {
   ui->setupUi(this);
 
@@ -98,6 +94,14 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
     ui->rowContent->setItem(0, i, new QTableWidgetItem{});
     ui->rowContent->item(0, i)->setBackground(GetBrushForType(RowType::REPEAT));
   }
+
+  m_printer.setOutputFormat(   QPrinter::PdfFormat);
+  m_printer.setPageSize(       QPageSize{QPageSize::PageSizeId::A4});
+  m_printer.setPageOrientation(QPageLayout::Landscape);
+  m_printer.setOutputFileName("test.pdf");
+
+  m_doc.setPageSize(m_printer.pageRect().size());
+//  doc.setPageSize(printer.pageLayout().paintRectPixels());
 
   QObject::connect(ui->rowCountActive, &QCheckBox::clicked, this, [this](const bool checked) -> void
   {
@@ -171,10 +175,14 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
     auto text = item->text();
   });
 
+  /**
+   *  Save The PDF
+   *  @lambda
+   */
   QObject::connect(ui->createPDF, &QPushButton::clicked, this,
     [this]()
   {
-//      SaveTableAsPDF(ui->rowContent);
+      SaveTableAsPDF(ui->rowContent, &m_doc, &m_printer);
   });
 
   QObject::connect(ui->addRow, &QPushButton::clicked, this,
