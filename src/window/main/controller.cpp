@@ -260,6 +260,9 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
           window->doc_window.SetFlags(QList<QString>{v.begin() + 1, v.end()});
       }
       else
+      if (message == "Task Data")
+        window->doc_window.ReceiveData(message, v);
+      else
       if (message == "File Upload")
         window->q_client->setIncomingFile(v);
       else

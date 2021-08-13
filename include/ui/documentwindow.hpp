@@ -1,15 +1,17 @@
-#ifndef DOCUMENTWINDOW_H
-#define DOCUMENTWINDOW_H
+#ifndef DOCUMENTWINDOW_HPP
+#define DOCUMENTWINDOW_HPP
 
 #include <QMainWindow>
 #include <QMouseEvent>
 #include <QTextDocument>
+#include <QTableWidget>
 #include <QPrinter>
 #include <QDialog>
 #include <QFile>
 #include <QFileDialog>
 #include <QBuffer>
 #include <QMimeDatabase>
+#include <QHash>
 
 #include <include/ui/kfiledialog.h>
 #include <headers/util.hpp>
@@ -19,6 +21,16 @@ enum class RowType
   HEADER = 0x00,
   REPEAT = 0x01
 };
+using TaskFlags = QHash<QString, QString>;
+using Coords    = QHash<qint32, qint32>;
+
+struct TaskData
+{
+  TaskFlags         flags;
+  QVector<FileWrap> files;
+};
+
+using TaskMap = QHash<QString, TaskData>;
 
 namespace Ui {
 class DocumentWindow;
@@ -34,7 +46,8 @@ public:
 
   void SetFlags(const QList<QString>& flags);
   void SetFilePath(QString path) { m_file_path = path; }
-  void Receive(const QVector<FileWrap>& files);
+  void ReceiveFiles(QVector<FileWrap>&& files);
+  void ReceiveData (const QString& message, const QVector<QString>& data);
 
 signals:
   void RequestData(const QVector<QString>& argv);
@@ -46,6 +59,11 @@ private:
   void SetInserting(const bool inserting, const int32_t& index = -1);
   void AddRow();
   void AddColumn();
+  void SaveSection();
+  void SavePDF();
+  bool ImageAtCell(int32_t row, int32_t col);
+
+
   Ui::DocumentWindow *ui;
   QList<QString>     m_flags;
   int32_t            m_flag_index;
@@ -54,6 +72,10 @@ private:
   QString            m_file_path;
   QTextDocument      m_doc;
   QPrinter           m_printer;
+  TaskMap            m_tasks;
+  int32_t            m_task_index;
+  QTableWidget       m_table;
+  Coords             m_image_coords;
 };
 
-#endif // DOCUMENTWINDOW_H
+#endif // DOCUMENTWINDOW_HPP
