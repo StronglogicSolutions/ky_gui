@@ -324,7 +324,7 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
        auto    slash_index = file_path.lastIndexOf("/") + 1;
        QString file_name = file_path.right(file_path.size() - slash_index);
        QString dir = file_path.left(slash_index);
-       QFile   file(file_path);
+       QFile   file{file_path};
 
        if (file.open(QIODevice::ReadOnly)) {
          if (QMimeDatabase{}.mimeTypeForFile(file_path).name().contains("video"))
@@ -363,10 +363,10 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
         return QString{QString::number(s->dateTime().toTime_t()) + 'TO' + QString::number(e->dateTime().toTime_t())};
       };
 
-      const bool row_count_active  =  ui->rowCountActive ->isChecked();
-      const bool date_range_active = !ui->dateRangeActive->isChecked();
+      const bool row_count_active  = ui->rowCountActive ->isChecked();
+      const bool date_range_active = ui->dateRangeActive->isChecked();
 
-      if (row_count_active && date_range_active)
+      if (!row_count_active && !date_range_active)
       {
         ui->mandatoryLabel->setStyleSheet("color: red");
         UI::infoMessageBox("Results must be filtered by date or rowcount");

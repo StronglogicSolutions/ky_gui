@@ -78,6 +78,11 @@ struct DownloadConsole
   {
     files.push_back(FileWrap{.id = id, .buffer = QByteArray{reinterpret_cast<char*>(data), static_cast<int>(size)}});
   }
+
+  Files&& GetData()
+  {
+    return std::move(files);
+  }
 };
 
 Q_DECLARE_METATYPE(StringVec)
@@ -144,7 +149,7 @@ class Client : public QDialog {
   void           messageReceived(int t, QString s, QVector<QString> args);
   void           eventReceived(int t, std::string event, StringVec args);
   void           clientDisconnected();
-  void           onDownload(const QVector<FileWrap>& files);
+  void           onDownload(QVector<FileWrap> files);
 
  private:
   void           sendEncoded(std::string message);

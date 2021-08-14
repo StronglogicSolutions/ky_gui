@@ -211,7 +211,7 @@ void MainWindow::connectClient() {
   if (!file_path.isEmpty())
   {
     arg_ui    ->setFilePath(file_path);
-    doc_window .SetFilePath(file_path);
+//    doc_window .SetFilePath(file_path);
   }
 
   setConnectScreen(false);
@@ -225,9 +225,9 @@ void MainWindow::connectClient() {
     // REQUEST is to 1. Fetch tasks for range and 2. Fetch files for all those tasks (whoa)
   });
   QObject::connect(q_client, &Client::onDownload, this,
-    [this](const DownloadConsole::Files& files) -> void
+    [this](DownloadConsole::Files files) -> void
     {
-      doc_window.Receive(files);
+      doc_window.ReceiveFiles(std::move(files));
     }
   );
 
