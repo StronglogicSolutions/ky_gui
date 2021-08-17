@@ -578,3 +578,9 @@ void DocumentWindow::ReceiveFiles(QVector<FileWrap>&& files)
 
   SaveSection();
 }
+
+void DocumentWindow::keyPressEvent(QKeyEvent* e)
+{
+  if (e->key() == Qt::Key_Escape)
+    close();
+}

@@ -156,7 +156,7 @@ public:
     };
 
    protected:
-    void keyPressEvent(QKeyEvent *e);
+    virtual void keyPressEvent(QKeyEvent* e) override;
 
    private:
     /** UI & Messages */

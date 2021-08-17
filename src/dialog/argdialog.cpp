@@ -87,11 +87,10 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
         if (is_video)
         {
           qDebug() << "File is video";
-
+          m_task->setArgument("is_video", true);
           QString preview_filename  = FileUtils::generatePreview(file_path, file_name);
           QString preview_file_path = QCoreApplication::applicationDirPath() + "/assets/previews/" + preview_filename;
-          file.setFileName(preview_file_path);
-          m_task->setArgument("is_video", true);
+          file.setFileName(preview_file_path);          
 
           if (file.open(QIODevice::ReadOnly))
           {

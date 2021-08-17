@@ -219,11 +219,11 @@ void MainWindow::connectClient() {
   qDebug() << "Connecting to KServer";
 
   QObject::connect(q_client, &Client::messageReceived, this, &MainWindow::onMessageReceived);
-  QObject::connect(&doc_window, &DocumentWindow::RequestData, this, [this](const QVector<QString>& argv)
+  QObject::connect(&doc_window, &DocumentWindow::RequestData, this, [this](QVector<QString> argv)
   {
-//    q_client->request<const QVector<QString>&>(constants::RequestType::FETCH_FILE, argv);
-    // REQUEST is to 1. Fetch tasks for range and 2. Fetch files for all those tasks (whoa)
+    q_client->request(static_cast<uint8_t>(RequestType::FETCH_TASK_DATA), argv);
   });
+
   QObject::connect(q_client, &Client::onDownload, this,
     [this](DownloadConsole::Files files) -> void
     {

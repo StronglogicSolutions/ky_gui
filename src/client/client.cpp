@@ -677,10 +677,11 @@ void Client::request(uint8_t request_code, T payload) {
             std::vector<std::string>{std::to_string(request_code), std::to_string(payload)});
       break;
       case (RequestType::FETCH_TASK_DATA):
-        if constexpr (std::is_same_v<T, const QVector<QString>&>)
+        if constexpr (std::is_same_v<T, QVector<QString>>)
         {
           std::vector<std::string> op_payload{};
-          op_payload.reserve((payload.size() + 1));
+          op_payload.reserve((payload.size() + 2));
+          op_payload.emplace_back(std::to_string(request_code));
           op_payload.emplace_back(std::to_string(getSelectedApp()));
           for (const QString& chunk : payload) op_payload.emplace_back(chunk.toStdString());
           operation_string = createOperation("FetchTaskData", op_payload);
@@ -702,7 +703,8 @@ void Client::request(uint8_t request_code, T payload) {
 template void  Client::request(uint8_t request_code, ScheduledTask    payload);
 template void  Client::request(uint8_t request_code, KApplication     payload);
 template void  Client::request(uint8_t request_code, uint32_t         payload);
-template void  Client::request(uint8_t request_code, const QVector<QString>& payload);
+template void  Client::request(uint8_t request_code, QVector<QString> payload);
+
 
 /**
  * @brief Client::request

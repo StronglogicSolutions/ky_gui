@@ -50,10 +50,11 @@ public:
   void ReceiveData (const QString& message, const QVector<QString>& data);
 
 signals:
-  void RequestData(const QVector<QString>& argv);
+  void RequestData(QVector<QString> argv);
 
 protected:
   virtual void mouseReleaseEvent(QMouseEvent* e) override;
+  virtual void keyPressEvent(QKeyEvent* e) override;
 
 private:
   void SetInserting(const bool inserting, const int32_t& index = -1);
