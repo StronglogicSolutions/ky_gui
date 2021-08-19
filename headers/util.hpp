@@ -74,6 +74,16 @@ const uint8_t SCHEDULED_TASK_RECURRING_INDEX = 0x05;
 const uint8_t SCHEDULED_TASK_NOTIFY_INDEX    = 0x06;
 const uint8_t SCHEDULED_TASK_RUNTIME_INDEX   = 0x07;
 const uint8_t SCHEDULED_TASK_FILES_INDEX     = 0x08;
+
+const uint8_t TASK_ID_INDEX       {0x00};
+const uint8_t TASK_TIME_INDEX     {0x01};
+const uint8_t TASK_FLAGS_INDEX    {0x02};
+const uint8_t TASK_COMPLETED_INDEX{0x03};
+const uint8_t TASK_RECURRING_INDEX{0x04};
+const uint8_t TASK_NOTIFY_INDEX   {0x05};
+const uint8_t TASK_RUNTIME_INDEX  {0x06};
+const uint8_t TASK_FILES_INDEX    {0x07};
+
 }
 
 namespace {
@@ -226,7 +236,11 @@ bool isOperation(const char* data) {
 }
 
 bool isUploadCompleteEvent(const char* event) {
-    return strcmp(event, "File Transfer Complete") == 0;
+  return strcmp(event, "File Transfer Complete") == 0;
+}
+
+bool isUploadCompleteEvent(const QString& s) {
+  return s == "File Transfer Complete";
 }
 
 bool isValidJson(const QString& s) {
