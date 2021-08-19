@@ -41,6 +41,18 @@ static void CloseTable(QTextDocument* doc_ptr)
   cursor.insertHtml("</tbody></table>");
 }
 
+static bool FindInTable(QTableWidget* t, const QString& s)
+{
+  auto rows = t->rowCount();
+  auto cols = t->columnCount();
+
+  for (int32_t i = 0; i < rows; i++)
+    for (int32_t j = 0; j < cols; j++)
+      if (t->item(i, j)->text() == s)
+        return true;
+  return false;
+}
+
 /**
  * @brief DocumentWindow::SaveSection
  */
@@ -378,6 +390,7 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
         // send request for data / files
         // onDataArriva => add to vector of QString html
       {
+        m_fetch_files                     = FindInTable(ui->rowContent, "$FILE_TYPE");
         const auto             date_range = (date_range_active) ? DatetimesToRange(ui->startDateTime, ui->endDateTime) : "0TO0";
         const auto             row_count  = (row_count_active) ? ui->rowCount->text() : "0";
         const auto             max_id     = QString::number(ui->lastID->intValue());
@@ -482,25 +495,25 @@ void DocumentWindow::ReceiveData(const QString& message, const QVector<QString>&
   if (message == "Task Data")
   {
     const int32_t task_count = data.front().toInt();
-    const int32_t arg_count  = ((data.size() - 1) / task_count);
+    const int32_t arg_count  = ((data.size() - (1 + task_count)) / task_count);
 
-    for (int32_t i = 1; i < task_count; i += arg_count)
+    for (int32_t i = 1; i <= task_count; i += arg_count)
     {
       const auto id = data.at(i);
       TaskFlags  flags{};
 
-      for (int32_t j = 0; j < arg_count; j++)
-        flags.insert(data.at(i + j), data.at(i + j + 1));
+      for (int32_t j = 0; j < (arg_count / 2); j++)
+        flags.insert(data.at(i + j + 1), data.at(i + j + 2));
 
       m_tasks.insert(id, TaskData{.flags = flags});
       m_task_index++;
     }
   }
   else
-  if (message == "Task Data Final")
-  {
-    qDebug() << "Still waiting for files before rendering";
-  }
+  if (message == "Task Data Final")  
+    if (m_fetch_files)
+      for (const auto& id : m_tasks.keys())
+        emit RequestFiles(id);
 }
 
 /**

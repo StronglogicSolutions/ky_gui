@@ -51,6 +51,7 @@ public:
 
 signals:
   void RequestData(QVector<QString> argv);
+  void RequestFiles(const QString& id);
 
 protected:
   virtual void mouseReleaseEvent(QMouseEvent* e) override;
@@ -77,6 +78,7 @@ private:
   int32_t            m_task_index;
   QTableWidget       m_table;
   Coords             m_image_coords;
+  bool               m_fetch_files;
 };
 
 #endif // DOCUMENTWINDOW_HPP
