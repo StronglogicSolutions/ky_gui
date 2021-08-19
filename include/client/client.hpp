@@ -71,7 +71,7 @@ struct DownloadConsole
 
   bool is_downloading()
   {
-    return (wt_count == 0);
+    return (wt_count != 0);
   }
 
   void Write(const QString& id, uint8_t* data, const size_t size)
