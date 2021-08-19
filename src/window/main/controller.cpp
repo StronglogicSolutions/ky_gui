@@ -160,120 +160,123 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
                                                    const StringVec& v)
 {
   QString event_message = utils::timestampPrefix();
-  if (!v.empty()) {
+//  if (!v.empty()) {
     // TODO: Why do we rely on this weird circumstance?
-    if (v.size() == 1)
-      event_message += message + "\n" + v.at(0);
-    else
-    {
-      event_message += message;
-
-      if (message == "Process Result")
-      {
-        const auto error = v.size() > 3;
-        const auto app_name = window->q_client->getAppName(std::stoi(v.at(0).toUtf8().constData()));
-        event_message += '\n';
-        event_message += app_name;
-        event_message += ": ";
-        event_message += v.at(2);
-
-        const auto process_it = std::find_if(window->m_processes.begin(), window->m_processes.end(),
-          [v](const Process& process) { return process.id == v.at(1); });
-
-        if (process_it != window->m_processes.end())
-          updateProcessResult(v.at(1), v.at(2), error);
-        else // new process, from scheduled task
-        {
-          Process new_process{
-            .name  = app_name,
-            .state = !error ? ProcessState::SUCCEEDED : ProcessState::FAILED,
-            .start = TimeUtils::getTime(),
-            .id    = "Scheduled task",
-            .error = error ? v.at(3) : "No errors reported"};
-
-            if (v.count() > 2 && !v.at(2).isEmpty())
-            {
-              new_process.result = v.at(2);
-              new_process.end = new_process.start;
-            }
-
-          window->m_processes.push_back(new_process);
-          window->m_process_model->setItem(window->m_process_model->rowCount(),
-                                           utils::createProcessListItem(new_process));
-        }
-
-        if (error)
-          event_message += "\n Error: " + v.at(3);
-      }
-      else
-      if (message == "Platform Post")
-      {
-        if (v.size() < 6)
-          event_message += "\nEvent occurred, but data is missing";
-        else
-          event_message += "\nContent: " + v.at(3) + "\nCompleted: " + v.at(5);
-      }
-      else
-      if (QString::compare(message, "Application was registered") == 0) {
-        const KApplication application{.name = v.at(0), .path = v.at(1), .data = v.at(2), .mask = v.at(3)};
-        window->app_ui.      addApplication(application);
-        window->q_client->   addCommand    (application);
-        window->ui->appList->addItem       (application.name);
-      }
-      else
-      if (message == "Application was deleted")
-      {
-        const auto name = v.at(0);
-        const auto i   = window->ui->appList->findText(name);
-        window->app_ui.removeApplication(KApplication{.name = name});
-        if (i != -1)
-          window->ui->appList->removeItem(i);
-      }
-      else
-      if (message =="Scheduled Tasks")
-      {
-        const auto details = v.at(0);
-        if (details == "Schedule")
-        {
-          window->schedule_ui.clear();
-          window->schedule_ui.insert_tasks(v);
-        }
-        else
-        if (details == "Schedule more")
-          window->schedule_ui.insert_tasks(v);
-        else
-        if (details == "Schedule end")
-          window->schedule_ui.receive_response(RequestType::FETCH_SCHEDULE, v);
-      }
-      else
-      if (message == "Schedule PUT")
-        window->schedule_ui.receive_response(RequestType::UPDATE_SCHEDULE, v);
-      else
-      if (message == "Schedule Tokens")
-        window->schedule_ui.receive_response(RequestType::FETCH_SCHEDULE_TOKENS, v);
-      else
-      if (message == "Application Flags")
-      {
-        if (v.front().toInt() != window->q_client->getSelectedApp())
-          qDebug() << "do not match";
-        else
-          window->doc_window.SetFlags(QList<QString>{v.begin() + 1, v.end()});
-      }
-      else
-      if (message == "Task Data")
-        window->doc_window.ReceiveData(message, v);
-      else
-      if (message == "File Upload")
-        window->q_client->setIncomingFile(v);
-      else
-      if (message == "File Upload Meta")
-        window->q_client->setIncomingID(v.front());
-      if (message == "Message Received")
-        event_message += "\n" + v.at(1) + ": " + v.at(2);
-    }
-  }
+  if (v.size() == 1)
+    event_message += message + "\n" + v.at(0);
   else
-    event_message += message;  // Unknown event
+  {
+    event_message += message;
+
+    if (message == "Process Result")
+    {
+      const auto error = v.size() > 3;
+      const auto app_name = window->q_client->getAppName(std::stoi(v.at(0).toUtf8().constData()));
+      event_message += '\n';
+      event_message += app_name;
+      event_message += ": ";
+      event_message += v.at(2);
+
+      const auto process_it = std::find_if(window->m_processes.begin(), window->m_processes.end(),
+        [v](const Process& process) { return process.id == v.at(1); });
+
+      if (process_it != window->m_processes.end())
+        updateProcessResult(v.at(1), v.at(2), error);
+      else // new process, from scheduled task
+      {
+        Process new_process{
+          .name  = app_name,
+          .state = !error ? ProcessState::SUCCEEDED : ProcessState::FAILED,
+          .start = TimeUtils::getTime(),
+          .id    = "Scheduled task",
+          .error = error ? v.at(3) : "No errors reported"};
+
+          if (v.count() > 2 && !v.at(2).isEmpty())
+          {
+            new_process.result = v.at(2);
+            new_process.end = new_process.start;
+          }
+
+        window->m_processes.push_back(new_process);
+        window->m_process_model->setItem(window->m_process_model->rowCount(),
+                                         utils::createProcessListItem(new_process));
+      }
+
+      if (error)
+        event_message += "\n Error: " + v.at(3);
+    }
+    else
+    if (message == "Platform Post")
+    {
+      if (v.size() < 6)
+        event_message += "\nEvent occurred, but data is missing";
+      else
+        event_message += "\nContent: " + v.at(3) + "\nCompleted: " + v.at(5);
+    }
+    else
+    if (QString::compare(message, "Application was registered") == 0) {
+      const KApplication application{.name = v.at(0), .path = v.at(1), .data = v.at(2), .mask = v.at(3)};
+      window->app_ui.      addApplication(application);
+      window->q_client->   addCommand    (application);
+      window->ui->appList->addItem       (application.name);
+    }
+    else
+    if (message == "Application was deleted")
+    {
+      const auto name = v.at(0);
+      const auto i   = window->ui->appList->findText(name);
+      window->app_ui.removeApplication(KApplication{.name = name});
+      if (i != -1)
+        window->ui->appList->removeItem(i);
+    }
+    else
+    if (message =="Scheduled Tasks")
+    {
+      const auto details = v.at(0);
+      if (details == "Schedule")
+      {
+        window->schedule_ui.clear();
+        window->schedule_ui.insert_tasks(v);
+      }
+      else
+      if (details == "Schedule more")
+        window->schedule_ui.insert_tasks(v);
+      else
+      if (details == "Schedule end")
+        window->schedule_ui.receive_response(RequestType::FETCH_SCHEDULE, v);
+    }
+    else
+    if (message == "Schedule PUT")
+      window->schedule_ui.receive_response(RequestType::UPDATE_SCHEDULE, v);
+    else
+    if (message == "Schedule Tokens")
+      window->schedule_ui.receive_response(RequestType::FETCH_SCHEDULE_TOKENS, v);
+    else
+    if (message == "Application Flags")
+    {
+      if (v.front().toInt() != window->q_client->getSelectedApp())
+        qDebug() << "do not match";
+      else
+        window->doc_window.SetFlags(QList<QString>{v.begin() + 1, v.end()});
+    }
+    else
+    if (message == "Task Data")
+      window->doc_window.ReceiveData(message, v);
+    else
+    if (message == "Task Data Final")
+      window->doc_window.ReceiveData(message, v);
+    else
+    if (message == "File Upload")
+      window->q_client->setIncomingFile(v);
+    else
+    if (message == "File Upload Meta")
+      window->q_client->setIncomingID(v.front());
+    if (message == "Message Received")
+      event_message += "\n" + v.at(1) + ": " + v.at(2);
+  }
+//  }
+//  else
+//    event_message += message;  // Unknown event
 
   return event_message;
 }
