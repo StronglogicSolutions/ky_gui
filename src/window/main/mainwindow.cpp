@@ -224,6 +224,11 @@ void MainWindow::connectClient() {
     q_client->request(static_cast<uint8_t>(RequestType::FETCH_TASK_DATA), argv);
   });
 
+  QObject::connect(&doc_window, &DocumentWindow::RequestFiles, this, [this](const QString& id)
+  {
+    q_client->request(static_cast<uint8_t>(RequestType::FETCH_FILE), id);
+  });
+
   QObject::connect(q_client, &Client::onDownload, this,
     [this](DownloadConsole::Files files) -> void
     {
