@@ -27,7 +27,7 @@ static QBrush GetBrushForType(const RowType& type)
  */
 static bool IsImage(const QString& s)
 {
-  return (s == "--media=$FILE_TYPE");
+  return (s == "$FILE_TYPE");
 }
 
 /**
@@ -58,14 +58,14 @@ static bool FindInTable(QTableWidget* t, const QString& s)
  */
 void DocumentWindow::SaveSection()
 {
-  QString text;
+  QString       text{};
   QTableWidget* t = &m_table;
+  QTextCursor   cursor{&m_doc};
 
   if (m_doc.isEmpty())
   {
     text = QString{"<table><thead>"};
     text.append("<tr>");
-
     for (int i = 0; i < t->columnCount(); i++)
       text.append("<th>")
           .append(t->horizontalHeaderItem(i)->data(Qt::DisplayRole).toString())
@@ -74,66 +74,48 @@ void DocumentWindow::SaveSection()
     text.append("<tbody>");
   }
 
-  for (int i = 0; i < t->rowCount(); i++) {
-    text.append("<tr>");
-    for (int j = 0; j < t->columnCount(); j++)
+  for (TaskMap::Iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
+  {
+    for (int i = 0; i < t->rowCount(); i++)
     {
-      if (ImageAtCell(i, j))
+      text.append("<tr>");
+      for (int j = 0; j < t->columnCount(); j++)
       {
-        /** Rendering Image (see example at end of method)
-         *
-         * 1. QCursor
-         * 2. Inject HTML thus far
-         * 3. Render QPixMap
-         * 4. Inject rendered QPixMap
-         * 4. clear text and resume
-         *
-         */
+        text.append("<td>");
+        if (ImageAtCell(i, j))
+        {
+          const FileWrap file = it->files.front();
+          QPixmap pm{};
+          pm.loadFromData(file.buffer, QMimeDatabase{}.mimeTypeForName(file.name).preferredSuffix().toUtf8());
+          cursor.movePosition(QTextCursor::End);
+          cursor.insertHtml(text);
+          cursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
+          cursor.insertImage(pm.toImage().scaledToHeight(t->rowHeight(i)));
+          text.clear();
+        }
+        else
+        {
+          QTableWidgetItem* item = t->item(i, j);
+          if (!item || item->text().isEmpty())
+            t->setItem(i, j, new QTableWidgetItem("0"));
+          auto text_to_insert = t->item(i, j)->text();
+          text.append(t->item(i, j)->text());
+        }
+        text.append("</td>");
       }
-      else
-      {
-        QTableWidgetItem* item = t->item(i, j);
-        if (!item || item->text().isEmpty())
-          t->setItem(i, j, new QTableWidgetItem("0"));
-
-        text.append("<td>")
-          .append(t->item(i, j)->text())
-          .append("</td>");
-      }
+      text.append("</tr>");
     }
-    text.append("</tr>");
+
+    cursor.movePosition(QTextCursor::End);
+    cursor.insertHtml(text);
   }
-
-  QTextCursor cursor{&m_doc};
-  cursor.movePosition(QTextCursor::End);
-  cursor.insertHtml(text);
-  /** Adding image to QTextDocument
-    *
-    *           QTextCursor cursor(&document);
-                QPalette palette;
-                palette.setColor(backgroundRole(), QColor(255, 255, 255));
-                this->ui->tab_3->setPalette(palette);
-                this->ui->tab_3->setAutoFillBackground(true);
-
-                QPixmap pm = this->ui->tab_3->grab();
-                pm = pm.transformed(QTransform().rotate(270));
-
-                cursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
-
-                QImage img = pm.toImage();
-                img = img.scaledToHeight(img.height()-60);
-                cursor.insertImage(img);
-
-                this->ui->tab_3->setAutoFillBackground(false);
-  */
-
-  /**
-    * Getting QPixMap from a QTableWidgetItem (cell)
-    *
-    * QPixmap m = item->data(Qt::DecorationRole).value<QPixmap>();
-    *
-  */
 }
+/**
+ * Getting QPixMap from a QTableWidgetItem (cell)
+ *
+ * QPixmap m = item->data(Qt::DecorationRole).value<QPixmap>();
+ *
+ */
 
 /**
  * @brief DocumentWindow::DocumentWindow
@@ -153,12 +135,14 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
   ui->startDateTime->setEnabled(false);
   ui->endDateTime  ->setEnabled(false);
   ui->rowCount     ->setEnabled(false);
-
+  m_table          .setColumnCount(ui->rowContent->columnCount());
   for (auto i = 0; i < ui->rowContent->columnCount(); i++)
   {
     ui->rowContent->setItem(0, i, new QTableWidgetItem{});
+    m_table        .setHorizontalHeaderItem(i, new QTableWidgetItem{});
     ui->rowContent->item(0, i)->setBackground(GetBrushForType(RowType::REPEAT));
   }
+
 
   m_printer.setOutputFormat(   QPrinter::PdfFormat);
   m_printer.setPageSize(       QPageSize{QPageSize::PageSizeId::A4});
@@ -211,11 +195,11 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
       if (!m_file_path.isEmpty())
       {
         QTableWidgetItem* file_item = new QTableWidgetItem();
-        QPixmap pm{m_file_path};
-        file_item->setData(
-            Qt::DecorationRole,
-            pm.scaledToHeight(ui->rowContent->rowHeight(0),
-                              Qt::TransformationMode::SmoothTransformation));
+
+        file_item->setData(Qt::DecorationRole,
+                           QPixmap{m_file_path}.scaledToHeight(ui->rowContent->rowHeight(0),
+                           Qt::TransformationMode::SmoothTransformation));
+
         ui->rowContent->setItem(row, col, file_item);
         m_file_path.clear();
       }
@@ -265,13 +249,14 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
   });
 
   /**
-   *  savePDF
+   *  createPDF
    *  @lambda
    */
   QObject::connect(ui->createPDF, &QPushButton::clicked, this,
     [this]()
   {
     CloseTable(&m_doc);
+    SavePDF();
   });
 
   /**
@@ -449,6 +434,7 @@ void DocumentWindow::AddRow()
   ui->rowContent->setRowCount(count + 1);
   for (auto i = 0; i < ui->rowContent->columnCount(); i++)
   {
+    m_table.setVerticalHeaderItem(i, new QTableWidgetItem{});
     ui->rowContent->setItem(count, i, new QTableWidgetItem{});
     ui->rowContent->item(count, i)->setBackground(GetBrushForType(RowType::REPEAT));
   }
@@ -460,8 +446,9 @@ void DocumentWindow::AddRow()
  */
 void DocumentWindow::AddColumn()
 {
-  auto count = ui->rowContent->columnCount();
+  const auto count = ui->rowContent->columnCount();
   ui->rowContent->setColumnCount(count + 1);
+  m_table        .setColumnCount(count + 1);
   for (auto i = 0; i < ui->rowContent->rowCount(); i++)
   {
     ui->rowContent->setItem(i, count, new QTableWidgetItem{});
@@ -503,7 +490,7 @@ void DocumentWindow::ReceiveData(const QString& message, const QVector<QString>&
       TaskFlags  flags{};
 
       for (int32_t j = 0; j < (arg_count / 2); j++)
-        flags.insert(data.at(i + j + 1), data.at(i + j + 2));
+        flags.insert(data.at(i + (j * 2) + 1), data.at(i + (j * 2) + 2));
 
       m_tasks.insert(id, TaskData{.flags = flags});
       m_task_index++;
@@ -545,24 +532,27 @@ void DocumentWindow::ReceiveFiles(QVector<FileWrap>&& files)
 
   for (auto&& file : files)
   {
-    auto it = m_tasks.find(file.id);
+    auto it = m_tasks.find(file.task_id);
     if (it != m_tasks.end())
      it->files.push_back(std::move(file));
     else
       throw std::invalid_argument{"Task with matching ID not found"};
   }
 
+  m_table.setRowCount((m_table.rowCount() + m_tasks.size()));
   QTableWidget* t = ui->rowContent;
   for (TaskMap::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
   {
     const auto task = *it;
     for (auto row = 0; row < t->rowCount(); row++)
     {
+      m_table.insertRow(m_table.rowCount() + 1);
       const bool should_insert = m_row_types.at(row) == RowType::REPEAT;
       if (should_insert)
       {
         for (auto col = 0; col < t->columnCount(); col++)
         {
+          m_table.insertColumn(m_table.columnCount() + 1);
           const auto item = t->item(row, col);
           if (!item->text().isEmpty())
           {
@@ -572,7 +562,8 @@ void DocumentWindow::ReceiveFiles(QVector<FileWrap>&& files)
               // TODO: Render here, or when saving section (or both)
             else
             {
-              const auto f_it    = task.flags.find(item->text());
+              const auto text  = item->text().remove(0, 1);
+              const auto f_it  = task.flags.find(text);
               const bool found = f_it != task.flags.cend();
 
               if (found)
