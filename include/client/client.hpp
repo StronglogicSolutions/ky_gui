@@ -65,9 +65,27 @@ struct DownloadConsole
   int32_t              wt_count;
   int32_t              rx_count;
   Files                files;
+  bool                 wt_for_metadata;
 
   DownloadConsole(Kiqoder::FileHandler f_handler)
-  : handler(f_handler) {}
+  : handler(f_handler),
+    wt_count(0),
+    rx_count(0),
+    wt_for_metadata(false) {}
+
+  FileWrap* GetFile (const QString& id)
+  {
+    for (auto it = files.begin(); it != files.end(); it++)
+      if (it->task_id == id)
+        return it;
+    return nullptr;
+  };
+
+  bool WaitingForFile(const QString& id)
+  {
+    FileWrap* file = GetFile(id);
+    return (file != nullptr && file->buffer == nullptr);
+  }
 
   bool is_downloading()
   {
@@ -76,13 +94,39 @@ struct DownloadConsole
 
   void Write(const QString& id, uint8_t* data, const size_t size)
   {
-    files.push_back(FileWrap{.id = id, .buffer = QByteArray{reinterpret_cast<char*>(data), static_cast<int>(size)}});
+    FileWrap* file = GetFile(id);
+    if (file != nullptr && file->HasID())
+      file->buffer = QByteArray(reinterpret_cast<char*>(data), size);
+  }
+
+  void Receive(uint8_t* data, const size_t size)
+  {
+    handler.processPacket(data, size);
   }
 
   Files&& GetData()
   {
     return std::move(files);
   }
+
+  void Wait(const bool wait = true)
+  {
+    wt_for_metadata = wait;
+  }
+
+  bool SetMetadata(const QVector<QString>& data)
+  {
+    const auto& task_id = data.front();
+    if (WaitingForFile(task_id))
+    {
+      Wait(false);
+      handler.setID(task_id.toUInt());
+      return true;
+    }
+    return false;
+  }
+
+  bool Waiting() { return wt_for_metadata; }
 };
 
 Q_DECLARE_METATYPE(StringVec)
@@ -143,7 +187,7 @@ class Client : public QDialog {
   void           ping();  
   void           sendIPCMessage(const QString& type, const QString& message, const QString& user);
   void           setIncomingFile(const StringVec& files);
-  void           setIncomingID(const QString& id);
+  void           setMetadata(const QVector<QString>& data);
 
  signals:
   void           messageReceived(int t, QString s, QVector<QString> args);
