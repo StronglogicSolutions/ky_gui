@@ -62,17 +62,15 @@ void DocumentWindow::SaveSection()
   QTableWidget* t = &m_table;
   QTextCursor   cursor{&m_doc};
 
-  if (m_doc.isEmpty())
-  {
-    text = QString{"<table><thead>"};
-    text.append("<tr>");
-    for (int i = 0; i < t->columnCount(); i++)
-      text.append("<th>")
-          .append(t->horizontalHeaderItem(i)->data(Qt::DisplayRole).toString())
-          .append("</th>");
-    text.append("</tr></thead>");
-    text.append("<tbody>");
-  }
+
+  text = QString{"<table><thead>"};
+  text.append("<tr>");
+  for (int i = 0; i < t->columnCount(); i++)
+    text.append("<th>")
+        .append(t->horizontalHeaderItem(i)->data(Qt::DisplayRole).toString())
+        .append("</th>");
+  text.append("</tr></thead>");
+  text.append("<tbody>");
 
   for (TaskMap::Iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
   {
@@ -85,6 +83,7 @@ void DocumentWindow::SaveSection()
         if (ImageAtCell(i, j))
         {
           const FileWrap file = it->files.front();
+          auto size = file.buffer.size();
           QPixmap pm{};
           pm.loadFromData(file.buffer, QMimeDatabase{}.mimeTypeForName(file.name).preferredSuffix().toUtf8());
           cursor.movePosition(QTextCursor::End);
@@ -105,7 +104,7 @@ void DocumentWindow::SaveSection()
       }
       text.append("</tr>");
     }
-
+    text.append("</tbody></table>");
     cursor.movePosition(QTextCursor::End);
     cursor.insertHtml(text);
   }
@@ -255,7 +254,6 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
   QObject::connect(ui->createPDF, &QPushButton::clicked, this,
     [this]()
   {
-    CloseTable(&m_doc);
     SavePDF();
   });
 
