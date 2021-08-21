@@ -160,8 +160,6 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
                                                    const StringVec& v)
 {
   QString event_message = utils::timestampPrefix();
-//  if (!v.empty()) {
-    // TODO: Why do we rely on this weird circumstance?
   if (v.size() == 1)
     event_message += message + "\n" + v.at(0);
   else
@@ -270,13 +268,10 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
       window->q_client->setIncomingFile(v);
     else
     if (message == "File Upload Meta")
-      window->q_client->setIncomingID(v.front());
+      window->q_client->setMetadata(v);
+    else
     if (message == "Message Received")
       event_message += "\n" + v.at(1) + ": " + v.at(2);
   }
-//  }
-//  else
-//    event_message += message;  // Unknown event
-
   return event_message;
 }
