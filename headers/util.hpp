@@ -43,10 +43,13 @@ struct ScheduledTask {
 
 struct FileWrap
 {
+  QString    task_id;
   QString    id;
-  QByteArray buffer;
   QString    name;
   QString    type;
+  QByteArray buffer;
+
+  bool HasID() { return !(id.isEmpty()); }
 };
 
 namespace constants {
@@ -62,7 +65,8 @@ TRIGGER_CREATE        = 0x07,
 FETCH_TASK_FLAGS      = 0x08,
 FETCH_FILE            = 0x09,
 FETCH_FILE_ACK        = 0x0A,
-FETCH_TASK_DATA       = 0x0B
+FETCH_FILE_READY      = 0x0B,
+FETCH_TASK_DATA       = 0x0C
 };
 
 const uint8_t SCHEDULED_TASK_ID_INDEX        = 0x00;
