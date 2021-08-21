@@ -128,7 +128,10 @@ Client::Client(QWidget *parent, int count, char** arguments)
       m_download_console.rx_count++;
 
       if (--m_download_console.wt_count)
+      {
+        m_download_console.Wait();
         sendEncoded(createOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
+      }
       else
         onDownload(std::move(m_download_console.GetData()));
     }
@@ -758,20 +761,31 @@ void Client::setIncomingFile(const StringVec& files)
   m_download_console.wt_count = files.front().toUInt();
 
   for (int32_t i = 0; i < m_download_console.wt_count; i++)
-    m_download_console.files.push_back(FileWrap{.id   = files[1 + (3 * i)],
-                                                .name = files[2 + (3 * i)],
-                                                .type = files[3 + (3 * i)]});
-
+    m_download_console.files.push_back(FileWrap{.task_id = files[1 + (3 * i)],
+                                                .id      = files[2 + (3 * i)],
+                                                .name    = files[3 + (3 * i)],
+                                                .type    = files[4 + (3 * i)],
+                                                .buffer  = nullptr});
+  m_download_console.Wait();
   sendEncoded(createOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
 }
 
-void Client::setIncomingID(const QString& id)
+void Client::setMetadata(const StringVec& data)
 {
-  m_download_console.handler.setID(id.toUInt());
+  if (m_download_console.SetMetadata(data))
+    sendEncoded(createOperation("FILE_READY", {std::to_string(constants::RequestType::FETCH_FILE_READY)}));
 }
 
 void Client::handleDownload(uint8_t* data, ssize_t size)
 {
-  if (m_download_console.is_downloading())
-    m_download_console.handler.processPacket(data, size);
+  if (m_download_console.Waiting())
+  {
+    std::string decoded{data, data + findNullIndex(data)};
+    if (isValidJson(decoded))
+      emit Client::messageReceived(EVENT_UPDATE_TYPE, getEvent(decoded.c_str()), getArgs(decoded.c_str()));
+    else
+      qDebug() << "Error downloading file metadata";
+  }
+  else
+    m_download_console.Receive(data, size);
 }
