@@ -7,6 +7,7 @@
 #include <QTextCursor>
 #include <QTimer>
 #include "headers/util.hpp"
+#include <QSaveFile>
 
 /**
  * @brief GetBrushForType
@@ -71,7 +72,7 @@ void DocumentWindow::SaveSection()
         .append("</th>");
   text.append("</tr></thead>");
   text.append("<tbody>");
-
+  int32_t file_idx{};
   for (TaskMap::Iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
   {
     for (int i = 0; i < t->rowCount(); i++)
@@ -83,13 +84,17 @@ void DocumentWindow::SaveSection()
         if (ImageAtCell(i, j))
         {
           const FileWrap file = it->files.front();
-          auto size = file.buffer.size();
+          auto suffix = QMimeDatabase{}.mimeTypeForName(file.name).preferredSuffix().toUtf8();
+          QSaveFile savefile{"file" + QString::number(file_idx) + '.' + suffix};
+          savefile.open(QIODevice::WriteOnly);
+          savefile.write(file.buffer);
+          savefile.commit();
           QPixmap pm{};
-          pm.loadFromData(file.buffer, QMimeDatabase{}.mimeTypeForName(file.name).preferredSuffix().toUtf8());
+          pm.loadFromData(file.buffer, suffix);
           cursor.movePosition(QTextCursor::End);
           cursor.insertHtml(text);
           cursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
-          cursor.insertImage(pm.toImage().scaledToHeight(t->rowHeight(i)));
+          cursor.insertImage(pm.toImage().scaledToHeight(320));
           text.clear();
         }
         else
@@ -142,11 +147,10 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
     ui->rowContent->item(0, i)->setBackground(GetBrushForType(RowType::REPEAT));
   }
 
-
   m_printer.setOutputFormat(   QPrinter::PdfFormat);
   m_printer.setPageSize(       QPageSize{QPageSize::PageSizeId::A4});
   m_printer.setPageOrientation(QPageLayout::Landscape);
-  m_printer.setOutputFileName("test.pdf");
+  m_printer.setOutputFileName("kiq_document.pdf");
 
   m_doc.setPageSize(m_printer.pageRect().size());
 //  doc.setPageSize(printer.pageLayout().paintRectPixels());
