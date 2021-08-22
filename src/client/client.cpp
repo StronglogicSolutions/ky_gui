@@ -224,7 +224,7 @@ void Client::handleMessages() {
       QString error{e.what()};
     }
   }
-  memset(receive_buffer, 0, 2048);
+  memset(receive_buffer, 0, MAX_PACKET_SIZE);
   ::close(m_client_socket_fd);
 }
 
