@@ -7,7 +7,6 @@
 #include <QTextCursor>
 #include <QTimer>
 #include "headers/util.hpp"
-#include <QSaveFile>
 
 /**
  * @brief GetBrushForType
@@ -72,7 +71,7 @@ void DocumentWindow::SaveSection()
         .append("</th>");
   text.append("</tr></thead>");
   text.append("<tbody>");
-  int32_t file_idx{};
+
   for (TaskMap::Iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
   {
     for (int i = 0; i < t->rowCount(); i++)
@@ -84,13 +83,8 @@ void DocumentWindow::SaveSection()
         if (ImageAtCell(i, j))
         {
           const FileWrap file = it->files.front();
-          auto suffix = QMimeDatabase{}.mimeTypeForName(file.name).preferredSuffix().toUtf8();
-          QSaveFile savefile{"file" + QString::number(file_idx) + '.' + suffix};
-          savefile.open(QIODevice::WriteOnly);
-          savefile.write(file.buffer);
-          savefile.commit();
-          QPixmap pm{};
-          pm.loadFromData(file.buffer, suffix);
+          QPixmap        pm{};
+          pm.loadFromData(file.buffer, QMimeDatabase{}.mimeTypeForName(file.name).preferredSuffix().toUtf8());
           cursor.movePosition(QTextCursor::End);
           cursor.insertHtml(text);
           cursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
@@ -114,20 +108,14 @@ void DocumentWindow::SaveSection()
     cursor.insertHtml(text);
   }
 }
-/**
- * Getting QPixMap from a QTableWidgetItem (cell)
- *
- * QPixmap m = item->data(Qt::DecorationRole).value<QPixmap>();
- *
- */
 
 /**
  * @brief DocumentWindow::DocumentWindow
  * @constructor
  * @param parent
  */
-DocumentWindow::DocumentWindow(QWidget *parent) :
-  QMainWindow(parent),
+DocumentWindow::DocumentWindow(QWidget *parent)
+: QMainWindow(parent),
   ui(new Ui::DocumentWindow),
   m_flag_index(-1),
   m_inserting(false),
@@ -150,10 +138,8 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
   m_printer.setOutputFormat(   QPrinter::PdfFormat);
   m_printer.setPageSize(       QPageSize{QPageSize::PageSizeId::A4});
   m_printer.setPageOrientation(QPageLayout::Landscape);
-  m_printer.setOutputFileName("kiq_document.pdf");
-
+  m_printer.setOutputFileName("kiq_document.pdf"); // TODO: Set from UI
   m_doc.setPageSize(m_printer.pageRect().size());
-//  doc.setPageSize(printer.pageLayout().paintRectPixels());
 
   /**
    * activateRowCount
@@ -215,8 +201,7 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
         ui->rowContent->item(row, col)->setBackground(GetBrushForType(m_row_types.at(row)));
         SetInserting(false);
       }
-    }
-  );
+    });
 
   /**
    * setRowRepeating
@@ -224,21 +209,20 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
    */
   QObject::connect(ui->rowContent->verticalHeader(), &QHeaderView::sectionClicked, this,
     [this](int32_t index)
-  {
-    RowType row_type = m_row_types.at(index);
-    for (int i = 0; i < ui->rowContent->columnCount(); i++)
-      if (row_type == RowType::HEADER)
-      {
-        ui->rowContent->item(index, i)->setBackground(GetBrushForType(RowType::REPEAT));
-        m_row_types[index] = RowType::REPEAT;
-      }
-      else
-      {
-        ui->rowContent->item(index, i)->setBackground(GetBrushForType(RowType::HEADER));
-        m_row_types[index] = RowType::HEADER;
-      }
-
-  });
+    {
+      RowType row_type = m_row_types.at(index);
+      for (int i = 0; i < ui->rowContent->columnCount(); i++)
+        if (row_type == RowType::HEADER)
+        {
+          ui->rowContent->item(index, i)->setBackground(GetBrushForType(RowType::REPEAT));
+          m_row_types[index] = RowType::REPEAT;
+        }
+        else
+        {
+          ui->rowContent->item(index, i)->setBackground(GetBrushForType(RowType::HEADER));
+          m_row_types[index] = RowType::HEADER;
+        }
+    });
 
   /**
    * onCellValueChanged
@@ -246,10 +230,10 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
    */
   QObject::connect(ui->rowContent, &QTableWidget::itemChanged, this,
     [this](QTableWidgetItem* item)
-  {
-    auto type = item->Type;
-    auto text = item->text();
-  });
+    {
+      auto type = item->Type;
+      auto text = item->text();
+    });
 
   /**
    *  createPDF
@@ -257,9 +241,9 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
    */
   QObject::connect(ui->createPDF, &QPushButton::clicked, this,
     [this]()
-  {
-    SavePDF();
-  });
+    {
+      SavePDF();
+    });
 
   /**
    * addRow
@@ -267,9 +251,9 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
    */
   QObject::connect(ui->addRow, &QPushButton::clicked, this,
     [this]()
-  {
-    AddRow();
-  });
+    {
+      AddRow();
+    });
 
   /**
    * removeRow
@@ -277,14 +261,14 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
    */
   QObject::connect(ui->removeRow, &QPushButton::clicked, this,
     [this]()
-  {
-    auto count = ui->rowContent->rowCount();
-    if (count)
     {
-      ui->rowContent->setRowCount((count - 1));
-      m_row_types.pop_back();
-    }
-  });
+      auto count = ui->rowContent->rowCount();
+      if (count)
+      {
+        ui->rowContent->setRowCount((count - 1));
+        m_row_types.pop_back();
+      }
+    });
 
   /**
    * addColumn
@@ -292,9 +276,9 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
    */
   QObject::connect(ui->addColumn, &QPushButton::clicked, this,
     [this]()
-  {
-    AddColumn();
-  });
+    {
+      AddColumn();
+    });
 
   /**
    * removeColumn
@@ -341,15 +325,14 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
        qDebug() << "Could not read the file path";
        QMessageBox::warning(this, tr("File Error"), tr("Could not read the file path"));
       }
-    }
-  );
+    });
 
   /**
    * saveTableSection
    * @lambda
    */
   QObject::connect(ui->saveTable, &QPushButton::clicked, this,
-    [this]()
+    [this]() -> void
     {
     /**
      * DateTimesToRange
@@ -372,10 +355,6 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
         QTimer::singleShot(5000, this, [this]() -> void { ui->mandatoryLabel->setStyleSheet("color: #FFF;"); });
       }
       else
-        // Row count
-        // Date range
-        // send request for data / files
-        // onDataArriva => add to vector of QString html
       {
         m_fetch_files                     = FindInTable(ui->rowContent, "$FILE_TYPE");
         const auto             date_range = (date_range_active) ? DatetimesToRange(ui->startDateTime, ui->endDateTime) : "0TO0";
@@ -386,9 +365,7 @@ DocumentWindow::DocumentWindow(QWidget *parent) :
 
         emit RequestData(argv);
       }
-    }
-  );
-
+    });
 }
 
 /**
@@ -571,7 +548,7 @@ void DocumentWindow::ReceiveFiles(QVector<FileWrap>&& files)
               if (found)
               {
                 const auto value = f_it.value();
-                auto widget = new QTableWidgetItem{};
+                auto widget      = new QTableWidgetItem{};
                 widget->setText(value);
                 m_table.setItem(row, col, widget);
               }
