@@ -5,7 +5,10 @@
 #include <QPrinter>
 #include <QTextDecoder>
 #include <QTextCursor>
+#include <QTextTable>
 #include <QTimer>
+#include <QPainter>
+#include <QAbstractTextDocumentLayout>
 #include "headers/util.hpp"
 
 /**
@@ -58,54 +61,33 @@ static bool FindInTable(QTableWidget* t, const QString& s)
  */
 void DocumentWindow::SaveSection()
 {
-  QString       text{};
-  QTableWidget* t = &m_table;
   QTextCursor   cursor{&m_doc};
+  uint32_t      row_idx{};
+  const auto    row_count    = m_tasks.size();
+  const auto    col_count    = m_table.columnCount();
+  QTableWidget* t            = &m_table;
+  QTextTable*   render_table = cursor.insertTable(row_count, col_count);
 
-
-  text = QString{"<table><thead>"};
-  text.append("<tr>");
-  for (int i = 0; i < t->columnCount(); i++)
-    text.append("<th>")
-        .append(t->horizontalHeaderItem(i)->data(Qt::DisplayRole).toString())
-        .append("</th>");
-  text.append("</tr></thead>");
-  text.append("<tbody>");
-
-  for (TaskMap::Iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
+  for (TaskMap::Iterator it = m_tasks.begin(); it != m_tasks.end(); it++, row_idx++)
   {
     for (int i = 0; i < t->rowCount(); i++)
     {
-      text.append("<tr>");
       for (int j = 0; j < t->columnCount(); j++)
       {
-        text.append("<td>");
+        const int      col_idx = j;
+        QTextTableCell cell    = render_table->cellAt(row_idx, col_idx);
+
         if (ImageAtCell(i, j))
         {
           const FileWrap file = it->files.front();
           QPixmap        pm{};
           pm.loadFromData(file.buffer, QMimeDatabase{}.mimeTypeForName(file.name).preferredSuffix().toUtf8());
-          cursor.movePosition(QTextCursor::End);
-          cursor.insertHtml(text);
-          cursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
-          cursor.insertImage(pm.toImage().scaledToHeight(320));
-          text.clear();
+          cell.firstCursorPosition().insertImage(pm.toImage().scaledToHeight(320));
         }
         else
-        {
-          QTableWidgetItem* item = t->item(i, j);
-          if (!item || item->text().isEmpty())
-            t->setItem(i, j, new QTableWidgetItem("0"));
-          auto text_to_insert = t->item(i, j)->text();
-          text.append(t->item(i, j)->text());
-        }
-        text.append("</td>");
+          cell.firstCursorPosition().insertText(t->item(i, j)->text());
       }
-      text.append("</tr>");
     }
-    text.append("</tbody></table>");
-    cursor.movePosition(QTextCursor::End);
-    cursor.insertHtml(text);
   }
 }
 
@@ -139,6 +121,7 @@ DocumentWindow::DocumentWindow(QWidget *parent)
   m_printer.setPageSize(       QPageSize{QPageSize::PageSizeId::A4});
   m_printer.setPageOrientation(QPageLayout::Landscape);
   m_printer.setOutputFileName("kiq_document.pdf"); // TODO: Set from UI
+  m_svg    .setFileName      ("kiq_document.svg");
   m_doc.setPageSize(m_printer.pageRect().size());
 
   /**
@@ -428,6 +411,7 @@ void DocumentWindow::AddColumn()
   const auto count = ui->rowContent->columnCount();
   ui->rowContent->setColumnCount(count + 1);
   m_table        .setColumnCount(count + 1);
+  m_table        .setHorizontalHeaderItem(count, new QTableWidgetItem{});
   for (auto i = 0; i < ui->rowContent->rowCount(); i++)
   {
     ui->rowContent->setItem(i, count, new QTableWidgetItem{});
@@ -499,7 +483,18 @@ bool DocumentWindow::ImageAtCell(int32_t row, int32_t col)
  */
 void DocumentWindow::SavePDF()
 {
+  qDebug() << m_doc.toHtml();
   m_doc.print(&m_printer);
+  QRect rectSize{static_cast<int>(0),
+                 static_cast<int>(0),
+                 static_cast<int>(m_doc.size().width()),
+                 static_cast<int>(m_doc.size().height())};
+  QPainter painter{&m_svg};
+  painter.setViewport(rectSize);
+  m_doc.documentLayout()->setPaintDevice(&m_svg);
+  m_doc.drawContents(&painter);
+  m_doc  .clear();
+  m_table.clear();
 }
 
 /**
@@ -538,7 +533,6 @@ void DocumentWindow::ReceiveFiles(QVector<FileWrap>&& files)
             const bool image = IsImage(item->text());
             if (image)
               m_image_coords.insert(row, col);
-              // TODO: Render here, or when saving section (or both)
             else
             {
               const auto text  = item->text().remove(0, 1);

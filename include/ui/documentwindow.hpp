@@ -7,6 +7,7 @@
 #include <QTableWidget>
 #include <QPrinter>
 #include <QDialog>
+#include <QSvgGenerator>
 #include <QFile>
 #include <QFileDialog>
 #include <QBuffer>
@@ -73,6 +74,7 @@ private:
   QList<RowType>     m_row_types;
   QString            m_file_path;
   QTextDocument      m_doc;
+  QSvgGenerator      m_svg;
   QPrinter           m_printer;
   TaskMap            m_tasks;
   int32_t            m_task_index;
