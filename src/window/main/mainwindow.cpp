@@ -224,9 +224,9 @@ void MainWindow::connectClient() {
     q_client->request(static_cast<uint8_t>(RequestType::FETCH_TASK_DATA), argv);
   });
 
-  QObject::connect(&doc_window, &DocumentWindow::RequestFiles, this, [this](const QString& id)
+  QObject::connect(&doc_window, &DocumentWindow::RequestFiles, this, [this](const QVector<QString>& ids)
   {
-    q_client->request(static_cast<uint8_t>(RequestType::FETCH_FILE), id);
+    q_client->request(static_cast<uint8_t>(RequestType::FETCH_FILE), ids);
   });
 
   QObject::connect(q_client, &Client::onDownload, this,

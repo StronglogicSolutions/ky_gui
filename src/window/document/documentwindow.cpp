@@ -70,9 +70,9 @@ void DocumentWindow::SaveSection()
 
   for (TaskMap::Iterator it = m_tasks.begin(); it != m_tasks.end(); it++, row_idx++)
   {
-    for (int i = 0; i < t->rowCount(); i++)
+    for (int i = 0; i < ui->rowContent->rowCount(); i++)
     {
-      for (int j = 0; j < t->columnCount(); j++)
+      for (int j = 0; j < col_count; j++)
       {
         const int      col_idx = j;
         QTextTableCell cell    = render_table->cellAt(row_idx, col_idx);
@@ -85,7 +85,7 @@ void DocumentWindow::SaveSection()
           cell.firstCursorPosition().insertImage(pm.toImage().scaledToHeight(320));
         }
         else
-          cell.firstCursorPosition().insertText(t->item(i, j)->text());
+          cell.firstCursorPosition().insertText(t->item(row_idx, col_idx)->text());
       }
     }
   }
@@ -445,9 +445,10 @@ void DocumentWindow::ReceiveData(const QString& message, const QVector<QString>&
   if (message == "Task Data")
   {
     const int32_t task_count = data.front().toInt();
-    const int32_t arg_count  = ((data.size() - (1 + task_count)) / task_count);
+    const int32_t item_count = data.size();
+    const int32_t arg_count  = ((item_count - (1 + task_count)) / task_count);
 
-    for (int32_t i = 1; i <= task_count; i += arg_count)
+    for (int32_t i = 1; i < item_count; i += (arg_count + 1))
     {
       const auto id = data.at(i);
       TaskFlags  flags{};
@@ -462,8 +463,7 @@ void DocumentWindow::ReceiveData(const QString& message, const QVector<QString>&
   else
   if (message == "Task Data Final")  
     if (m_fetch_files)
-      for (const auto& id : m_tasks.keys())
-        emit RequestFiles(id);
+      emit RequestFiles(m_tasks.keys().toVector());
 }
 
 /**
@@ -483,7 +483,6 @@ bool DocumentWindow::ImageAtCell(int32_t row, int32_t col)
  */
 void DocumentWindow::SavePDF()
 {
-  qDebug() << m_doc.toHtml();
   m_doc.print(&m_printer);
   QRect rectSize{static_cast<int>(0),
                  static_cast<int>(0),
