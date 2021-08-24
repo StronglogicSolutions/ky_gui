@@ -685,9 +685,8 @@ void Client::request(uint8_t request_code, T payload) {
           std::vector<std::string>{std::to_string(request_code), std::to_string(getSelectedApp())});
       break;
       case (RequestType::FETCH_FILE):
-        if constexpr (std::is_same_v<T, QString>)
-          operation_string = createOperation("FetchFileOperation",
-            std::vector<std::string>{std::to_string(request_code), payload.toStdString()});
+        if constexpr (std::is_same_v<T, QVector<QString>>)
+          operation_string = createOperation("FetchFileOperation", ArgsToV(payload, request_code));
       break;
       case (RequestType::FETCH_TASK_DATA):
         if constexpr (std::is_same_v<T, QVector<QString>>)
@@ -713,11 +712,11 @@ void Client::request(uint8_t request_code, T payload) {
   }
 }
 
-template void  Client::request(uint8_t request_code, ScheduledTask    payload);
-template void  Client::request(uint8_t request_code, KApplication     payload);
-template void  Client::request(uint8_t request_code, uint32_t         payload);
-template void  Client::request(uint8_t request_code, QVector<QString> payload);
-template void  Client::request(uint8_t request_code, QString          payload);
+template void Client::request(uint8_t request_code, ScheduledTask    payload);
+template void Client::request(uint8_t request_code, KApplication     payload);
+template void Client::request(uint8_t request_code, uint32_t         payload);
+template void Client::request(uint8_t request_code, QVector<QString> payload);
+template void Client::request(uint8_t request_code, QString          payload);
 
 
 /**
@@ -761,10 +760,10 @@ void Client::setIncomingFile(const StringVec& files)
   m_download_console.wt_count = files.front().toUInt();
 
   for (int32_t i = 0; i < m_download_console.wt_count; i++)
-    m_download_console.files.push_back(FileWrap{.task_id = files[1 + (3 * i)],
-                                                .id      = files[2 + (3 * i)],
-                                                .name    = files[3 + (3 * i)],
-                                                .type    = files[4 + (3 * i)],
+    m_download_console.files.push_back(FileWrap{.task_id = files[1 + (4 * i)],
+                                                .id      = files[2 + (4 * i)],
+                                                .name    = files[3 + (4 * i)],
+                                                .type    = files[4 + (4 * i)],
                                                 .buffer  = nullptr});
   m_download_console.Wait();
   sendEncoded(createOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
