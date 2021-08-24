@@ -52,7 +52,7 @@ public:
 
 signals:
   void RequestData(QVector<QString> argv);
-  void RequestFiles(const QString& id);
+  void RequestFiles(const QVector<QString>& id);
 
 protected:
   virtual void mouseReleaseEvent(QMouseEvent* e) override;
