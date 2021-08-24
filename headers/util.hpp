@@ -299,6 +299,20 @@ bool isMessage(const char* data) {
   return false;
 }
 
+template <typename T, typename P>
+std::vector<std::string> ArgsToV(QVector<T> args, P arg)
+{
+  std::vector<std::string> v{};
+  if constexpr (std::is_same_v<P, uint8_t>)
+    v.emplace_back(std::to_string(arg));
+  if constexpr (std::is_same_v<T, QString>)
+    for (const auto& s : args)
+      v.emplace_back(s.toStdString());
+  return v;
+}
+
+template std::vector<std::string> ArgsToV(QVector<QString>, uint8_t);
+
 std::string createOperation(const char* op, std::vector<std::string> args) {
     StringBuffer s;
     Writer<StringBuffer, Document::EncodingType, ASCII<>> w(s);
