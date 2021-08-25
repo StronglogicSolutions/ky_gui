@@ -34,6 +34,7 @@ SOURCES += \
         src/window/main/mainwindow.cpp \
         src/window/main/controller.cpp \
         src/window/document/documentwindow.cpp \
+        src/window/document/helpers.cpp \
         src/client/client.cpp \
         src/task/instagram_task.cpp \
         src/task/generic_task.cpp \
@@ -58,6 +59,7 @@ HEADERS += \
         include/task/task.hpp \
         include/task/instagram_task.hpp\
         include/task/generic_task.hpp\
+        src/window/document/helpers.hpp \
         third_party/kiqoder/kiqoder.hpp\
         third_party/kiqoder/file_iterator.hpp\
         headers/kmessage_codec.hpp \
