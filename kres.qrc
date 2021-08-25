@@ -18,6 +18,7 @@
         <file>icons/gear.png</file>
         <file>icons/messages.png</file>
         <file>icons/refresh.png</file>
+        <file>icons/make.png</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/log.png</file>

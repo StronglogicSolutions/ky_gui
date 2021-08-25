@@ -5,6 +5,8 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += printsupport
+QT       += svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -29,8 +31,10 @@ QMAKE_CXXFLAGS += "-fno-sized-deallocation"
 
 SOURCES += \
         src/main.cpp \
-        src/mainwindow/mainwindow.cpp \
-        src/mainwindow/controller.cpp \
+        src/window/main/mainwindow.cpp \
+        src/window/main/controller.cpp \
+        src/window/document/documentwindow.cpp \
+        src/window/document/helpers.cpp \
         src/client/client.cpp \
         src/task/instagram_task.cpp \
         src/task/generic_task.cpp \
@@ -43,6 +47,7 @@ SOURCES += \
 
 
 HEADERS += \
+        include/ui/documentwindow.hpp \
         include/ui/appdialog.hpp \
         include/ui/argdialog.h \
         include/ui/messagedialog.hpp \
@@ -54,6 +59,9 @@ HEADERS += \
         include/task/task.hpp \
         include/task/instagram_task.hpp\
         include/task/generic_task.hpp\
+        src/window/document/helpers.hpp \
+        third_party/kiqoder/kiqoder.hpp\
+        third_party/kiqoder/file_iterator.hpp\
         headers/kmessage_codec.hpp \
         headers/instatask_generated.h \
         headers/generictask_generated.h \
@@ -68,6 +76,7 @@ FORMS += \
         appdialog.ui \
         argdialog.ui \
         consoledialog.ui \
+        documentwindow.ui \
         mainwindow.ui \
         messagedialog.ui \
         scheduledialog.ui

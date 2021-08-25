@@ -41,15 +41,32 @@ struct ScheduledTask {
   QString          envfile;
 };
 
+struct FileWrap
+{
+  QString    task_id;
+  QString    id;
+  QString    name;
+  QString    type;
+  QByteArray buffer;
+
+  bool HasID() { return !(id.isEmpty()); }
+};
+
 namespace constants {
 enum RequestType {
-  REGISTER              = 0x00,
-  UPDATE                = 0x01,
-  DELETE                = 0x02,
-  GET                   = 0x03,
-  FETCH_SCHEDULE        = 0x04,
-  UPDATE_SCHEDULE       = 0x05,
-  FETCH_SCHEDULE_TOKENS = 0x06
+REGISTER              = 0x00,
+UPDATE                = 0x01,
+DELETE                = 0x02,
+GET                   = 0x03,
+FETCH_SCHEDULE        = 0x04,
+UPDATE_SCHEDULE       = 0x05,
+FETCH_SCHEDULE_TOKENS = 0x06,
+TRIGGER_CREATE        = 0x07,
+FETCH_TASK_FLAGS      = 0x08,
+FETCH_FILE            = 0x09,
+FETCH_FILE_ACK        = 0x0A,
+FETCH_FILE_READY      = 0x0B,
+FETCH_TASK_DATA       = 0x0C
 };
 
 const uint8_t SCHEDULED_TASK_ID_INDEX        = 0x00;
@@ -61,6 +78,16 @@ const uint8_t SCHEDULED_TASK_RECURRING_INDEX = 0x05;
 const uint8_t SCHEDULED_TASK_NOTIFY_INDEX    = 0x06;
 const uint8_t SCHEDULED_TASK_RUNTIME_INDEX   = 0x07;
 const uint8_t SCHEDULED_TASK_FILES_INDEX     = 0x08;
+
+const uint8_t TASK_ID_INDEX       {0x00};
+const uint8_t TASK_TIME_INDEX     {0x01};
+const uint8_t TASK_FLAGS_INDEX    {0x02};
+const uint8_t TASK_COMPLETED_INDEX{0x03};
+const uint8_t TASK_RECURRING_INDEX{0x04};
+const uint8_t TASK_NOTIFY_INDEX   {0x05};
+const uint8_t TASK_RUNTIME_INDEX  {0x06};
+const uint8_t TASK_FILES_INDEX    {0x07};
+
 }
 
 namespace {
@@ -213,7 +240,11 @@ bool isOperation(const char* data) {
 }
 
 bool isUploadCompleteEvent(const char* event) {
-    return strcmp(event, "File Transfer Complete") == 0;
+  return strcmp(event, "File Transfer Complete") == 0;
+}
+
+bool isUploadCompleteEvent(const QString& s) {
+  return s == "File Transfer Complete";
 }
 
 bool isValidJson(const QString& s) {
@@ -268,6 +299,20 @@ bool isMessage(const char* data) {
   return false;
 }
 
+template <typename T, typename P>
+std::vector<std::string> ArgsToV(QVector<T> args, P arg)
+{
+  std::vector<std::string> v{};
+  if constexpr (std::is_same_v<P, uint8_t>)
+    v.emplace_back(std::to_string(arg));
+  if constexpr (std::is_same_v<T, QString>)
+    for (const auto& s : args)
+      v.emplace_back(s.toStdString());
+  return v;
+}
+
+template std::vector<std::string> ArgsToV(QVector<QString>, uint8_t);
+
 std::string createOperation(const char* op, std::vector<std::string> args) {
     StringBuffer s;
     Writer<StringBuffer, Document::EncodingType, ASCII<>> w(s);
@@ -297,9 +342,27 @@ std::string getOperation(const char* data) {
     return "";
 }
 
+QString getOperation(const QString& data) {
+    Document d;
+    d.Parse(data.toUtf8());
+    if (d.HasMember("command")) {
+        return d["command"].GetString();
+    }
+    return "";
+}
+
 QString getEvent(const char* data) {
     Document d;
     d.Parse(data);
+    if (d.HasMember("event")) {
+        return d["event"].GetString();
+    }
+    return "";
+}
+
+QString getEvent(const QString& data) {
+    Document d;
+    d.Parse(data.toUtf8());
     if (d.HasMember("event")) {
         return d["event"].GetString();
     }
@@ -315,27 +378,36 @@ QString getMessage(const char* data) {
     return "";
 }
 
+QString getMessage(const QString& data) {
+  Document d;
+  d.Parse(data.toUtf8());
+  if (d.HasMember("message")) {
+      return d["message"].GetString();
+  }
+  return "";
+}
+
 QVector<QString> getShortArgs(const char* data) {
-    Document d;
-    d.Parse(data);
-    QVector<QString> args{};
-    if (d.HasMember("args")) {
-        if (d["args"].IsArray()) {
-            for (const auto& m : d["args"].GetArray()) {
-                if (m.GetStringLength() < 100) {
-                    args.push_back(m.GetString());
-                }
-            }
-        } else {
-            for (const auto& m : d["args"].GetObject()) {
-                QString arg = m.name.GetString();
-                arg +=  ": ";
-                arg += m.value.GetString();
-                args.push_back(arg);
-            }
+  Document d;
+  d.Parse(data);
+  QVector<QString> args{};
+  if (d.HasMember("args")) {
+    if (d["args"].IsArray()) {
+      for (const auto& m : d["args"].GetArray()) {
+        if (m.GetStringLength() < 100) {
+            args.push_back(m.GetString());
         }
+      }
+    } else {
+      for (const auto& m : d["args"].GetObject()) {
+        QString arg = m.name.GetString();
+        arg +=  ": ";
+        arg += m.value.GetString();
+        args.push_back(arg);
+      }
     }
-    return args;
+  }
+  return args;
 }
 
 QVector<QString> getArgs(const char* data) {
@@ -382,7 +454,7 @@ CommandMap getArgMap(const char* data) {
   return cm;
 }
 
-std::string createMessage(const char* data,
+std::string createMessage(const char*                data,
                           std::map<int, std::string> map = {}) {
     StringBuffer s;
     Writer<StringBuffer> w(s);
@@ -512,7 +584,7 @@ QString generatePreview(QString video_path, QString video_name) {
 }; // namespace FileUtils
 
 namespace UI {
-inline void infoMessageBox(QString text, QString title = "KYGUI") {
+static void infoMessageBox(QString text, QString title = "KYGUI") {
   QMessageBox box;
   box.setWindowTitle(title);
   box.setText(text);

@@ -6,8 +6,8 @@ using namespace KData;
 using namespace IGData;
 using namespace GenericData;
 
-static const int MAX_PACKET_SIZE = 4096;
-static const int HEADER_SIZE     = 4;
+static const uint32_t MAX_PACKET_SIZE = 4096;
+static const uint32_t HEADER_SIZE     = 4;
 
 flatbuffers::FlatBufferBuilder builder(1024);
 
@@ -121,12 +121,26 @@ Client::Client(QWidget *parent, int count, char** arguments)
   m_outbound_task(nullptr),
   executing(false),
   m_commands({}),
+  m_download_console(Kiqoder::FileHandler{
+    [this](int32_t id, uint8_t* buffer, size_t size) -> void
+    {
+      m_download_console.Write(QString::number(id), buffer, size);
+      m_download_console.rx_count++;
+
+      if (--m_download_console.wt_count)
+      {
+        m_download_console.Wait();
+        sendEncoded(createOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
+      }
+      else
+        onDownload(std::move(m_download_console.GetData()));
+    }
+  }),
   m_server_ip(arguments[1]),
   m_server_port((arguments[2]))
 {
-
-  // Register metadata type for passing data over slots/signals
   qRegisterMetaType<QVector<QString>>("QVector<QString>");
+  qRegisterMetaType<QVector<FileWrap>>("QVector<FileWrap>");
 }
 
 /**
@@ -141,86 +155,98 @@ Client::~Client() {
  * @brief Client::handleMessages
  */
 void Client::handleMessages() {
-    uint8_t receive_buffer[MAX_PACKET_SIZE];
-    for (;;) {
-        memset(receive_buffer, 0, MAX_PACKET_SIZE);
-        ssize_t bytes_received{0};
-        bytes_received = recv(m_client_socket_fd, receive_buffer, MAX_PACKET_SIZE, 0);
+  uint8_t receive_buffer[MAX_PACKET_SIZE];
+  for (;;) {
+    memset(receive_buffer, 0, MAX_PACKET_SIZE);
+    ssize_t bytes_received = recv(m_client_socket_fd, receive_buffer, MAX_PACKET_SIZE, 0);
 
-        if (bytes_received < 1)
-          break;                // Finish message loop
+    if (!bytes_received)
+      break;
 
-        size_t end_idx = findNullIndex(receive_buffer);
-        std::string data_string{receive_buffer, receive_buffer + end_idx};
-
-        qDebug() << "Received data from KServer: \n" << data_string.c_str();
-
-        if (isPong(data_string.c_str())) {
-            qDebug() << "Server returned pong";
-            emit Client::messageReceived(PONG_REPLY_TYPE, "Pong", {data_string.c_str()}); // Update UI
-            continue;
-        }
-
-        try {
-          if (!isValidJson(data_string)) {
-            qDebug() << "Attempted to parse incoming message with invalid JSON:\n" << data_string.c_str();
-            continue;
-          }
-          else
-          if (isNewSession(data_string.c_str())) { // Session Start
-            StringVec s_v = getArgs(data_string.c_str());
-            emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", s_v); // Update UI
-          }
-          else
-          if (serverWaitingForFile(data_string.c_str())) { // Server expects a file
-            processFileQueue();
-          }
-          else
-          if (isEvent(data_string.c_str())) { // Receiving event
-            QString event = getEvent(data_string.c_str());
-            QVector<QString> args = getArgs(data_string.c_str());
-            emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args); // Update UI (event)
-            if (isUploadCompleteEvent(event.toUtf8().constData())) { // Upload complete
-              if (!args.isEmpty()) {
-                sent_files.at(sent_files.size() - 1).timestamp =
-                    std::stoi(args.at(0).toUtf8().constData()); // mark file with server-generated timestamp
-                if (outgoing_files.isEmpty()) { // Task files are all sent
-                  sendTaskEncoded(m_outbound_task); // Send remaining task data to complete scheduling
-                  file_was_sent = false;
-                } else { // Begin file upload operation. Task will be sent after all outgoing files are sent.
-                  sendEncoded(
-                      createOperation("FileUpload", {"Subsequent file"}));
-                }
-              }
-            }
-          }
-          std::string formatted_json = getJsonString(data_string);
-          emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(formatted_json.data(), formatted_json.size()), {});
-        } catch (const std::exception& e) {
-          QString error{e.what()};
-        }
+    if (m_download_console.is_downloading())
+    {
+      handleDownload(receive_buffer, bytes_received);
+      continue;
     }
-    memset(receive_buffer, 0, 2048);
-    ::close(m_client_socket_fd);
+
+    size_t end_idx = findNullIndex(receive_buffer);
+    std::string data_string{receive_buffer, receive_buffer + end_idx};
+
+    qDebug() << "Received data from KServer: \n" << data_string.c_str();
+
+    if (isPong(data_string.c_str()))
+    {
+      qDebug() << "Server returned pong";
+      emit Client::messageReceived(PONG_REPLY_TYPE, "Pong", {data_string.c_str()}); // Update UI
+      continue;
+    }
+
+    try
+    {
+      if (!isValidJson(data_string))
+      {
+        qDebug() << "Attempted to parse incoming message with invalid JSON:\n" << data_string.c_str();
+        continue;
+      }
+      else
+      if (isNewSession(data_string.c_str()))
+      {
+        StringVec s_v = getArgs(data_string.c_str());
+        emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", s_v); // Update UI
+      }
+      else
+      if (serverWaitingForFile(data_string.c_str()))
+        processFileQueue();
+      else
+      if (isEvent(data_string.c_str()))
+      {
+        QString event = getEvent(data_string.c_str());
+        QVector<QString> args = getArgs(data_string.c_str());
+        emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args);
+        if (isUploadCompleteEvent(event.toUtf8().constData()))
+        {
+          if (!args.isEmpty())
+          {
+            sent_files.at(sent_files.size() - 1).timestamp = std::stoi(args.at(0).toUtf8().constData());
+            if (outgoing_files.isEmpty())
+            {
+              sendTaskEncoded(m_outbound_task);
+              file_was_sent = false;
+            }
+            else
+              sendEncoded(createOperation("FileUpload", {"Subsequent file"}));
+          }
+        }
+      }
+      std::string formatted_json = getJsonString(data_string);
+      emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(formatted_json.data(), formatted_json.size()), {});
+    } catch (const std::exception& e) {
+      QString error{e.what()};
+    }
   }
+  memset(receive_buffer, 0, MAX_PACKET_SIZE);
+  ::close(m_client_socket_fd);
+}
 
 
-void Client::handleEvent(std::string data) {
-  QString event = getEvent(data.c_str());
-  QVector<QString> args = getArgs(data.c_str());
-  emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args); // Update UI (event)
-  if (isUploadCompleteEvent(event.toUtf8().constData())) { // Upload complete
-    if (!args.isEmpty()) {
-      sent_files.at(sent_files.size() - 1).timestamp =
-        std::stoi(args.at(0).toUtf8().constData()); // mark file with server-generated timestamp
-      if (outgoing_files.isEmpty()) { // Task files are all sent
+void Client::handleEvent(std::string data)
+{
+  QString          event = getEvent(data.c_str());
+  QVector<QString> args  = getArgs (data.c_str());
+
+  emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args);
+
+  if (isUploadCompleteEvent(event))
+  {
+    if (!args.isEmpty())
+    {
+      sent_files.at(sent_files.size() - 1).timestamp = args.at(0).toInt();
+      if (outgoing_files.isEmpty())
+      {
         sendTaskEncoded(m_outbound_task); // Send remaining task data to complete scheduling
         file_was_sent = false;
-      } else { // Begin file upload operation. Task will be sent after all outgoing files are sent.
-        sendEncoded(
-          createOperation("FileUpload", {"Subsequent file"})
-        );
-      }
+      } else
+        sendEncoded(createOperation("FileUpload", {"Subsequent file"}));
     }
   }
 }
@@ -391,65 +417,58 @@ void Client::sendTaskEncoded(Scheduler::Task* task) {
  * @param [in] {uint8_t*} data A pointer to a buffer of bytes
  * @param [in] {int}      size The size of the buffer to be packetized and sent
  */
-void Client::sendPackets(uint8_t* data, int size) {
-  uint32_t total_size = static_cast<uint32_t>(size + HEADER_SIZE);
-  uint32_t total_packets = static_cast<uint32_t>(ceil(
-    static_cast<double>(
-        static_cast<double>(total_size) / static_cast<double>(MAX_PACKET_SIZE)) // total size / packet
-    )
-  );
-  uint32_t idx = 0;
-  for (; idx < total_packets; idx++) {
-    bool is_first_packet = (idx == 0);
-    bool is_last_packet = (idx == (total_packets - 1));
-    if (is_first_packet) {
-      uint32_t first_packet_size =
-          std::min(size + HEADER_SIZE, MAX_PACKET_SIZE);
-      uint8_t packet[first_packet_size];
+void Client::sendPackets(uint8_t* data, uint32_t size)
+{
+  uint32_t total_size    = static_cast<uint32_t>(size + HEADER_SIZE);
+  uint32_t total_packets = static_cast<uint32_t>(ceil(static_cast<double>(
+        static_cast<double>(total_size) / static_cast<double>(MAX_PACKET_SIZE))));
 
+  for (uint32_t idx = 0; idx < total_packets; idx++)
+  {
+    bool is_first_packet = (idx == 0);
+    bool is_last_packet  = (idx == (total_packets - 1));
+
+    if (is_first_packet)
+    {
+      uint32_t first_packet_size = std::min(size + HEADER_SIZE, MAX_PACKET_SIZE);
+      uint8_t  packet[first_packet_size];
       packet[0] = (total_size >> 24) & 0xFF;
       packet[1] = (total_size >> 16) & 0xFF;
-      packet[2] = (total_size >> 8) & 0xFF;
-      packet[3] = (total_size) & 0xFF;
+      packet[2] = (total_size >> 8)  & 0xFF;
+      packet[3] = (total_size)       & 0xFF;
 
       std::memcpy(packet + HEADER_SIZE, data, first_packet_size - HEADER_SIZE);
-      /**
-       * SEND PACKET !!!
-       */
+
       ::send(m_client_socket_fd, packet, first_packet_size, 0);
-      if (is_last_packet) {
+
+      if (is_last_packet)
         break;
-      }
       continue;
     }
-    int offset = (idx * MAX_PACKET_SIZE) - HEADER_SIZE;
+
+    uint32_t offset      = (idx * MAX_PACKET_SIZE) - HEADER_SIZE;
     uint32_t packet_size = std::min(size - offset, MAX_PACKET_SIZE);
-    uint8_t packet[packet_size];
+    uint8_t  packet[packet_size];
 
     std::memcpy(packet, data + offset, packet_size);
-    /**
-     * SEND PACKET !!!
-     */
     ::send(m_client_socket_fd, packet, packet_size, 0);
-    if (is_last_packet) {
-        // cleanup
-        qDebug() << "Last packet of file sent";
-        file_was_sent = true;
-    }
+
+    if (is_last_packet)
+      file_was_sent = true;
   }
 }
 
 
 void Client::ping() {
-  if (m_client_socket_fd != -1) {  // if we have active connection
-    if (outgoing_files.size() == 0 || file_was_sent) {
-      /* 1st condition: we aren't sending file packets
-         2nd condition: we were sending packets, but the file is complete and we want
-         to ping in case the server is unresponsive */
+  if (m_client_socket_fd != -1)
+  {
+    if ((outgoing_files.size() == 0 || file_was_sent) && !m_download_console.is_downloading())
+    {
+      qDebug() << "Pinging server";
+
       uint8_t send_buffer[5];
       memset(send_buffer, 0, 5);
       send_buffer[4] = (TaskCode::PINGBYTE & 0xFF);
-      qDebug() << "Pinging server";
       ::send(m_client_socket_fd, send_buffer, 5, 0);
     }
   }
@@ -620,67 +639,85 @@ void Client::request(uint8_t request_code, T payload) {
   try {
     std::string operation_string{};
 
-    if (request_code == RequestType::REGISTER ||
-        request_code == RequestType::DELETE     )
+    switch (request_code)
     {
-      if constexpr (std::is_same_v<T, KApplication>) {
-        std::vector<std::string> operation_args{
-            std::to_string(request_code),
-            payload.name.toUtf8().constData(),
-            payload.path.toUtf8().constData(),
-            payload.data.toUtf8().constData(),
-            payload.mask.toUtf8().constData()
-        };
-        operation_string = createOperation("AppRequest", operation_args);
-      }
-      else
-        throw std::invalid_argument{
-          "Register payload must be KApplication object"
-        };
-    }
-    else
-    if (request_code == RequestType::FETCH_SCHEDULE) {
-      operation_string = createOperation(
-          "Schedule",
-          {std::to_string(RequestType::FETCH_SCHEDULE)}
-      );
-    }
-    else
-    if (request_code == RequestType::UPDATE_SCHEDULE        ||
-        request_code == RequestType::FETCH_SCHEDULE_TOKENS) {
-      if constexpr (std::is_same_v<T, ScheduledTask>) {
-        std::vector<std::string> operation_args{
-          std::to_string(request_code),
-          payload.id.toUtf8().constData(),
-          payload.app.toUtf8().constData(),
-          std::to_string(payload.time.toTime_t()),
-          payload.flags.toUtf8().constData(),
-          payload.completed.toUtf8().constData(),
-          payload.recurring.toUtf8().constData(),
-          payload.notify.toUtf8().constData(),
-          payload.runtime.toUtf8().constData(),
-          (payload.files.isEmpty()) ?
-                                      "" :
-                                      payload.files.front().toUtf8().constData(),
-          payload.envfile.toUtf8().constData()
-        };
-        operation_string = createOperation("Schedule", operation_args);
-
-        qDebug() << "Update Schedule string:\n" << operation_string.c_str();
-      }
-    }
-    else {
+      case (RequestType::REGISTER):
+      case (RequestType::DELETE):
+        if constexpr (std::is_same_v<T, KApplication>) {
+          std::vector<std::string> operation_args{
+              std::to_string(request_code),
+              payload.name.toUtf8().constData(),
+              payload.path.toUtf8().constData(),
+              payload.data.toUtf8().constData(),
+              payload.mask.toUtf8().constData()
+          };
+          operation_string = createOperation("AppRequest", operation_args);
+        }
+        else
+          throw std::invalid_argument{
+            "Register payload must be KApplication object"
+          };
+      break;
+      case (RequestType::FETCH_SCHEDULE):
+        operation_string = createOperation("Schedule", {std::to_string(RequestType::FETCH_SCHEDULE)});
+      break;
+      case (RequestType::UPDATE_SCHEDULE):
+      case (RequestType::FETCH_SCHEDULE_TOKENS):
+        if constexpr (std::is_same_v<T, ScheduledTask>)
+          operation_string = createOperation(
+            "Schedule", std::vector<std::string>{
+               std::to_string(request_code),
+               payload.id.toUtf8().constData(),
+               payload.app.toUtf8().constData(),
+               std::to_string(payload.time.toTime_t()),
+               payload.flags.toUtf8().constData(),
+               payload.completed.toUtf8().constData(),
+               payload.recurring.toUtf8().constData(),
+               payload.notify.toUtf8().constData(),
+               payload.runtime.toUtf8().constData(),
+               (payload.files.isEmpty()) ?
+                                           "" :
+                                           payload.files.front().toUtf8().constData(),
+               payload.envfile.toUtf8().constData()});
+      break;
+      case (RequestType::FETCH_TASK_FLAGS):
+        operation_string = createOperation("TaskOperation",
+          std::vector<std::string>{std::to_string(request_code), std::to_string(getSelectedApp())});
+      break;
+      case (RequestType::FETCH_FILE):
+        if constexpr (std::is_same_v<T, QVector<QString>>)
+          operation_string = createOperation("FetchFileOperation", ArgsToV(payload, request_code));
+      break;
+      case (RequestType::FETCH_TASK_DATA):
+        if constexpr (std::is_same_v<T, QVector<QString>>)
+        {
+          std::vector<std::string> op_payload{};
+          op_payload.reserve((payload.size() + 2));
+          op_payload.emplace_back(std::to_string(request_code));
+          op_payload.emplace_back(std::to_string(getSelectedApp()));
+          for (const QString& chunk : payload) op_payload.emplace_back(chunk.toStdString());
+          operation_string = createOperation("FetchTaskData", op_payload);
+        }
+      break;
+    default:
       qDebug() << "Client is unable to process request";
+      return;
     }
 
     sendEncoded(operation_string);
-  } catch (const std::exception& e) {
+  }
+  catch (const std::exception& e)
+  {
     qDebug() << "Exception caught:\n" << e.what();
   }
 }
 
-template void  Client::request(uint8_t request_code, ScheduledTask payload);
-template void  Client::request(uint8_t request_code, KApplication payload);
+template void Client::request(uint8_t request_code, ScheduledTask    payload);
+template void Client::request(uint8_t request_code, KApplication     payload);
+template void Client::request(uint8_t request_code, uint32_t         payload);
+template void Client::request(uint8_t request_code, QVector<QString> payload);
+template void Client::request(uint8_t request_code, QString          payload);
+
 
 /**
  * @brief Client::request
@@ -689,7 +726,8 @@ template void  Client::request(uint8_t request_code, KApplication payload);
  *
  * @param request_code
  */
-void Client::request(uint8_t request_code) {
+void Client::request(uint8_t request_code)
+{
   request(request_code, std::vector<std::string>{});
 }
 
@@ -704,4 +742,49 @@ void Client::sendIPCMessage(const QString& type, const QString& message, const Q
         user.toUtf8().constData()
       }
   ));
+}
+
+/**
+ * @brief Client::setIncomingFile
+ * @param files
+ */
+void Client::setIncomingFile(const StringVec& files)
+{
+  if (m_download_console.is_downloading())
+  {
+    qDebug() << "Client already has incoming pending. Ignoring request.";
+    return;
+  }
+
+  m_download_console.files.clear();
+  m_download_console.wt_count = files.front().toUInt();
+
+  for (int32_t i = 0; i < m_download_console.wt_count; i++)
+    m_download_console.files.push_back(FileWrap{.task_id = files[1 + (4 * i)],
+                                                .id      = files[2 + (4 * i)],
+                                                .name    = files[3 + (4 * i)],
+                                                .type    = files[4 + (4 * i)],
+                                                .buffer  = nullptr});
+  m_download_console.Wait();
+  sendEncoded(createOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
+}
+
+void Client::setMetadata(const StringVec& data)
+{
+  if (m_download_console.SetMetadata(data))
+    sendEncoded(createOperation("FILE_READY", {std::to_string(constants::RequestType::FETCH_FILE_READY)}));
+}
+
+void Client::handleDownload(uint8_t* data, ssize_t size)
+{
+  if (m_download_console.Waiting())
+  {
+    std::string decoded{data, data + findNullIndex(data)};
+    if (isValidJson(decoded))
+      emit Client::messageReceived(EVENT_UPDATE_TYPE, getEvent(decoded.c_str()), getArgs(decoded.c_str()));
+    else
+      qDebug() << "Error downloading file metadata";
+  }
+  else
+    m_download_console.Receive(data, size);
 }

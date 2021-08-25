@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'scheduledialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.14.2
+** Created by: Qt User Interface Compiler version 5.15.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -438,8 +438,8 @@ public:
         maskLabel_4->setText(QCoreApplication::translate("ScheduleDialog", "Flags", nullptr));
         pathLabel->setText(QCoreApplication::translate("ScheduleDialog", "Time", nullptr));
         dataLabel->setText(QCoreApplication::translate("ScheduleDialog", "Status", nullptr));
-        completed->setItemText(0, QCoreApplication::translate("ScheduleDialog", "Completed", nullptr));
-        completed->setItemText(1, QCoreApplication::translate("ScheduleDialog", "Scheduled", nullptr));
+        completed->setItemText(0, QCoreApplication::translate("ScheduleDialog", "Scheduled", nullptr));
+        completed->setItemText(1, QCoreApplication::translate("ScheduleDialog", "Success", nullptr));
         completed->setItemText(2, QCoreApplication::translate("ScheduleDialog", "Failed", nullptr));
         completed->setItemText(3, QCoreApplication::translate("ScheduleDialog", "Retry Failed", nullptr));
 

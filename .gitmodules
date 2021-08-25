@@ -1,0 +1,3 @@
+[submodule "third_party/kiqoder"]
+	path = third_party/kiqoder
+	url = git@github.com:stronglogicsolutions/kiqoder

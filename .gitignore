@@ -20,4 +20,5 @@ ui_consoledialog.h
 ui_messagedialog.h
 ui_appdialog.h
 ui_scheduledialog.h
+ui_documentwindow.h
 

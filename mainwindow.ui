@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>783</width>
+    <width>789</width>
     <height>517</height>
    </rect>
   </property>
@@ -37,6 +37,7 @@
    <property name="styleSheet">
     <string notr="true">border-color: rgb(0, 0, 0);
 background-color: rgb(0, 43, 54);
+background-color: rgb(51, 51, 51);
 QPushButton::hover:
 {
    opacity: 0.7;
@@ -281,7 +282,7 @@ font-weight: 700;</string>
       </layout>
      </widget>
     </item>
-    <item row="0" column="0" colspan="2">
+    <item row="1" column="1">
      <widget class="QWidget" name="outerLayer" native="true">
       <layout class="QGridLayout" name="outerLayout">
        <property name="sizeConstraint">
@@ -300,7 +301,7 @@ font-weight: 700;</string>
               </sizepolicy>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: #2f535f;
+              <string notr="true">background-color: #333;
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);</string>
              </property>
@@ -340,7 +341,7 @@ color: rgb(0, 0, 0);</string>
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,0,2">
+            <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,0,0,2">
              <property name="spacing">
               <number>4</number>
              </property>
@@ -349,6 +350,7 @@ color: rgb(0, 0, 0);</string>
                <property name="styleSheet">
                 <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
 color: rgb(131, 148, 150);
+background-color: rgb(0,0,0);
 font-weight: 700;</string>
                </property>
                <property name="text">
@@ -380,10 +382,9 @@ font-weight: 700;</string>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-background-color: #2f535f;
-color: rgb(131, 148, 150);
-font-weight: 700;
-</string>
+background-color: #5eabc2;
+color: rgb(29, 51, 59);
+font-weight: 700;</string>
                  </property>
                 </widget>
                </item>
@@ -395,22 +396,52 @@ font-weight: 700;
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
+                 <property name="styleSheet">
+                  <string notr="true">background-color: #2f535f;</string>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
                  <property name="icon">
                   <iconset resource="kres.qrc">
-                   <normaloff>:/icons/icons/gear.png</normaloff>:/icons/icons/gear.png</iconset>
+                   <normaloff>:/icons/icons/add.png</normaloff>:/icons/icons/add.png</iconset>
                  </property>
                 </widget>
                </item>
               </layout>
              </item>
              <item>
+              <widget class="QPushButton" name="makeDoc">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(147,147,147);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+               </property>
+               <property name="text">
+                <string>Generate document</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QLabel" name="selectProcessTitle_2">
                <property name="styleSheet">
                 <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
 color: rgb(131, 148, 150);
+background-color: rgb(0,0,0);
 font-weight: 700;</string>
                </property>
                <property name="text">
@@ -435,15 +466,15 @@ font-weight: 700;</string>
                <item>
                 <widget class="QComboBox" name="ipcList">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-background-color: #2f535f;
-color: rgb(131, 148, 150);
+background-color: #5eabc2;
+color: rgb(29, 51, 59);
 font-weight: 700;
 </string>
                  </property>
@@ -471,6 +502,9 @@ font-weight: 700;
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">background-color: #2f535f;</string>
                  </property>
                  <property name="text">
                   <string/>
@@ -506,7 +540,7 @@ font-weight: 700;
                   <bool>false</bool>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">background-color: rgb(255, 85, 0);
+                  <string notr="true">background-color: rgb(147, 147, 147);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 43, 54);
 font-weight: 700;
@@ -558,7 +592,7 @@ padding: 4px;</string>
                   <bool>false</bool>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">background-color: rgb(255, 85, 0);
+                  <string notr="true">background-color: rgb(147,147,147);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 43, 54);
 font-weight: 700;
@@ -619,7 +653,7 @@ padding: 4px;</string>
                   <bool>false</bool>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">background-color: rgb(255, 85, 0);
+                  <string notr="true">background-color: rgb(147,147,147);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 43, 54);
 font-weight: 700;
@@ -659,6 +693,7 @@ padding: 4px;</string>
                <property name="styleSheet">
                 <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
 color: rgb(131, 148, 150);
+background-color: rgb(0,0,0);
 font-weight: 700;</string>
                </property>
                <property name="text">
@@ -727,6 +762,7 @@ item { border-bottom: 1px solid black; padding: 16px;} </string>
                    <property name="styleSheet">
                     <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
 color: rgb(131, 148, 150);
+background-color: rgb(0,0,0);
 font-weight: 700;</string>
                    </property>
                    <property name="text">
@@ -763,7 +799,8 @@ font-weight: 700;
 background-color: rgb(29, 51, 59);
 color: rgb(223, 252, 255);
 padding: 4px;
-item { border-bottom: 1px solid black; padding: 16px;} </string>
+item { border-bottom: 1px solid black;
+padding: 16px;} </string>
                    </property>
                    <property name="alternatingRowColors">
                     <bool>true</bool>
@@ -804,6 +841,7 @@ item { border-bottom: 1px solid black; padding: 16px;} </string>
                    <property name="styleSheet">
                     <string notr="true">font: 75 11pt &quot;Noto Sans&quot;;
 color: rgb(131, 148, 150);
+background-color: rgb(0,0,0);
 font-weight: 700;</string>
                    </property>
                    <property name="text">
@@ -839,10 +877,10 @@ font-weight: 700;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
-background-color: #2f535f;
-color: rgb(131, 148, 150);
+color: rgb(0, 43, 54);
 font-weight: 700;
-background-color: rgb(29, 51, 59);
+background-color: #2f535f;
+background-color: rgb(94, 171, 194);
 color: rgb(223, 252, 255);</string>
                    </property>
                   </widget>
@@ -877,7 +915,7 @@ color: rgb(223, 252, 255);</string>
                    <property name="styleSheet">
                     <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
-background-color: rgb(255, 0, 4);
+background-color: rgb(185, 0, 0);
 font-weight: 700;
 padding: 4px;
 border-style: outset;
@@ -917,7 +955,7 @@ padding: 4px;</string>
                     <bool>false</bool>
                    </property>
                    <property name="styleSheet">
-                    <string notr="true">background-color: rgb(255, 85, 0);
+                    <string notr="true">background-color: rgb(147,147,147);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 43, 54);
 font-weight: 700;
@@ -956,7 +994,7 @@ padding: 4px;</string>
                     </size>
                    </property>
                    <property name="styleSheet">
-                    <string notr="true">background-color: rgb(2, 180, 43);
+                    <string notr="true">background-color: rgb(147,147,147);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
 font-weight: 700;
@@ -995,7 +1033,7 @@ padding: 4px;</string>
                     <bool>false</bool>
                    </property>
                    <property name="styleSheet">
-                    <string notr="true">background-color: rgb(2, 180, 43);
+                    <string notr="true">background-color: rgb(147,147,147);
 font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
 font-weight: 700;
@@ -1048,7 +1086,7 @@ padding: 4px;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>783</width>
+     <width>789</width>
      <height>23</height>
     </rect>
    </property>
@@ -1075,6 +1113,17 @@ padding: 4px;</string>
    </widget>
    <addaction name="kyGUIMenu"/>
    <addaction name="kyThemeMenu"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
   </widget>
   <action name="actionDefault">
    <property name="text">
