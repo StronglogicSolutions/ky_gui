@@ -1,10 +1,7 @@
-#ifndef DOCUMENTWINDOW_HPP
-#define DOCUMENTWINDOW_HPP
+#pragma once
 
 #include <QMainWindow>
 #include <QMouseEvent>
-#include <QTextDocument>
-#include <QTableWidget>
 #include <QPrinter>
 #include <QDialog>
 #include <QSvgGenerator>
@@ -13,15 +10,11 @@
 #include <QBuffer>
 #include <QMimeDatabase>
 #include <QHash>
-
+#include "src/window/document/helpers.hpp"
 #include <include/ui/kfiledialog.h>
 #include <headers/util.hpp>
 
-enum class RowType
-{
-  HEADER = 0x00,
-  REPEAT = 0x01
-};
+
 using TaskFlags = QHash<QString, QString>;
 using Coords    = QHash<qint32, qint32>;
 
@@ -62,6 +55,7 @@ private:
   void SetInserting(const bool inserting, const int32_t& index = -1);
   void AddRow();
   void AddColumn();
+  void RenderSection();
   void SaveSection();
   void SavePDF();
   bool ImageAtCell(int32_t row, int32_t col);
@@ -82,5 +76,3 @@ private:
   Coords             m_image_coords;
   bool               m_fetch_files;
 };
-
-#endif // DOCUMENTWINDOW_HPP
