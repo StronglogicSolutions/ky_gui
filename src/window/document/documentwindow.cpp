@@ -3,93 +3,12 @@
 #include <QDebug>
 #include <QList>
 #include <QPrinter>
+#include <QPrintDialog>
 #include <QTextDecoder>
-#include <QTextCursor>
 #include <QTextTable>
 #include <QTimer>
-#include <QPainter>
 #include <QAbstractTextDocumentLayout>
 #include "headers/util.hpp"
-
-/**
- * @brief GetBrushForType
- * @param type
- * @return
- */
-static QBrush GetBrushForType(const RowType& type)
-{
-  return (type == RowType::REPEAT) ?
-    QBrush{QColor{"grey"}} :
-    QBrush{QColor{"red"}};
-}
-
-/**
- * @brief IsImage
- * @param s
- * @return
- */
-static bool IsImage(const QString& s)
-{
-  return (s == "$FILE_TYPE");
-}
-
-/**
- * @brief CloseTable
- * @param doc_ptr
- */
-static void CloseTable(QTextDocument* doc_ptr)
-{
-  QTextCursor cursor{doc_ptr};
-  cursor.movePosition(QTextCursor::End);
-  cursor.insertHtml("</tbody></table>");
-}
-
-static bool FindInTable(QTableWidget* t, const QString& s)
-{
-  auto rows = t->rowCount();
-  auto cols = t->columnCount();
-
-  for (int32_t i = 0; i < rows; i++)
-    for (int32_t j = 0; j < cols; j++)
-      if (t->item(i, j)->text() == s)
-        return true;
-  return false;
-}
-
-/**
- * @brief DocumentWindow::SaveSection
- */
-void DocumentWindow::SaveSection()
-{
-  QTextCursor   cursor{&m_doc};
-  uint32_t      row_idx{};
-  const auto    row_count    = m_tasks.size();
-  const auto    col_count    = m_table.columnCount();
-  QTableWidget* t            = &m_table;
-  QTextTable*   render_table = cursor.insertTable(row_count, col_count);
-
-  for (TaskMap::Iterator it = m_tasks.begin(); it != m_tasks.end(); it++, row_idx++)
-  {
-    for (int i = 0; i < ui->rowContent->rowCount(); i++)
-    {
-      for (int j = 0; j < col_count; j++)
-      {
-        const int      col_idx = j;
-        QTextTableCell cell    = render_table->cellAt(row_idx, col_idx);
-
-        if (ImageAtCell(i, j))
-        {
-          const FileWrap file = it->files.front();
-          QPixmap        pm{};
-          pm.loadFromData(file.buffer, QMimeDatabase{}.mimeTypeForName(file.name).preferredSuffix().toUtf8());
-          cell.firstCursorPosition().insertImage(pm.toImage().scaledToHeight(320));
-        }
-        else
-          cell.firstCursorPosition().insertText(t->item(row_idx, col_idx)->text());
-      }
-    }
-  }
-}
 
 /**
  * @brief DocumentWindow::DocumentWindow
@@ -117,10 +36,12 @@ DocumentWindow::DocumentWindow(QWidget *parent)
     ui->rowContent->item(0, i)->setBackground(GetBrushForType(RowType::REPEAT));
   }
 
-  m_printer.setOutputFormat(   QPrinter::PdfFormat);
-  m_printer.setPageSize(       QPageSize{QPageSize::PageSizeId::A4});
+  m_printer.setPageSize       (QPageSize{QPageSize::PageSizeId::A4});
+  m_printer.setOutputFormat   (QPrinter::PdfFormat);
+//  m_printer.setResolution     (QPrinter::HighResolution);
   m_printer.setPageOrientation(QPageLayout::Landscape);
   m_printer.setOutputFileName("kiq_document.pdf"); // TODO: Set from UI
+  m_printer.setColorMode(QPrinter::Color);
   m_svg    .setFileName      ("kiq_document.svg");
   m_doc.setPageSize(m_printer.pageRect().size());
 
@@ -436,6 +357,84 @@ void DocumentWindow::mouseReleaseEvent(QMouseEvent* e)
 }
 
 /**
+ * @brief DocumentWindow::SaveSection
+ */
+void DocumentWindow::SaveSection()
+{
+  QTextCursor   cursor{&m_doc};
+  uint32_t      row_idx{};
+  const auto    row_count    = m_tasks.size();
+  const auto    col_count    = m_table.columnCount();
+  QTableWidget* t            = &m_table;
+  QTextTable*   render_table = cursor.insertTable(row_count, col_count);
+
+  for (TaskMap::Iterator it = m_tasks.begin(); it != m_tasks.end(); it++, row_idx++)
+  {
+    for (int i = 0; i < ui->rowContent->rowCount(); i++)
+    {
+      for (int j = 0; j < col_count; j++)
+      {
+        const int      col_idx = j;
+        QTextTableCell cell    = render_table->cellAt(row_idx, col_idx);
+
+        if (ImageAtCell(i, j))
+        {
+          const FileWrap file = it->files.front();
+          QPixmap        pm{};
+          pm.loadFromData(file.buffer, QMimeDatabase{}.mimeTypeForName(file.name).preferredSuffix().toUtf8());
+          cell.firstCursorPosition().insertImage(pm.toImage().scaledToHeight(240));
+        }
+        else
+          cell.firstCursorPosition().insertText(t->item(row_idx, col_idx)->text());
+      }
+    }
+  }
+}
+
+void DocumentWindow::RenderSection()
+{
+  m_table.setRowCount(m_tasks.size());
+
+  QTableWidget* t       = ui->rowContent;
+  int32_t       row_idx = 0;
+  const auto    rows    = t->rowCount();
+  const auto    cols    = t->columnCount();
+  for (TaskMap::iterator it = m_tasks.begin(); it != m_tasks.end(); it++, row_idx++)
+  {
+    const auto task = *it;
+    for (auto row = 0; row < rows; row++)
+    {
+      const bool should_insert = m_row_types.at(row) == RowType::REPEAT;
+      for (auto col = 0; col < cols; col++)
+      {
+        const auto item = t->item(row, col);
+        auto widget = new QTableWidgetItem{};
+        if (should_insert)
+        {
+          const bool image = IsImage(item->text());
+          if (image)
+            m_image_coords.insert(row, col);
+          else
+          {
+            const auto text  = item->text().isEmpty() ? "" : item->text().remove(0, 1);
+            const auto f_it  = task.flags.find(text);
+            const bool found = f_it != task.flags.cend();
+
+            if (found)
+              widget->setText(f_it.value());
+          }
+        }
+        else
+          widget->setText(item->text());
+
+        m_table.setItem(row_idx, col, widget);
+      }
+    }
+  }
+  SaveSection();
+}
+
+/**
  * @brief DocumentWindow::ReceiveData
  * @param [in] message {QString}
  * @param [in] data    {QVector<QString>}
@@ -461,9 +460,13 @@ void DocumentWindow::ReceiveData(const QString& message, const QVector<QString>&
     }
   }
   else
-  if (message == "Task Data Final")  
+  if (message == "Task Data Final")
+  {
     if (m_fetch_files)
       emit RequestFiles(m_tasks.keys().toVector());
+    else
+      RenderSection();
+  }
 }
 
 /**
@@ -483,7 +486,14 @@ bool DocumentWindow::ImageAtCell(int32_t row, int32_t col)
  */
 void DocumentWindow::SavePDF()
 {
+  QFont font = ui->font->font();
+  font .setPixelSize(11);
+  m_doc.setDefaultFont(font);
+
+  if (QPrintDialog(&m_printer, this).exec() != QDialog::Accepted) return;
+
   m_doc.print(&m_printer);
+
   QRect rectSize{static_cast<int>(0),
                  static_cast<int>(0),
                  static_cast<int>(m_doc.size().width()),
@@ -502,7 +512,6 @@ void DocumentWindow::SavePDF()
  */
 void DocumentWindow::ReceiveFiles(QVector<FileWrap>&& files)
 {
-
   for (auto&& file : files)
   {
     auto it = m_tasks.find(file.task_id);
@@ -511,48 +520,7 @@ void DocumentWindow::ReceiveFiles(QVector<FileWrap>&& files)
     else
       throw std::invalid_argument{"Task with matching ID not found"};
   }
-
-  m_table.setRowCount((m_table.rowCount() + m_tasks.size()));
-  QTableWidget* t = ui->rowContent;
-  for (TaskMap::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
-  {
-    const auto task = *it;
-    for (auto row = 0; row < t->rowCount(); row++)
-    {
-      m_table.insertRow(m_table.rowCount() + 1);
-      const bool should_insert = m_row_types.at(row) == RowType::REPEAT;
-      if (should_insert)
-      {
-        for (auto col = 0; col < t->columnCount(); col++)
-        {
-          m_table.insertColumn(m_table.columnCount() + 1);
-          const auto item = t->item(row, col);
-          if (!item->text().isEmpty())
-          {
-            const bool image = IsImage(item->text());
-            if (image)
-              m_image_coords.insert(row, col);
-            else
-            {
-              const auto text  = item->text().remove(0, 1);
-              const auto f_it  = task.flags.find(text);
-              const bool found = f_it != task.flags.cend();
-
-              if (found)
-              {
-                const auto value = f_it.value();
-                auto widget      = new QTableWidgetItem{};
-                widget->setText(value);
-                m_table.setItem(row, col, widget);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  SaveSection();
+  RenderSection();
 }
 
 void DocumentWindow::keyPressEvent(QKeyEvent* e)
