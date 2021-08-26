@@ -358,23 +358,33 @@ void DocumentWindow::mouseReleaseEvent(QMouseEvent* e)
 
 /**
  * @brief DocumentWindow::SaveSection
+ * Uses the intermediary table (m_table) to build our final render table.
+ * Renders media in cells as needed.
  */
 void DocumentWindow::SaveSection()
 {
   QTextCursor   cursor{&m_doc};
-  uint32_t      row_idx{};
-  const auto    row_count    = m_tasks.size();
+  int32_t       row_idx{};
+  const auto    row_count    = m_table.rowCount();
   const auto    col_count    = m_table.columnCount();
+  const auto    top_count    = (row_count - m_tasks.size());
   QTableWidget* t            = &m_table;
   QTextTable*   render_table = cursor.insertTable(row_count, col_count);
 
-  for (TaskMap::Iterator it = m_tasks.begin(); it != m_tasks.end(); it++, row_idx++)
-  {
-    for (int i = 0; i < ui->rowContent->rowCount(); i++)
+  for (; row_idx < top_count; row_idx++)
+    for (auto col = 0; col < col_count; col++)
     {
-      for (int j = 0; j < col_count; j++)
+      QTextTableCell cell    = render_table->cellAt(row_idx, col);
+      cell.firstCursorPosition().insertText(t->item(row_idx, col)->text());
+    }
+
+  for (TaskMap::Iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
+  {
+    for (auto i = top_count; i < ui->rowContent->rowCount(); i++, row_idx++)
+    {
+      for (auto j = 0; j < col_count; j++)
       {
-        const int      col_idx = j;
+        const auto     col_idx = j;
         QTextTableCell cell    = render_table->cellAt(row_idx, col_idx);
 
         if (ImageAtCell(i, j))
@@ -391,27 +401,51 @@ void DocumentWindow::SaveSection()
   }
 }
 
+/**
+ * @brief DocumentWindow::RenderSection
+ *
+ * Uses the template table and task data to build our intermediary table.
+ * The intermediary has header rows at the top, and all content rows (REPEAT type) below.
+ *
+ */
 void DocumentWindow::RenderSection()
 {
-  m_table.setRowCount(m_tasks.size());
+  int32_t rows_add{};
+  int32_t rows_mul{};
+  for (const auto& row_type : m_row_types)
+    if (row_type == RowType::HEADER)
+      rows_add++;
+  rows_mul = (m_row_types.size() - rows_add);
+  m_table.setRowCount((m_tasks.size() * rows_mul) + rows_add);
 
   QTableWidget* t       = ui->rowContent;
   int32_t       row_idx = 0;
   const auto    rows    = t->rowCount();
   const auto    cols    = t->columnCount();
+
+  for (auto row = 0; row < m_row_types.size(); row++)
+  {
+    if (m_row_types.at(row) == RowType::HEADER)
+    {
+      for (auto col = 0; col < cols; col++)
+        m_table.setItem(row_idx, col, new QTableWidgetItem{t->item(row, col)->text()});
+     row_idx++;
+    }
+  }
+
   for (TaskMap::iterator it = m_tasks.begin(); it != m_tasks.end(); it++, row_idx++)
   {
     const auto task = *it;
     for (auto row = 0; row < rows; row++)
     {
       const bool should_insert = m_row_types.at(row) == RowType::REPEAT;
-      for (auto col = 0; col < cols; col++)
+      if (should_insert)
       {
-        const auto item = t->item(row, col);
-        auto widget = new QTableWidgetItem{};
-        if (should_insert)
+        for (auto col = 0; col < cols; col++)
         {
-          const bool image = IsImage(item->text());
+          const auto item = t->item(row, col);
+          auto       widget = new QTableWidgetItem{};
+          const bool image  = IsImage(item->text());
           if (image)
             m_image_coords.insert(row, col);
           else
@@ -423,11 +457,8 @@ void DocumentWindow::RenderSection()
             if (found)
               widget->setText(f_it.value());
           }
+          m_table.setItem(row_idx, col, widget);
         }
-        else
-          widget->setText(item->text());
-
-        m_table.setItem(row_idx, col, widget);
       }
     }
   }
