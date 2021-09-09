@@ -97,6 +97,8 @@ struct DownloadConsole
     FileWrap* file = GetFile(id);
     if (file != nullptr && file->HasID())
       file->buffer = QByteArray(reinterpret_cast<char*>(data), size);
+    else
+      KLOG("Failed to write incoming data");
   }
 
   void Receive(uint8_t* data, const size_t size)
@@ -121,8 +123,10 @@ struct DownloadConsole
     {
       Wait(false);
       handler.setID(task_id.toUInt());
+      KLOG("Set metadata");
       return true;
     }
+    KLOG("Failed to set metadata");
     return false;
   }
 

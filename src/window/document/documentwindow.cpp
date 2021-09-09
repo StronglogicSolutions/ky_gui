@@ -363,6 +363,7 @@ void DocumentWindow::mouseReleaseEvent(QMouseEvent* e)
  */
 void DocumentWindow::SaveSection()
 {
+  KLOG("Saving section");
   QTextCursor   cursor{&m_doc};
   int32_t       row_idx{};
   const auto    row_count    = m_table.rowCount();
@@ -410,6 +411,7 @@ void DocumentWindow::SaveSection()
  */
 void DocumentWindow::RenderSection()
 {
+  KLOG("Rendering section");
   int32_t rows_add{};
   int32_t rows_mul{};
   for (const auto& row_type : m_row_types)
@@ -472,6 +474,7 @@ void DocumentWindow::RenderSection()
  */
 void DocumentWindow::ReceiveData(const QString& message, const QVector<QString>& data)
 {
+  KLOG("Received data");
   if (message == "Task Data")
   {
     const int32_t task_count = data.front().toInt();
@@ -517,6 +520,7 @@ bool DocumentWindow::ImageAtCell(int32_t row, int32_t col)
  */
 void DocumentWindow::SavePDF()
 {
+  KLOG("Saving PDF");
   QFont font = ui->font->font();
   font .setPixelSize(11);
   m_doc.setDefaultFont(font);
@@ -543,6 +547,7 @@ void DocumentWindow::SavePDF()
  */
 void DocumentWindow::ReceiveFiles(QVector<FileWrap>&& files)
 {
+  KLOG("Received ", files.size(), " files");
   for (auto&& file : files)
   {
     auto it = m_tasks.find(file.task_id);

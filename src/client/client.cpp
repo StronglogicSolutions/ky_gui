@@ -172,11 +172,11 @@ void Client::handleMessages() {
     size_t end_idx = findNullIndex(receive_buffer);
     std::string data_string{receive_buffer, receive_buffer + end_idx};
 
-    qDebug() << "Received data from KServer: \n" << data_string.c_str();
+    KLOG("Received data from KServer: \n", data_string.c_str());
 
     if (isPong(data_string.c_str()))
     {
-      qDebug() << "Server returned pong";
+      KLOG("Pong");
       emit Client::messageReceived(PONG_REPLY_TYPE, "Pong", {data_string.c_str()}); // Update UI
       continue;
     }
@@ -185,7 +185,7 @@ void Client::handleMessages() {
     {
       if (!isValidJson(data_string))
       {
-        qDebug() << "Attempted to parse incoming message with invalid JSON:\n" << data_string.c_str();
+        KLOG("Invalid JSON: ", data_string);
         continue;
       }
       else
