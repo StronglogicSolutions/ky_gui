@@ -221,6 +221,13 @@
          </property>
         </spacer>
        </item>
+       <item>
+        <widget class="QPushButton" name="runTest">
+         <property name="text">
+          <string>Run Test</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item row="4" column="0">

@@ -114,18 +114,7 @@ DocumentWindow::DocumentWindow(QWidget *parent)
   QObject::connect(ui->rowContent->verticalHeader(), &QHeaderView::sectionClicked, this,
     [this](int32_t index)
     {
-      RowType row_type = m_row_types.at(index);
-      for (int i = 0; i < ui->rowContent->columnCount(); i++)
-        if (row_type == RowType::HEADER)
-        {
-          ui->rowContent->item(index, i)->setBackground(GetBrushForType(RowType::REPEAT));
-          m_row_types[index] = RowType::REPEAT;
-        }
-        else
-        {
-          ui->rowContent->item(index, i)->setBackground(GetBrushForType(RowType::HEADER));
-          m_row_types[index] = RowType::HEADER;
-        }
+      ToggleRow(index);
     });
 
   /**
@@ -269,6 +258,22 @@ DocumentWindow::DocumentWindow(QWidget *parent)
 
         emit RequestData(argv);
       }
+    });
+
+  QObject::connect(ui->runTest, &QPushButton::clicked, this,
+    [this]() -> void
+    {
+      AddColumn();
+      AddRow();
+      ToggleRow(0);
+      ui->rowContent->setItem(0, 0, new QTableWidgetItem{"User"});
+      ui->rowContent->setItem(0, 1, new QTableWidgetItem{"Description"});
+      ui->rowContent->setItem(0, 2, new QTableWidgetItem{"Image"});
+      ui->rowContent->setItem(1, 0, new QTableWidgetItem{"$USER"});
+      ui->rowContent->setItem(1, 1, new QTableWidgetItem{"$DESCRIPTION"});
+      ui->rowContent->setItem(1, 2, new QTableWidgetItem{"$FILE_TYPE"});
+      ui->rowCountActive->toggle();
+      ui->rowCount->setValue(3);
     });
 }
 
@@ -563,4 +568,20 @@ void DocumentWindow::keyPressEvent(QKeyEvent* e)
 {
   if (e->key() == Qt::Key_Escape)
     close();
+}
+
+void DocumentWindow::ToggleRow(const int32_t& index)
+{
+  RowType row_type = m_row_types.at(index);
+  for (int i = 0; i < ui->rowContent->columnCount(); i++)
+    if (row_type == RowType::HEADER)
+    {
+      ui->rowContent->item(index, i)->setBackground(GetBrushForType(RowType::REPEAT));
+      m_row_types[index] = RowType::REPEAT;
+    }
+    else
+    {
+      ui->rowContent->item(index, i)->setBackground(GetBrushForType(RowType::HEADER));
+      m_row_types[index] = RowType::HEADER;
+    }
 }

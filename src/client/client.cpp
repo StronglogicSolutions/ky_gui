@@ -164,7 +164,7 @@ void Client::handleMessages() {
       break;
 
     if (m_download_console.is_downloading())
-    {
+    { // TODO: make sure not PONG?
       handleDownload(receive_buffer, bytes_received);
       continue;
     }
