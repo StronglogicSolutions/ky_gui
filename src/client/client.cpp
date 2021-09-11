@@ -137,7 +137,54 @@ Client::Client(QWidget *parent, int count, char** arguments)
     }
   }),
   m_server_ip(arguments[1]),
-  m_server_port((arguments[2]))
+  m_server_port((arguments[2])),
+  m_message_decoder(Kiqoder::FileHandler{
+    [this](int32_t id, uint8_t* buffer, size_t size) -> void
+    {
+      std::string data_string{buffer, buffer + size};
+      try
+      {
+        if (!isValidJson(data_string))
+        {
+          KLOG("Invalid JSON: ", data_string);
+        }
+        else
+        if (isNewSession(data_string.c_str()))
+        {
+          StringVec s_v = getArgs(data_string.c_str());
+          emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", s_v); // Update UI
+        }
+        else
+        if (serverWaitingForFile(data_string.c_str()))
+          processFileQueue();
+        else
+        if (isEvent(data_string.c_str()))
+        {
+          QString event = getEvent(data_string.c_str());
+          QVector<QString> args = getArgs(data_string.c_str());
+          emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args);
+          if (isUploadCompleteEvent(event.toUtf8().constData()))
+          {
+            if (!args.isEmpty())
+            {
+              sent_files.at(sent_files.size() - 1).timestamp = std::stoi(args.at(0).toUtf8().constData());
+              if (outgoing_files.isEmpty())
+              {
+                sendTaskEncoded(m_outbound_task);
+                file_was_sent = false;
+              }
+              else
+                sendEncoded(createOperation("FileUpload", {"Subsequent file"}));
+            }
+          }
+        }
+        std::string formatted_json = getJsonString(data_string);
+        emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(formatted_json.data(), formatted_json.size()), {});
+      } catch (const std::exception& e) {
+        QString error{e.what()};
+      }
+    }
+  })
 {
   qRegisterMetaType<QVector<QString>>("QVector<QString>");
   qRegisterMetaType<QVector<FileWrap>>("QVector<FileWrap>");
@@ -169,60 +216,14 @@ void Client::handleMessages() {
       continue;
     }
 
-    size_t end_idx = findNullIndex(receive_buffer);
-    std::string data_string{receive_buffer, receive_buffer + end_idx};
-
-    KLOG("Received data from KServer: \n", data_string.c_str());
-
-    if (isPong(data_string.c_str()))
+    if (isPong(receive_buffer, bytes_received))
     {
       KLOG("Pong");
-      emit Client::messageReceived(PONG_REPLY_TYPE, "Pong", {data_string.c_str()}); // Update UI
+      emit Client::messageReceived(PONG_REPLY_TYPE, "Pong", {});
       continue;
     }
 
-    try
-    {
-      if (!isValidJson(data_string))
-      {
-        KLOG("Invalid JSON: ", data_string);
-        continue;
-      }
-      else
-      if (isNewSession(data_string.c_str()))
-      {
-        StringVec s_v = getArgs(data_string.c_str());
-        emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", s_v); // Update UI
-      }
-      else
-      if (serverWaitingForFile(data_string.c_str()))
-        processFileQueue();
-      else
-      if (isEvent(data_string.c_str()))
-      {
-        QString event = getEvent(data_string.c_str());
-        QVector<QString> args = getArgs(data_string.c_str());
-        emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args);
-        if (isUploadCompleteEvent(event.toUtf8().constData()))
-        {
-          if (!args.isEmpty())
-          {
-            sent_files.at(sent_files.size() - 1).timestamp = std::stoi(args.at(0).toUtf8().constData());
-            if (outgoing_files.isEmpty())
-            {
-              sendTaskEncoded(m_outbound_task);
-              file_was_sent = false;
-            }
-            else
-              sendEncoded(createOperation("FileUpload", {"Subsequent file"}));
-          }
-        }
-      }
-      std::string formatted_json = getJsonString(data_string);
-      emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(formatted_json.data(), formatted_json.size()), {});
-    } catch (const std::exception& e) {
-      QString error{e.what()};
-    }
+    m_message_decoder.processPacket(receive_buffer, bytes_received);
   }
   memset(receive_buffer, 0, MAX_PACKET_SIZE);
   ::close(m_client_socket_fd);
