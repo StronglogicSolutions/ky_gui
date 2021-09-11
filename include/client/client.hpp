@@ -224,5 +224,6 @@ class Client : public QDialog {
   Scheduler::TaskQueue          m_task_queue;
   QString                       m_server_ip;
   QString                       m_server_port;
+  Kiqoder::FileHandler          m_message_decoder;
 };
 #endif // CLIENT_HPP

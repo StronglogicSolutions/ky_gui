@@ -310,6 +310,14 @@ bool isPong(const char* data) {
     return strcmp(data, "PONG") == 0;
 }
 
+bool isPong(const uint8_t* bytes, size_t size)
+{
+  return (size     >  3    &&
+          bytes[0] == 0x50 &&
+          bytes[1] == 0x4f &&
+          bytes[2] == 0x4e &&
+          bytes[3] == 0x47    );
+}
 // TODO: This should be "message", no?
 bool isMessage(const char* data) {
   Document d;
