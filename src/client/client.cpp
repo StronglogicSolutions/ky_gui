@@ -207,7 +207,7 @@ void Client::handleMessages() {
     memset(receive_buffer, 0, MAX_PACKET_SIZE);
     ssize_t bytes_received = recv(m_client_socket_fd, receive_buffer, MAX_PACKET_SIZE, 0);
 
-    if (!bytes_received)
+    if (bytes_received == -1)
       break;
 
     if (m_download_console.is_downloading())
@@ -779,13 +779,7 @@ void Client::setMetadata(const StringVec& data)
 void Client::handleDownload(uint8_t* data, ssize_t size)
 {
   if (m_download_console.Waiting())
-  {
-    std::string decoded{data, data + findNullIndex(data)};
-    if (isValidJson(decoded))
-      emit Client::messageReceived(EVENT_UPDATE_TYPE, getEvent(decoded.c_str()), getArgs(decoded.c_str()));
-    else
-      qDebug() << "Error downloading file metadata";
-  }
+    m_message_decoder.processPacket(data, size);
   else
     m_download_console.Receive(data, size);
 }
