@@ -461,17 +461,14 @@ void Client::sendPackets(uint8_t* data, uint32_t size)
 
 
 void Client::ping() {
-  if (m_client_socket_fd != -1)
+  if ((outgoing_files.size() == 0 || file_was_sent) && !m_download_console.is_downloading())
   {
-    if ((outgoing_files.size() == 0 || file_was_sent) && !m_download_console.is_downloading())
-    {
-      qDebug() << "Pinging server";
+    qDebug() << "Pinging server";
 
-      uint8_t send_buffer[5];
-      memset(send_buffer, 0, 5);
-      send_buffer[4] = (TaskCode::PINGBYTE & 0xFF);
-      ::send(m_client_socket_fd, send_buffer, 5, 0);
-    }
+    uint8_t send_buffer[5];
+    memset(send_buffer, 0, 5);
+    send_buffer[4] = (TaskCode::PINGBYTE & 0xFF);
+    ::send(m_client_socket_fd, send_buffer, 5, 0);
   }
 }
 
