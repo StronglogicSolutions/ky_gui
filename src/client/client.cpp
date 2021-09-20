@@ -141,12 +141,15 @@ Client::Client(QWidget *parent, int count, char** arguments)
   m_message_decoder(Kiqoder::FileHandler{
     [this](int32_t id, uint8_t* buffer, size_t size) -> void
     {
+      if (nullptr == buffer) return;
+
       std::string data_string{buffer, buffer + size};
       try
       {
         if (!isValidJson(data_string))
         {
           KLOG("Invalid JSON: ", data_string);
+          return;
         }
         else
         if (isNewSession(data_string.c_str()))
@@ -160,8 +163,8 @@ Client::Client(QWidget *parent, int count, char** arguments)
         else
         if (isEvent(data_string.c_str()))
         {
-          QString event = getEvent(data_string.c_str());
-          QVector<QString> args = getArgs(data_string.c_str());
+          const QString          event = getEvent(data_string.c_str());
+          const QVector<QString> args  = getArgs(data_string.c_str());
           emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args);
           if (isUploadCompleteEvent(event.toUtf8().constData()))
           {
@@ -207,11 +210,11 @@ void Client::handleMessages() {
     memset(receive_buffer, 0, MAX_PACKET_SIZE);
     ssize_t bytes_received = recv(m_client_socket_fd, receive_buffer, MAX_PACKET_SIZE, 0);
 
-    if (bytes_received == -1)
+    if (bytes_received < 1)
       break;
 
     if (m_download_console.is_downloading())
-    { // TODO: make sure not PONG?
+    {
       handleDownload(receive_buffer, bytes_received);
       continue;
     }
@@ -244,7 +247,7 @@ void Client::handleEvent(std::string data)
       sent_files.at(sent_files.size() - 1).timestamp = args.at(0).toInt();
       if (outgoing_files.isEmpty())
       {
-        sendTaskEncoded(m_outbound_task); // Send remaining task data to complete scheduling
+        sendTaskEncoded(m_outbound_task);
         file_was_sent = false;
       } else
         sendEncoded(createOperation("FileUpload", {"Subsequent file"}));
@@ -264,19 +267,43 @@ void Client::processFileQueue() {
   });
 }
 
+static const char* DNStoIP(const QString& dns)
+{
+  const  auto     start_index = (dns.contains("://")) ? (dns.size() - dns.lastIndexOf('/') - 1) : 0;
+  struct hostent* he          = gethostbyname(dns.right(start_index).toUtf8());
+  if (nullptr != he && nullptr != he->h_addr_list)
+  return inet_ntoa(*(struct in_addr*)he->h_addr_list[0]);
+  return nullptr;
+}
+
+static const bool IsIP(const QString& address)
+{
+  if (address.isEmpty())         return false;
+  if (address.front().isDigit()) return true;
+
+  const bool has_https = (address.contains("https://"));
+  const bool has_http  = (!has_https) && (address.contains("http://"));
+
+  return (has_https) ? address.at(8).isDigit() :
+           (has_http) ? address.at(7).isDigit() :
+                        false;
+}
+
 /**
  * @brief Client::start
  */
 void Client::start(QString ip, QString port) {
-  const char* server_ip = ip.isEmpty() ?
-                            m_server_ip.toUtf8().constData() :
-                            ip.toUtf8().constData();
+  const QString port_address = port.isEmpty() ? m_server_port : port;
+  const QString host_address = (ip.isEmpty()) ? m_server_ip: ip;
 
-  const char* server_port = port.isEmpty() ?
-                              m_server_port.toUtf8().constData() :
-                              port.toUtf8().constData();
+  if (host_address.isEmpty())
+    return;
 
-  if (m_client_socket_fd == -1) {
+  const QString ip_address   = IsIP(host_address) ? host_address : DNStoIP(host_address);
+  const char*   server_ip    = ip_address.toUtf8();
+  const char*   server_port  = port_address.toUtf8();
+
+  if (server_ip && m_client_socket_fd == -1) {
     m_client_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (m_client_socket_fd != -1) {
       sockaddr_in server_socket;
@@ -288,10 +315,7 @@ void Client::start(QString ip, QString port) {
       }
       int socket_option = 1;
       // Free up the port to begin listening again
-      setsockopt(
-        m_client_socket_fd, SOL_SOCKET, SO_REUSEADDR, &socket_option,
-        sizeof(socket_option)
-      );
+      setsockopt(m_client_socket_fd, SOL_SOCKET, SO_REUSEADDR, &socket_option, sizeof(socket_option));
 
       server_socket.sin_port = htons(port_value);
       inet_pton(AF_INET, server_ip, &server_socket.sin_addr.s_addr);
@@ -326,6 +350,12 @@ void Client::start(QString ip, QString port) {
  * @param [in] {const QString&} The message to send
  */
 void Client::sendMessage(const QString& s) {
+  if (s == "test")
+  {
+    request(static_cast<uint8_t>(constants::RequestType::FETCH_FILE), QVector<QString>{"104", "105", "106"});
+    return;
+  }
+
   if (m_client_socket_fd != -1) {
     sendEncoded(createMessage(s.toUtf8(), ""));
   } else {
@@ -338,9 +368,8 @@ void Client::sendMessage(const QString& s) {
  * @param [in] {std::string message} The message to send
  */
 void Client::sendEncoded(std::string message) {
-  std::vector<uint8_t> fb_byte_vector{message.begin(), message.end()};
-  auto byte_vector = builder.CreateVector(fb_byte_vector);
-  auto k_message = CreateMessage(builder, 69, byte_vector);
+  qDebug() << "Sending: " << message.c_str();
+  auto k_message = CreateMessage(builder, 69, builder.CreateVector(std::vector<uint8_t>{message.begin(), message.end()}));
 
   builder.Finish(k_message);
 
@@ -354,14 +383,7 @@ void Client::sendEncoded(std::string message) {
   send_buffer[2] = (size >> 8)           & 0xFF;
   send_buffer[3] = size                  & 0xFF;
   send_buffer[4] = (TaskCode::GENMSGBYTE & 0xFF);
-  std::memcpy(send_buffer + 5, encoded_message_buffer, size);
-  qDebug() << "Sending encoded message";
-  std::string message_to_send{};
-  for (unsigned int i = 0; i < (size + 5); i++) {
-      message_to_send += (char)*(send_buffer + i);
-  }
-  qDebug() << "Encoded message size: " << (size + 5);
-  // Send start operation
+  std::memcpy(send_buffer + 5, encoded_message_buffer, size);  
   ::send(m_client_socket_fd, send_buffer, size + 5, 0);
   builder.Clear();
 }
@@ -461,7 +483,7 @@ void Client::sendPackets(uint8_t* data, uint32_t size)
 
 
 void Client::ping() {
-  if ((outgoing_files.size() == 0 || file_was_sent) && !m_download_console.is_downloading())
+  if ((outgoing_files.isEmpty() || file_was_sent) && !(m_fetching))
   {
     qDebug() << "Pinging server";
 
