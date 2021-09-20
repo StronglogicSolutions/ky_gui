@@ -142,7 +142,7 @@ static O BuildLogMessage(T... args)
 template <typename... T>
 static void KLOG(T... args)
 {
-  qDebug() << BuildLogMessage(args...);
+  qDebug().noquote() << BuildLogMessage(args...);
 }
 
 /**
