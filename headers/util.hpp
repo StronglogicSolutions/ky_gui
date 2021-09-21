@@ -15,6 +15,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <sstream>
 #include "rapidjson/document.h"
 #include "rapidjson/pointer.h"
 #include "rapidjson/prettywriter.h"
@@ -123,6 +124,25 @@ static QString escapeMessage(QString s) {
 
 static QString escapeTextToRaw(QString s) {
     return escapeText(s).toUtf8().constData();
+}
+
+template <typename... T, typename O = QString>
+static O BuildLogMessage(T... args)
+{
+  if constexpr((std::is_same_v<T, QString> || ...))
+    return (O{} + ... + args);
+  else
+  {
+    std::stringstream ss{};
+    (ss << ... << std::forward<T>(args));
+    return QString::fromStdString(ss.str());
+  }
+}
+
+template <typename... T>
+static void KLOG(T... args)
+{
+  qDebug() << BuildLogMessage(args...);
 }
 
 /**

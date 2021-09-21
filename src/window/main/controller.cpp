@@ -159,6 +159,8 @@ void MainWindow::Controller::updateProcessResult(
 QString MainWindow::Controller::handleEventMessage(const QString&   message,
                                                    const StringVec& v)
 {
+  KLOG("Event: ", message);
+
   QString event_message = utils::timestampPrefix();
   if (v.size() == 1)
     event_message += message + "\n" + v.at(0);

@@ -55,6 +55,7 @@ private:
   void SetInserting(const bool inserting, const int32_t& index = -1);
   void AddRow();
   void AddColumn();
+  void ToggleRow(const int32_t& index);
   void RenderSection();
   void SaveSection();
   void SavePDF();
