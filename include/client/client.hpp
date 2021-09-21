@@ -192,6 +192,7 @@ class Client : public QDialog {
   void           sendIPCMessage(const QString& type, const QString& message, const QString& user);
   void           setIncomingFile(const StringVec& files);
   void           setMetadata(const QVector<QString>& data);
+  void           SetFetching(bool fetching = true) { m_fetching = fetching; }
 
  signals:
   void           messageReceived(int t, QString s, QVector<QString> args);
@@ -224,5 +225,7 @@ class Client : public QDialog {
   Scheduler::TaskQueue          m_task_queue;
   QString                       m_server_ip;
   QString                       m_server_port;
+  Kiqoder::FileHandler          m_message_decoder;
+  bool                          m_fetching;
 };
 #endif // CLIENT_HPP

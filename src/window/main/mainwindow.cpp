@@ -183,7 +183,7 @@ void MainWindow::setConnectScreen(bool visible) {
     QString config_json = QString::fromUtf8(file.readAll());
     ui->kyConfig->setText(config_json);
 
-    qDebug() << "Set config json: \n" << ui->kyConfig->toPlainText();
+    KLOG("Set config json: \n", ui->kyConfig->toPlainText());
 
     file.close();
     ui->outerLayer->setVisible(false);
@@ -216,22 +216,25 @@ void MainWindow::connectClient() {
 
   setConnectScreen(false);
 
-  qDebug() << "Connecting to KServer";
+  KLOG("Connecting to server");
 
   QObject::connect(q_client, &Client::messageReceived, this, &MainWindow::onMessageReceived);
   QObject::connect(&doc_window, &DocumentWindow::RequestData, this, [this](QVector<QString> argv)
   {
+    q_client->SetFetching();
     q_client->request(static_cast<uint8_t>(RequestType::FETCH_TASK_DATA), argv);
   });
 
   QObject::connect(&doc_window, &DocumentWindow::RequestFiles, this, [this](const QVector<QString>& ids)
   {
+    q_client->SetFetching();
     q_client->request(static_cast<uint8_t>(RequestType::FETCH_FILE), ids);
   });
 
   QObject::connect(q_client, &Client::onDownload, this,
     [this](DownloadConsole::Files files) -> void
     {
+      q_client->SetFetching(false);
       doc_window.ReceiveFiles(std::move(files));
     }
   );
@@ -436,7 +439,7 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
     else
     {
       m_progress_timer.stop();
-      qDebug() << "Server timeout";
+      KLOG("Heartbeat timeout");
     }
     break;
   }

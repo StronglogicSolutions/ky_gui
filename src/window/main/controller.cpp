@@ -264,7 +264,10 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
       window->doc_window.ReceiveData(message, v);
     else
     if (message == "Task Data Final")
+    {
+      window->q_client->SetFetching(false);
       window->doc_window.ReceiveData(message, v);
+    }
     else
     if (message == "File Upload")
       window->q_client->setIncomingFile(v);

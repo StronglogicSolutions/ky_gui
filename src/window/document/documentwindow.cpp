@@ -395,6 +395,8 @@ void DocumentWindow::SaveSection()
 
         if (ImageAtCell(i, j))
         {
+          if (it->files.isEmpty()) continue;
+
           const FileWrap file = it->files.front();
           QPixmap        pm{};
           pm.loadFromData(file.buffer, QMimeDatabase{}.mimeTypeForName(file.name).preferredSuffix().toUtf8());
