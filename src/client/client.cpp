@@ -269,10 +269,13 @@ void Client::processFileQueue() {
 
 static const char* DNStoIP(const QString& dns)
 {
-  const  auto     start_index = (dns.contains("://")) ? (dns.size() - dns.lastIndexOf('/') - 1) : 0;
-  struct hostent* he          = gethostbyname(dns.right(start_index).toUtf8());
+  const auto start_index = (dns.contains("://")) ? (dns.size() - dns.lastIndexOf('/') - 1) : 0;
+  const auto domain      = (start_index)         ? (dns.right(start_index))                : dns;
+  struct hostent* he     = gethostbyname(domain.toUtf8());
+
   if (nullptr != he && nullptr != he->h_addr_list)
-  return inet_ntoa(*(struct in_addr*)he->h_addr_list[0]);
+    return inet_ntoa(*(struct in_addr*)he->h_addr_list[0]);
+
   return nullptr;
 }
 
@@ -285,8 +288,8 @@ static const bool IsIP(const QString& address)
   const bool has_http  = (!has_https) && (address.contains("http://"));
 
   return (has_https) ? address.at(8).isDigit() :
-           (has_http) ? address.at(7).isDigit() :
-                        false;
+                       (has_http) ? address.at(7).isDigit() :
+                                    false;
 }
 
 /**
