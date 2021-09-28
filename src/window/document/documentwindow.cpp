@@ -6,9 +6,30 @@
 #include <QPrintDialog>
 #include <QTextDecoder>
 #include <QTextTable>
+#include <QScreen>
 #include <QTimer>
+#include <QDesktopWidget>
+#include <QCalendarWidget>
 #include <QAbstractTextDocumentLayout>
 #include "headers/util.hpp"
+
+static void CenterWidget(QWidget *widget)
+{
+  const auto host = widget->parentWidget();
+
+  if (host)
+  {
+    const auto hostRect = host->geometry();
+    widget->move(hostRect.center() - widget->rect().center());
+  }
+  else
+  {
+    QScreen* screen = widget->window()->screen();
+    const int x = (screen->geometry().width()  - widget->width())  / 2;
+    const int y = (screen->geometry().height() - widget->height()) / 2;
+    widget->move(x, y);
+  }
+}
 
 /**
  * @brief DocumentWindow::DocumentWindow
@@ -24,18 +45,55 @@ DocumentWindow::DocumentWindow(QWidget *parent)
   m_printer(QPrinter::PrinterResolution)
 {
   ui->setupUi(this);
+  SetDatePickers();
+  SetTable();
+  SetPrinter();
+  SetListeners();
+}
 
+/**
+ * ~DocumentWindow
+ * @destructor
+ */
+DocumentWindow::~DocumentWindow()
+{
+  delete ui;
+}
+
+void DocumentWindow::SetDatePickers()
+{
   ui->startDateTime->setEnabled(false);
   ui->endDateTime  ->setEnabled(false);
-  ui->rowCount     ->setEnabled(false);
-  m_table          .setColumnCount(ui->rowContent->columnCount());
-  for (auto i = 0; i < ui->rowContent->columnCount(); i++)
-  {
-    ui->rowContent->setItem(0, i, new QTableWidgetItem{});
-    m_table        .setHorizontalHeaderItem(i, new QTableWidgetItem{});
-    ui->rowContent->item(0, i)->setBackground(GetBrushForType(RowType::REPEAT));
-  }
+  ui->startDateTime->setDateTime(QDateTime::currentDateTime());
+  ui->endDateTime  ->setDateTime(QDateTime::currentDateTime());
 
+  QObject::connect(ui->startPick, &QPushButton::clicked, this, [this]() -> void
+  {
+    QCalendarWidget* widget = new QCalendarWidget();
+    QObject::connect(widget, &QCalendarWidget::selectionChanged, widget, [this, widget]() -> void
+    {
+      ui->startDateTime->setDateTime(widget->selectedDate().startOfDay());
+      widget->close();
+    });
+    CenterWidget(widget);
+    widget->show();
+  });
+
+  QObject::connect(ui->endPick, &QPushButton::clicked, this, [this]() -> void
+  {
+    QCalendarWidget* widget = new QCalendarWidget();
+    QObject::connect(widget, &QCalendarWidget::selectionChanged, widget, [this, widget]() -> void
+    {
+      ui->endDateTime->setDateTime(widget->selectedDate().startOfDay());
+      widget->close();
+    });
+    CenterWidget(widget);
+    widget->show();
+  });
+}
+
+void DocumentWindow::SetTable()
+{
   m_printer.setPageSize       (QPageSize{QPageSize::PageSizeId::A4});
   m_printer.setOutputFormat   (QPrinter::PdfFormat);
 //  m_printer.setResolution     (QPrinter::HighResolution);
@@ -45,6 +103,22 @@ DocumentWindow::DocumentWindow(QWidget *parent)
   m_svg    .setFileName      ("kiq_document.svg");
   m_doc.setPageSize(m_printer.pageRect().size());
 
+}
+
+void DocumentWindow::SetPrinter()
+{
+  ui->rowCount     ->setEnabled(false);
+  m_table          .setColumnCount(ui->rowContent->columnCount());
+  for (auto i = 0; i < ui->rowContent->columnCount(); i++)
+  {
+    ui->rowContent->setItem(0, i, new QTableWidgetItem{});
+    m_table        .setHorizontalHeaderItem(i, new QTableWidgetItem{});
+    ui->rowContent->item(0, i)->setBackground(GetBrushForType(RowType::REPEAT));
+  }
+}
+
+void DocumentWindow::SetListeners()
+{
   /**
    * activateRowCount
    * @lambda
@@ -271,15 +345,6 @@ DocumentWindow::DocumentWindow(QWidget *parent)
       ui->rowCountActive->toggle();
       ui->rowCount->setValue(3);
     });
-}
-
-/**
- * ~DocumentWindow
- * @destructor
- */
-DocumentWindow::~DocumentWindow()
-{
-  delete ui;
 }
 
 /**
