@@ -10,13 +10,15 @@
 #include <QBuffer>
 #include <QMimeDatabase>
 #include <QHash>
+#include <QPair>
 #include "src/window/document/helpers.hpp"
 #include <include/ui/kfiledialog.h>
 #include <headers/util.hpp>
 
 
 using TaskFlags = QHash<QString, QString>;
-using Coords    = QHash<qint32, qint32>;
+using Coord     = QPair<qint32, qint32>;
+using Coords    = QHash<Coord, QMimeType>;
 
 struct TaskData
 {
