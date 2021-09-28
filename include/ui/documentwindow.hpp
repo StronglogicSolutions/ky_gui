@@ -62,6 +62,10 @@ private:
   void SaveSection();
   void SavePDF();
   bool ImageAtCell(int32_t row, int32_t col);
+  void SetDatePickers();
+  void SetPrinter();
+  void SetTable();
+  void SetListeners();
 
 
   Ui::DocumentWindow *ui;

@@ -20,7 +20,7 @@
       <x>0</x>
       <y>0</y>
       <width>981</width>
-      <height>581</height>
+      <height>628</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0,0,0,0" columnstretch="3,1,0">
@@ -74,18 +74,9 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1">
              <item>
-              <widget class="QLabel" name="label_2">
-               <property name="minimumSize">
-                <size>
-                 <width>108</width>
-                 <height>0</height>
-                </size>
-               </property>
+              <widget class="QPushButton" name="startPick">
                <property name="text">
                 <string>Start</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
@@ -97,18 +88,9 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1">
              <item>
-              <widget class="QLabel" name="label_3">
-               <property name="minimumSize">
-                <size>
-                 <width>108</width>
-                 <height>0</height>
-                </size>
-               </property>
+              <widget class="QPushButton" name="endPick">
                <property name="text">
                 <string>End</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
