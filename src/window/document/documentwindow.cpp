@@ -72,8 +72,7 @@ DocumentWindow::DocumentWindow(QWidget *parent)
     [this](int index)
     {
       SetInserting(true, index);
-    }
-  );
+    });
 
   /**
    * setCellValue
@@ -88,12 +87,9 @@ DocumentWindow::DocumentWindow(QWidget *parent)
       if (!m_file_path.isEmpty())
       {
         QTableWidgetItem* file_item = new QTableWidgetItem();
-
-        file_item->setData(Qt::DecorationRole,
-                           QPixmap{m_file_path}.scaledToHeight(ui->rowContent->rowHeight(0),
-                           Qt::TransformationMode::SmoothTransformation));
-
+        file_item     ->setData(Qt::DecorationRole, QPixmap{m_file_path}.scaledToHeight(240));
         ui->rowContent->setItem(row, col, file_item);
+        m_image_coords.insert(QPair{row, col}, QMimeDatabase().mimeTypeForName(m_file_path));
         m_file_path.clear();
       }
       else
@@ -103,8 +99,8 @@ DocumentWindow::DocumentWindow(QWidget *parent)
         widget->setText(flag.right(flag.size() - flag.indexOf('=') - 1));
         ui->rowContent->setItem(row, col, widget);
         ui->rowContent->item(row, col)->setBackground(GetBrushForType(m_row_types.at(row)));
-        SetInserting(false);
       }
+      SetInserting(false);
     });
 
   /**
@@ -198,8 +194,8 @@ DocumentWindow::DocumentWindow(QWidget *parent)
       if (file_path.size())
       {
        auto    slash_index = file_path.lastIndexOf("/") + 1;
-       QString file_name = file_path.right(file_path.size() - slash_index);
-       QString dir = file_path.left(slash_index);
+       QString file_name   = file_path.right(file_path.size() - slash_index);
+       QString dir         = file_path.left(slash_index);
        QFile   file{file_path};
 
        if (file.open(QIODevice::ReadOnly)) {
@@ -365,6 +361,8 @@ void DocumentWindow::mouseReleaseEvent(QMouseEvent* e)
  * @brief DocumentWindow::SaveSection
  * Uses the intermediary table (m_table) to build our final render table.
  * Renders media in cells as needed.
+ *
+ * TODO: render non-task images
  */
 void DocumentWindow::SaveSection()
 {
@@ -381,7 +379,13 @@ void DocumentWindow::SaveSection()
     for (auto col = 0; col < col_count; col++)
     {
       QTextTableCell cell    = render_table->cellAt(row_idx, col);
-      cell.firstCursorPosition().insertText(t->item(row_idx, col)->text());
+      if (ImageAtCell(row_idx, col))
+      {
+        const auto image = ui->rowContent->item(row_idx, col)->data(Qt::DecorationRole);
+        cell.firstCursorPosition().insertImage(image.value<QPixmap>().toImage().scaledToHeight(240));
+      }
+      else
+        cell.firstCursorPosition().insertText(t->item(row_idx, col)->text());
     }
 
   for (TaskMap::Iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
@@ -435,8 +439,9 @@ void DocumentWindow::RenderSection()
   for (auto row = 0; row < m_row_types.size(); row++)
   {
     if (m_row_types.at(row) == RowType::HEADER)
-    {
+    { // TODO: Check if text or media
       for (auto col = 0; col < cols; col++)
+
         m_table.setItem(row_idx, col, new QTableWidgetItem{t->item(row, col)->text()});
      row_idx++;
     }
@@ -452,11 +457,11 @@ void DocumentWindow::RenderSection()
       {
         for (auto col = 0; col < cols; col++)
         {
-          const auto item = t->item(row, col);
+          const auto item   = t->item(row, col);
           auto       widget = new QTableWidgetItem{};
           const bool image  = IsImage(item->text());
-          if (image)
-            m_image_coords.insert(row, col);
+          if (image && !task.files.empty())
+            m_image_coords.insert({row, col}, QMimeDatabase{}.mimeTypeForName(task.files.front().name)); // TODO: Insert MimeType
           else
           {
             const auto text  = item->text().isEmpty() ? "" : item->text().remove(0, 1);
@@ -518,8 +523,8 @@ void DocumentWindow::ReceiveData(const QString& message, const QVector<QString>&
  */
 bool DocumentWindow::ImageAtCell(int32_t row, int32_t col)
 {
-  const auto it = m_image_coords.find(row);
-  return (it != m_image_coords.cend() && it.value() == col);
+  const auto it = m_image_coords.find(QPair{row, col});
+  return (it != m_image_coords.cend());
 }
 
 /**
