@@ -133,7 +133,10 @@ Client::Client(QWidget *parent, int count, char** arguments)
         sendEncoded(createOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
       }
       else
+      {
         onDownload(std::move(m_download_console.GetData()));
+        m_download_console.Reset();
+      }
     }
   }),
   m_server_ip(arguments[1]),
