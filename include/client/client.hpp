@@ -119,7 +119,7 @@ struct DownloadConsole
   bool SetMetadata(const QVector<QString>& data)
   {
     static const int32_t FILE_ID_INDEX{1};
-    const auto&          id = data[FILE_ID_INDEX];
+    const  auto&         id = data[FILE_ID_INDEX];
     if (WaitingForFile(id))
     {
       Wait(false);

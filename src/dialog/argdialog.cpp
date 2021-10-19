@@ -209,11 +209,9 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
         setTaskArguments();
         uint task_date_time = std::get<Scheduler::VariantIndex::QSTRING>(
                                  m_task->getTaskArgumentValue("datetime")).toUInt();
-        if (task_date_time <= TimeUtils::unixtime())
-        {
-         UI::infoMessageBox("Unable to schedule tasks in the past!", "DateTime Error");
-         return;
-        }
+        if (task_date_time <= TimeUtils::unixtime())        
+         UI::infoMessageBox("This was set to the past", "DateTime Warning");
+
 
         if (m_task->isReady())
         {
