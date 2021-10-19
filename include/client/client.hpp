@@ -53,9 +53,9 @@ typedef std::map<int, std::vector<std::string>> CommandArgMap;
 typedef QVector<QString> StringVec;
 
 struct SentFile {
-    int                 timestamp;
-    QString             name;
-    Scheduler::FileType type;
+  int                 timestamp;
+  QString             name;
+  Scheduler::FileType type;
 };
 
 struct DownloadConsole
@@ -68,15 +68,15 @@ struct DownloadConsole
   bool                 wt_for_metadata;
 
   DownloadConsole(Kiqoder::FileHandler f_handler)
-  : handler(f_handler),
-    wt_count(0),
-    rx_count(0),
-    wt_for_metadata(false) {}
+  : handler(f_handler)
+  {
+    Reset();
+  }
 
   FileWrap* GetFile (const QString& id)
   {
     for (auto it = files.begin(); it != files.end(); it++)
-      if (it->task_id == id)
+      if (it->id == id)
         return it;
     return nullptr;
   };
@@ -118,11 +118,12 @@ struct DownloadConsole
 
   bool SetMetadata(const QVector<QString>& data)
   {
-    const auto& task_id = data.front();
-    if (WaitingForFile(task_id))
+    static const int32_t FILE_ID_INDEX{1};
+    const auto&          id = data[FILE_ID_INDEX];
+    if (WaitingForFile(id))
     {
       Wait(false);
-      handler.setID(task_id.toUInt());
+      handler.setID(id.toUInt());
       KLOG("Set metadata");
       return true;
     }
@@ -131,6 +132,13 @@ struct DownloadConsole
   }
 
   bool Waiting() { return wt_for_metadata; }
+
+  void Reset()
+  {
+    wt_count        = 0;
+    rx_count        = 0;
+    wt_for_metadata = false;
+  }
 };
 
 Q_DECLARE_METATYPE(StringVec)
