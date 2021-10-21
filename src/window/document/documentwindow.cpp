@@ -114,6 +114,7 @@ void DocumentWindow::SetTable()
   m_printer.setColorMode(QPrinter::Color);
   m_svg    .setFileName      ("kiq_document.svg");
   m_doc.setPageSize(m_printer.pageRect().size());
+  m_doc.setDefaultStyleSheet(QString{"color: black;"});
 
 }
 
@@ -650,13 +651,7 @@ void DocumentWindow::SavePDF()
   if (QPrintDialog(&m_printer, this).exec() != QDialog::Accepted) return;
 
   m_doc.print(&m_printer);
-
-  QRect rectSize{static_cast<int>(0),
-                 static_cast<int>(0),
-                 static_cast<int>(-1),
-                 static_cast<int>(-1)};
   QPainter painter{&m_svg};
-//  painter.setViewport(rectSize);
   m_svg.setSize(QSize{-1, -1});
   m_doc.documentLayout()->setPaintDevice(&m_svg);
   m_doc.drawContents(&painter);
