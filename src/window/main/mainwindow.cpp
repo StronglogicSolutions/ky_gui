@@ -209,10 +209,8 @@ void MainWindow::connectClient() {
   QString file_path = configValue("fileDirectory", m_config);
 
   if (!file_path.isEmpty())
-  {
-    arg_ui    ->setFilePath(file_path);
-//    doc_window .SetFilePath(file_path);
-  }
+    arg_ui->setFilePath(file_path);
+
 
   setConnectScreen(false);
 
@@ -293,14 +291,16 @@ void MainWindow::connectClient() {
   QObject::connect(ui->execute, &QPushButton::clicked, this,
                    [this]() { q_client->execute(); });
 
-  QObject::connect(ui->addArgs, &QPushButton::clicked, this, [this]() {
-    if (ui->appList->count() == 0) {
+  QObject::connect(ui->addArgs, &QPushButton::clicked, this, [this]()
+  {
+    if (ui->appList->count() == 0)
+    {
       QMessageBox::warning(this, tr("Args"),
                            tr("Please connect to the KServer and retrieve a "
                               "list of available processes."));
-    } else {
-      arg_ui->show();
     }
+    else
+      arg_ui->show();
   });
 
   QObject::connect(ui->openMessages, &QPushButton::clicked, this, [this]() {

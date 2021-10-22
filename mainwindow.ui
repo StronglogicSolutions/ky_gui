@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>789</width>
-    <height>517</height>
+    <height>552</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -462,7 +462,7 @@ font-weight: 700;</string>
               </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="3,0">
+              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="3,0,0">
                <item>
                 <widget class="QComboBox" name="ipcList">
                  <property name="sizePolicy">
@@ -480,6 +480,11 @@ font-weight: 700;
                  </property>
                  <item>
                   <property name="text">
+                   <string>telegram:messages</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
                    <string>discord:messages</string>
                   </property>
                  </item>
@@ -493,7 +498,25 @@ font-weight: 700;
                    <string>youtube:livestream</string>
                   </property>
                  </item>
+                 <item>
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </item>
                 </widget>
+               </item>
+               <item>
+                <spacer name="verticalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
                <item>
                 <widget class="QPushButton" name="editIpc">

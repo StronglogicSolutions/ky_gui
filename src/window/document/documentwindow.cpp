@@ -31,6 +31,15 @@ static void CenterWidget(QWidget *widget)
   }
 }
 
+static const FileWrap& FindImage(const QVector<FileWrap>& files)
+{
+  for (const auto& file : files)
+  {
+    if (file.type == "image")
+      return file;
+  }
+}
+
 /**
  * @brief DocumentWindow::DocumentWindow
  * @constructor
@@ -466,8 +475,8 @@ void DocumentWindow::SaveSection()
         {
           if (it->files.isEmpty()) continue;
 
-          const FileWrap file = it->files.front();
-          QPixmap        pm{};
+          const FileWrap& file = FindImage(it->files);
+          QPixmap         pm{};
           pm.loadFromData(file.buffer, QMimeDatabase{}.mimeTypeForName(file.name).preferredSuffix().toUtf8());
           cell.firstCursorPosition().insertImage(pm.toImage().scaledToHeight(240));
         }
@@ -526,7 +535,7 @@ void DocumentWindow::RenderSection()
           auto       widget = new QTableWidgetItem{};
           const bool image  = IsImage(item->text());
           if (image && !task.files.empty())
-            m_image_coords.insert({row, col}, QMimeDatabase{}.mimeTypeForName(task.files.front().name)); // TODO: Insert MimeType
+            m_image_coords.insert({row, col}, QMimeDatabase{}.mimeTypeForName(FindImage(task.files).name));
           else
           {
             const auto text  = item->text().isEmpty() ? "" : item->text().remove(0, 1);
