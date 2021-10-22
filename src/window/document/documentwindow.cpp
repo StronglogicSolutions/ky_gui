@@ -13,6 +13,8 @@
 #include <QAbstractTextDocumentLayout>
 #include "headers/util.hpp"
 
+static const uint32_t DEFAULT_HEIGHT{240};
+
 static void CenterWidget(QWidget *widget)
 {
   const auto host = widget->parentWidget();
@@ -51,7 +53,9 @@ DocumentWindow::DocumentWindow(QWidget *parent)
   m_flag_index(-1),
   m_inserting(false),
   m_row_types(QList<RowType>{RowType::REPEAT}),
-  m_printer(QPrinter::PrinterResolution)
+  m_printer(QPrinter::PrinterResolution),
+  m_img_height(0),
+  m_scale_images(true)
 {
   ui->setupUi(this);
   SetDatePickers();
@@ -105,12 +109,12 @@ void DocumentWindow::SetTable()
 {
   m_printer.setPageSize       (QPageSize{QPageSize::PageSizeId::A4});
   m_printer.setOutputFormat   (QPrinter::PdfFormat);
-//  m_printer.setResolution     (QPrinter::HighResolution);
   m_printer.setPageOrientation(QPageLayout::Landscape);
   m_printer.setOutputFileName("kiq_document.pdf"); // TODO: Set from UI
   m_printer.setColorMode(QPrinter::Color);
   m_svg    .setFileName      ("kiq_document.svg");
   m_doc.setPageSize(m_printer.pageRect().size());
+  m_doc.setDefaultStyleSheet(QString{"color: black;"});
 
 }
 
@@ -354,6 +358,37 @@ void DocumentWindow::SetListeners()
       ui->rowCountActive->toggle();
       ui->rowCount->setValue(3);
     });
+
+  /**
+   * scaleImages
+   * @lambda
+   */
+  QObject::connect(ui->scaleImages, &QCheckBox::clicked, this, [this](const bool checked) -> void
+  {
+    ui->imageHeight->setEnabled(checked);
+    m_scale_images = checked;
+  });
+
+  /**
+   * setImageHeight
+   * @lambda
+   */
+  QObject::connect(ui->imageHeight, &QLineEdit::textChanged, this,
+    [this](const QString& s) -> void
+    {
+      if (s == "auto")
+      {
+        m_img_height = 0;
+      }
+      else
+      if (s == "0")
+      {
+        m_img_height = 0;
+        ui->imageHeight->setText("auto");
+      }
+      else
+        m_img_height = s.toUInt();
+    });
 }
 
 /**
@@ -456,7 +491,9 @@ void DocumentWindow::SaveSection()
       if (ImageAtCell(row_idx, col))
       {
         const auto image = ui->rowContent->item(row_idx, col)->data(Qt::DecorationRole);
-        cell.firstCursorPosition().insertImage(image.value<QPixmap>().toImage().scaledToHeight(240));
+        cell.firstCursorPosition().insertImage((m_scale_images) ?
+                image.value<QPixmap>().toImage().scaledToHeight((m_img_height) ? m_img_height : DEFAULT_HEIGHT) :
+                image.value<QPixmap>().toImage());
       }
       else
         cell.firstCursorPosition().insertText(t->item(row_idx, col)->text());
@@ -614,13 +651,8 @@ void DocumentWindow::SavePDF()
   if (QPrintDialog(&m_printer, this).exec() != QDialog::Accepted) return;
 
   m_doc.print(&m_printer);
-
-  QRect rectSize{static_cast<int>(0),
-                 static_cast<int>(0),
-                 static_cast<int>(m_doc.size().width()),
-                 static_cast<int>(m_doc.size().height())};
   QPainter painter{&m_svg};
-  painter.setViewport(rectSize);
+  m_svg.setSize(QSize{-1, -1});
   m_doc.documentLayout()->setPaintDevice(&m_svg);
   m_doc.drawContents(&painter);
   m_doc  .clear();

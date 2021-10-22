@@ -82,4 +82,6 @@ private:
   QTableWidget       m_table;
   Coords             m_image_coords;
   bool               m_fetch_files;
+  int32_t            m_img_height;
+  bool               m_scale_images;
 };
