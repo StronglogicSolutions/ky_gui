@@ -10,22 +10,22 @@ static const QString R_ARGS_FLAG{"R_ARGS"};
 *   │░░░░░░░░░░░░░░░ HELPERS ░░░░░░░░░░░░░░░░░│
 *   └──────────────────────────────────────────────────┘
 */
-const QString completed_string(QString s) {
+static QString completed_string(QString s) {
   if (s.compare("0") == 0)
     return "Scheduled";
   else
   if (s.compare("1") == 0)
-    return "Success";
+    return "Success  ";
   else
   if (s.compare("2") == 0)
-    return "Failed";
+    return "Failed   ";
   else
   if (s.compare("3") == 0)
-    return "Retry Failed";
+    return "RetryFail";
   return s;
 }
 
-const QString completed_num_string(QString s) {
+static QString completed_num_string(QString s) {
   if (s.compare("Scheduled") == 0)
     return "0";
   else
@@ -55,7 +55,7 @@ uint8_t completed_integer(QString s) {
   return 10;
 }
 
-const QString recurring_string(QString s) {
+static QString recurring_string(QString s) {
   if (s.compare("0") == 0)
     return "No";
   else
@@ -76,7 +76,7 @@ const QString recurring_string(QString s) {
   return s;
 }
 
-const QString recurring_num_string(QString s) {
+static QString recurring_num_string(QString s) {
   if (s.compare("No") == 0)
     return "0";
   else
@@ -97,7 +97,7 @@ const QString recurring_num_string(QString s) {
   return s;
 }
 
-uint8_t recurring_integer(QString s) {
+static uint8_t recurring_integer(QString s) {
   if (s.compare("No") == 0)
     return 0;
   else
@@ -274,13 +274,13 @@ ScheduledTask ScheduleDialog::readFields() {
 
     for (int i = 0; i < row_count; i++)
     {
-      auto flag  = table.item(i, 0)->text();
-      auto value = table.item(i, 1)->text();      
+      const auto flag  = table.item(i, 0)->text();
+      const auto value = table.item(i, 1)->text();
 
       if (value.isEmpty()) continue;
 
-      auto index = flag.indexOf('=');
-      auto key   = flag.rightRef(flag.size() - index - 2);
+      const auto index = flag.indexOf('=');
+      const auto key   = flag.rightRef(flag.size() - index - 2);
       env.file  += '\n' + key + '=' + '"' + value.trimmed() + '"' + ARG_DELIM;
       env.flags += flag + ' ';
     }
@@ -336,7 +336,7 @@ void ScheduleDialog::receive_response(RequestType type, QVector<QString> v) {
       auto row = ui->paramTable->rowCount(); // insert row
       auto value = v.at(i + 1);
       ui->paramTable->insertRow(row);
-      QTableWidgetItem *item = new QTableWidgetItem(key);
+      QTableWidgetItem *item  = new QTableWidgetItem(key);
       QTableWidgetItem *item2 = new QTableWidgetItem(value);
       ui->paramTable->setItem(row, 0, item);
       ui->paramTable->setItem(row, 1, item2);
@@ -354,7 +354,7 @@ void ScheduleDialog::refreshUI() {
     ui->taskList->clear();
 
     for (const auto& task : m_tasks)
-      ui->taskList->addItem(QString{task.id + ": " + task.time.toString()});
+      ui->taskList->addItem(task.id + ": " + task.time.toString() + " - " + task.app + " - " + completed_string(task.completed));
 
     ui->taskList->setCurrentIndex(0);
   }

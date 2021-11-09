@@ -42,6 +42,11 @@ static const FileWrap& FindImage(const QVector<FileWrap>& files)
   }
 }
 
+static bool IsToken(const QString& s)
+{
+  return (s.size() && s.front() == '$');
+}
+
 /**
  * @brief DocumentWindow::DocumentWindow
  * @constructor
@@ -53,7 +58,7 @@ DocumentWindow::DocumentWindow(QWidget *parent)
   m_flag_index(-1),
   m_inserting(false),
   m_row_types(QList<RowType>{RowType::REPEAT}),
-  m_printer(QPrinter::PrinterResolution),
+  m_printer(QPrinter::HighResolution),
   m_img_height(0),
   m_scale_images(true)
 {
@@ -293,11 +298,15 @@ void DocumentWindow::SetListeners()
          }
          m_file_path = file_path;
          SetInserting(true);
-       } else {
+       }
+       else
+       {
          qDebug() << "Unable to open selected file";
          QMessageBox::warning(this, tr("File Error"), tr("Unable to open selected file"));
        }
-      } else {
+      }
+      else
+      {
        qDebug() << "Could not read the file path";
        QMessageBox::warning(this, tr("File Error"), tr("Could not read the file path"));
       }
@@ -348,6 +357,7 @@ void DocumentWindow::SetListeners()
     {
       AddColumn();
       AddRow();
+      AddRow();
       ToggleRow(0);
       ui->rowContent->setItem(0, 0, new QTableWidgetItem{"User"});
       ui->rowContent->setItem(0, 1, new QTableWidgetItem{"Description"});
@@ -355,8 +365,13 @@ void DocumentWindow::SetListeners()
       ui->rowContent->setItem(1, 0, new QTableWidgetItem{"$USER"});
       ui->rowContent->setItem(1, 1, new QTableWidgetItem{"$DESCRIPTION"});
       ui->rowContent->setItem(1, 2, new QTableWidgetItem{"$FILE_TYPE"});
+      ui->rowContent->setItem(2, 0, new QTableWidgetItem{"Repeat text"});
+      ui->rowContent->setItem(2, 1, new QTableWidgetItem{"Some repeat text"});
+      ui->rowContent->setItem(2, 2, new QTableWidgetItem{"More repeat text"});
       ui->rowCountActive->toggle();
+      ui->rowCount->setEnabled(true);
       ui->rowCount->setValue(3);
+
     });
 
   /**
@@ -475,12 +490,13 @@ void DocumentWindow::mouseReleaseEvent(QMouseEvent* e)
  */
 void DocumentWindow::SaveSection()
 {
+  const auto GetTopCount = [this]() -> int { int i{}; for (;i < m_row_types.size(); i++) if (m_row_types.at(i) == RowType::REPEAT) break; return i;};
   KLOG("Saving section");
   QTextCursor   cursor{&m_doc};
   int32_t       row_idx{};
   const auto    row_count    = m_table.rowCount();
   const auto    col_count    = m_table.columnCount();
-  const auto    top_count    = (row_count - m_tasks.size());
+  const auto    top_count    = GetTopCount();
   QTableWidget* t            = &m_table;
   QTextTable*   render_table = cursor.insertTable(row_count, col_count);
 
@@ -492,8 +508,8 @@ void DocumentWindow::SaveSection()
       {
         const auto image = ui->rowContent->item(row_idx, col)->data(Qt::DecorationRole);
         cell.firstCursorPosition().insertImage((m_scale_images) ?
-                image.value<QPixmap>().toImage().scaledToHeight((m_img_height) ? m_img_height : DEFAULT_HEIGHT) :
-                image.value<QPixmap>().toImage());
+          image.value<QPixmap>().toImage().scaledToHeight((m_img_height) ? m_img_height : DEFAULT_HEIGHT) :
+          image.value<QPixmap>().toImage());
       }
       else
         cell.firstCursorPosition().insertText(t->item(row_idx, col)->text());
@@ -550,15 +566,19 @@ void DocumentWindow::RenderSection()
   for (auto row = 0; row < m_row_types.size(); row++)
   {
     if (m_row_types.at(row) == RowType::HEADER)
-    { // TODO: Check if text or media
+    {
       for (auto col = 0; col < cols; col++)
-
         m_table.setItem(row_idx, col, new QTableWidgetItem{t->item(row, col)->text()});
-     row_idx++;
+      row_idx++;
     }
   }
 
-  for (TaskMap::iterator it = m_tasks.begin(); it != m_tasks.end(); it++, row_idx++)
+  /**
+    This assumes that there is one row for each task, but we have the row_mul value above which tells us how many
+    rows there should be. Thus we should consider incrementing row_idx in the next loop, as per iterations
+    of the "rows" value. row_idx should maintain its value as we iterate the next task.
+  */
+  for (TaskMap::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
   {
     const auto task = *it;
     for (auto row = 0; row < rows; row++)
@@ -575,15 +595,15 @@ void DocumentWindow::RenderSection()
             m_image_coords.insert({row, col}, QMimeDatabase{}.mimeTypeForName(FindImage(task.files).name));
           else
           {
-            const auto text  = item->text().isEmpty() ? "" : item->text().remove(0, 1);
+                  auto value = item->text();
+            const auto text  = (IsToken(value)) ? value.remove(0, 1) : value;
             const auto f_it  = task.flags.find(text);
             const bool found = f_it != task.flags.cend();
-
-            if (found)
-              widget->setText(f_it.value());
+            widget->setText((found) ? f_it.value() : text);
           }
           m_table.setItem(row_idx, col, widget);
         }
+        row_idx++;
       }
     }
   }
