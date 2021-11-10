@@ -14,7 +14,7 @@
 #include "src/window/document/helpers.hpp"
 #include <include/ui/kfiledialog.h>
 #include <headers/util.hpp>
-
+#include <QDrag>
 
 using TaskFlags = QHash<QString, QString>;
 using Coord     = QPair<qint32, qint32>;
@@ -52,6 +52,7 @@ signals:
 protected:
   virtual void mouseReleaseEvent(QMouseEvent* e) override;
   virtual void keyPressEvent(QKeyEvent* e) override;
+  virtual void mousePressEvent(QMouseEvent* e) override;
 
 private:
   void SetInserting(const bool inserting, const int32_t& index = -1);

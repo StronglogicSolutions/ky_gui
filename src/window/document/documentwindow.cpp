@@ -191,10 +191,14 @@ void DocumentWindow::SetListeners()
         widget->setText(flag.right(flag.size() - flag.indexOf('=') - 1));
         ui->rowContent->setItem(row, col, widget);
         ui->rowContent->item(row, col)->setBackground(GetBrushForType(m_row_types.at(row)));
+        for (auto item : ui->rowContent->selectedItems())
+        {
+          auto row = item->row();
+          auto col = item->column();
+        }
       }
       SetInserting(false);
     });
-
   /**
    * setRowRepeating
    * @lambda
@@ -404,6 +408,17 @@ void DocumentWindow::SetListeners()
       else
         m_img_height = s.toUInt();
     });
+
+  /**
+   * merge
+   * @lambda
+   */
+  QObject::connect(ui->merge, &QPushButton::clicked, this, [this]() -> void
+  {
+    for (const auto& item : ui->rowContent->selectedItems())
+      qDebug() << "Checking item";
+  });
+
 }
 
 /**
@@ -463,6 +478,16 @@ void DocumentWindow::AddColumn()
     ui->rowContent->setItem(i, count, new QTableWidgetItem{});
     ui->rowContent->item(i, count)->setBackground(GetBrushForType(m_row_types.at(i)));
   }
+}
+
+/**
+ * mousePressEvent
+ * @param [in] {QMouseEvent} event
+ */
+void DocumentWindow::mousePressEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::LeftButton)
+        event->pos();
 }
 
 /**
@@ -573,11 +598,6 @@ void DocumentWindow::RenderSection()
     }
   }
 
-  /**
-    This assumes that there is one row for each task, but we have the row_mul value above which tells us how many
-    rows there should be. Thus we should consider incrementing row_idx in the next loop, as per iterations
-    of the "rows" value. row_idx should maintain its value as we iterate the next task.
-  */
   for (TaskMap::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
   {
     const auto task = *it;
@@ -601,6 +621,7 @@ void DocumentWindow::RenderSection()
             const bool found = f_it != task.flags.cend();
             widget->setText((found) ? f_it.value() : text);
           }
+//          m_table.setSpan(row_idx, col, )
           m_table.setItem(row_idx, col, widget);
         }
         row_idx++;
