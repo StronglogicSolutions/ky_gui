@@ -415,8 +415,29 @@ void DocumentWindow::SetListeners()
    */
   QObject::connect(ui->merge, &QPushButton::clicked, this, [this]() -> void
   {
-    for (const auto& item : ui->rowContent->selectedItems())
-      qDebug() << "Checking item";
+    struct CellRange
+    {
+      int32_t xy1[2];
+      int32_t xy2[2];
+
+      int32_t XStart() const { return xy1[0]; }
+      int32_t YStart() const { return xy1[1]; }
+      int32_t XEnd()   const { return xy2[0]; }
+      int32_t YEnd()   const { return xy2[1]; }
+    };
+
+    const auto GetRange = [](const QTableWidgetSelectionRange& r) -> CellRange { return CellRange{{r.topRow(), r.leftColumn()}, {r.bottomRow(), r.rightColumn()}};};
+
+    auto row = ui->rowContent->currentRow();
+    auto col = ui->rowContent->currentColumn();
+    for (const auto& r : ui->rowContent->selectedRanges())
+    {
+      auto coords = GetRange(r);
+      auto item = ui->rowContent->item(coords.XStart(), coords.YStart());
+      if (IsImage(item->text()))
+        qDebug() << "We can expand this image";
+    }
+
   });
 
 }
