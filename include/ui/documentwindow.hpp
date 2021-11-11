@@ -16,9 +16,10 @@
 #include <headers/util.hpp>
 #include <QDrag>
 
-using TaskFlags = QHash<QString, QString>;
-using Coord     = QPair<qint32, qint32>;
-using Coords    = QHash<Coord, QMimeType>;
+using TaskFlags  = QHash<QString, QString>;
+using Coord      = QPair<qint32, qint32>;
+using FileCoords = QHash<Coord, QMimeType>;
+using Coords     = QHash<Coord, bool>;
 
 struct TaskData
 {
@@ -28,6 +29,26 @@ struct TaskData
 
 using TaskMap = QHash<QString, TaskData>;
 
+struct CellRange
+{
+  int32_t xy1[2];
+  int32_t xy2[2];
+
+  int32_t XStart()  const { return xy1[0]; }
+  int32_t YStart()  const { return xy1[1]; }
+  int32_t XEnd()    const { return xy2[0]; }
+  int32_t YEnd()    const { return xy2[1]; }
+  int32_t XLength() const { return xy2[0] - xy1[0]; }
+  int32_t YLength() const { return xy2[1] - xy1[1]; }
+
+  void SetCoords(Coords& coords)
+  {
+    for (auto row = XStart(); row != XEnd(); row++)
+      for (auto col = YStart(); col != YEnd(); col++)
+        coords.insert({row, col}, true);
+  }
+};
+const auto GetRange = [](const QTableWidgetSelectionRange& r) -> CellRange { return CellRange{{r.topRow(), r.leftColumn()}, {r.bottomRow(), r.rightColumn()}};};
 namespace Ui {
 class DocumentWindow;
 }
@@ -62,11 +83,13 @@ private:
   void RenderSection();
   void SaveSection();
   void SavePDF();
-  bool ImageAtCell(int32_t row, int32_t col);
+  bool ImageAtCell(const int32_t& row, const int32_t& col) const;
   void SetDatePickers();
   void SetPrinter();
   void SetTable();
   void SetListeners();
+  bool CellIsOpen(const int32_t& row, const int32_t& col) const;
+  void SetCoord(const int32_t& row, const int32_t& col, bool is_set = true);
 
 
   Ui::DocumentWindow *ui;
@@ -81,8 +104,9 @@ private:
   TaskMap            m_tasks;
   int32_t            m_task_index;
   QTableWidget       m_table;
-  Coords             m_image_coords;
+  FileCoords         m_image_coords;
   bool               m_fetch_files;
   int32_t            m_img_height;
   bool               m_scale_images;
+  Coords             m_coords;
 };

@@ -414,32 +414,20 @@ void DocumentWindow::SetListeners()
    * @lambda
    */
   QObject::connect(ui->merge, &QPushButton::clicked, this, [this]() -> void
-  {
-    struct CellRange
-    {
-      int32_t xy1[2];
-      int32_t xy2[2];
+  {    
+    Coords coords{};
 
-      int32_t XStart() const { return xy1[0]; }
-      int32_t YStart() const { return xy1[1]; }
-      int32_t XEnd()   const { return xy2[0]; }
-      int32_t YEnd()   const { return xy2[1]; }
-    };
-
-    const auto GetRange = [](const QTableWidgetSelectionRange& r) -> CellRange { return CellRange{{r.topRow(), r.leftColumn()}, {r.bottomRow(), r.rightColumn()}};};
-
-    auto row = ui->rowContent->currentRow();
-    auto col = ui->rowContent->currentColumn();
     for (const auto& r : ui->rowContent->selectedRanges())
     {
       auto coords = GetRange(r);
       auto item = ui->rowContent->item(coords.XStart(), coords.YStart());
       if (IsImage(item->text()))
-        qDebug() << "We can expand this image";
+      {
+        ui->rowContent->setSpan(coords.XStart(), coords.YStart(), coords.XLength(), coords.YLength());
+        coords.SetCoords(m_coords);
+      }
     }
-
   });
-
 }
 
 /**
@@ -570,6 +558,7 @@ void DocumentWindow::SaveSection()
         const auto     col_idx = j;
         QTextTableCell cell    = render_table->cellAt(row_idx, col_idx);
 
+        if (!CellIsOpen(row_idx, col_idx)) continue;
         if (ImageAtCell(i, j))
         {
           if (it->files.isEmpty()) continue;
@@ -641,9 +630,9 @@ void DocumentWindow::RenderSection()
             const auto f_it  = task.flags.find(text);
             const bool found = f_it != task.flags.cend();
             widget->setText((found) ? f_it.value() : text);
-          }
-//          m_table.setSpan(row_idx, col, )
+          }          
           m_table.setItem(row_idx, col, widget);
+          SetCoord(row_idx, col);
         }
         row_idx++;
       }
@@ -694,7 +683,7 @@ void DocumentWindow::ReceiveData(const QString& message, const QVector<QString>&
  * @param col
  * @return
  */
-bool DocumentWindow::ImageAtCell(int32_t row, int32_t col)
+bool DocumentWindow::ImageAtCell(const int32_t& row, const int32_t& col) const
 {
   const auto it = m_image_coords.find(QPair{row, col});
   return (it != m_image_coords.cend());
@@ -759,4 +748,14 @@ void DocumentWindow::ToggleRow(const int32_t& index)
       ui->rowContent->item(index, i)->setBackground(GetBrushForType(RowType::HEADER));
       m_row_types[index] = RowType::HEADER;
     }
+}
+
+bool DocumentWindow::CellIsOpen(const int32_t& row, const int32_t& col) const
+{
+  return (!m_coords.contains({row, col}) || m_coords.value(QPair{row, col}));
+}
+
+void DocumentWindow::SetCoord(const int32_t &row, const int32_t &col, bool is_set)
+{
+  m_coords.insert({row, col}, is_set);
 }
