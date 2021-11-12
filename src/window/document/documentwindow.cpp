@@ -8,7 +8,6 @@
 #include <QTextTable>
 #include <QScreen>
 #include <QTimer>
-#include <QDesktopWidget>
 #include <QCalendarWidget>
 #include <QAbstractTextDocumentLayout>
 #include "headers/util.hpp"
@@ -35,11 +34,10 @@ static void CenterWidget(QWidget *widget)
 
 static const FileWrap& FindImage(const QVector<FileWrap>& files)
 {
-  for (const auto& file : files)
-  {
+  for (const auto& file : files)  
     if (file.type == "image")
       return file;
-  }
+  throw std::invalid_argument{"No image"};
 }
 
 static bool IsToken(const QString& s)
@@ -123,6 +121,9 @@ void DocumentWindow::SetTable()
 
 }
 
+/**
+ * @brief DocumentWindow::SetPrinter
+ */
 void DocumentWindow::SetPrinter()
 {
   ui->rowCount     ->setEnabled(false);
@@ -135,6 +136,9 @@ void DocumentWindow::SetPrinter()
   }
 }
 
+/**
+ * @brief DocumentWindow::SetListeners
+ */
 void DocumentWindow::SetListeners()
 {
   /**
@@ -199,6 +203,7 @@ void DocumentWindow::SetListeners()
       }
       SetInserting(false);
     });
+
   /**
    * setRowRepeating
    * @lambda
@@ -207,17 +212,6 @@ void DocumentWindow::SetListeners()
     [this](int32_t index)
     {
       ToggleRow(index);
-    });
-
-  /**
-   * onCellValueChanged
-   * @lambda
-   */
-  QObject::connect(ui->rowContent, &QTableWidget::itemChanged, this,
-    [this](QTableWidgetItem* item)
-    {
-      auto type = item->Type;
-      auto text = item->text();
     });
 
   /**
@@ -356,10 +350,17 @@ void DocumentWindow::SetListeners()
       }
     });
 
+  /**
+    * RunTest
+    * Function for QA convenience
+    * TODO: remove
+    **/
   QObject::connect(ui->runTest, &QPushButton::clicked, this,
     [this]() -> void
     {
       AddColumn();
+      AddColumn();
+      AddRow();
       AddRow();
       AddRow();
       ToggleRow(0);
@@ -371,11 +372,9 @@ void DocumentWindow::SetListeners()
       ui->rowContent->setItem(1, 2, new QTableWidgetItem{"$FILE_TYPE"});
       ui->rowContent->setItem(2, 0, new QTableWidgetItem{"Repeat text"});
       ui->rowContent->setItem(2, 1, new QTableWidgetItem{"Some repeat text"});
-      ui->rowContent->setItem(2, 2, new QTableWidgetItem{"More repeat text"});
       ui->rowCountActive->toggle();
       ui->rowCount->setEnabled(true);
       ui->rowCount->setValue(3);
-
     });
 
   /**
@@ -395,10 +394,8 @@ void DocumentWindow::SetListeners()
   QObject::connect(ui->imageHeight, &QLineEdit::textChanged, this,
     [this](const QString& s) -> void
     {
-      if (s == "auto")
-      {
-        m_img_height = 0;
-      }
+      if (s == "auto")      
+        m_img_height = 0;      
       else
       if (s == "0")
       {
@@ -414,12 +411,9 @@ void DocumentWindow::SetListeners()
    * @lambda
    */
   QObject::connect(ui->merge, &QPushButton::clicked, this, [this]() -> void
-  {    
-    Coords coords{};
-
-    for (const auto& r : ui->rowContent->selectedRanges())
+  {
+    for (const auto& coords : CellRange::FromQRanges(ui->rowContent->selectedRanges()))
     {
-      auto coords = GetRange(r);
       auto item = ui->rowContent->item(coords.XStart(), coords.YStart());
       if (IsImage(item->text()))
       {
@@ -449,10 +443,8 @@ void DocumentWindow::SetFlags(const QList<QString>& flags)
  */
 void DocumentWindow::SetInserting(const bool inserting, const int32_t& index)
 {
-  if (m_file_path.isEmpty())
-  {
-    m_flag_index = index;
-  }
+  if (m_file_path.isEmpty())  
+    m_flag_index = index;  
   m_inserting  = inserting;
   setCursor(m_inserting ? Qt::CursorShape::CrossCursor : Qt::CursorShape::ArrowCursor);
 }
@@ -462,7 +454,7 @@ void DocumentWindow::SetInserting(const bool inserting, const int32_t& index)
  */
 void DocumentWindow::AddRow()
 {
-  auto count = ui->rowContent->rowCount();
+  const auto count = ui->rowContent->rowCount();
   ui->rowContent->setRowCount(count + 1);
   for (auto i = 0; i < ui->rowContent->columnCount(); i++)
   {
@@ -490,16 +482,6 @@ void DocumentWindow::AddColumn()
 }
 
 /**
- * mousePressEvent
- * @param [in] {QMouseEvent} event
- */
-void DocumentWindow::mousePressEvent(QMouseEvent* event)
-{
-    if (event->button() == Qt::LeftButton)
-        event->pos();
-}
-
-/**
  * @brief DocumentWindow::mouseReleaseEvent
  * @param e
  *
@@ -507,12 +489,7 @@ void DocumentWindow::mousePressEvent(QMouseEvent* event)
  */
 void DocumentWindow::mouseReleaseEvent(QMouseEvent* e)
 {
-  if (e->button() == Qt::LeftButton)
-  {
-    qDebug() << "Mouse pressed";
-    if (m_inserting)
-      SetInserting(false);
-  }
+  if (e->button() == Qt::LeftButton && m_inserting) SetInserting(false);
 }
 
 /**
@@ -570,6 +547,7 @@ void DocumentWindow::SaveSection()
         }
         else
           cell.firstCursorPosition().insertText(t->item(row_idx, col_idx)->text());
+        render_table->mergeCells(row_idx, col_idx, t->rowSpan(row_idx, col_idx), t->columnSpan(row_idx, col_idx));
       }
     }
   }
@@ -630,8 +608,10 @@ void DocumentWindow::RenderSection()
             const auto f_it  = task.flags.find(text);
             const bool found = f_it != task.flags.cend();
             widget->setText((found) ? f_it.value() : text);
-          }          
+          }
+
           m_table.setItem(row_idx, col, widget);
+          m_table.setSpan(row_idx, col, t->rowSpan(row, col), t->columnSpan(row, col));
           SetCoord(row_idx, col);
         }
         row_idx++;
@@ -685,8 +665,7 @@ void DocumentWindow::ReceiveData(const QString& message, const QVector<QString>&
  */
 bool DocumentWindow::ImageAtCell(const int32_t& row, const int32_t& col) const
 {
-  const auto it = m_image_coords.find(QPair{row, col});
-  return (it != m_image_coords.cend());
+  return (m_image_coords.find(QPair{row, col}) != m_image_coords.cend());
 }
 
 /**

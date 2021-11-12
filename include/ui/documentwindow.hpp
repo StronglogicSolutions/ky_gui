@@ -14,7 +14,6 @@
 #include "src/window/document/helpers.hpp"
 #include <include/ui/kfiledialog.h>
 #include <headers/util.hpp>
-#include <QDrag>
 
 using TaskFlags  = QHash<QString, QString>;
 using Coord      = QPair<qint32, qint32>;
@@ -31,6 +30,12 @@ using TaskMap = QHash<QString, TaskData>;
 
 struct CellRange
 {
+  using QSelectionRanges = QList<QTableWidgetSelectionRange>;
+  using CellRanges = std::vector<CellRange>;
+  CellRange(const QTableWidgetSelectionRange& r) { xy1[0] = r.topRow(); xy1[1] = r.leftColumn(); xy2[0] = r.bottomRow(); xy2[1] = r.rightColumn(); }
+  static CellRange  FromQRange (const QTableWidgetSelectionRange& r) { return CellRange{r}; }
+  static CellRanges FromQRanges(const QSelectionRanges&           r) { return CellRanges{r.begin(), r.end()}; }
+
   int32_t xy1[2];
   int32_t xy2[2];
 
@@ -38,17 +43,17 @@ struct CellRange
   int32_t YStart()  const { return xy1[1]; }
   int32_t XEnd()    const { return xy2[0]; }
   int32_t YEnd()    const { return xy2[1]; }
-  int32_t XLength() const { return xy2[0] - xy1[0]; }
-  int32_t YLength() const { return xy2[1] - xy1[1]; }
+  int32_t XLength() const { return xy2[0] - xy1[0] + 1; }
+  int32_t YLength() const { return xy2[1] - xy1[1] + 1; }
 
-  void SetCoords(Coords& coords)
+  void SetCoords(Coords& coords) const
   {
     for (auto row = XStart(); row != XEnd(); row++)
       for (auto col = YStart(); col != YEnd(); col++)
         coords.insert({row, col}, true);
   }
 };
-const auto GetRange = [](const QTableWidgetSelectionRange& r) -> CellRange { return CellRange{{r.topRow(), r.leftColumn()}, {r.bottomRow(), r.rightColumn()}};};
+
 namespace Ui {
 class DocumentWindow;
 }
@@ -73,7 +78,6 @@ signals:
 protected:
   virtual void mouseReleaseEvent(QMouseEvent* e) override;
   virtual void keyPressEvent(QKeyEvent* e) override;
-  virtual void mousePressEvent(QMouseEvent* e) override;
 
 private:
   void SetInserting(const bool inserting, const int32_t& index = -1);
