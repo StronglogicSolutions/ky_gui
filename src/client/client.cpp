@@ -710,10 +710,13 @@ void Client::request(uint8_t request_code, T payload) {
         operation_string = createOperation("TaskOperation",
           std::vector<std::string>{std::to_string(request_code), std::to_string(getSelectedApp())});
       break;
-      case (RequestType::FETCH_FILE):
-        if constexpr (std::is_same_v<T, QVector<QString>>)
-          operation_string = createOperation("FetchFileOperation", ArgsToV(payload, request_code));
-      break;
+    case (RequestType::FETCH_FILE):
+      if constexpr (std::is_same_v<T, QVector<QString>>)
+        operation_string = createOperation("FetchFileOperation", ArgsToV(payload, request_code));
+    break;
+    case (RequestType::FETCH_TERM_HITS):
+        operation_string = createOperation("FetchTermHits", {std::to_string(request_code)});
+    break;
       case (RequestType::FETCH_TASK_DATA):
         if constexpr (std::is_same_v<T, QVector<QString>>)
         {

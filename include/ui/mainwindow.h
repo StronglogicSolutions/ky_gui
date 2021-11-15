@@ -17,6 +17,7 @@
 #include <QTextStream>
 
 #include <include/ui/documentwindow.hpp>
+#include <include/ui/researchwindow.hpp>
 #include <include/ui/argdialog.h>
 #include <include/ui/messagedialog.hpp>
 #include <include/ui/appdialog.hpp>
@@ -175,6 +176,7 @@ public:
     ScheduleDialog        schedule_ui;
     MessageDialog         message_ui;
     DocumentWindow        doc_window;
+    ResearchWindow        research_window;
 
     /** Client member */
     Client*               q_client;

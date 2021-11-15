@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>789</width>
-    <height>552</height>
+    <width>893</width>
+    <height>562</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -649,6 +649,30 @@ padding: 4px;</string>
                 </widget>
                </item>
                <item>
+                <widget class="QPushButton" name="startTest">
+                 <property name="styleSheet">
+                  <string notr="true">background-color: rgb(147,147,147);
+font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);
+font-weight: 700;
+padding: 4px;
+border-style: outset;
+border-width: 2px;
+border-radius: 4px;
+border-color: #00000f;
+min-width: 4em;
+padding: 4px;</string>
+                 </property>
+                 <property name="text">
+                  <string>Research</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="kres.qrc">
+                   <normaloff>:/icons/icons/ml.png</normaloff>:/icons/icons/ml.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QPushButton" name="execute">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1109,7 +1133,7 @@ padding: 4px;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>789</width>
+     <width>893</width>
      <height>23</height>
     </rect>
    </property>

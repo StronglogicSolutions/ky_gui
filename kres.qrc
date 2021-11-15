@@ -19,6 +19,7 @@
         <file>icons/messages.png</file>
         <file>icons/refresh.png</file>
         <file>icons/make.png</file>
+        <file>icons/ml.png</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/log.png</file>

@@ -237,8 +237,8 @@ void MainWindow::connectClient() {
     }
   );
 
-  auto server_ip   = ui->serverIp->toPlainText();
-  auto server_port = ui->serverPort->toPlainText();
+  const auto server_ip   = ui->serverIp->toPlainText();
+  const auto server_port = ui->serverPort->toPlainText();
   setWindowTitle(windowTitle() + " kiq://" + server_ip + ":" + server_port);
   q_client->start(server_ip, server_port);
 
@@ -377,6 +377,10 @@ void MainWindow::connectClient() {
 
   QObject::connect(ui->editApps, &QPushButton::clicked, this, [this]() {
     app_ui.show();
+  });
+
+  QObject::connect(ui->startTest, &QPushButton::clicked, this, [this]() {
+    q_client->request(RequestType::FETCH_TERM_HITS);
   });
 
   QObject::connect(ui->tasks, &QPushButton::clicked, this, [this]() {
