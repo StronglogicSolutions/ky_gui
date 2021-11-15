@@ -8,7 +8,6 @@
 #include <QTextTable>
 #include <QScreen>
 #include <QTimer>
-#include <QDesktopWidget>
 #include <QCalendarWidget>
 #include <QAbstractTextDocumentLayout>
 #include "headers/util.hpp"
@@ -35,11 +34,15 @@ static void CenterWidget(QWidget *widget)
 
 static const FileWrap& FindImage(const QVector<FileWrap>& files)
 {
-  for (const auto& file : files)
-  {
+  for (const auto& file : files)  
     if (file.type == "image")
       return file;
-  }
+  throw std::invalid_argument{"No image"};
+}
+
+static bool IsToken(const QString& s)
+{
+  return (s.size() && s.front() == '$');
 }
 
 /**
@@ -53,7 +56,7 @@ DocumentWindow::DocumentWindow(QWidget *parent)
   m_flag_index(-1),
   m_inserting(false),
   m_row_types(QList<RowType>{RowType::REPEAT}),
-  m_printer(QPrinter::PrinterResolution),
+  m_printer(QPrinter::HighResolution),
   m_img_height(0),
   m_scale_images(true)
 {
@@ -118,6 +121,9 @@ void DocumentWindow::SetTable()
 
 }
 
+/**
+ * @brief DocumentWindow::SetPrinter
+ */
 void DocumentWindow::SetPrinter()
 {
   ui->rowCount     ->setEnabled(false);
@@ -130,6 +136,9 @@ void DocumentWindow::SetPrinter()
   }
 }
 
+/**
+ * @brief DocumentWindow::SetListeners
+ */
 void DocumentWindow::SetListeners()
 {
   /**
@@ -186,6 +195,11 @@ void DocumentWindow::SetListeners()
         widget->setText(flag.right(flag.size() - flag.indexOf('=') - 1));
         ui->rowContent->setItem(row, col, widget);
         ui->rowContent->item(row, col)->setBackground(GetBrushForType(m_row_types.at(row)));
+        for (auto item : ui->rowContent->selectedItems())
+        {
+          auto row = item->row();
+          auto col = item->column();
+        }
       }
       SetInserting(false);
     });
@@ -198,17 +212,6 @@ void DocumentWindow::SetListeners()
     [this](int32_t index)
     {
       ToggleRow(index);
-    });
-
-  /**
-   * onCellValueChanged
-   * @lambda
-   */
-  QObject::connect(ui->rowContent, &QTableWidget::itemChanged, this,
-    [this](QTableWidgetItem* item)
-    {
-      auto type = item->Type;
-      auto text = item->text();
     });
 
   /**
@@ -293,11 +296,15 @@ void DocumentWindow::SetListeners()
          }
          m_file_path = file_path;
          SetInserting(true);
-       } else {
+       }
+       else
+       {
          qDebug() << "Unable to open selected file";
          QMessageBox::warning(this, tr("File Error"), tr("Unable to open selected file"));
        }
-      } else {
+      }
+      else
+      {
        qDebug() << "Could not read the file path";
        QMessageBox::warning(this, tr("File Error"), tr("Could not read the file path"));
       }
@@ -343,10 +350,18 @@ void DocumentWindow::SetListeners()
       }
     });
 
+  /**
+    * RunTest
+    * Function for QA convenience
+    * TODO: remove
+    **/
   QObject::connect(ui->runTest, &QPushButton::clicked, this,
     [this]() -> void
     {
       AddColumn();
+      AddColumn();
+      AddRow();
+      AddRow();
       AddRow();
       ToggleRow(0);
       ui->rowContent->setItem(0, 0, new QTableWidgetItem{"User"});
@@ -355,7 +370,10 @@ void DocumentWindow::SetListeners()
       ui->rowContent->setItem(1, 0, new QTableWidgetItem{"$USER"});
       ui->rowContent->setItem(1, 1, new QTableWidgetItem{"$DESCRIPTION"});
       ui->rowContent->setItem(1, 2, new QTableWidgetItem{"$FILE_TYPE"});
+      ui->rowContent->setItem(2, 0, new QTableWidgetItem{"Repeat text"});
+      ui->rowContent->setItem(2, 1, new QTableWidgetItem{"Some repeat text"});
       ui->rowCountActive->toggle();
+      ui->rowCount->setEnabled(true);
       ui->rowCount->setValue(3);
     });
 
@@ -376,10 +394,8 @@ void DocumentWindow::SetListeners()
   QObject::connect(ui->imageHeight, &QLineEdit::textChanged, this,
     [this](const QString& s) -> void
     {
-      if (s == "auto")
-      {
-        m_img_height = 0;
-      }
+      if (s == "auto")      
+        m_img_height = 0;      
       else
       if (s == "0")
       {
@@ -389,6 +405,23 @@ void DocumentWindow::SetListeners()
       else
         m_img_height = s.toUInt();
     });
+
+  /**
+   * merge
+   * @lambda
+   */
+  QObject::connect(ui->merge, &QPushButton::clicked, this, [this]() -> void
+  {
+    for (const auto& coords : CellRange::FromQRanges(ui->rowContent->selectedRanges()))
+    {
+      auto item = ui->rowContent->item(coords.XStart(), coords.YStart());
+      if (IsImage(item->text()))
+      {
+        ui->rowContent->setSpan(coords.XStart(), coords.YStart(), coords.XLength(), coords.YLength());
+        coords.SetCoords(m_coords);
+      }
+    }
+  });
 }
 
 /**
@@ -410,10 +443,8 @@ void DocumentWindow::SetFlags(const QList<QString>& flags)
  */
 void DocumentWindow::SetInserting(const bool inserting, const int32_t& index)
 {
-  if (m_file_path.isEmpty())
-  {
-    m_flag_index = index;
-  }
+  if (m_file_path.isEmpty())  
+    m_flag_index = index;  
   m_inserting  = inserting;
   setCursor(m_inserting ? Qt::CursorShape::CrossCursor : Qt::CursorShape::ArrowCursor);
 }
@@ -423,7 +454,7 @@ void DocumentWindow::SetInserting(const bool inserting, const int32_t& index)
  */
 void DocumentWindow::AddRow()
 {
-  auto count = ui->rowContent->rowCount();
+  const auto count = ui->rowContent->rowCount();
   ui->rowContent->setRowCount(count + 1);
   for (auto i = 0; i < ui->rowContent->columnCount(); i++)
   {
@@ -458,12 +489,7 @@ void DocumentWindow::AddColumn()
  */
 void DocumentWindow::mouseReleaseEvent(QMouseEvent* e)
 {
-  if (e->button() == Qt::LeftButton)
-  {
-    qDebug() << "Mouse pressed";
-    if (m_inserting)
-      SetInserting(false);
-  }
+  if (e->button() == Qt::LeftButton && m_inserting) SetInserting(false);
 }
 
 /**
@@ -475,12 +501,13 @@ void DocumentWindow::mouseReleaseEvent(QMouseEvent* e)
  */
 void DocumentWindow::SaveSection()
 {
+  const auto GetTopCount = [this]() -> int { int i{}; for (;i < m_row_types.size(); i++) if (m_row_types.at(i) == RowType::REPEAT) break; return i;};
   KLOG("Saving section");
   QTextCursor   cursor{&m_doc};
   int32_t       row_idx{};
   const auto    row_count    = m_table.rowCount();
   const auto    col_count    = m_table.columnCount();
-  const auto    top_count    = (row_count - m_tasks.size());
+  const auto    top_count    = GetTopCount();
   QTableWidget* t            = &m_table;
   QTextTable*   render_table = cursor.insertTable(row_count, col_count);
 
@@ -492,8 +519,8 @@ void DocumentWindow::SaveSection()
       {
         const auto image = ui->rowContent->item(row_idx, col)->data(Qt::DecorationRole);
         cell.firstCursorPosition().insertImage((m_scale_images) ?
-                image.value<QPixmap>().toImage().scaledToHeight((m_img_height) ? m_img_height : DEFAULT_HEIGHT) :
-                image.value<QPixmap>().toImage());
+          image.value<QPixmap>().toImage().scaledToHeight((m_img_height) ? m_img_height : DEFAULT_HEIGHT) :
+          image.value<QPixmap>().toImage());
       }
       else
         cell.firstCursorPosition().insertText(t->item(row_idx, col)->text());
@@ -508,6 +535,7 @@ void DocumentWindow::SaveSection()
         const auto     col_idx = j;
         QTextTableCell cell    = render_table->cellAt(row_idx, col_idx);
 
+        if (!CellIsOpen(row_idx, col_idx)) continue;
         if (ImageAtCell(i, j))
         {
           if (it->files.isEmpty()) continue;
@@ -519,6 +547,7 @@ void DocumentWindow::SaveSection()
         }
         else
           cell.firstCursorPosition().insertText(t->item(row_idx, col_idx)->text());
+        render_table->mergeCells(row_idx, col_idx, t->rowSpan(row_idx, col_idx), t->columnSpan(row_idx, col_idx));
       }
     }
   }
@@ -550,15 +579,14 @@ void DocumentWindow::RenderSection()
   for (auto row = 0; row < m_row_types.size(); row++)
   {
     if (m_row_types.at(row) == RowType::HEADER)
-    { // TODO: Check if text or media
+    {
       for (auto col = 0; col < cols; col++)
-
         m_table.setItem(row_idx, col, new QTableWidgetItem{t->item(row, col)->text()});
-     row_idx++;
+      row_idx++;
     }
   }
 
-  for (TaskMap::iterator it = m_tasks.begin(); it != m_tasks.end(); it++, row_idx++)
+  for (TaskMap::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
   {
     const auto task = *it;
     for (auto row = 0; row < rows; row++)
@@ -575,15 +603,18 @@ void DocumentWindow::RenderSection()
             m_image_coords.insert({row, col}, QMimeDatabase{}.mimeTypeForName(FindImage(task.files).name));
           else
           {
-            const auto text  = item->text().isEmpty() ? "" : item->text().remove(0, 1);
+                  auto value = item->text();
+            const auto text  = (IsToken(value)) ? value.remove(0, 1) : value;
             const auto f_it  = task.flags.find(text);
             const bool found = f_it != task.flags.cend();
-
-            if (found)
-              widget->setText(f_it.value());
+            widget->setText((found) ? f_it.value() : text);
           }
+
           m_table.setItem(row_idx, col, widget);
+          m_table.setSpan(row_idx, col, t->rowSpan(row, col), t->columnSpan(row, col));
+          SetCoord(row_idx, col);
         }
+        row_idx++;
       }
     }
   }
@@ -632,10 +663,9 @@ void DocumentWindow::ReceiveData(const QString& message, const QVector<QString>&
  * @param col
  * @return
  */
-bool DocumentWindow::ImageAtCell(int32_t row, int32_t col)
+bool DocumentWindow::ImageAtCell(const int32_t& row, const int32_t& col) const
 {
-  const auto it = m_image_coords.find(QPair{row, col});
-  return (it != m_image_coords.cend());
+  return (m_image_coords.find(QPair{row, col}) != m_image_coords.cend());
 }
 
 /**
@@ -697,4 +727,14 @@ void DocumentWindow::ToggleRow(const int32_t& index)
       ui->rowContent->item(index, i)->setBackground(GetBrushForType(RowType::HEADER));
       m_row_types[index] = RowType::HEADER;
     }
+}
+
+bool DocumentWindow::CellIsOpen(const int32_t& row, const int32_t& col) const
+{
+  return (!m_coords.contains({row, col}) || m_coords.value(QPair{row, col}));
+}
+
+void DocumentWindow::SetCoord(const int32_t &row, const int32_t &col, bool is_set)
+{
+  m_coords.insert({row, col}, is_set);
 }
