@@ -56,7 +56,7 @@ DocumentWindow::DocumentWindow(QWidget *parent)
   m_flag_index(-1),
   m_inserting(false),
   m_row_types(QList<RowType>{RowType::REPEAT}),
-  m_printer(QPrinter::HighResolution),
+  m_printer(QPrinter::PrinterResolution),
   m_img_height(0),
   m_scale_images(true)
 {
@@ -501,10 +501,24 @@ void DocumentWindow::mouseReleaseEvent(QMouseEvent* e)
  */
 void DocumentWindow::SaveSection()
 {
-  const auto GetTopCount = [this]() -> int { int i{}; for (;i < m_row_types.size(); i++) if (m_row_types.at(i) == RowType::REPEAT) break; return i;};
+  using BFormat  = QTextBlockFormat;
+  using TFormat  = QTextTableFormat;
+  using TLength  = QTextLength;
+  using TLengths = QVector<TLength>;
+
+  static const int32_t PREF_WIDTH{240};
+
+  const auto GetCenterFormat = []()                     -> BFormat
+    { BFormat f{}; Qt::Alignment a = (f.alignment() & Qt::AlignHorizontal_Mask); f.setAlignment(a); return f; };
+  const auto GetTopCount     = [this]()                 -> int
+    { int i{}; for (;i < m_row_types.size(); i++) if (m_row_types.at(i) == RowType::REPEAT) break; return i; };
+  const auto GetTableFormat  = [](const int32_t& width) -> TFormat
+    { TFormat f{}; TLength l{TLength::VariableLength, static_cast<qreal>(width)}; TLengths lts{l}; f.setColumnWidthConstraints(lts); return f; };
+
   KLOG("Saving section");
-  QTextCursor   cursor{&m_doc};
-  int32_t       row_idx{};
+  QTextCursor   cursor   {&m_doc};
+  int32_t       max_width{};
+  int32_t       row_idx  {};
   const auto    row_count    = m_table.rowCount();
   const auto    col_count    = m_table.columnCount();
   const auto    top_count    = GetTopCount();
@@ -543,14 +557,20 @@ void DocumentWindow::SaveSection()
           const FileWrap& file = FindImage(it->files);
           QPixmap         pm{};
           pm.loadFromData(file.buffer, QMimeDatabase{}.mimeTypeForName(file.name).preferredSuffix().toUtf8());
-          cell.firstCursorPosition().insertImage(pm.toImage().scaledToHeight(240));
+          const auto      image = pm.toImage().scaledToHeight(PREF_WIDTH);
+          cell.firstCursorPosition().insertImage(image);
+
+          if (image.width() < PREF_WIDTH)
+            cell.firstCursorPosition().setBlockFormat(GetCenterFormat());
         }
-        else
+        else        
           cell.firstCursorPosition().insertText(t->item(row_idx, col_idx)->text());
+
         render_table->mergeCells(row_idx, col_idx, t->rowSpan(row_idx, col_idx), t->columnSpan(row_idx, col_idx));
       }
     }
   }
+  render_table->setFormat(GetTableFormat(PREF_WIDTH));
 }
 
 /**
