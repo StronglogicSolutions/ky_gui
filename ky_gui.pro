@@ -35,6 +35,7 @@ SOURCES += \
         src/window/main/controller.cpp \
         src/window/document/documentwindow.cpp \
         src/window/document/helpers.cpp \
+        src/window/research/researchwindow.cpp \
         src/client/client.cpp \
         src/task/instagram_task.cpp \
         src/task/generic_task.cpp \
@@ -53,6 +54,7 @@ HEADERS += \
         include/ui/messagedialog.hpp \
         include/ui/scheduledialog.hpp \
         include/ui/mainwindow.h \
+        include/ui/researchwindow.hpp \
         include/ui/connection_indicator.h \
         include/ui/kfiledialog.h \
         include/client/client.hpp \
@@ -79,6 +81,7 @@ FORMS += \
         documentwindow.ui \
         mainwindow.ui \
         messagedialog.ui \
+        researchwindow.ui \
         scheduledialog.ui
 
 # Default rules for deployment.

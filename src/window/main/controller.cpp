@@ -275,6 +275,12 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
     if (message == "File Upload Meta")
       window->q_client->setMetadata(v);
     else
+    if (message == "Term Hits")
+    {
+      window->research_window.ReceiveData(v);
+      window->research_window.show();
+    }
+    else
     if (message == "Message Received")
       event_message += "\n" + v.at(1) + ": " + v.at(2);
   }

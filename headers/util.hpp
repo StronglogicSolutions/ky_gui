@@ -67,27 +67,28 @@ FETCH_TASK_FLAGS      = 0x08,
 FETCH_FILE            = 0x09,
 FETCH_FILE_ACK        = 0x0A,
 FETCH_FILE_READY      = 0x0B,
-FETCH_TASK_DATA       = 0x0C
+FETCH_TASK_DATA       = 0x0C,
+FETCH_TERM_HITS       = 0x13
 };
 
-const uint8_t SCHEDULED_TASK_ID_INDEX        = 0x00;
-const uint8_t SCHEDULED_TASK_NAME_INDEX      = 0x01;
-const uint8_t SCHEDULED_TASK_TIME_INDEX      = 0x02;
-const uint8_t SCHEDULED_TASK_FLAGS_INDEX     = 0x03;
-const uint8_t SCHEDULED_TASK_COMPLETED_INDEX = 0x04;
-const uint8_t SCHEDULED_TASK_RECURRING_INDEX = 0x05;
-const uint8_t SCHEDULED_TASK_NOTIFY_INDEX    = 0x06;
-const uint8_t SCHEDULED_TASK_RUNTIME_INDEX   = 0x07;
-const uint8_t SCHEDULED_TASK_FILES_INDEX     = 0x08;
+static const uint8_t SCHEDULED_TASK_ID_INDEX        = 0x00;
+static const uint8_t SCHEDULED_TASK_NAME_INDEX      = 0x01;
+static const uint8_t SCHEDULED_TASK_TIME_INDEX      = 0x02;
+static const uint8_t SCHEDULED_TASK_FLAGS_INDEX     = 0x03;
+static const uint8_t SCHEDULED_TASK_COMPLETED_INDEX = 0x04;
+static const uint8_t SCHEDULED_TASK_RECURRING_INDEX = 0x05;
+static const uint8_t SCHEDULED_TASK_NOTIFY_INDEX    = 0x06;
+static const uint8_t SCHEDULED_TASK_RUNTIME_INDEX   = 0x07;
+static const uint8_t SCHEDULED_TASK_FILES_INDEX     = 0x08;
 
-const uint8_t TASK_ID_INDEX       {0x00};
-const uint8_t TASK_TIME_INDEX     {0x01};
-const uint8_t TASK_FLAGS_INDEX    {0x02};
-const uint8_t TASK_COMPLETED_INDEX{0x03};
-const uint8_t TASK_RECURRING_INDEX{0x04};
-const uint8_t TASK_NOTIFY_INDEX   {0x05};
-const uint8_t TASK_RUNTIME_INDEX  {0x06};
-const uint8_t TASK_FILES_INDEX    {0x07};
+static const uint8_t TASK_ID_INDEX       {0x00};
+static const uint8_t TASK_TIME_INDEX     {0x01};
+static const uint8_t TASK_FLAGS_INDEX    {0x02};
+static const uint8_t TASK_COMPLETED_INDEX{0x03};
+static const uint8_t TASK_RECURRING_INDEX{0x04};
+static const uint8_t TASK_NOTIFY_INDEX   {0x05};
+static const uint8_t TASK_RUNTIME_INDEX  {0x06};
+static const uint8_t TASK_FILES_INDEX    {0x07};
 
 }
 
