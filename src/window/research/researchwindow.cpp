@@ -16,11 +16,16 @@ ResearchWindow::ResearchWindow(QWidget *parent) :
   ui->termTable->setColumnWidth(4, 200);
   ui->termTable->setColumnWidth(5, 200);
   ui->termTable->setColumnWidth(6, 160);
+
+  QObject::connect(ui->termTable->horizontalHeader(), &QHeaderView::sectionClicked, this,
+    [this](int32_t index)
+    {
+      ui->termTable->sortByColumn(index, ui->termTable->horizontalHeader()->sortIndicatorOrder());
+    });
 }
 
 void ResearchWindow::ReceiveData(const QVector<QString>& argv)
 {
-
   for (auto i = 0; i < argv.size(); i++)
   {
     const auto object        = QJsonDocument::fromJson(argv[i].toUtf8()).object();

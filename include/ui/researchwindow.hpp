@@ -20,7 +20,7 @@ public:
 protected:
   virtual void keyPressEvent(QKeyEvent* e) override;
 private:
-  Ui::ResearchWindow *ui;
+  Ui::ResearchWindow* ui;
 };
 
 #endif // RESEARCHWINDOW_H
