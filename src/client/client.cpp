@@ -355,18 +355,12 @@ void Client::start(QString ip, QString port) {
  * @brief Client::sendMessage
  * @param [in] {const QString&} The message to send
  */
-void Client::sendMessage(const QString& s) {
-  if (s == "test")
-  {
-    request(static_cast<uint8_t>(constants::RequestType::FETCH_FILE), QVector<QString>{"104", "105", "106"});
-    return;
-  }
-
-  if (m_client_socket_fd != -1) {
+void Client::sendMessage(const QString& s)
+{
+  if (m_client_socket_fd != -1)
     sendEncoded(createMessage(s.toUtf8(), ""));
-  } else {
-    qDebug() << "You must first open a connection";
-  }
+  else
+    KLOG("You must first open a connection");
 }
 
 /**
@@ -398,14 +392,16 @@ void Client::sendEncoded(std::string message) {
  * @brief Client::sendTaskEncoded
  * @param [in] {Scheduler::Task*} task The task arguments
  */
-void Client::sendTaskEncoded(Scheduler::Task* task) {
-  if (task->getType() == Scheduler::TaskType::INSTAGRAM) {
-    flatbuffers::Offset<IGTask> ig_task =
-    createIGTask(task, getSelectedApp(), sent_files);
+void Client::sendTaskEncoded(Scheduler::Task* task)
+{
+  if (task->getType() == Scheduler::TaskType::INSTAGRAM)
+  {
+    flatbuffers::Offset<IGTask> ig_task = createIGTask(task, getSelectedApp(), sent_files);
     builder.Finish(ig_task);
-  } else {
-    flatbuffers::Offset<GenericTask> generic_task =
-    createGenericTask(task, getSelectedApp(), sent_files);
+  }
+  else
+  {
+    flatbuffers::Offset<GenericTask> generic_task = createGenericTask(task, getSelectedApp(), sent_files);
     builder.Finish(generic_task);
   }
 
@@ -417,8 +413,8 @@ void Client::sendTaskEncoded(Scheduler::Task* task) {
 
   send_buffer[0] = (size >> 24)         & 0xFF;
   send_buffer[1] = (size >> 16)         & 0xFF;
-  send_buffer[2] = (size >> 8)          & 0xFF;
-  send_buffer[3] = size                 & 0xFF;
+  send_buffer[2] = (size >>  8)         & 0xFF;
+  send_buffer[3] = (size >>  0)         & 0xFF;
   send_buffer[4] = (task->getTaskCode() & 0xFF);
 
   std::memcpy(send_buffer + 5, encoded_message_buffer, size);
@@ -488,15 +484,19 @@ void Client::sendPackets(uint8_t* data, uint32_t size)
 }
 
 
-void Client::ping() {
+void Client::ping() 
+{
   if ((outgoing_files.isEmpty() || file_was_sent) && !(m_fetching))
   {
-    qDebug() << "Pinging server";
-
-    uint8_t send_buffer[5];
-    memset(send_buffer, 0, 5);
-    send_buffer[4] = (TaskCode::PINGBYTE & 0xFF);
-    ::send(m_client_socket_fd, send_buffer, 5, 0);
+    static const size_t size{0x05};
+    KLOG("Pinging server");
+    uint8_t send_buffer[size];
+    send_buffer[0] = (size >> 24)         & 0xFF;
+    send_buffer[1] = (size >> 16)         & 0xFF;
+    send_buffer[2] = (size >>  8)         & 0xFF;
+    send_buffer[3] = (size >>  0)         & 0xFF;
+    send_buffer[4] = (TaskCode::PINGBYTE) & 0xFF;
+    ::send(m_client_socket_fd, send_buffer, size, 0);
   }
 }
 
