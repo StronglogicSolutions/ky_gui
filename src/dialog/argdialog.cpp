@@ -178,7 +178,8 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
 
   ui->dateTime->setDateTime(QDateTime::currentDateTime());
 
-  QObject::connect(ui->dateTime, &QDateTimeEdit::dateTimeChanged, this, [this]() {
+  QObject::connect(ui->dateTime, &QDateTimeEdit::dateTimeChanged, this, [this]()
+  {
     m_task->setArgument("datetime", QString::number(ui->dateTime->dateTime().toTime_t()));
   });
 
@@ -247,36 +248,42 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
   });
 }
 
-void ArgDialog::showEvent(QShowEvent* event) {
-  if (event->type() == QEvent::Show) {
-    if (m_task == nullptr || m_task->getTaskCode() != findTaskCode(m_app_name)) {
+void ArgDialog::showEvent(QShowEvent* event)
+{
+  if (event->type() == QEvent::Show)
+  {
+    if (m_task == nullptr || m_task->getTaskCode() != findTaskCode(m_app_name))
+    {
       m_task = createTask(m_app_name);
       if (m_task->getType() == INSTAGRAM) {   // recurring and notification should
         ui->recurring->hide();                // only be visible for generic tasks
         ui->recurringLabel->hide();
         ui->notification->hide();
         ui->notificationLabel->hide();
-      } else if (ui->recurring->isHidden()) {
+      }
+      else
+        if (ui->recurring->isHidden())
+        {
         ui->recurring->show();
         ui->recurringLabel->show();
         ui->notification->show();
         ui->notificationLabel->show();
       }
     }
-
     ui->argType->clear();
 
-    for (const auto& name : m_task->getArgumentNames()) {
-      ui->argType->addItem(name, QVariant::String);
-    }
+    for (const auto& name : m_task->getArgumentNames())
+      ui->argType->addItem(name, QVariant::String);    
 
-    if (m_config.contains("users")) {
+    if (m_config.contains("users"))
+    {
       ui->user->clear();
       ui->user->addItems(configValueToQList("users", m_config));
     }
-    if (ui->user->count() > 0) {
+    if (ui->user->count() > 0)
       m_task->setArgument("user", ui->user->itemText(0));
-    }
+
+    m_task->setArgument("datetime", QString::number(ui->dateTime->dateTime().toTime_t()));
   }
 }
 

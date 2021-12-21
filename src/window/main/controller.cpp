@@ -188,7 +188,7 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
           .name  = app_name,
           .state = !error ? ProcessState::SUCCEEDED : ProcessState::FAILED,
           .start = TimeUtils::getTime(),
-          .id    = "Scheduled task",
+          .id    = v.at(1),
           .error = error ? v.at(3) : "No errors reported"};
 
           if (v.count() > 2 && !v.at(2).isEmpty())
