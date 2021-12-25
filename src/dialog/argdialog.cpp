@@ -266,17 +266,19 @@ void ArgDialog::showEvent(QShowEvent* event) {
 
     ui->argType->clear();
 
-    for (const auto& name : m_task->getArgumentNames()) {
+    for (const auto& name : m_task->getArgumentNames())
       ui->argType->addItem(name, QVariant::String);
-    }
 
-    if (m_config.contains("users")) {
+    if (m_config.contains("users"))
+    {
       ui->user->clear();
       ui->user->addItems(configValueToQList("users", m_config));
     }
-    if (ui->user->count() > 0) {
+
+    if (ui->user->count() > 0)
       m_task->setArgument("user", ui->user->itemText(0));
-    }
+
+    m_task->setArgument("datetime", QString::number(ui->dateTime->dateTime().toTime_t()));
   }
 }
 
