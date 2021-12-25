@@ -149,11 +149,14 @@ Client::Client(QWidget *parent, int count, char** arguments)
       std::string data_string{buffer, buffer + size};
       try
       {
-        if (!isValidJson(data_string))
+        if (isPong(buffer, size))
         {
-          KLOG("Invalid JSON: ", data_string);
-          return;
+          emit Client::messageReceived(PONG_REPLY_TYPE, "Pong", {});
+          return KLOG("Pong");
         }
+        else
+        if (!isValidJson(data_string))        
+          return KLOG("Invalid JSON: ", data_string);
         else
         if (isNewSession(data_string.c_str()))
         {
@@ -186,8 +189,10 @@ Client::Client(QWidget *parent, int count, char** arguments)
         }
         std::string formatted_json = getJsonString(data_string);
         emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(formatted_json.data(), formatted_json.size()), {});
-      } catch (const std::exception& e) {
-        QString error{e.what()};
+      }
+      catch (const std::exception& e)
+      {
+        KLOG("Exception caught decoding message: ", e.what());
       }
     }
   })
@@ -219,13 +224,6 @@ void Client::handleMessages() {
     if (m_download_console.is_downloading())
     {
       handleDownload(receive_buffer, bytes_received);
-      continue;
-    }
-
-    if (isPong(receive_buffer, bytes_received))
-    {
-      KLOG("Pong");
-      emit Client::messageReceived(PONG_REPLY_TYPE, "Pong", {});
       continue;
     }
 

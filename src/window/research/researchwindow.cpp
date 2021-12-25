@@ -30,7 +30,10 @@ void ResearchWindow::ReceiveData(const QVector<QString>& argv)
   {
     const auto object        = QJsonDocument::fromJson(argv[i].toUtf8()).object();
     ui->termTable->setRowCount(ui->termTable->rowCount() + 1);
-    ui->termTable->setItem(i, 0, new QTableWidgetItem{object["id"].toString()});
+    auto id_data       = new QTableWidgetItem{};
+    id_data->setData(Qt::DisplayRole, object["id"].toString().toUInt());
+    ui->termTable->setItem(i, 0, id_data);
+//    ui->termTable->setItem(i, 0, new QTableWidgetItem{object["id"].toInt()});
     ui->termTable->setItem(i, 1, new QTableWidgetItem{object["term"].toString()});
     ui->termTable->setItem(i, 2, new QTableWidgetItem{object["type"].toString()});
     ui->termTable->setItem(i, 3, new QTableWidgetItem{object["user"].toString()});
