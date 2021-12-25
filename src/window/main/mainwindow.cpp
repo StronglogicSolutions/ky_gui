@@ -288,8 +288,10 @@ void MainWindow::connectClient() {
     QApplication::exit(CLIENT_EXIT);
   });
 
-  QObject::connect(ui->execute, &QPushButton::clicked, this,
-                   [this]() { q_client->execute(); });
+  QObject::connect(ui->execute, &QPushButton::clicked, this, [this]()
+  {
+    q_client->execute();
+  });
 
   QObject::connect(ui->addArgs, &QPushButton::clicked, this, [this]()
   {
