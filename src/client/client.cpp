@@ -572,22 +572,24 @@ QString Client::getAppName(int mask) {
 /**
  * @brief Client::execute
  */
-void Client::execute() {
-  if (!selected_commands.empty()) {
+void Client::execute()
+{
+  using Payload = std::vector<std::string>;
+  auto MakeUUID = []() { return QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces); };
+  static const auto request = std::to_string(constants::RequestType::EXECUTE_PROCESS);
+
+  if (!selected_commands.empty())
+  {
     executing = true;
-    for (const auto& command : selected_commands) {
-      auto app_name = getAppName(command);
-      auto message = app_name + " pending";
-      auto request_id =
-        QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces);
-      emit Client::messageReceived(
-        PROCESS_REQUEST_TYPE, message, { QString{command}, app_name, request_id }
-      );
-    std::string execute_operation =
-      createOperation(
-        "Execute",
-          {std::to_string(command),  std::string(request_id.toUtf8().constData())}
-      );
+    for (const auto& command : selected_commands)
+    {
+      const auto app_name          = getAppName(command);
+      const auto message           = app_name + " pending";
+      const auto request_id        = MakeUUID();
+      const auto payload           = Payload{request, std::to_string(command),  std::string(request_id.toUtf8().constData())};
+      const auto execute_operation = createOperation("Execute", payload);
+
+      emit Client::messageReceived(PROCESS_REQUEST_TYPE, message, {QString{command}, app_name, request_id});
       sendEncoded(execute_operation);
     }
   }
@@ -599,18 +601,21 @@ void Client::execute() {
  * @param [in] {bool}                     file_pending A boolean indicating whether there are
  *                                        files being sent for this task
  */
-void Client::scheduleTask(Scheduler::Task* task) {
-  if (m_outbound_task == nullptr) {
+void Client::scheduleTask(Scheduler::Task* task)
+{
+  if (m_outbound_task == nullptr)
+  {
     m_outbound_task = std::move(task);
-    if (m_outbound_task->hasFiles()) {
+    if (m_outbound_task->hasFiles())
       sendFiles(m_outbound_task);
-    } else {
+    else
+    {
       qDebug() << "Requesting a task to be scheduled";
       sendTaskEncoded(m_outbound_task);
     }
-  } else {
-    m_task_queue.enqueue(task);
   }
+  else
+    m_task_queue.enqueue(task);
 }
 
 /**
