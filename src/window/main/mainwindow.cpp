@@ -481,7 +481,8 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v) {
                                   .id = v.at(2)});
 
     int row = 0;
-    for (const auto& process : m_processes) {
+    for (const auto& process : m_processes)
+    {
       m_process_model->setItem(row, utils::createProcessListItem(process));
       row++;
     }
