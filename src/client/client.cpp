@@ -814,3 +814,13 @@ void Client::handleDownload(uint8_t* data, ssize_t size)
   else
     m_download_console.Receive(data, size);
 }
+
+void Client::setCommands(Commands commands)
+{
+  using Pair = std::pair<int32_t, std::string>;
+  if (!commands.empty() && selected_commands.empty())
+    selected_commands = {commands.front().mask.toInt()};
+  m_commands = commands;
+  for (const auto& command : commands)
+    m_command_map.insert(Pair{command.mask.toInt(), command.name.toStdString()});
+}

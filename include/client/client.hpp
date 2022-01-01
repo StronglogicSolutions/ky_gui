@@ -48,9 +48,8 @@ static constexpr int GENTASKBYTE = 0xFC;
 static constexpr int PINGBYTE    = 0xFD;
 }  // namespace TaskCode
 
-typedef QVector<KApplication> Commands;
-typedef std::map<int, std::vector<std::string>> CommandArgMap;
-typedef QVector<QString> StringVec;
+using Commands   = QVector<KApplication>;
+using StringVec  = QVector<QString>;
 
 struct SentFile {
   int                 timestamp;
@@ -142,7 +141,7 @@ struct DownloadConsole
 };
 
 Q_DECLARE_METATYPE(StringVec)
-Q_DECLARE_METATYPE(QVector<QByteArray>);
+Q_DECLARE_METATYPE(QVector<QByteArray>)
 
 class Client : public QDialog {
   Q_OBJECT
@@ -184,13 +183,8 @@ class Client : public QDialog {
  public slots:
   void           sendMessage(const QString& s);
   void           setSelectedApp(std::vector<QString> app_names);
-  void           setCommands(Commands commands) {
-    if (!commands.empty() && selected_commands.empty()) {
-      auto first_command = commands.front();
-      selected_commands = {first_command.mask.toInt()};
-    }
-    m_commands = commands;
-  }
+  void           setCommands(Commands commands);
+  CommandMap     GetCommands() { return m_command_map; }
   void           addCommand(KApplication command)
   {
     m_commands.append(command);
@@ -225,7 +219,7 @@ class Client : public QDialog {
   bool                          executing;
   bool                          file_was_sent;
   Commands                      m_commands;
-  CommandArgMap                 m_command_arg_map;
+  CommandMap                    m_command_map;
   std::vector<int>              selected_commands;
   QQueue<Scheduler::KFileData>  outgoing_files;
   DownloadConsole               m_download_console;

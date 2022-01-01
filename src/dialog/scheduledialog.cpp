@@ -1,16 +1,19 @@
 ﻿#include "include/ui/scheduledialog.hpp"
 #include "ui_scheduledialog.h"
-#include <QDebug>
+#include <QStandardItem>
+#include <QKeyEvent>
+#include <QTimer>
 
 static const char    ARG_DELIM  {'\x1f'};
 static const QString R_ARGS_FLAG{"R_ARGS"};
 
 /**
-*   ┌──────────────────────────────────────────────────┐
-*   │░░░░░░░░░░░░░░░ HELPERS ░░░░░░░░░░░░░░░░░│
-*   └──────────────────────────────────────────────────┘
+*  ┌──────────────────────────────────────────────────┐
+*  │░░░░░░░░░░░░░░░ HELPERS ░░░░░░░░░░░░░░░░░│
+*  └──────────────────────────────────────────────────┘
 */
-static QString completed_string(QString s) {
+static QString completed_string(QString s)
+{
   if (s.compare("0") == 0)
     return "Scheduled";
   else
@@ -25,7 +28,8 @@ static QString completed_string(QString s) {
   return s;
 }
 
-static QString completed_num_string(QString s) {
+static QString completed_num_string(QString s)
+{
   if (s.compare("Scheduled") == 0)
     return "0";
   else
@@ -40,7 +44,8 @@ static QString completed_num_string(QString s) {
   return s;
 }
 
-uint8_t completed_integer(QString s) {
+uint8_t completed_integer(QString s)
+{
   if (s.compare("Scheduled") == 0)
     return 0;
   else
@@ -55,7 +60,8 @@ uint8_t completed_integer(QString s) {
   return 10;
 }
 
-static QString recurring_string(QString s) {
+static QString recurring_string(QString s)
+{
   if (s.compare("0") == 0)
     return "No";
   else
@@ -76,7 +82,8 @@ static QString recurring_string(QString s) {
   return s;
 }
 
-static QString recurring_num_string(QString s) {
+static QString recurring_num_string(QString s)
+{
   if (s.compare("No") == 0)
     return "0";
   else
@@ -97,7 +104,8 @@ static QString recurring_num_string(QString s) {
   return s;
 }
 
-static uint8_t recurring_integer(QString s) {
+static uint8_t recurring_integer(QString s)
+{
   if (s.compare("No") == 0)
     return 0;
   else
@@ -119,9 +127,9 @@ static uint8_t recurring_integer(QString s) {
 }
 
 /**
-*   ┌─────────────────────────────────────────────────────────────────────────┐
-*   │░░░░░░░░░░░░░░░░ ScheduleDialog Definitions ░░░░░░░░░░░░░░░░░│
-*   └─────────────────────────────────────────────────────────────────────────┘
+*  ┌─────────────────────────────────────────────────────────────────────────┐
+*  │░░░░░░░░░░░░░░░░ ScheduleDialog Definitions ░░░░░░░░░░░░░░░░░│
+*  └─────────────────────────────────────────────────────────────────────────┘
 */
 
 /**
@@ -132,34 +140,40 @@ static uint8_t recurring_integer(QString s) {
  */
 ScheduleDialog::ScheduleDialog(QWidget *parent)
 : QDialog(parent),
-  ui(new Ui::ScheduleDialog)
+  ui(new Ui::ScheduleDialog),
+  m_mask(0x00),
+  m_refreshing(false)
 {
   ui->setupUi(this);
   ui->dateTime->setDateTime(QDateTime::currentDateTime());
-
   ui->paramTable->setHorizontalHeaderLabels(QStringList{"Param Map", "Value"});
   ui->paramTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-
+  ui->taskList->setModel(&m_task_model);
+  ui->appList->setModel(&m_task_filter_model);
 
 /**
-*   ┌──────────────────────────────────────────────────┐
-*   │░░░░░░░░░░░░░░░░ SLOTS ░░░░░░░░░░░░░░░░░│
-*   └──────────────────────────────────────────────────┘
+*  ┌──────────────────────────────────────────────────┐
+*  │░░░░░░░░░░░░░░░░ SLOTS ░░░░░░░░░░░░░░░░░│
+*  └──────────────────────────────────────────────────┘
 */
   /** Fetch **/
-  QObject::connect(ui->fetchSchedule, &QPushButton::clicked, this, [this]() {
+  QObject::connect(ui->fetchSchedule, &QPushButton::clicked, this, [this]()
+  {
     updateSchedule();
   });
   /** Save **/
-  QObject::connect(ui->saveTask, &QPushButton::clicked, this, [this]() {
+  QObject::connect(ui->saveTask, &QPushButton::clicked, this, [this]()
+  {
     scheduleRequest(RequestType::UPDATE_SCHEDULE, readFields());
   });
   /** Delete **/
-  QObject::connect(ui->deleteTask, &QPushButton::clicked, this, [this]() {
+  QObject::connect(ui->deleteTask, &QPushButton::clicked, this, [this]()
+  {
     this->close();
   });
   /** Close **/
-  QObject::connect(ui->close, &QPushButton::clicked, this, [this]() {
+  QObject::connect(ui->close, &QPushButton::clicked, this, [this]()
+  {
     this->close();
   });
   /** Select **/
@@ -167,16 +181,36 @@ ScheduleDialog::ScheduleDialog(QWidget *parent)
     ui->taskList,
     static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
     this,
-    [this](int index) {
-        if ((index > -1) && !m_tasks.empty()) {
+    [this](int index)
+    {
+      if ((index > -1) && !m_tasks.empty())
+      {
         scheduleRequest(RequestType::FETCH_SCHEDULE_TOKENS, readFields());
         setFields(m_tasks.at(index));
       }
     }
   );
   /** Date select **/
-  QObject::connect(ui->dateTime, &QDateTimeEdit::dateTimeChanged, this, [this]() {
+  QObject::connect(ui->dateTime, &QDateTimeEdit::dateTimeChanged, this, [this]()
+  {
     ui->timeText->setText(ui->dateTime->dateTime().toString());
+  });
+  /** Task Filter **/
+  QObject::connect(&m_task_filter_model, &QStandardItemModel::itemChanged, this, [this](QStandardItem* item)
+  {
+               m_refreshing = false;
+    const bool checked      = item->checkState() == Qt::CheckState::Checked;
+    const auto text         = item->text();
+    const auto it           = m_apps.find(text.toStdString());
+    if (it != m_apps.end())
+    {
+      int mask = it->second;
+      if (checked)
+        m_mask |= mask;
+      else
+        m_mask &= ~mask;
+    }
+    refreshUI();
   });
 }
 
@@ -193,7 +227,8 @@ ScheduleDialog::~ScheduleDialog()
 /**
  * @brief ScheduleDialog::showEvent
  */
-void ScheduleDialog::showEvent(QShowEvent *) {
+void ScheduleDialog::showEvent(QShowEvent*)
+{
   refreshUI();
 }
 
@@ -217,10 +252,13 @@ void ScheduleDialog::setFields(ScheduledTask task) {
  * @brief ScheduleDialog::insert_tasks
  * @param task_arguments
  */
-void ScheduleDialog::insert_tasks(QVector<QString> task_arguments) {
-  uint16_t arg_num = task_arguments.size();
-QVector<QString> files;
-  for (uint16_t i = 1; i < arg_num; i += 9) {
+void ScheduleDialog::insert_tasks(QVector<QString> task_arguments)
+{
+  uint16_t         arg_num = task_arguments.size();
+  QVector<QString> files;
+
+  for (uint16_t i = 1; i < arg_num; i += 9)
+  {
     ScheduledTask task{
       .id        = task_arguments.at(i + 0),
       .app       = task_arguments.at(i + 1),
@@ -291,8 +329,6 @@ ScheduledTask ScheduleDialog::readFields() {
     return env;
   };
 
-  // TODO: update ScheduledTask::flags by rebuilding the flags in the read_env_string function
-
   const EnvData env_data = read_env_data();
 
   return ScheduledTask {
@@ -304,7 +340,7 @@ ScheduledTask ScheduleDialog::readFields() {
       .recurring = recurring_num_string(ui->recurring->currentText()),
       .notify    = ui->notifyCheck->isChecked() ? "1" : "0",
       .runtime   = ui->runtimeText->text(),
-      .files     = {ui->filesText->text()},  // files need to be an actual array
+      .files     = {ui->filesText->text()},  // array
       .envfile   = env_data.file
   };
 }
@@ -313,27 +349,29 @@ ScheduledTask ScheduleDialog::readFields() {
  * @brief ScheduleDialog::receive_response
  * @param v
  */
-void ScheduleDialog::receive_response(RequestType type, QVector<QString> v) {
-  if (type == RequestType::UPDATE_SCHEDULE) {
+void ScheduleDialog::receive_response(RequestType type, QVector<QString> v)
+{
+  if (type == RequestType::UPDATE_SCHEDULE)
+  {
     QString display_s{};
     for (const auto& e : v) display_s += e + "\n";
     UI::infoMessageBox(display_s, "Schedule Response");
   }
   else
-  if (type == RequestType::FETCH_SCHEDULE) {
-    refreshUI();
-  }
+  if (type == RequestType::FETCH_SCHEDULE)
+    refreshUI();  
   else
-  if (type == RequestType::FETCH_SCHEDULE_TOKENS) {
+  if (type == RequestType::FETCH_SCHEDULE_TOKENS)
+  {
     QList<QString> keys = m_tasks.at(ui->taskList->currentIndex()).flags.split(' ');
     ui->paramTable->setRowCount(0);
     auto row_count = (keys.size() < v.size()) ? keys.size() : (v.size() - 1);
-    for (int i = 0; i < row_count; i++) {
+    for (int i = 0; i < row_count; i++)
+    {
       auto key = keys.at(i);
-      if (key.isEmpty())
-        continue;
+      if (key.isEmpty()) continue;
 
-      auto row = ui->paramTable->rowCount(); // insert row
+      auto row = ui->paramTable->rowCount();
       auto value = v.at(i + 1);
       ui->paramTable->insertRow(row);
       QTableWidgetItem *item  = new QTableWidgetItem(key);
@@ -344,18 +382,79 @@ void ScheduleDialog::receive_response(RequestType type, QVector<QString> v) {
   }
 }
 
-void ScheduleDialog::refreshUI() {
-  if (!m_tasks.empty()) {
-    std::sort(m_tasks.begin(), m_tasks.end(), [](ScheduledTask a, ScheduledTask b) {
-      return a.id.toUInt() > b.id.toUInt();
-    });
+static QStandardItem* CreateTaskModelItem(const ScheduledTask& task)
+{
+  QString template_text{"%0: %1 - %2 - %3"};
+  QStandardItem* item = new QStandardItem{
+    template_text
+    .arg(task.id)
+    .arg(task.time.toString())
+    .arg(task.app)
+    .arg(completed_string(task.completed))};
+  item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+  item->setSelectable(true);
+  item->setCheckState(Qt::CheckState::Unchecked);
+  return item;
+}
 
-    setFields(m_tasks.front());
-    ui->taskList->clear();
+static QStandardItem* CreateFilterModelItem(const QString& app)
+{
+  QStandardItem* item = new QStandardItem{app};
+  item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+  item->setSelectable(true);
+  item->setCheckState(Qt::CheckState::Unchecked);
+  return item;
+}
 
-    for (const auto& task : m_tasks)
-      ui->taskList->addItem(task.id + ": " + task.time.toString() + " - " + task.app + " - " + completed_string(task.completed));
+void ScheduleDialog::refreshUI()
+{
+  m_refreshing = true;
+  QTimer::singleShot(3000, Qt::TimerType::VeryCoarseTimer, this, [this]()
+  {
+    if (m_refreshing)
+    {
+      const uint32_t bitmask = (m_mask) ? m_mask : 0xFFFFFFFF;
+      if (m_tasks.size())
+      {
+        std::sort(m_tasks.begin(), m_tasks.end(), [](ScheduledTask a, ScheduledTask b) {
+          return a.id.toUInt() > b.id.toUInt();
+        });
 
-    ui->taskList->setCurrentIndex(0);
+        setFields(m_tasks.front());
+        ui->taskList->clear();
+        int count{};
+        for (auto i = 0; i < m_tasks.size(); i++)
+        {
+          const auto mask = m_apps.at(m_tasks[i].app.toStdString());
+          if ((mask & bitmask) == mask)
+            m_task_model.setItem(count++, CreateTaskModelItem(m_tasks[i]));
+        }
+
+        ui->taskList->setCurrentIndex(0);
+      }
+    }
+  });
+}
+
+void ScheduleDialog::keyPressEvent(QKeyEvent* e)
+{
+  if (e->key() == Qt::Key_Space)
+  {
+    if (ui->taskList->isVisible())
+    {
+      auto item = m_task_model.item(ui->taskList->currentIndex(), 0);
+      item->setCheckState(item->checkState() == Qt::CheckState::Checked ? Qt::CheckState::Unchecked : Qt::CheckState::Checked);
+    }
   }
+}
+
+void ScheduleDialog::SetApps(const CommandMap& map)
+{
+  int32_t i{};
+  for (const auto& [mask, name] : map)
+  {
+    m_apps.insert({name, mask});
+    m_task_filter_model.setItem(i++, CreateFilterModelItem(name.c_str()));
+  }
+  ui->appList->setCurrentIndex(0);
 }

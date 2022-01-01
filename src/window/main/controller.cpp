@@ -85,6 +85,7 @@ void MainWindow::Controller::handleCommands(const StringVec& args,
     app_index++;
   }
   window->app_ui.setApplications(k_applications);
+  window->schedule_ui.SetApps(window->q_client->GetCommands());
 }
 /**
  * @brief MainWindow::MessageParser::handleMessage
