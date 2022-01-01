@@ -31,7 +31,6 @@ class ScheduleDialog : public QDialog
 
  protected:
   virtual void showEvent(QShowEvent* e)     override;
-  virtual void keyPressEvent(QKeyEvent* e) override;
 
  private:
   void           setFields(ScheduledTask task);

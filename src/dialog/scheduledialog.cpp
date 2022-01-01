@@ -1,7 +1,6 @@
 ﻿#include "include/ui/scheduledialog.hpp"
 #include "ui_scheduledialog.h"
 #include <QStandardItem>
-#include <QKeyEvent>
 #include <QTimer>
 
 static const char    ARG_DELIM  {'\x1f'};
@@ -432,18 +431,6 @@ void ScheduleDialog::refreshUI()
       }
     }
   });
-}
-
-void ScheduleDialog::keyPressEvent(QKeyEvent* e)
-{
-  if (e->key() == Qt::Key_Space)
-  {
-    if (ui->taskList->isVisible())
-    {
-      auto item = m_task_model.item(ui->taskList->currentIndex(), 0);
-      item->setCheckState(item->checkState() == Qt::CheckState::Checked ? Qt::CheckState::Unchecked : Qt::CheckState::Checked);
-    }
-  }
 }
 
 void ScheduleDialog::SetApps(const CommandMap& map)
