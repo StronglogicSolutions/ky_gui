@@ -184,6 +184,7 @@ class Client : public QDialog {
   void           sendMessage(const QString& s);
   void           setSelectedApp(std::vector<QString> app_names);
   void           setCommands(Commands commands);
+  CommandMap     GetCommands() { return m_command_map; }
   void           addCommand(KApplication command)
   {
     m_commands.append(command);

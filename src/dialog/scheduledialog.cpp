@@ -140,7 +140,9 @@ static uint8_t recurring_integer(QString s)
  */
 ScheduleDialog::ScheduleDialog(QWidget *parent)
 : QDialog(parent),
-  ui(new Ui::ScheduleDialog)
+  ui(new Ui::ScheduleDialog),
+  m_mask(0x00),
+  m_refreshing(false)
 {
   ui->setupUi(this);
   ui->dateTime->setDateTime(QDateTime::currentDateTime());
@@ -193,6 +195,23 @@ ScheduleDialog::ScheduleDialog(QWidget *parent)
   {
     ui->timeText->setText(ui->dateTime->dateTime().toString());
   });
+  /** Task Filter **/
+  QObject::connect(&m_task_filter_model, &QStandardItemModel::itemChanged, this, [this](QStandardItem* item)
+  {
+               m_refreshing = false;
+    const bool checked      = item->checkState() == Qt::CheckState::Checked;
+    const auto text         = item->text();
+    const auto it           = m_apps.find(text.toStdString());
+    if (it != m_apps.end())
+    {
+      int mask = it->second;
+      if (checked)
+        m_mask |= mask;
+      else
+        m_mask &= ~mask;
+    }
+    refreshUI();
+  });
 }
 
 /**
@@ -233,10 +252,13 @@ void ScheduleDialog::setFields(ScheduledTask task) {
  * @brief ScheduleDialog::insert_tasks
  * @param task_arguments
  */
-void ScheduleDialog::insert_tasks(QVector<QString> task_arguments) {
-  uint16_t arg_num = task_arguments.size();
-QVector<QString> files;
-  for (uint16_t i = 1; i < arg_num; i += 9) {
+void ScheduleDialog::insert_tasks(QVector<QString> task_arguments)
+{
+  uint16_t         arg_num = task_arguments.size();
+  QVector<QString> files;
+
+  for (uint16_t i = 1; i < arg_num; i += 9)
+  {
     ScheduledTask task{
       .id        = task_arguments.at(i + 0),
       .app       = task_arguments.at(i + 1),
@@ -307,8 +329,6 @@ ScheduledTask ScheduleDialog::readFields() {
     return env;
   };
 
-  // TODO: update ScheduledTask::flags by rebuilding the flags in the read_env_string function
-
   const EnvData env_data = read_env_data();
 
   return ScheduledTask {
@@ -320,7 +340,7 @@ ScheduledTask ScheduleDialog::readFields() {
       .recurring = recurring_num_string(ui->recurring->currentText()),
       .notify    = ui->notifyCheck->isChecked() ? "1" : "0",
       .runtime   = ui->runtimeText->text(),
-      .files     = {ui->filesText->text()},  // files need to be an actual array
+      .files     = {ui->filesText->text()},  // array
       .envfile   = env_data.file
   };
 }
@@ -329,27 +349,29 @@ ScheduledTask ScheduleDialog::readFields() {
  * @brief ScheduleDialog::receive_response
  * @param v
  */
-void ScheduleDialog::receive_response(RequestType type, QVector<QString> v) {
-  if (type == RequestType::UPDATE_SCHEDULE) {
+void ScheduleDialog::receive_response(RequestType type, QVector<QString> v)
+{
+  if (type == RequestType::UPDATE_SCHEDULE)
+  {
     QString display_s{};
     for (const auto& e : v) display_s += e + "\n";
     UI::infoMessageBox(display_s, "Schedule Response");
   }
   else
-  if (type == RequestType::FETCH_SCHEDULE) {
-    refreshUI();
-  }
+  if (type == RequestType::FETCH_SCHEDULE)
+    refreshUI();  
   else
-  if (type == RequestType::FETCH_SCHEDULE_TOKENS) {
+  if (type == RequestType::FETCH_SCHEDULE_TOKENS)
+  {
     QList<QString> keys = m_tasks.at(ui->taskList->currentIndex()).flags.split(' ');
     ui->paramTable->setRowCount(0);
     auto row_count = (keys.size() < v.size()) ? keys.size() : (v.size() - 1);
-    for (int i = 0; i < row_count; i++) {
+    for (int i = 0; i < row_count; i++)
+    {
       auto key = keys.at(i);
-      if (key.isEmpty())
-        continue;
+      if (key.isEmpty()) continue;
 
-      auto row = ui->paramTable->rowCount(); // insert row
+      auto row = ui->paramTable->rowCount();
       auto value = v.at(i + 1);
       ui->paramTable->insertRow(row);
       QTableWidgetItem *item  = new QTableWidgetItem(key);
@@ -360,7 +382,7 @@ void ScheduleDialog::receive_response(RequestType type, QVector<QString> v) {
   }
 }
 
-QStandardItem* CreateTaskModelItem(const ScheduledTask& task)
+static QStandardItem* CreateTaskModelItem(const ScheduledTask& task)
 {
   QString template_text{"%0: %1 - %2 - %3"};
   QStandardItem* item = new QStandardItem{
@@ -375,31 +397,43 @@ QStandardItem* CreateTaskModelItem(const ScheduledTask& task)
   return item;
 }
 
-//static QStandardItem* CreateFilterModelItem(const QString& app)
-//{
-//  QString template_text{"%0"};
-//  QStandardItem* item = new QStandardItem{template_text.arg(app)};
-//  item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-//  item->setSelectable(true);
-//  item->setCheckState(Qt::CheckState::Unchecked);
-//  return item;
-//}
+static QStandardItem* CreateFilterModelItem(const QString& app)
+{
+  QStandardItem* item = new QStandardItem{app};
+  item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+  item->setSelectable(true);
+  item->setCheckState(Qt::CheckState::Unchecked);
+  return item;
+}
 
 void ScheduleDialog::refreshUI()
 {
-  if (!m_tasks.empty()) {
-    std::sort(m_tasks.begin(), m_tasks.end(), [](ScheduledTask a, ScheduledTask b) {
-      return a.id.toUInt() > b.id.toUInt();
-    });
+  m_refreshing = true;
+  QTimer::singleShot(3000, Qt::TimerType::VeryCoarseTimer, this, [this]()
+  {
+    if (m_refreshing)
+    {
+      const uint32_t bitmask = (m_mask) ? m_mask : 0xFFFFFFFF;
+      if (m_tasks.size())
+      {
+        std::sort(m_tasks.begin(), m_tasks.end(), [](ScheduledTask a, ScheduledTask b) {
+          return a.id.toUInt() > b.id.toUInt();
+        });
 
-    setFields(m_tasks.front());
-    ui->taskList->clear();
+        setFields(m_tasks.front());
+        ui->taskList->clear();
+        int count{};
+        for (auto i = 0; i < m_tasks.size(); i++)
+        {
+          const auto mask = m_apps.at(m_tasks[i].app.toStdString());
+          if ((mask & bitmask) == mask)
+            m_task_model.setItem(count++, CreateTaskModelItem(m_tasks[i]));
+        }
 
-    for (auto i = 0; i < m_tasks.size(); i++)
-      m_task_model.setItem(i, CreateTaskModelItem(m_tasks[i]));
-
-    ui->taskList->setCurrentIndex(0);
-  }
+        ui->taskList->setCurrentIndex(0);
+      }
+    }
+  });
 }
 
 void ScheduleDialog::keyPressEvent(QKeyEvent* e)
@@ -416,16 +450,11 @@ void ScheduleDialog::keyPressEvent(QKeyEvent* e)
 
 void ScheduleDialog::SetApps(const CommandMap& map)
 {
+  int32_t i{};
   for (const auto& [mask, name] : map)
   {
-    ui->appList->addItem(name.c_str());
+    m_apps.insert({name, mask});
+    m_task_filter_model.setItem(i++, CreateFilterModelItem(name.c_str()));
   }
-
+  ui->appList->setCurrentIndex(0);
 }
-
-/*void ScheduleDialog::hideEvent(QHideEvent* e)
-{
-  int mask{};
-
-}
-*/

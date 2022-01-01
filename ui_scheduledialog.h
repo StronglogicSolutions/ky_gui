@@ -32,8 +32,13 @@ class Ui_ScheduleDialog
 public:
     QGridLayout *gridLayout;
     QVBoxLayout *verticalLayout;
+    QHBoxLayout *horizontalLayout;
+    QLabel *dialogLabel;
+    QHBoxLayout *horizontalLayout_13;
+    QLabel *appsLabel_2;
+    QComboBox *appList;
     QHBoxLayout *horizontalLayout_12;
-    QLabel *appsLabel;
+    QLabel *tasksLabel;
     QComboBox *taskList;
     QPushButton *fetchSchedule;
     QHBoxLayout *horizontalLayout_4;
@@ -81,24 +86,70 @@ public:
         verticalLayout->setSpacing(36);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(16, 16, 16, 16);
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        dialogLabel = new QLabel(ScheduleDialog);
+        dialogLabel->setObjectName(QString::fromUtf8("dialogLabel"));
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy.setHorizontalStretch(2);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(dialogLabel->sizePolicy().hasHeightForWidth());
+        dialogLabel->setSizePolicy(sizePolicy);
+        dialogLabel->setMinimumSize(QSize(196, 0));
+        dialogLabel->setMaximumSize(QSize(196, 16777215));
+        dialogLabel->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
+"color: rgb(131, 148, 150);\n"
+"font-weight: 700;"));
+        dialogLabel->setAlignment(Qt::AlignCenter);
+        dialogLabel->setWordWrap(false);
+
+        horizontalLayout->addWidget(dialogLabel);
+
+
+        verticalLayout->addLayout(horizontalLayout);
+
+        horizontalLayout_13 = new QHBoxLayout();
+        horizontalLayout_13->setObjectName(QString::fromUtf8("horizontalLayout_13"));
+        horizontalLayout_13->setContentsMargins(0, -1, -1, -1);
+        appsLabel_2 = new QLabel(ScheduleDialog);
+        appsLabel_2->setObjectName(QString::fromUtf8("appsLabel_2"));
+        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Preferred);
+        sizePolicy1.setHorizontalStretch(2);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(appsLabel_2->sizePolicy().hasHeightForWidth());
+        appsLabel_2->setSizePolicy(sizePolicy1);
+        appsLabel_2->setMinimumSize(QSize(196, 0));
+        appsLabel_2->setMaximumSize(QSize(196, 16777215));
+        appsLabel_2->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
+"color: rgb(131, 148, 150);\n"
+"font-weight: 700;"));
+        appsLabel_2->setAlignment(Qt::AlignCenter);
+
+        horizontalLayout_13->addWidget(appsLabel_2);
+
+        appList = new QComboBox(ScheduleDialog);
+        appList->setObjectName(QString::fromUtf8("appList"));
+
+        horizontalLayout_13->addWidget(appList);
+
+
+        verticalLayout->addLayout(horizontalLayout_13);
+
         horizontalLayout_12 = new QHBoxLayout();
         horizontalLayout_12->setObjectName(QString::fromUtf8("horizontalLayout_12"));
         horizontalLayout_12->setContentsMargins(0, -1, -1, -1);
-        appsLabel = new QLabel(ScheduleDialog);
-        appsLabel->setObjectName(QString::fromUtf8("appsLabel"));
-        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-        sizePolicy.setHorizontalStretch(2);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(appsLabel->sizePolicy().hasHeightForWidth());
-        appsLabel->setSizePolicy(sizePolicy);
-        appsLabel->setMinimumSize(QSize(196, 0));
-        appsLabel->setMaximumSize(QSize(196, 16777215));
-        appsLabel->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
+        tasksLabel = new QLabel(ScheduleDialog);
+        tasksLabel->setObjectName(QString::fromUtf8("tasksLabel"));
+        sizePolicy1.setHeightForWidth(tasksLabel->sizePolicy().hasHeightForWidth());
+        tasksLabel->setSizePolicy(sizePolicy1);
+        tasksLabel->setMinimumSize(QSize(196, 0));
+        tasksLabel->setMaximumSize(QSize(196, 16777215));
+        tasksLabel->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
 "color: rgb(131, 148, 150);\n"
 "font-weight: 700;"));
-        appsLabel->setAlignment(Qt::AlignCenter);
+        tasksLabel->setAlignment(Qt::AlignCenter);
 
-        horizontalLayout_12->addWidget(appsLabel);
+        horizontalLayout_12->addWidget(tasksLabel);
 
         taskList = new QComboBox(ScheduleDialog);
         taskList->setObjectName(QString::fromUtf8("taskList"));
@@ -107,11 +158,11 @@ public:
 
         fetchSchedule = new QPushButton(ScheduleDialog);
         fetchSchedule->setObjectName(QString::fromUtf8("fetchSchedule"));
-        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(fetchSchedule->sizePolicy().hasHeightForWidth());
-        fetchSchedule->setSizePolicy(sizePolicy1);
+        QSizePolicy sizePolicy2(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(fetchSchedule->sizePolicy().hasHeightForWidth());
+        fetchSchedule->setSizePolicy(sizePolicy2);
         fetchSchedule->setMinimumSize(QSize(100, 25));
         fetchSchedule->setMaximumSize(QSize(210, 16777215));
         fetchSchedule->setLayoutDirection(Qt::LeftToRight);
@@ -132,6 +183,8 @@ public:
 
         horizontalLayout_12->addWidget(fetchSchedule);
 
+        horizontalLayout_12->setStretch(0, 1);
+        horizontalLayout_12->setStretch(1, 1);
 
         verticalLayout->addLayout(horizontalLayout_12);
 
@@ -139,8 +192,8 @@ public:
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
         nameLabel = new QLabel(ScheduleDialog);
         nameLabel->setObjectName(QString::fromUtf8("nameLabel"));
-        sizePolicy.setHeightForWidth(nameLabel->sizePolicy().hasHeightForWidth());
-        nameLabel->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(nameLabel->sizePolicy().hasHeightForWidth());
+        nameLabel->setSizePolicy(sizePolicy1);
         nameLabel->setMinimumSize(QSize(196, 0));
         nameLabel->setMaximumSize(QSize(196, 16777215));
         nameLabel->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
@@ -162,8 +215,8 @@ public:
         horizontalLayout_10->setObjectName(QString::fromUtf8("horizontalLayout_10"));
         maskLabel_4 = new QLabel(ScheduleDialog);
         maskLabel_4->setObjectName(QString::fromUtf8("maskLabel_4"));
-        sizePolicy.setHeightForWidth(maskLabel_4->sizePolicy().hasHeightForWidth());
-        maskLabel_4->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(maskLabel_4->sizePolicy().hasHeightForWidth());
+        maskLabel_4->setSizePolicy(sizePolicy1);
         maskLabel_4->setMinimumSize(QSize(196, 0));
         maskLabel_4->setMaximumSize(QSize(196, 16777215));
         maskLabel_4->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
@@ -185,8 +238,8 @@ public:
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         pathLabel = new QLabel(ScheduleDialog);
         pathLabel->setObjectName(QString::fromUtf8("pathLabel"));
-        sizePolicy.setHeightForWidth(pathLabel->sizePolicy().hasHeightForWidth());
-        pathLabel->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(pathLabel->sizePolicy().hasHeightForWidth());
+        pathLabel->setSizePolicy(sizePolicy1);
         pathLabel->setMinimumSize(QSize(196, 0));
         pathLabel->setMaximumSize(QSize(196, 16777215));
         pathLabel->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
@@ -204,6 +257,11 @@ public:
 
         dateTime = new QDateTimeEdit(ScheduleDialog);
         dateTime->setObjectName(QString::fromUtf8("dateTime"));
+        QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(dateTime->sizePolicy().hasHeightForWidth());
+        dateTime->setSizePolicy(sizePolicy3);
 
         horizontalLayout_3->addWidget(dateTime);
 
@@ -215,8 +273,8 @@ public:
         horizontalLayout_9->setContentsMargins(-1, -1, 18, -1);
         dataLabel = new QLabel(ScheduleDialog);
         dataLabel->setObjectName(QString::fromUtf8("dataLabel"));
-        sizePolicy.setHeightForWidth(dataLabel->sizePolicy().hasHeightForWidth());
-        dataLabel->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(dataLabel->sizePolicy().hasHeightForWidth());
+        dataLabel->setSizePolicy(sizePolicy1);
         dataLabel->setMinimumSize(QSize(196, 0));
         dataLabel->setMaximumSize(QSize(196, 16777215));
         dataLabel->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
@@ -237,8 +295,8 @@ public:
 
         maskLabel = new QLabel(ScheduleDialog);
         maskLabel->setObjectName(QString::fromUtf8("maskLabel"));
-        sizePolicy.setHeightForWidth(maskLabel->sizePolicy().hasHeightForWidth());
-        maskLabel->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(maskLabel->sizePolicy().hasHeightForWidth());
+        maskLabel->setSizePolicy(sizePolicy1);
         maskLabel->setMinimumSize(QSize(196, 0));
         maskLabel->setMaximumSize(QSize(196, 16777215));
         maskLabel->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
@@ -261,8 +319,8 @@ public:
 
         maskLabel_3 = new QLabel(ScheduleDialog);
         maskLabel_3->setObjectName(QString::fromUtf8("maskLabel_3"));
-        sizePolicy.setHeightForWidth(maskLabel_3->sizePolicy().hasHeightForWidth());
-        maskLabel_3->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(maskLabel_3->sizePolicy().hasHeightForWidth());
+        maskLabel_3->setSizePolicy(sizePolicy1);
         maskLabel_3->setMinimumSize(QSize(196, 0));
         maskLabel_3->setMaximumSize(QSize(196, 16777215));
         maskLabel_3->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
@@ -293,8 +351,8 @@ public:
         horizontalLayout_8->setObjectName(QString::fromUtf8("horizontalLayout_8"));
         maskLabel_2 = new QLabel(ScheduleDialog);
         maskLabel_2->setObjectName(QString::fromUtf8("maskLabel_2"));
-        sizePolicy.setHeightForWidth(maskLabel_2->sizePolicy().hasHeightForWidth());
-        maskLabel_2->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(maskLabel_2->sizePolicy().hasHeightForWidth());
+        maskLabel_2->setSizePolicy(sizePolicy1);
         maskLabel_2->setMinimumSize(QSize(196, 0));
         maskLabel_2->setMaximumSize(QSize(196, 16777215));
         maskLabel_2->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
@@ -316,8 +374,8 @@ public:
         horizontalLayout_11->setObjectName(QString::fromUtf8("horizontalLayout_11"));
         maskLabel_5 = new QLabel(ScheduleDialog);
         maskLabel_5->setObjectName(QString::fromUtf8("maskLabel_5"));
-        sizePolicy.setHeightForWidth(maskLabel_5->sizePolicy().hasHeightForWidth());
-        maskLabel_5->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(maskLabel_5->sizePolicy().hasHeightForWidth());
+        maskLabel_5->setSizePolicy(sizePolicy1);
         maskLabel_5->setMinimumSize(QSize(196, 0));
         maskLabel_5->setMaximumSize(QSize(196, 16777215));
         maskLabel_5->setStyleSheet(QString::fromUtf8("font: 75 11pt \"Noto Sans\";\n"
@@ -352,8 +410,8 @@ public:
         horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
         deleteTask = new QPushButton(ScheduleDialog);
         deleteTask->setObjectName(QString::fromUtf8("deleteTask"));
-        sizePolicy1.setHeightForWidth(deleteTask->sizePolicy().hasHeightForWidth());
-        deleteTask->setSizePolicy(sizePolicy1);
+        sizePolicy2.setHeightForWidth(deleteTask->sizePolicy().hasHeightForWidth());
+        deleteTask->setSizePolicy(sizePolicy2);
         deleteTask->setMinimumSize(QSize(100, 25));
         deleteTask->setMaximumSize(QSize(420, 16777215));
         deleteTask->setStyleSheet(QString::fromUtf8("background-color: rgb(170, 0, 0);\n"
@@ -375,8 +433,8 @@ public:
 
         saveTask = new QPushButton(ScheduleDialog);
         saveTask->setObjectName(QString::fromUtf8("saveTask"));
-        sizePolicy1.setHeightForWidth(saveTask->sizePolicy().hasHeightForWidth());
-        saveTask->setSizePolicy(sizePolicy1);
+        sizePolicy2.setHeightForWidth(saveTask->sizePolicy().hasHeightForWidth());
+        saveTask->setSizePolicy(sizePolicy2);
         saveTask->setMinimumSize(QSize(100, 25));
         saveTask->setMaximumSize(QSize(420, 16777215));
         saveTask->setStyleSheet(QString::fromUtf8("background-color: rgb(2, 180, 43);\n"
@@ -421,7 +479,7 @@ public:
         verticalLayout->addLayout(horizontalLayout_7);
 
 
-        gridLayout->addLayout(verticalLayout, 1, 0, 1, 1);
+        gridLayout->addLayout(verticalLayout, 0, 0, 1, 1);
 
 
         retranslateUi(ScheduleDialog);
@@ -432,7 +490,9 @@ public:
     void retranslateUi(QDialog *ScheduleDialog)
     {
         ScheduleDialog->setWindowTitle(QCoreApplication::translate("ScheduleDialog", "Dialog", nullptr));
-        appsLabel->setText(QCoreApplication::translate("ScheduleDialog", "Tasks", nullptr));
+        dialogLabel->setText(QCoreApplication::translate("ScheduleDialog", "Schedule", nullptr));
+        appsLabel_2->setText(QCoreApplication::translate("ScheduleDialog", "Apps", nullptr));
+        tasksLabel->setText(QCoreApplication::translate("ScheduleDialog", "Tasks", nullptr));
         fetchSchedule->setText(QCoreApplication::translate("ScheduleDialog", "Fetch", nullptr));
         nameLabel->setText(QCoreApplication::translate("ScheduleDialog", "App", nullptr));
         maskLabel_4->setText(QCoreApplication::translate("ScheduleDialog", "Flags", nullptr));
