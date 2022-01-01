@@ -409,16 +409,14 @@ static QStandardItem* CreateFilterModelItem(const QString& app)
 void ScheduleDialog::refreshUI()
 {
   m_refreshing = true;
-  QTimer::singleShot(3000, Qt::TimerType::VeryCoarseTimer, this, [this]()
+  QTimer::singleShot(1000, Qt::TimerType::VeryCoarseTimer, this, [this]()
   {
     if (m_refreshing)
     {
       const uint32_t bitmask = (m_mask) ? m_mask : 0xFFFFFFFF;
       if (m_tasks.size())
       {
-        std::sort(m_tasks.begin(), m_tasks.end(), [](ScheduledTask a, ScheduledTask b) {
-          return a.id.toUInt() > b.id.toUInt();
-        });
+        std::sort(m_tasks.begin(), m_tasks.end(), [](ScheduledTask a, ScheduledTask b){ return a.id.toUInt() > b.id.toUInt(); });
 
         setFields(m_tasks.front());
         ui->taskList->clear();
