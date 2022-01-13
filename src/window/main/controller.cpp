@@ -240,9 +240,6 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
         window->schedule_ui.insert_tasks(v);
       }
       else
-      if (details == "Schedule more")
-        window->schedule_ui.insert_tasks(v);
-      else
       if (details == "Schedule end")
         window->schedule_ui.receive_response(RequestType::FETCH_SCHEDULE, v);
     }

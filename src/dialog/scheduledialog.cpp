@@ -182,10 +182,10 @@ ScheduleDialog::ScheduleDialog(QWidget *parent)
     this,
     [this](int index)
     {
-      if ((index > -1) && !m_tasks.empty())
+      if ((index > -1) && !m_tasks.empty() && !m_task_indexes.empty())
       {
         scheduleRequest(RequestType::FETCH_SCHEDULE_TOKENS, readFields());
-        setFields(m_tasks.at(index));
+        setFields(GetTask(index));
       }
     }
   );
@@ -256,7 +256,7 @@ void ScheduleDialog::insert_tasks(QVector<QString> task_arguments)
   uint16_t         arg_num = task_arguments.size();
   QVector<QString> files;
 
-  for (uint16_t i = 1; i < arg_num; i += 9)
+  for (uint16_t i = 1, j = 0; i < arg_num; i += 9)
   {
     ScheduledTask task{
       .id        = task_arguments.at(i + 0),
@@ -267,10 +267,9 @@ void ScheduleDialog::insert_tasks(QVector<QString> task_arguments)
       .recurring = task_arguments.at(i + 5),
       .notify    = task_arguments.at(i + 6),
       .runtime   = task_arguments.at(i + 7),
-      .files     = QVector<QString>{task_arguments.at(i + 8)} // parse
-    };
-
+      .files     = QVector<QString>{task_arguments.at(i + 8)}};
     m_tasks.push_back(task);
+    m_task_indexes.push_back(j++);
   }
 }
 
@@ -278,7 +277,8 @@ void ScheduleDialog::insert_tasks(QVector<QString> task_arguments)
  * @brief ScheduleDialog::clear
  */
 void ScheduleDialog::clear() {
-  m_tasks          .clear();
+  m_tasks           .clear();
+  m_task_indexes    .clear();
   ui->taskList     ->clear();
   ui->appText      ->clear();
   ui->timeText     ->clear();
@@ -331,7 +331,7 @@ ScheduledTask ScheduleDialog::readFields() {
   const EnvData env_data = read_env_data();
 
   return ScheduledTask {
-      .id        = m_tasks.at(ui->taskList->currentIndex()).id,
+      .id        = m_tasks.at(m_task_indexes.at(ui->taskList->currentIndex())).id,
       .app       = ui->appText->text(),
       .time      = QDateTime::fromString(ui->timeText->text()),
       .flags     = env_data.flags.trimmed(),
@@ -362,7 +362,8 @@ void ScheduleDialog::receive_response(RequestType type, QVector<QString> v)
   else
   if (type == RequestType::FETCH_SCHEDULE_TOKENS)
   {
-    QList<QString> keys = m_tasks.at(ui->taskList->currentIndex()).flags.split(' ');
+    const auto& task    = m_tasks.at(m_task_indexes.at(ui->taskList->currentIndex()));
+    QList<QString> keys = task.flags.split(' ');
     ui->paramTable->setRowCount(0);
     auto row_count = (keys.size() < v.size()) ? keys.size() : (v.size() - 1);
     for (int i = 0; i < row_count; i++)
@@ -412,19 +413,33 @@ void ScheduleDialog::refreshUI()
   {
     if (m_refreshing)
     {
-      const uint32_t bitmask = (m_mask) ? m_mask : 0xFFFFFFFF;
+      uint32_t bitmask;
+      if (m_mask)
+      {
+        bitmask = m_mask;
+        m_task_indexes.clear();
+      }
+      else
+      {
+        m_task_indexes.clear();
+        bitmask = 0xFFFFFFFF;
+      }
+
       if (m_tasks.size())
       {
         std::sort(m_tasks.begin(), m_tasks.end(), [](ScheduledTask a, ScheduledTask b){ return a.id.toUInt() > b.id.toUInt(); });
-
         setFields(m_tasks.front());
+
         ui->taskList->clear();
         int count{};
         for (auto i = 0; i < m_tasks.size(); i++)
         {
           const auto mask = m_apps.at(m_tasks[i].app.toStdString());
           if ((mask & bitmask) == mask)
+          {
             m_task_model.setItem(count++, CreateTaskModelItem(m_tasks[i]));
+            m_task_indexes.push_back(i);
+          }
         }
 
         ui->taskList->setCurrentIndex(0);
@@ -442,4 +457,9 @@ void ScheduleDialog::SetApps(const CommandMap& map)
     m_task_filter_model.setItem(i++, CreateFilterModelItem(name.c_str()));
   }
   ui->appList->setCurrentIndex(0);
+}
+
+ScheduledTask  ScheduleDialog::GetTask(int index) const
+{
+  return (m_tasks.at(m_task_indexes.at(index)));
 }
