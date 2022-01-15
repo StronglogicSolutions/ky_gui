@@ -36,7 +36,7 @@ class ScheduleDialog : public QDialog
   void           setFields(ScheduledTask task);
   ScheduledTask  readFields();
   void           refreshUI();
-  ScheduledTask  GetTask() const;
+  ScheduledTask  GetTask(int index) const;
 
   Ui::ScheduleDialog*        ui;
   QVector<ScheduledTask> m_tasks;

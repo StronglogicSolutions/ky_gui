@@ -331,7 +331,7 @@ ScheduledTask ScheduleDialog::readFields() {
   const EnvData env_data = read_env_data();
 
   return ScheduledTask {
-      .id        = m_tasks.at(m_task_indexes.at(ui->taskList->currentIndex())).id,
+      .id        = GetTask(ui->taskList->currentIndex()).id,
       .app       = ui->appText->text(),
       .time      = QDateTime::fromString(ui->timeText->text()),
       .flags     = env_data.flags.trimmed(),
@@ -362,7 +362,7 @@ void ScheduleDialog::receive_response(RequestType type, QVector<QString> v)
   else
   if (type == RequestType::FETCH_SCHEDULE_TOKENS)
   {
-    const auto& task    = m_tasks.at(m_task_indexes.at(ui->taskList->currentIndex()));
+    const auto&    task = GetTask(ui->taskList->currentIndex());
     QList<QString> keys = task.flags.split(' ');
     ui->paramTable->setRowCount(0);
     auto row_count = (keys.size() < v.size()) ? keys.size() : (v.size() - 1);
