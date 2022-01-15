@@ -31,15 +31,16 @@ class ScheduleDialog : public QDialog
 
  protected:
   virtual void showEvent(QShowEvent* e)     override;
-  virtual void keyPressEvent(QKeyEvent* e) override;
 
  private:
   void           setFields(ScheduledTask task);
   ScheduledTask  readFields();
   void           refreshUI();
+  ScheduledTask  GetTask(int index) const;
 
   Ui::ScheduleDialog*        ui;
   QVector<ScheduledTask> m_tasks;
+  QVector<size_t>        m_task_indexes;
   QStandardItemModel     m_task_model;
   QStandardItemModel     m_task_filter_model;
   AppMap                 m_apps;

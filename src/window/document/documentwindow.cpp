@@ -56,7 +56,7 @@ DocumentWindow::DocumentWindow(QWidget *parent)
   m_flag_index(-1),
   m_inserting(false),
   m_row_types(QList<RowType>{RowType::REPEAT}),
-  m_printer(QPrinter::PrinterResolution),
+  m_printer(QPrinter::HighResolution),
   m_img_height(0),
   m_scale_images(true)
 {
