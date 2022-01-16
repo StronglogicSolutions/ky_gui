@@ -14,6 +14,146 @@ using namespace Scheduler;
 
 static const char JPG_FORMAT[]{"JPG"};
 
+enum class DimensionType
+{
+square    = 0x00,
+landscape = 0x01,
+vertical  = 0x02
+};
+
+struct Dimensions
+{
+static constexpr int   square    = 1;
+static constexpr float landscape = 1.91f;
+static constexpr float vertical  = 0.8f;
+
+Dimensions(int width_, int height_)
+: type(DetectDimensions(width_, height_)),
+  width(width_),
+  height(height_)
+{}
+
+DimensionType type;
+int width;
+int height;
+
+bool is_square()    const { return (type == DimensionType::square); }
+bool is_landscape() const { return (type == DimensionType::landscape); }
+bool is_vertical()  const { return (type == DimensionType::vertical); }
+
+QRect Get()
+{
+  if (is_square())
+  {
+    if (height != width)
+      return (height > width) ? QRect{                   0, (height - width) / 2, width,  width} :
+                                QRect{(width - height) / 2,                    0, height, height};
+    else
+      return QRect{0, 0, height, width};
+  }
+
+  const float ratio = (width / height);
+
+  if (is_landscape())
+    if (ratio < landscape) // height too big
+      height = (width * (1 / landscape));
+    else                   // width too big
+      width = (height * landscape);
+  else
+  if (ratio < vertical) // height too big
+    height = (width * (1 / vertical));
+  else
+    width = (height * vertical);
+
+  return QRect{0, 0, height, width};
+}
+
+static DimensionType DetectDimensions(int width, int height)
+{
+  const float ratio = (width / height);
+
+  if (width == height)
+    return DimensionType::square;
+
+  auto sq_delta = square    - ratio;
+  auto ls_delta = landscape - ratio;
+  auto vt_delta = vertical  - ratio;
+
+  return (sq_delta < ls_delta) ?
+           (sq_delta < vt_delta) ? DimensionType::square : DimensionType::vertical :
+             (ls_delta < vt_delta) ? DimensionType::landscape : DimensionType::vertical;
+
+}
+};
+
+
+
+void FormatImage(int width, int height)
+{
+  Dimensions d{width, height};
+
+}
+
+Scheduler::KFileData ArgDialog::PrepareFile(const QString& path)
+{
+  Scheduler::KFileData file_data;
+
+  if (path.size())
+  {
+    const auto slash_index = path.lastIndexOf("/") + 1;
+    QString    file_name   = path.right(path.size() - slash_index);
+    QString    dir         = path.left(slash_index);
+    QFile      file{path};
+
+    if (file.open(QIODevice::ReadOnly))
+    {
+      QByteArray    bytes{};
+      QMimeDatabase db{};
+      QMimeType     mime_type = db.mimeTypeForFile(path);
+      FileType      file_type{};
+      auto          is_video  = mime_type.name().contains("video");
+
+      if (!is_video)
+      {
+              QBuffer buffer{&bytes};
+        const QImage  image{path};
+              QSize   image_size      = image.size();
+        const auto    height          = image_size.height();
+        const auto    width           = image_size.width();
+        const bool    is_IG           = (m_task->getType() == TaskType::INSTAGRAM);
+        const char*   format          = (is_IG) ? JPG_FORMAT : mime_type.preferredSuffix().toUtf8().constData();
+        const QImage  processed_image = (is_IG) ? image.copy(Dimensions{width, height}.Get()) : image;
+
+        processed_image.save(&buffer, format);
+        file_type = FileType::IMAGE;
+      }
+      else
+      {
+        file_type = FileType::VIDEO;
+        bytes = file.readAll();
+      }
+
+      file_data = Scheduler::KFileData{
+        .name  = file_name,
+        .type  = file_type,
+        .path  = path,
+        .bytes = bytes};
+    }
+    else
+    {
+      qDebug() << "Unable to open selected file";
+      QMessageBox::warning(this, tr("File Error"), tr("Unable to open selected file"));
+    }
+  }
+  else
+  {
+    qDebug() << "Could not read the file path";
+    QMessageBox::warning(this, tr("File Error"), tr("Could not read the file path"));
+  }
+
+  return file_data;
+}
+
 bool isSave(QString s) {
   return (s.compare("Save") == 0 || s.compare("&Save") == 0);
 }
@@ -33,94 +173,41 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
     auto file_path = file_dialog.openFileDialog(m_file_path);
     qDebug() << "Selected file:" << file_path;
 
-    if (file_path.size() > 0) {
-      auto slash_index = file_path.lastIndexOf("/") + 1;
-      QString file_name = file_path.right(file_path.size() - slash_index);
-      QString dir = file_path.left(slash_index);
-      QFile file(file_path);
+    Scheduler::KFileData file = PrepareFile(file_path);
 
-      if (file.open(QIODevice::ReadOnly)) {
-        QByteArray    bytes{};
-        QMimeDatabase db{};
-        QMimeType     mime_type = db.mimeTypeForFile(file_path);
-        FileType      file_type{};
-        auto          is_video  = mime_type.name().contains("video");
-        addItem(file_name, "file");
+    if (file.valid())
+    {
+      addItem(file.name, "file");
+      m_task->addArgument("files", file);
 
-        if (!is_video)
+      if (file.type == FileType::IMAGE)
+        addFile(file.path);
+      else
+      {
+        qDebug() << "File is video";
+        m_task->setArgument("is_video", true);
+        QString preview_filename  = FileUtils::generatePreview(file.path, file.name);
+        QString preview_file_path = QCoreApplication::applicationDirPath() + "/assets/previews/" + preview_filename;
+        QFile   prev_file{preview_file_path};
+
+        if (prev_file.open(QIODevice::ReadOnly))
         {
-                QBuffer buffer{&bytes};
-                QImage  processed_image;
-          const QImage  image{file_path};
-                QSize   image_size  = image.size();
-          const auto    height      = image_size.height();
-          const auto    width       = image_size.width();
-          const bool    is_IG       = (m_task->getType() == TaskType::INSTAGRAM);
-          const char*   format      = (is_IG) ? JPG_FORMAT :
-                                                mime_type.preferredSuffix().toUtf8().constData();
-
-          if (is_IG && height != width)
-          {
-            processed_image = (height > width) ?
-              image.copy(QRect{                   0, (height - width) / 2, width,  width}) :
-              image.copy(QRect{(width - height) / 2,                    0, height, height});
-          }
-          else
-            processed_image = image;
-
-          processed_image.save(&buffer, format);
-          addFile(file_path);
-          file_type = FileType::IMAGE;
+          // TODO: create some way of verifying preview generation was successful
+          addFile("assets/previews/" + preview_filename);
+          addItem(preview_filename, "file");
+          addFile("assets/previews/" + preview_filename);
+          m_task->addArgument("files", Scheduler::KFileData{
+                                         .name  = preview_filename,
+                                         .type  = FileType::IMAGE,
+                                         .path  = preview_file_path,
+                                         .bytes = prev_file.readAll()});
         }
         else
         {
-          file_type = FileType::VIDEO;
-          bytes = file.readAll();
-        }
-
-        m_task->addArgument("files", Scheduler::KFileData{
-                                         .name  = file_name,
-                                         .type  = file_type,
-                                         .path  = file_path,
-                                         .bytes = bytes});
-
-        if (is_video)
-        {
-          qDebug() << "File is video";
-          m_task->setArgument("is_video", true);
-          QString preview_filename  = FileUtils::generatePreview(file_path, file_name);
-          QString preview_file_path = QCoreApplication::applicationDirPath() + "/assets/previews/" + preview_filename;
-          file.setFileName(preview_file_path);          
-
-          if (file.open(QIODevice::ReadOnly))
-          {
-            // TODO: create some way of verifying preview generation was successful
-            addFile("assets/previews/" + preview_filename);
-            addItem(preview_filename, "file");
-            addFile("assets/previews/" + preview_filename);
-            m_task->addArgument("files", Scheduler::KFileData{
-                                           .name  = preview_filename,
-                                           .type  = is_video ? FileType::VIDEO : FileType::IMAGE,
-                                           .path  = preview_file_path,
-                                           .bytes = file.readAll()});
-          }
-          else
-          {
-            qDebug() << "Could not add preview image for video";
-            QMessageBox::warning(this, tr("File Error"), tr("Could not add preview image for video"));
-          }
+          qDebug() << "Could not add preview image for video";
+          QMessageBox::warning(this, tr("File Error"), tr("Could not add preview image for video"));
         }
       }
-      else
-      {
-        qDebug() << "Unable to open selected file";
-        QMessageBox::warning(this, tr("File Error"), tr("Unable to open selected file"));
-      }
-    }
-    else
-    {
-      qDebug() << "Could not read the file path";
-      QMessageBox::warning(this, tr("File Error"), tr("Could not read the file path"));
     }
   });
 
