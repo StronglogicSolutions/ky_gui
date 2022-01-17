@@ -9,6 +9,7 @@
 #include <QTableWidgetItem>
 #include <algorithm>
 #include <vector>
+#include <cmath>
 
 using namespace Scheduler;
 
@@ -28,71 +29,71 @@ static constexpr float landscape = 1.91f;
 static constexpr float vertical  = 0.8f;
 
 Dimensions(int width_, int height_)
-: type(DetectDimensions(width_, height_)),
+:
+  ratio(ComputeRatio(width_, height_)),
   width(width_),
-  height(height_)
+  height(height_),
+  type(DetectDimensions(width_, height_, ratio))
 {}
 
+float         ratio;
+int           width;
+int           height;
 DimensionType type;
-int width;
-int height;
 
-bool is_square()    const { return (type == DimensionType::square); }
+bool is_square()    const { return (type == DimensionType::square);    }
 bool is_landscape() const { return (type == DimensionType::landscape); }
-bool is_vertical()  const { return (type == DimensionType::vertical); }
+bool is_vertical()  const { return (type == DimensionType::vertical);  }
 
 QRect Get()
 {
   if (is_square())
   {
     if (height != width)
-      return (height > width) ? QRect{                   0, (height - width) / 2, width,  width} :
-                                QRect{(width - height) / 2,                    0, height, height};
+      return (height > width) ? QRect{0, (height - width) / 2, width,  width} :
+                                QRect{(width - height) / 2, 0, height, height};
     else
       return QRect{0, 0, height, width};
   }
 
-  const float ratio = (width / height);
+  const float target = (is_landscape()) ? landscape : vertical;
+  int x{0};
+  int y{0};
 
-  if (is_landscape())
-    if (ratio < landscape) // height too big
-      height = (width * (1 / landscape));
-    else                   // width too big
-      width = (height * landscape);
+  if (ratio > target)
+  {
+    const auto new_height = (width * (1 / target));
+    y                     = -((new_height - height) / 2);
+    height                = new_height;
+  }
   else
-  if (ratio < vertical) // height too big
-    height = (width * (1 / vertical));
-  else
-    width = (height * vertical);
+  {
+    const auto new_width = (height * target);
+    x                    = -((new_width - width) / 2);
+    width                = new_width;
+  }
 
-  return QRect{0, 0, height, width};
+  return QRect{x, y, width, height};
 }
 
-static DimensionType DetectDimensions(int width, int height)
+static DimensionType DetectDimensions(const int width, const int height, const float& ratio)
 {
-  const float ratio = (width / height);
-
   if (width == height)
     return DimensionType::square;
 
-  auto sq_delta = square    - ratio;
-  auto ls_delta = landscape - ratio;
-  auto vt_delta = vertical  - ratio;
+  const auto sq_delta = std::fabs(square    - ratio);
+  const auto ls_delta = std::fabs(landscape - ratio);
+  const auto vt_delta = std::fabs(vertical  - ratio);
 
   return (sq_delta < ls_delta) ?
-           (sq_delta < vt_delta) ? DimensionType::square : DimensionType::vertical :
-             (ls_delta < vt_delta) ? DimensionType::landscape : DimensionType::vertical;
-
+           (sq_delta < vt_delta) ? DimensionType::square    :
+                                   DimensionType::vertical    :
+           (ls_delta < vt_delta) ? DimensionType::landscape :
+                                   DimensionType::vertical;
 }
+
+static float ComputeRatio(int width, int height) { return static_cast<float>(width) / static_cast<float>(height); }
 };
-
-
-
-void FormatImage(int width, int height)
-{
-  Dimensions d{width, height};
-
-}
 
 Scheduler::KFileData ArgDialog::PrepareFile(const QString& path)
 {
@@ -133,11 +134,7 @@ Scheduler::KFileData ArgDialog::PrepareFile(const QString& path)
         bytes = file.readAll();
       }
 
-      file_data = Scheduler::KFileData{
-        .name  = file_name,
-        .type  = file_type,
-        .path  = path,
-        .bytes = bytes};
+      file_data = Scheduler::KFileData{file_name, file_type, path, bytes};
     }
     else
     {
@@ -226,36 +223,40 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
   QObject::connect(ui->addArgument, &QPushButton::clicked, this, [this]() {
     QString text = ui->argInput->toPlainText();
     auto type = ui->argType->currentText();
-    if (text.size() > 0) {
-      if (type == Args::HASHTAG_TYPE) {
+    if (text.size() > 0)
+    {
+      if (type == Args::HASHTAG_TYPE)
         addHashtag(text);
-      }
       else
-      if (type == Args::DESCRIPTION_TYPE) {
+      if (type == Args::DESCRIPTION_TYPE)
+      {
         addItem(text, type);
         m_task->setArgument(Args::DESCRIPTION_TYPE, text);
       }
       else
-      if (type == Args::PROMOTE_TYPE) {
+      if (type == Args::PROMOTE_TYPE)
+      {
         addOrReplaceInArgList(text, Args::PROMOTE_TYPE);
         m_task->setArgument(Args::PROMOTE_TYPE, text);
       }
       else
-      if (type == Args::LINK_BIO_TYPE) {
+      if (type == Args::LINK_BIO_TYPE)
+      {
         addOrReplaceInArgList(text, Args::LINK_BIO_TYPE);
         m_task->setArgument(Args::LINK_BIO_TYPE, text);
       }
       else
-      if (type == Args::REQUESTED_BY_TYPE) {
+      if (type == Args::REQUESTED_BY_TYPE)
         addRequestedBy(text);
-      }
       else
-      if (type == Args::HEADER_TYPE) {
+      if (type == Args::HEADER_TYPE)
+      {
         addItem(text, type);
         m_task->setArgument(Args::HEADER_TYPE, text);
       }
       else
-      if (type == Args::REQUESTED_BY_PHRASE) {
+      if (type == Args::REQUESTED_BY_PHRASE)
+      {
         addItem(text, type);
         m_task->setArgument(Args::REQUESTED_BY_PHRASE, text);
       }
@@ -265,14 +266,17 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
 
   ui->dateTime->setDateTime(QDateTime::currentDateTime());
 
-  QObject::connect(ui->dateTime, &QDateTimeEdit::dateTimeChanged, this, [this]() {
+  QObject::connect(ui->dateTime, &QDateTimeEdit::dateTimeChanged, this, [this]()
+  {
     m_task->setArgument("datetime", QString::number(ui->dateTime->dateTime().toTime_t()));
   });
 
-  QObject::connect(ui->addRuntimeArg, &QPushButton::clicked, this, [this]() {
-    if (m_task->getType() == TaskType::INSTAGRAM) {
+  QObject::connect(ui->addRuntimeArg, &QPushButton::clicked, this, [this]()
+  {
+    if (m_task->getType() == TaskType::INSTAGRAM)
+    {
       const char* message{"Runtime arguments are not available for Instagram tasks"};
-      qDebug() << message;
+      KLOG(message);
       QMessageBox::warning(
         this,
         tr("Requested By"),
@@ -281,7 +285,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
       return;
     }
 
-    auto arg_text = ui->runtimeArgEdit->text();
+    const auto arg_text = ui->runtimeArgEdit->text();
     addOrReplaceInArgList(arg_text, Args::RUNTIME_ARG_TYPE);
     m_task->addArgument("runtime", arg_text);
     ui->runtimeArgEdit->clear();
@@ -334,16 +338,23 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
   });
 }
 
-void ArgDialog::showEvent(QShowEvent* event) {
-  if (event->type() == QEvent::Show) {
-    if (m_task == nullptr || m_task->getTaskCode() != findTaskCode(m_app_name)) {
+void ArgDialog::showEvent(QShowEvent* event) 
+{
+  if (event->type() == QEvent::Show)
+  {
+    if (m_task == nullptr || m_task->getTaskCode() != findTaskCode(m_app_name))
+    {
       m_task = createTask(m_app_name);
-      if (m_task->getType() == INSTAGRAM) {   // recurring and notification should
+      if (m_task->getType() == INSTAGRAM)
+      {                                       // recurring and notification should
         ui->recurring->hide();                // only be visible for generic tasks
         ui->recurringLabel->hide();
         ui->notification->hide();
         ui->notificationLabel->hide();
-      } else if (ui->recurring->isHidden()) {
+      }
+      else
+      if (ui->recurring->isHidden())
+      {
         ui->recurring->show();
         ui->recurringLabel->show();
         ui->notification->show();
@@ -376,23 +387,24 @@ void ArgDialog::setTaskArguments() {
   auto type = m_task->getType();
   if (type == TaskType::INSTAGRAM) {
     QString hashtags{};
-    for (const auto &tag : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("hashtags"))) {
-      hashtags += '#' + tag + ' ';
-    }
+    for (const auto& tag : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("hashtags")))
+      hashtags += '#' + tag + ' ';    
     hashtags.chop(1);
+
     QString requested_by{};
-    for (const auto &name : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("requested_by"))) {
+    for (const auto& name : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("requested_by")))
       requested_by += '@' + name + ' ';
-    }
+
     m_task->setArgument("hashtags_string", hashtags);
     m_task->setArgument("requested_by_string", requested_by);
   }
   else
-  if (type == TaskType::GENERIC) {
+  if (type == TaskType::GENERIC)
+  {
     QString runtime_string{};
-    for (const auto& arg : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("runtime"))) {
+    for (const auto& arg : std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue("runtime")))
       runtime_string += arg + " ";
-    }
+
     runtime_string.chop(1);
     m_task->setArgument("runtime_string", runtime_string);
   }
@@ -403,26 +415,28 @@ void ArgDialog::setTaskArguments() {
  * @param value
  * @param type
  */
-void ArgDialog::addItem(QString value, QString type) {
+void ArgDialog::addItem(QString value, QString type)
+{
   auto row = ui->argList->rowCount(); // insert row
   ui->argList->insertRow(row);
   // Create UI elements
-  QTableWidgetItem *item = new QTableWidgetItem(type);
+  QTableWidgetItem *item  = new QTableWidgetItem(type);
   QTableWidgetItem *item2 = new QTableWidgetItem(value);
-  QPushButton *q_pb = new QPushButton();
+  QPushButton      *q_pb  = new QPushButton();
   q_pb->setText("Delete");
   q_pb->setIcon(std::move(QIcon(":/icons/icons/quit.png")));
   // Delete listener
-  QObject::connect(q_pb, &QPushButton::clicked, this, [this]() {
+  QObject::connect(q_pb, &QPushButton::clicked, this, [this]()
+  {
     auto row_index = ui->argList->currentRow();
     auto name = ui->argList->item(row_index, 0)->text();
-    if (name == "file") { // UI displays files as type "file", but the argument is named "files"
+    if (name == "file")  // UI displays files as type "file", but the argument is named "files"
       name = Args::FILE_TYPE;
-    }
+
     auto value = ui->argList->item(row_index, 1)->text();
-    for (auto&& s : value.split("\n")) { // If there are multiple values, they are separated by line breaks
+    for (auto&& s : value.split("\n"))  // If there are multiple values, they are separated by line breaks
       m_task->removeArgument(name, s);
-    }
+
     ui->argList->removeRow(row_index);
   });
   ui->argList->setItem(row, 0, item);
@@ -434,7 +448,8 @@ void ArgDialog::addItem(QString value, QString type) {
  * @brief ArgDialog::addFile
  * @param path
  */
-void ArgDialog::addFile(QString path) {
+void ArgDialog::addFile(QString path)
+{
   auto row_count = ui->argList->rowCount();
 
   QTableWidgetItem *file_item = new QTableWidgetItem();
@@ -449,7 +464,8 @@ void ArgDialog::addFile(QString path) {
 /**
  * @brief ArgDialog::clearPost
  */
-void ArgDialog::clearPost() {
+void ArgDialog::clearPost()
+{
   QDateTime date_time = QDateTime::currentDateTime();
   m_task->clear();
   m_task->setDefaultValues();
@@ -467,27 +483,26 @@ void ArgDialog::clearTask() { m_task->clear(); }
  * @brief ArgDialog::addRequestedBy
  * @param value
  */
-void ArgDialog::addRequestedBy(QString value) {
+void ArgDialog::addRequestedBy(QString value)
+{
   QStringList names = value.split(" ");
   QVector<QString> requested_by_names =
       std::get<VariantIndex::STRVEC>(
           m_task->getTaskArgumentValue("requested_by"));
 
-  for (const auto &name : names) {
-    if (std::find(
-          requested_by_names.begin(), requested_by_names.end(),  value.toUtf8().constData()) == requested_by_names.end()) {
+  for (const auto &name : names)
+  {
+    auto it = std::find(requested_by_names.begin(), requested_by_names.end(),  value.toUtf8().constData());
+    if (it == requested_by_names.end())
+    {
       m_task->addArgument("requested_by", name);
       addToArgList(name, "requested_by");
-    } else {
-        const char* message =
-          "You have already inputed this name under \"requested_by\"";
-        qDebug() << message;
-
-        QMessageBox::warning(
-            this,
-            tr("Requested By"),
-            tr(message)
-            );
+    }
+    else
+    {
+      const char* message = "You have already inputed this name under \"requested_by\"";
+      qDebug() << message;
+      QMessageBox::warning(this, tr("Requested By"), tr(message));
     }
   }
 }
@@ -497,20 +512,21 @@ void ArgDialog::addRequestedBy(QString value) {
  * @param value
  * @param type
  */
-void ArgDialog::addToArgList(QString value, QString type) {
-  for (int i = 0; i < ui->argList->rowCount(); i++) {
+void ArgDialog::addToArgList(QString value, QString type)
+{
+  for (int i = 0; i < ui->argList->rowCount(); i++)
+  {
     auto item = ui->argList->item(i, 0);
-    if (item) {
-      if (QString::compare(item->text(), type) == 0) {
-        auto text = ui->argList->item(i, 1)->text();
-        text.append("\n");
-        text += value;
-        ui->argList->item(i, 1)->setText(text);
-        return;
-      }
+    if (item && QString::compare(item->text(), type) == 0)
+    {
+      auto text = ui->argList->item(i, 1)->text();
+      text.append("\n");
+      text += value;
+      ui->argList->item(i, 1)->setText(text);
+      return;
     }
   }
-    addItem(value, type);
+  addItem(value, type);
 }
 
 /**
@@ -518,17 +534,18 @@ void ArgDialog::addToArgList(QString value, QString type) {
  * @param value
  * @param type
  */
-void ArgDialog::addOrReplaceInArgList(QString value, QString type) {
-    for (int i = 0; i < ui->argList->rowCount(); i++) {
-        auto item = ui->argList->item(i, 1);
-        if (item) {
-          if (QString::compare(item->text(), type) == 0) {
-            ui->argList->item(i, 1)->setText(value);
-            return;
-          }
-        }
-    }
-    addItem(value, type);
+void ArgDialog::addOrReplaceInArgList(QString value, QString type)
+{
+  for (int i = 0; i < ui->argList->rowCount(); i++)
+  {
+    auto item = ui->argList->item(i, 1);
+    if (item && QString::compare(item->text(), type) == 0)
+      {
+        ui->argList->item(i, 1)->setText(value);
+        return;
+      }
+  }
+  addItem(value, type);
 }
 
 static const char findSplitChar(const QString& s)
@@ -550,44 +567,47 @@ static bool noSplit(const char& c)
  * @brief ArgDialog::addHashtag
  * @param tag
  */
-void ArgDialog::addHashtag(QString tag) {
+void ArgDialog::addHashtag(QString tag)
+{
   const char split_char = findSplitChar(tag);
-    QStringList tags = noSplit(split_char) ? QStringList{tag} : tag.split(split_char);
-    for (const auto& tag : tags) {
-      QVector<QString> hashtags = std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue(Args::HASHTAG_TYPE));
-        if (std::find(hashtags.begin(), hashtags.end(), tag.toUtf8().constData()) == hashtags.end()) {
-          m_task->addArgument(Args::HASHTAG_TYPE, tag);
-          addToArgList(tag, Args::HASHTAG_TYPE);
-        } else {
-          const char* message = "Can't add the same hashtag twice";
-          qDebug() << message;
-          QMessageBox::warning(
-              this,
-              tr("Hashtags"),
-              tr(message)
-              );
-        }
+  QStringList tags = noSplit(split_char) ? QStringList{tag} : tag.split(split_char);
+  for (const auto& tag : tags)
+  {
+    QVector<QString> hashtags = std::get<VariantIndex::STRVEC>(m_task->getTaskArgumentValue(Args::HASHTAG_TYPE));
+    if (std::find(hashtags.begin(), hashtags.end(), tag.toUtf8().constData()) == hashtags.end())
+    {
+      m_task->addArgument(Args::HASHTAG_TYPE, tag);
+      addToArgList(tag, Args::HASHTAG_TYPE);
     }
+    else
+    {
+      const char* message = "Can't add the same hashtag twice";
+      qDebug() << message;
+      QMessageBox::warning(this, tr("Hashtags"), tr(message));
+    }
+  }
 }
 
 /**
  * @brief ArgDialog::keyPressEvent
  * @param e
  */
-void ArgDialog::keyPressEvent(QKeyEvent *e) {
-  if (Qt::ControlModifier) {
-    if (e->key()==Qt::Key_Return || e->key()==Qt::Key_Enter) {
-      if (ui->argInput->hasFocus()) {
+void ArgDialog::keyPressEvent(QKeyEvent *e)
+{
+  if (Qt::ControlModifier)
+  {
+    if (e->key()==Qt::Key_Return || e->key()==Qt::Key_Enter)
+    {
+      if (ui->argInput->hasFocus())
+      {
         ui->addArgument->clicked();
-        auto idx = ui->argType->currentIndex();
-        if (idx != (ui->argType->count() - 1)) {
+        const auto idx = ui->argType->currentIndex();
+        if (idx != (ui->argType->count() - 1))
           ui->argType->setCurrentIndex(idx + 1);
-        }
       }
       else
-      if (ui->runtimeArgEdit->hasFocus()) {
-        (*(ui->addRuntimeArg)).clicked();
-      }
+      if (ui->runtimeArgEdit->hasFocus())
+        (*(ui->addRuntimeArg)).clicked();      
     }
   }
 }
@@ -598,7 +618,8 @@ void ArgDialog::keyPressEvent(QKeyEvent *e) {
  */
 void ArgDialog::setFilePath(QString path) { m_file_path = path; }
 
-void ArgDialog::setAppName(QString app_name) {
+void ArgDialog::setAppName(QString app_name)
+{
   m_app_name = app_name;
 }
 
@@ -606,44 +627,47 @@ void ArgDialog::setAppName(QString app_name) {
  * @brief ArgDialog::setConfig
  * @param config_string
  */
-void ArgDialog::setConfig(QJsonObject config) {
+void ArgDialog::setConfig(QJsonObject config)
+{
   m_config = config;
 }
 
 /**
  * @brief ArgDialog::~ArgDialog
  */
-ArgDialog::~ArgDialog() {
+ArgDialog::~ArgDialog()
+{
   delete m_task;
-  if (m_pending_task == nullptr) {
-    delete m_pending_task;
-  }
+  if (m_pending_task == nullptr)
+    delete m_pending_task;  
   delete m_loader;
   delete ui;
 }
 
 void ArgDialog::accept() { qDebug() << "Sending request to schedule a task.."; }
 
-void ArgDialog::setArgTypes() {
+void ArgDialog::setArgTypes()
+{
   ui->argType->clear();
-  for (const auto &arg : m_task->getTaskArguments()) {
-    ui->argType->addItem(arg->text());
-  }
+  for (const auto &arg : m_task->getTaskArguments())
+    ui->argType->addItem(arg->text());  
 }
 
-void ArgDialog::notifyClientSuccess() {
+void ArgDialog::notifyClientSuccess()
+{
 //   displayLoader(false);
-  if (m_pending_task != nullptr) {
+  if (m_pending_task != nullptr)
     delete m_pending_task;
-  } else {
+  else
     clearPost();
-  }
 }
 
-void ArgDialog::displayLoader(bool visible) {
-  if (visible) {
-    auto height = 400;
-    auto width = 480;
+void ArgDialog::displayLoader(bool visible)
+{
+  if (visible)
+  {
+    const auto height = 400;
+    const auto width  = 480;
     m_loader_widget.setMaximumSize(width, height);
     m_loader_widget.setMinimumSize(width, height);
     m_loader_widget.show();
@@ -659,7 +683,9 @@ void ArgDialog::displayLoader(bool visible) {
     ui->loaderText->setMaximumSize(width, height);
     ui->loaderText->setMinimumSize(width, height / 2);
     m_loader->start();
-  } else {
+  }
+  else
+  {
     m_loader_widget.hide();
     ui->loaderMovie->hide();
     ui->loaderMovie->setVisible(false);
