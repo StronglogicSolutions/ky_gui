@@ -76,6 +76,11 @@ struct KFileData {
   QString     path;
   QByteArray  bytes;
 
+  bool valid() const
+  {
+    return (!(path.isEmpty()) && !(bytes.isEmpty()));
+  }
+
 //  friend std::ostream &operator<<(std::ostream &out, const KFileData& file) {
 //    out << "Name: " << file.name.toUtf8()
 //        << "\nType: " << file.type;

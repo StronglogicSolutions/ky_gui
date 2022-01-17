@@ -43,44 +43,45 @@ class ArgDialog : public QDialog {
 
  public:
   explicit ArgDialog(QWidget *parent = nullptr);
-  virtual void keyPressEvent(QKeyEvent* e) override;
-  void setFilePath(QString path);
-  virtual void accept() override;
-  void setAppName(QString task_name);
-  void setConfig(QJsonObject config);
-  void notifyClientSuccess();
-
   ~ArgDialog();
 
+  virtual void         keyPressEvent(QKeyEvent* e) override;
+  void                 setFilePath(QString path);
+  virtual void         accept() override;
+  void                 setAppName(QString task_name);
+  void                 setConfig(QJsonObject config);
+  void                 notifyClientSuccess();
+
  signals:
-  void taskRequestReady(Scheduler::Task *task);
+  void                 taskRequestReady(Scheduler::Task *task);
 
  protected:
-  void showEvent(QShowEvent* event) override;
+  virtual void         showEvent(QShowEvent* event) override;
 
  private:
-  void clearPost();
-  void defaultPost();
-  void clearTask();
-  void displayLoader(bool visible);
-  void addToArgList(QString value, QString type);
-  void addOrReplaceInArgList(QString value, QString type);
-  void addHashtag(QString tag);
-  void addRequestedBy(QString value);
-  void setTaskArguments();
-  void setArgTypes();
-  Ui::ArgDialog *ui;
-  void addItem(QString value, QString type);
-  void addFile(QString path);
+  void                 clearPost();
+  void                 defaultPost();
+  void                 clearTask();
+  void                 displayLoader(bool visible);
+  void                 addToArgList(QString value, QString type);
+  void                 addOrReplaceInArgList(QString value, QString type);
+  void                 addHashtag(QString tag);
+  void                 addRequestedBy(QString value);
+  void                 setTaskArguments();
+  void                 setArgTypes();
+  void                 addItem(QString value, QString type);
+  void                 addFile(QString path);
+  Scheduler::KFileData PrepareFile(const QString& path);
 
-  Task*         m_task;
-  Task*         m_pending_task;
-  QString       m_file_path;
-  QJsonObject   m_config;
-  QString       m_app_name;
-  QMovie*       m_loader;
-  QWidget      m_loader_widget;
-  QVBoxLayout  m_loader_layout;
+  Ui::ArgDialog* ui;
+  Task*          m_task;
+  Task*          m_pending_task;
+  QString        m_file_path;
+  QJsonObject    m_config;
+  QString        m_app_name;
+  QMovie*        m_loader;
+  QWidget        m_loader_widget;
+  QVBoxLayout    m_loader_layout;
 };
 
 #endif  // ARGDIALOG_H
