@@ -126,6 +126,20 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   ui->processList->setModel(m_process_model);
   ui->serverIp->setText(argv[1]);
   ui->serverPort->setText(argv[2]);
+
+  m_config = loadJsonConfig(ui->kyConfig->toPlainText());
+  if (!m_config.contains("username") || !m_config.contains("password"))
+  {
+    KLOG("Unable to connect to KIQ without credentials. Please modify config JSON");
+    return;
+  }
+
+  const QString username  = configValue("username", m_config);
+  const QString password  = configValue("password", m_config);
+  const QString file_path = configValue("fileDirectory", m_config);
+
+  q_client->SetCredentials(username, password);
+  arg_ui->setFilePath(file_path);
 }
 
 /**
@@ -206,23 +220,8 @@ void MainWindow::setConnectScreen(bool visible) {
 void MainWindow::connectClient()
 {
   using namespace constants;
-  m_config = loadJsonConfig(ui->kyConfig->toPlainText());
-  if (!m_config.contains("username") || !m_config.contains("password"))
-  {
-    KLOG("Unable to connect to KIQ without credentials. Please modify config JSON");
-    return;
-  }
-
-  const QString username  = configValue("username", m_config);
-  const QString password  = configValue("password", m_config);
-  const QString file_path = configValue("fileDirectory", m_config);
-
-  q_client->SetCredentials(username, password);
-  arg_ui->setFilePath(file_path);
-
 
   setConnectScreen(false);
-
   KLOG("Connecting to server");
 
   QObject::connect(q_client, &Client::messageReceived, this, &MainWindow::onMessageReceived);

@@ -217,6 +217,7 @@ class Client : public QDialog {
   void           handleDownload(uint8_t* data, ssize_t size);
   void           sendPackets(uint8_t* data, uint32_t size);  
   void           GetToken();
+  std::string    CreateOperation(const char* op, std::vector<std::string> args);
 
   int                           argc;
   char**                        argv;

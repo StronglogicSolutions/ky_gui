@@ -343,24 +343,29 @@ std::vector<std::string> ArgsToV(QVector<T> args, P arg)
 
 template std::vector<std::string> ArgsToV(QVector<QString>, uint8_t);
 
-std::string createOperation(const char* op, std::vector<std::string> args) {
-    StringBuffer s;
-    Writer<StringBuffer, Document::EncodingType, ASCII<>> w(s);
-    w.StartObject();
-    w.Key("type");
-    w.String("operation");
-    w.Key("command");
-    w.String(op);
-    w.Key("args");
-    w.StartArray();
-    if (!args.empty()) {
-        for (const auto& arg : args) {
-            w.String(arg.c_str());
-        }
-    }
-    w.EndArray();
-    w.EndObject();
-    return s.GetString();
+std::string createOperation(const char* op, std::vector<std::string> args, const char* name = nullptr, const char* token = nullptr)
+{
+  StringBuffer s;
+  Writer<StringBuffer, Document::EncodingType, ASCII<>> w(s);
+  w.StartObject();
+  w.Key("type");
+  w.String("operation");
+  w.Key("command");
+  w.String(op);
+  w.Key("user");
+  w.String(name);
+  w.Key("token");
+  w.String(token);
+  w.Key("args");
+  w.StartArray();
+  if (!args.empty()) {
+      for (const auto& arg : args) {
+          w.String(arg.c_str());
+      }
+  }
+  w.EndArray();
+  w.EndObject();
+  return s.GetString();
 }
 
 std::string getOperation(const char* data) {
