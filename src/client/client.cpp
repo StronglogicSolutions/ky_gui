@@ -279,7 +279,8 @@ void Client::handleEvent(std::string data)
       {
         sendTaskEncoded(m_outbound_task);
         file_was_sent = false;
-      } else
+      }
+      else
         sendEncoded(createOperation("FileUpload", {"Subsequent file"}));
     }
   }
@@ -325,7 +326,10 @@ static const bool IsIP(const QString& address)
 /**
  * @brief Client::start
  */
-void Client::start(QString ip, QString port) {
+void Client::start(QString ip, QString port)
+{
+  GetToken();
+
   const QString port_address = port.isEmpty() ? m_server_port : port;
   const QString host_address = (ip.isEmpty()) ? m_server_ip: ip;
 
