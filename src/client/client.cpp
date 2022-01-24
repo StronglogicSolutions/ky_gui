@@ -2,6 +2,7 @@
 
 #include <include/client/client.hpp>
 
+
 using namespace KData;
 using namespace IGData;
 using namespace GenericData;
@@ -17,20 +18,21 @@ flatbuffers::FlatBufferBuilder builder(1024);
  * @return std::string A string with the following format denoting each file:
  * `1580057341filename|image::`
  */
-std::string getTaskFileInfo(std::vector<SentFile> files) {
+std::string getTaskFileInfo(std::vector<SentFile> files)
+{
   std::string info{};
-  for (const auto& f : files) {
+  for (const auto& f : files)
+  {
     info += std::to_string(f.timestamp);
     info += f.name.toUtf8().constData();
-    info += "|";
-    if (f.type == Scheduler::FileType::VIDEO) {
+    info += "|";    
+    if (f.type == Scheduler::FileType::VIDEO)
       info += "video";
-    } else {
-      info += "image";
-    }
+    else
+      info += "image";    
     info += ":";
   }
-  qDebug() << "File Info: " << info.c_str();
+  KLOG("File Info: ", info.c_str());
   return info;
 }
 
@@ -113,7 +115,7 @@ Client::MessageHandler Client::createMessageHandler(std::function<void()> cb) {
  * @param [in] {int} count
  * @param [in] {char**} arguments
  */
-Client::Client(QWidget *parent, int count, char** arguments)
+Client::Client(QWidget* parent, int count, char** arguments)
 : QDialog(parent),
   argc(count),
   argv(arguments),
@@ -199,6 +201,33 @@ Client::Client(QWidget *parent, int count, char** arguments)
 {
   qRegisterMetaType<QVector<QString>>("QVector<QString>");
   qRegisterMetaType<QVector<FileWrap>>("QVector<FileWrap>");
+}
+
+void Client::SetCredentials(const QString& username, const QString& password)
+{
+  m_user     = username;
+  m_password = password;
+}
+
+void Client::GetToken()
+{
+  QObject::connect(&m_network_manager, &QNetworkAccessManager::finished, this, [=](QNetworkReply* reply)
+  {
+    if (reply->error())
+      return KLOG(reply->errorString());
+
+    QString response = reply->readAll();
+    QJsonObject json = loadJsonConfig(response);
+    if (!json.empty() && json.contains("token"))
+    {
+      QString token = configValue("token", json);
+      m_token = token;
+    }
+    else
+      throw std::invalid_argument{"Failed to retrieve token"};
+  });
+
+  m_network_manager.get(QNetworkRequest(QUrl("http://localhost:8080?name=" + m_user + "&password=" + m_password)));
 }
 
 /**
@@ -307,16 +336,19 @@ void Client::start(QString ip, QString port) {
   const char*   server_ip    = ip_address.toUtf8();
   const char*   server_port  = port_address.toUtf8();
 
-  if (server_ip && m_client_socket_fd == -1) {
+  if (server_ip && m_client_socket_fd == -1)
+  {
     m_client_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (m_client_socket_fd != -1) {
+    if (m_client_socket_fd != -1)
+    {
       sockaddr_in server_socket;
-      char* end;
+      char*       end;
+      auto        port_value = strtol(server_port, &end, 10);
+
       server_socket.sin_family = AF_INET;
-      auto port_value = strtol(server_port, &end, 10);
-      if (port_value < 0 || end == server_port) {
-          return;
-      }
+
+      if (port_value < 0 || end == server_port) return;
+
       int socket_option = 1;
       // Free up the port to begin listening again
       setsockopt(m_client_socket_fd, SOL_SOCKET, SO_REUSEADDR, &socket_option, sizeof(socket_option));
@@ -325,28 +357,29 @@ void Client::start(QString ip, QString port) {
       inet_pton(AF_INET, server_ip, &server_socket.sin_addr.s_addr);
 
       if (::connect(m_client_socket_fd, reinterpret_cast<sockaddr*>(&server_socket),
-                    sizeof(server_socket)) != -1) {
-          std::string start_operation_string = createOperation("start", {});
-          // Send operation as an encoded message
-          sendEncoded(start_operation_string);
-          // Delegate message handling to its own thread
-          std::function<void()> message_send_fn = [this]() {
-            this->handleMessages();
-          };
-          MessageHandler message_handler = createMessageHandler(message_send_fn);
-          // Handle received messages on separate thread
-          std::thread (message_handler).detach();
-
-      } else {
+                    sizeof(server_socket)) != -1)
+      {
+        std::string start_operation_string = createOperation("start", {});
+        // Send operation as an encoded message
+        sendEncoded(start_operation_string);
+        // Delegate message handling to its own thread
+        std::function<void()> message_send_fn = [this]() { this->handleMessages(); };
+        MessageHandler message_handler = createMessageHandler(message_send_fn);
+        // Handle received messages on separate thread
+        std::thread (message_handler).detach();
+      }
+      else
+      {
         qDebug() << errno;
         ::close(m_client_socket_fd);
       }
-    } else {
-      qDebug() << "Failed to create new connection";
     }
-  } else {
-    qDebug() << "Connection already in progress";
+    else
+      qDebug() << "Failed to create new connection";
+
   }
+  else
+    qDebug() << "Connection already in progress";  
 }
 
 /**
