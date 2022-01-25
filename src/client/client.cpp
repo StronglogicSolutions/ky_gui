@@ -203,10 +203,11 @@ Client::Client(QWidget* parent, int count, char** arguments)
   qRegisterMetaType<QVector<FileWrap>>("QVector<FileWrap>");
 }
 
-void Client::SetCredentials(const QString& username, const QString& password)
+void Client::SetCredentials(const QString& username, const QString& password, const QString& auth_address)
 {
-  m_user     = username;
-  m_password = password;
+  m_user         = username;
+  m_password     = password;
+  m_auth_address = auth_address;
   GetToken();
 }
 
@@ -222,13 +223,13 @@ void Client::GetToken()
     if (!json.empty() && json.contains("token"))
     {
       QString token = configValue("token", json);
-      m_token = token;
+      m_token = token.toUtf8().constData();
     }
     else
       throw std::invalid_argument{"Failed to retrieve token"};
   });
 
-  m_network_manager.get(QNetworkRequest(QUrl("https://auth.kiq.monster?name=" + m_user + "&password=" + m_password)));
+  m_network_manager.get(QNetworkRequest(QUrl(m_auth_address + "?name=" + m_user + "&password=" + m_password)));
 }
 
 /**
@@ -517,10 +518,11 @@ void Client::sendPackets(uint8_t* data, uint32_t size)
 }
 
 
-void Client::ping() {
+void Client::ping()
+{
   if ((outgoing_files.isEmpty() || file_was_sent) && !(m_fetching))
   {
-    qDebug() << "Pinging server";
+    KLOG("Pinging server");
 
     uint8_t send_buffer[5];
     memset(send_buffer, 0, 5);
@@ -533,41 +535,39 @@ void Client::ping() {
  * @brief Client::sendFileEncoded
  * @param [in] {QByteArray} bytes An array of bytes to send
  */
-void Client::sendFileEncoded(QByteArray bytes) {
+void Client::sendFileEncoded(QByteArray bytes)
+{
   sendPackets(reinterpret_cast<uint8_t*>(bytes.data()), bytes.size());
 }
 
 /**
  * @brief Client::closeConnection
  */
-void Client::closeConnection() {
-  if (m_client_socket_fd != -1) {
-    std::string stop_operation_string = CreateOperation("stop", {});
-    // Send operation as an encoded message
+void Client::closeConnection()
+{
+  if (m_client_socket_fd != -1)
+  {
+    std::string stop_operation_string = CreateOperation("stop", {});   
     sendEncoded(stop_operation_string);
-    // Clean up socket file descriptor
     ::shutdown(m_client_socket_fd, SHUT_RDWR);
     ::close(m_client_socket_fd);
     m_client_socket_fd = -1;
     return;
   }
-  qDebug() << "There is no active connection to close";
+  KLOG("There is no active connection to close");
 }
 
 /**
  * @brief Client::setSelectedApp
  * @param [in] TYPE SHOULD CHANGE app_names
  */
-void Client::setSelectedApp(std::vector<QString> app_names) {
+void Client::setSelectedApp(std::vector<QString> app_names)
+{
   selected_commands.clear();
-  for (const auto& name : app_names) {
-    qDebug() << "Matching mask to " << name;
-    for (const auto& command : m_commands) {
-      if (command.name == name) {
-        selected_commands.push_back(command.mask.toInt());
-      }
-    }
-  }
+  for (const auto& name : app_names)
+    for (const auto& command : m_commands)
+      if (command.name == name)
+        selected_commands.push_back(command.mask.toInt());           
 }
 
 
@@ -575,10 +575,12 @@ void Client::setSelectedApp(std::vector<QString> app_names) {
  * @brief Client::getSelectedApp
  * @returns {int} The mask representing the selected application
  */
-int Client::getSelectedApp() {
-  if (selected_commands.size() == 1) {
+int Client::getSelectedApp()
+{
+  if (selected_commands.size() == 1)
     return selected_commands.at(0);
-  } else {
+  else
+  {
     QMessageBox m_box{};
     m_box.setText("App Selection Error. Unable to retrieve app selection");
     m_box.exec();
@@ -591,12 +593,11 @@ int Client::getSelectedApp() {
  * @param [in] {int} mask The mask representing the application
  * @returns {QString} The application name
  */
-QString Client::getAppName(int mask) {
-  for (const auto& command : m_commands) {
-    if (command.mask.toInt() == mask) {
-      return command.name;
-    }
-  }
+QString Client::getAppName(int mask)
+{
+  for (const auto& command : m_commands)
+    if (command.mask.toInt() == mask)
+      return command.name;      
   return "";
 }
 
@@ -641,7 +642,7 @@ void Client::scheduleTask(Scheduler::Task* task)
       sendFiles(m_outbound_task);
     else
     {
-      qDebug() << "Requesting a task to be scheduled";
+      KLOG("Requesting a task to be scheduled");
       sendTaskEncoded(m_outbound_task);
     }
   }
@@ -654,17 +655,20 @@ void Client::scheduleTask(Scheduler::Task* task)
  *
  * @param [in] {Task*}    A pointer to the task with files to be sent
  */
-void Client::sendFiles(Scheduler::Task* task) {
-  if (outgoing_files.isEmpty()) {
+void Client::sendFiles(Scheduler::Task* task)
+{
+  if (outgoing_files.isEmpty())
+  {
     file_was_sent = false;
-    for (const auto& file : task->getFiles()) {
-      outgoing_files.enqueue(std::move(file));
-    }
+    for (const auto& file : task->getFiles())
+      outgoing_files.enqueue(std::move(file));    
     std::string send_file_operation = CreateOperation("FileUpload", {});
     sendEncoded(send_file_operation);
-  } else {
+  }
+  else
+  {
     m_task_queue.enqueue(task);
-    qDebug() << "Still attempting to send a different file";
+    KLOG("Still attempting to send a different file");
   }
 }
 
@@ -674,14 +678,14 @@ void Client::sendFiles(Scheduler::Task* task) {
  * @param [in] {KApplication}  application
  * @param [in] {uint8_t}       request_code
  */
-void Client::appRequest(KApplication application, uint8_t request_code) {
+void Client::appRequest(KApplication application, uint8_t request_code)
+{
   std::vector<std::string> operation_args{
       std::to_string(request_code),
       application.name.toUtf8().constData(),
       application.path.toUtf8().constData(),
       application.data.toUtf8().constData(),
-      application.mask.toUtf8().constData()
-  };
+      application.mask.toUtf8().constData()};
   std::string operation_string = CreateOperation("AppRequest", operation_args);
 
   sendEncoded(operation_string);
@@ -694,29 +698,29 @@ void Client::appRequest(KApplication application, uint8_t request_code) {
  * @param [in] {T}             payload
  */
 template <typename T>
-void Client::request(uint8_t request_code, T payload) {
+void Client::request(uint8_t request_code, T payload)
+{
   using namespace constants;
-  try {
+  try
+  {
     std::string operation_string{};
 
     switch (request_code)
     {
       case (RequestType::REGISTER):
       case (RequestType::DELETE):
-        if constexpr (std::is_same_v<T, KApplication>) {
+        if constexpr (std::is_same_v<T, KApplication>)
+        {
           std::vector<std::string> operation_args{
               std::to_string(request_code),
               payload.name.toUtf8().constData(),
               payload.path.toUtf8().constData(),
               payload.data.toUtf8().constData(),
-              payload.mask.toUtf8().constData()
-          };
+              payload.mask.toUtf8().constData()};
           operation_string = CreateOperation("AppRequest", operation_args);
         }
         else
-          throw std::invalid_argument{
-            "Register payload must be KApplication object"
-          };
+          throw std::invalid_argument{"Register payload must be KApplication object"};
       break;
       case (RequestType::FETCH_SCHEDULE):
         operation_string = CreateOperation("Schedule", {std::to_string(RequestType::FETCH_SCHEDULE)});
@@ -735,8 +739,7 @@ void Client::request(uint8_t request_code, T payload) {
                payload.recurring.toUtf8().constData(),
                payload.notify.toUtf8().constData(),
                payload.runtime.toUtf8().constData(),
-               (payload.files.isEmpty()) ?
-                                           "" :
+               (payload.files.isEmpty()) ? "" :
                                            payload.files.front().toUtf8().constData(),
                payload.envfile.toUtf8().constData()});
       break;
@@ -771,7 +774,7 @@ void Client::request(uint8_t request_code, T payload) {
   }
   catch (const std::exception& e)
   {
-    qDebug() << "Exception caught:\n" << e.what();
+    KLOG("Exception caught:\n", e.what());
   }
 }
 
@@ -796,15 +799,15 @@ void Client::request(uint8_t request_code)
 
 /**
  */
-void Client::sendIPCMessage(const QString& type, const QString& message, const QString& user) {
+void Client::sendIPCMessage(const QString& type, const QString& message, const QString& user)
+{
   sendEncoded(CreateOperation(
-      "ipc",
-      {
-        type.toUtf8().constData(),
-        message.toUtf8().constData(),
-        user.toUtf8().constData()
-      }
-  ));
+    "ipc",
+    {
+      type.toUtf8().constData(),
+      message.toUtf8().constData(),
+      user.toUtf8().constData()
+    }));
 }
 
 /**
@@ -813,11 +816,8 @@ void Client::sendIPCMessage(const QString& type, const QString& message, const Q
  */
 void Client::setIncomingFile(const StringVec& files)
 {
-  if (m_download_console.is_downloading())
-  {
-    qDebug() << "Client already has incoming pending. Ignoring request.";
-    return;
-  }
+  if (m_download_console.is_downloading())  
+    return KLOG("Client already has incoming pending. Ignoring request.");
 
   m_download_console.files.clear();
   m_download_console.wt_count = files.front().toUInt();

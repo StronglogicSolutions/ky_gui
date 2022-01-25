@@ -128,7 +128,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   ui->serverPort->setText(argv[2]);
 
   m_config = loadJsonConfig(ui->kyConfig->toPlainText());
-  if (!m_config.contains("username") || !m_config.contains("password"))
+  if (!m_config.contains("username") || !m_config.contains("password") || !m_config.contains("auth"))
   {
     KLOG("Unable to connect to KIQ without credentials. Please modify config JSON");
     return;
@@ -136,9 +136,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
 
   const QString username  = configValue("username", m_config);
   const QString password  = configValue("password", m_config);
+  const QString address   = configValue("auth",     m_config);
   const QString file_path = configValue("fileDirectory", m_config);
 
-  q_client->SetCredentials(username, password);
+  q_client->SetCredentials(username, password, address);
   arg_ui->setFilePath(file_path);
 }
 

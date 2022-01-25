@@ -199,7 +199,7 @@ class Client : public QDialog {
   void           setIncomingFile(const StringVec& files);
   void           setMetadata(const QVector<QString>& data);
   void           SetFetching(bool fetching = true) { m_fetching = fetching; }
-  void           SetCredentials(const QString& username, const QString& password);
+  void           SetCredentials(const QString& username, const QString& password, const QString& auth_address);
 
  signals:
   void           messageReceived(int t, QString s, QVector<QString> args);
@@ -239,6 +239,7 @@ class Client : public QDialog {
   QString                       m_user;
   QString                       m_password;
   QString                       m_token;
+  QString                       m_auth_address;
   QNetworkAccessManager         m_network_manager;
 };
 #endif // CLIENT_HPP
