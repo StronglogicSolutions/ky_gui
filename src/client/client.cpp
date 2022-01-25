@@ -228,7 +228,7 @@ void Client::GetToken()
       throw std::invalid_argument{"Failed to retrieve token"};
   });
 
-  m_network_manager.get(QNetworkRequest(QUrl("http://localhost:8080?name=" + m_user + "&password=" + m_password)));
+  m_network_manager.get(QNetworkRequest(QUrl("https://auth.kiq.monster?name=" + m_user + "&password=" + m_password)));
 }
 
 /**
@@ -389,18 +389,13 @@ void Client::start(QString ip, QString port)
  * @brief Client::sendMessage
  * @param [in] {const QString&} The message to send
  */
-void Client::sendMessage(const QString& s) {
-  if (s == "test")
-  {
-    request(static_cast<uint8_t>(constants::RequestType::FETCH_FILE), QVector<QString>{"104", "105", "106"});
-    return;
-  }
+void Client::sendMessage(const QString& s)
+{
+  if (m_client_socket_fd != -1)
+    sendEncoded(createMessage(s.toUtf8(), "", m_user.toUtf8().constData(), m_token.toUtf8().constData()));
+  else
+    KLOG("You must first open a connection");
 
-  if (m_client_socket_fd != -1) {
-    sendEncoded(createMessage(s.toUtf8(), ""));
-  } else {
-    qDebug() << "You must first open a connection";
-  }
 }
 
 /**
