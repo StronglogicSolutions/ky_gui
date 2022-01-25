@@ -2,6 +2,7 @@
 
 #include <include/client/client.hpp>
 
+
 using namespace KData;
 using namespace IGData;
 using namespace GenericData;
@@ -17,20 +18,21 @@ flatbuffers::FlatBufferBuilder builder(1024);
  * @return std::string A string with the following format denoting each file:
  * `1580057341filename|image::`
  */
-std::string getTaskFileInfo(std::vector<SentFile> files) {
+std::string getTaskFileInfo(std::vector<SentFile> files)
+{
   std::string info{};
-  for (const auto& f : files) {
+  for (const auto& f : files)
+  {
     info += std::to_string(f.timestamp);
     info += f.name.toUtf8().constData();
-    info += "|";
-    if (f.type == Scheduler::FileType::VIDEO) {
+    info += "|";    
+    if (f.type == Scheduler::FileType::VIDEO)
       info += "video";
-    } else {
-      info += "image";
-    }
+    else
+      info += "image";    
     info += ":";
   }
-  qDebug() << "File Info: " << info.c_str();
+  KLOG("File Info: ", info.c_str());
   return info;
 }
 
@@ -113,7 +115,7 @@ Client::MessageHandler Client::createMessageHandler(std::function<void()> cb) {
  * @param [in] {int} count
  * @param [in] {char**} arguments
  */
-Client::Client(QWidget *parent, int count, char** arguments)
+Client::Client(QWidget* parent, int count, char** arguments)
 : QDialog(parent),
   argc(count),
   argv(arguments),
@@ -130,7 +132,7 @@ Client::Client(QWidget *parent, int count, char** arguments)
       if (--m_download_console.wt_count)
       {
         m_download_console.Wait();
-        sendEncoded(createOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
+        sendEncoded(CreateOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
       }
       else
       {
@@ -183,7 +185,7 @@ Client::Client(QWidget *parent, int count, char** arguments)
                 file_was_sent = false;
               }
               else
-                sendEncoded(createOperation("FileUpload", {"Subsequent file"}));
+                sendEncoded(CreateOperation("FileUpload", {"Subsequent file"}));
             }
           }
         }
@@ -199,6 +201,35 @@ Client::Client(QWidget *parent, int count, char** arguments)
 {
   qRegisterMetaType<QVector<QString>>("QVector<QString>");
   qRegisterMetaType<QVector<FileWrap>>("QVector<FileWrap>");
+}
+
+void Client::SetCredentials(const QString& username, const QString& password, const QString& auth_address)
+{
+  m_user         = username;
+  m_password     = password;
+  m_auth_address = auth_address;
+  GetToken();
+}
+
+void Client::GetToken()
+{
+  QObject::connect(&m_network_manager, &QNetworkAccessManager::finished, this, [=](QNetworkReply* reply)
+  {
+    if (reply->error())
+      return KLOG(reply->errorString());
+
+    QString response = reply->readAll();
+    QJsonObject json = loadJsonConfig(response);
+    if (!json.empty() && json.contains("token"))
+    {
+      QString token = configValue("token", json);
+      m_token = token.toUtf8().constData();
+    }
+    else
+      throw std::invalid_argument{"Failed to retrieve token"};
+  });
+
+  m_network_manager.get(QNetworkRequest(QUrl(m_auth_address + "?name=" + m_user + "&password=" + m_password)));
 }
 
 /**
@@ -250,8 +281,9 @@ void Client::handleEvent(std::string data)
       {
         sendTaskEncoded(m_outbound_task);
         file_was_sent = false;
-      } else
-        sendEncoded(createOperation("FileUpload", {"Subsequent file"}));
+      }
+      else
+        sendEncoded(CreateOperation("FileUpload", {"Subsequent file"}));
     }
   }
 }
@@ -296,7 +328,8 @@ static const bool IsIP(const QString& address)
 /**
  * @brief Client::start
  */
-void Client::start(QString ip, QString port) {
+void Client::start(QString ip, QString port)
+{    
   const QString port_address = port.isEmpty() ? m_server_port : port;
   const QString host_address = (ip.isEmpty()) ? m_server_ip: ip;
 
@@ -307,16 +340,19 @@ void Client::start(QString ip, QString port) {
   const char*   server_ip    = ip_address.toUtf8();
   const char*   server_port  = port_address.toUtf8();
 
-  if (server_ip && m_client_socket_fd == -1) {
+  if (server_ip && m_client_socket_fd == -1)
+  {
     m_client_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (m_client_socket_fd != -1) {
+    if (m_client_socket_fd != -1)
+    {
       sockaddr_in server_socket;
-      char* end;
+      char*       end;
+      auto        port_value = strtol(server_port, &end, 10);
+
       server_socket.sin_family = AF_INET;
-      auto port_value = strtol(server_port, &end, 10);
-      if (port_value < 0 || end == server_port) {
-          return;
-      }
+
+      if (port_value < 0 || end == server_port) return;
+
       int socket_option = 1;
       // Free up the port to begin listening again
       setsockopt(m_client_socket_fd, SOL_SOCKET, SO_REUSEADDR, &socket_option, sizeof(socket_option));
@@ -325,46 +361,42 @@ void Client::start(QString ip, QString port) {
       inet_pton(AF_INET, server_ip, &server_socket.sin_addr.s_addr);
 
       if (::connect(m_client_socket_fd, reinterpret_cast<sockaddr*>(&server_socket),
-                    sizeof(server_socket)) != -1) {
-          std::string start_operation_string = createOperation("start", {});
-          // Send operation as an encoded message
-          sendEncoded(start_operation_string);
-          // Delegate message handling to its own thread
-          std::function<void()> message_send_fn = [this]() {
-            this->handleMessages();
-          };
-          MessageHandler message_handler = createMessageHandler(message_send_fn);
-          // Handle received messages on separate thread
-          std::thread (message_handler).detach();
-
-      } else {
+                    sizeof(server_socket)) != -1)
+      {
+        std::string start_operation_string = CreateOperation("start", {});
+        // Send operation as an encoded message
+        sendEncoded(start_operation_string);
+        // Delegate message handling to its own thread
+        std::function<void()> message_send_fn = [this]() { this->handleMessages(); };
+        MessageHandler message_handler = createMessageHandler(message_send_fn);
+        // Handle received messages on separate thread
+        std::thread (message_handler).detach();
+      }
+      else
+      {
         qDebug() << errno;
         ::close(m_client_socket_fd);
       }
-    } else {
-      qDebug() << "Failed to create new connection";
     }
-  } else {
-    qDebug() << "Connection already in progress";
+    else
+      qDebug() << "Failed to create new connection";
+
   }
+  else
+    qDebug() << "Connection already in progress";  
 }
 
 /**
  * @brief Client::sendMessage
  * @param [in] {const QString&} The message to send
  */
-void Client::sendMessage(const QString& s) {
-  if (s == "test")
-  {
-    request(static_cast<uint8_t>(constants::RequestType::FETCH_FILE), QVector<QString>{"104", "105", "106"});
-    return;
-  }
+void Client::sendMessage(const QString& s)
+{
+  if (m_client_socket_fd != -1)
+    sendEncoded(createMessage(s.toUtf8(), "", m_user.toUtf8().constData(), m_token.toUtf8().constData()));
+  else
+    KLOG("You must first open a connection");
 
-  if (m_client_socket_fd != -1) {
-    sendEncoded(createMessage(s.toUtf8(), ""));
-  } else {
-    qDebug() << "You must first open a connection";
-  }
 }
 
 /**
@@ -486,10 +518,11 @@ void Client::sendPackets(uint8_t* data, uint32_t size)
 }
 
 
-void Client::ping() {
+void Client::ping()
+{
   if ((outgoing_files.isEmpty() || file_was_sent) && !(m_fetching))
   {
-    qDebug() << "Pinging server";
+    KLOG("Pinging server");
 
     uint8_t send_buffer[5];
     memset(send_buffer, 0, 5);
@@ -502,41 +535,39 @@ void Client::ping() {
  * @brief Client::sendFileEncoded
  * @param [in] {QByteArray} bytes An array of bytes to send
  */
-void Client::sendFileEncoded(QByteArray bytes) {
+void Client::sendFileEncoded(QByteArray bytes)
+{
   sendPackets(reinterpret_cast<uint8_t*>(bytes.data()), bytes.size());
 }
 
 /**
  * @brief Client::closeConnection
  */
-void Client::closeConnection() {
-  if (m_client_socket_fd != -1) {
-    std::string stop_operation_string = createOperation("stop", {});
-    // Send operation as an encoded message
+void Client::closeConnection()
+{
+  if (m_client_socket_fd != -1)
+  {
+    std::string stop_operation_string = CreateOperation("stop", {});   
     sendEncoded(stop_operation_string);
-    // Clean up socket file descriptor
     ::shutdown(m_client_socket_fd, SHUT_RDWR);
     ::close(m_client_socket_fd);
     m_client_socket_fd = -1;
     return;
   }
-  qDebug() << "There is no active connection to close";
+  KLOG("There is no active connection to close");
 }
 
 /**
  * @brief Client::setSelectedApp
  * @param [in] TYPE SHOULD CHANGE app_names
  */
-void Client::setSelectedApp(std::vector<QString> app_names) {
+void Client::setSelectedApp(std::vector<QString> app_names)
+{
   selected_commands.clear();
-  for (const auto& name : app_names) {
-    qDebug() << "Matching mask to " << name;
-    for (const auto& command : m_commands) {
-      if (command.name == name) {
-        selected_commands.push_back(command.mask.toInt());
-      }
-    }
-  }
+  for (const auto& name : app_names)
+    for (const auto& command : m_commands)
+      if (command.name == name)
+        selected_commands.push_back(command.mask.toInt());           
 }
 
 
@@ -544,10 +575,12 @@ void Client::setSelectedApp(std::vector<QString> app_names) {
  * @brief Client::getSelectedApp
  * @returns {int} The mask representing the selected application
  */
-int Client::getSelectedApp() {
-  if (selected_commands.size() == 1) {
+int Client::getSelectedApp()
+{
+  if (selected_commands.size() == 1)
     return selected_commands.at(0);
-  } else {
+  else
+  {
     QMessageBox m_box{};
     m_box.setText("App Selection Error. Unable to retrieve app selection");
     m_box.exec();
@@ -560,12 +593,11 @@ int Client::getSelectedApp() {
  * @param [in] {int} mask The mask representing the application
  * @returns {QString} The application name
  */
-QString Client::getAppName(int mask) {
-  for (const auto& command : m_commands) {
-    if (command.mask.toInt() == mask) {
-      return command.name;
-    }
-  }
+QString Client::getAppName(int mask)
+{
+  for (const auto& command : m_commands)
+    if (command.mask.toInt() == mask)
+      return command.name;      
   return "";
 }
 
@@ -587,7 +619,7 @@ void Client::execute()
       const auto message           = app_name + " pending";
       const auto request_id        = MakeUUID();
       const auto payload           = Payload{request, std::to_string(command),  std::string(request_id.toUtf8().constData())};
-      const auto execute_operation = createOperation("Execute", payload);
+      const auto execute_operation = CreateOperation("Execute", payload);
 
       emit Client::messageReceived(PROCESS_REQUEST_TYPE, message, {QString{command}, app_name, request_id});
       sendEncoded(execute_operation);
@@ -610,7 +642,7 @@ void Client::scheduleTask(Scheduler::Task* task)
       sendFiles(m_outbound_task);
     else
     {
-      qDebug() << "Requesting a task to be scheduled";
+      KLOG("Requesting a task to be scheduled");
       sendTaskEncoded(m_outbound_task);
     }
   }
@@ -623,17 +655,20 @@ void Client::scheduleTask(Scheduler::Task* task)
  *
  * @param [in] {Task*}    A pointer to the task with files to be sent
  */
-void Client::sendFiles(Scheduler::Task* task) {
-  if (outgoing_files.isEmpty()) {
+void Client::sendFiles(Scheduler::Task* task)
+{
+  if (outgoing_files.isEmpty())
+  {
     file_was_sent = false;
-    for (const auto& file : task->getFiles()) {
-      outgoing_files.enqueue(std::move(file));
-    }
-    std::string send_file_operation = createOperation("FileUpload", {});
+    for (const auto& file : task->getFiles())
+      outgoing_files.enqueue(std::move(file));    
+    std::string send_file_operation = CreateOperation("FileUpload", {});
     sendEncoded(send_file_operation);
-  } else {
+  }
+  else
+  {
     m_task_queue.enqueue(task);
-    qDebug() << "Still attempting to send a different file";
+    KLOG("Still attempting to send a different file");
   }
 }
 
@@ -643,15 +678,15 @@ void Client::sendFiles(Scheduler::Task* task) {
  * @param [in] {KApplication}  application
  * @param [in] {uint8_t}       request_code
  */
-void Client::appRequest(KApplication application, uint8_t request_code) {
+void Client::appRequest(KApplication application, uint8_t request_code)
+{
   std::vector<std::string> operation_args{
       std::to_string(request_code),
       application.name.toUtf8().constData(),
       application.path.toUtf8().constData(),
       application.data.toUtf8().constData(),
-      application.mask.toUtf8().constData()
-  };
-  std::string operation_string = createOperation("AppRequest", operation_args);
+      application.mask.toUtf8().constData()};
+  std::string operation_string = CreateOperation("AppRequest", operation_args);
 
   sendEncoded(operation_string);
 }
@@ -663,37 +698,37 @@ void Client::appRequest(KApplication application, uint8_t request_code) {
  * @param [in] {T}             payload
  */
 template <typename T>
-void Client::request(uint8_t request_code, T payload) {
+void Client::request(uint8_t request_code, T payload)
+{
   using namespace constants;
-  try {
+  try
+  {
     std::string operation_string{};
 
     switch (request_code)
     {
       case (RequestType::REGISTER):
       case (RequestType::DELETE):
-        if constexpr (std::is_same_v<T, KApplication>) {
+        if constexpr (std::is_same_v<T, KApplication>)
+        {
           std::vector<std::string> operation_args{
               std::to_string(request_code),
               payload.name.toUtf8().constData(),
               payload.path.toUtf8().constData(),
               payload.data.toUtf8().constData(),
-              payload.mask.toUtf8().constData()
-          };
-          operation_string = createOperation("AppRequest", operation_args);
+              payload.mask.toUtf8().constData()};
+          operation_string = CreateOperation("AppRequest", operation_args);
         }
         else
-          throw std::invalid_argument{
-            "Register payload must be KApplication object"
-          };
+          throw std::invalid_argument{"Register payload must be KApplication object"};
       break;
       case (RequestType::FETCH_SCHEDULE):
-        operation_string = createOperation("Schedule", {std::to_string(RequestType::FETCH_SCHEDULE)});
+        operation_string = CreateOperation("Schedule", {std::to_string(RequestType::FETCH_SCHEDULE)});
       break;
       case (RequestType::UPDATE_SCHEDULE):
       case (RequestType::FETCH_SCHEDULE_TOKENS):
         if constexpr (std::is_same_v<T, ScheduledTask>)
-          operation_string = createOperation(
+          operation_string = CreateOperation(
             "Schedule", std::vector<std::string>{
                std::to_string(request_code),
                payload.id.toUtf8().constData(),
@@ -704,21 +739,20 @@ void Client::request(uint8_t request_code, T payload) {
                payload.recurring.toUtf8().constData(),
                payload.notify.toUtf8().constData(),
                payload.runtime.toUtf8().constData(),
-               (payload.files.isEmpty()) ?
-                                           "" :
+               (payload.files.isEmpty()) ? "" :
                                            payload.files.front().toUtf8().constData(),
                payload.envfile.toUtf8().constData()});
       break;
       case (RequestType::FETCH_TASK_FLAGS):
-        operation_string = createOperation("TaskOperation",
+        operation_string = CreateOperation("TaskOperation",
           std::vector<std::string>{std::to_string(request_code), std::to_string(getSelectedApp())});
       break;
     case (RequestType::FETCH_FILE):
       if constexpr (std::is_same_v<T, QVector<QString>>)
-        operation_string = createOperation("FetchFileOperation", ArgsToV(payload, request_code));
+        operation_string = CreateOperation("FetchFileOperation", ArgsToV(payload, request_code));
     break;
     case (RequestType::FETCH_TERM_HITS):
-        operation_string = createOperation("FetchTermHits", {std::to_string(request_code)});
+        operation_string = CreateOperation("FetchTermHits", {std::to_string(request_code)});
     break;
       case (RequestType::FETCH_TASK_DATA):
         if constexpr (std::is_same_v<T, QVector<QString>>)
@@ -728,7 +762,7 @@ void Client::request(uint8_t request_code, T payload) {
           op_payload.emplace_back(std::to_string(request_code));
           op_payload.emplace_back(std::to_string(getSelectedApp()));
           for (const QString& chunk : payload) op_payload.emplace_back(chunk.toStdString());
-          operation_string = createOperation("FetchTaskData", op_payload);
+          operation_string = CreateOperation("FetchTaskData", op_payload);
         }
       break;
     default:
@@ -740,7 +774,7 @@ void Client::request(uint8_t request_code, T payload) {
   }
   catch (const std::exception& e)
   {
-    qDebug() << "Exception caught:\n" << e.what();
+    KLOG("Exception caught:\n", e.what());
   }
 }
 
@@ -765,15 +799,15 @@ void Client::request(uint8_t request_code)
 
 /**
  */
-void Client::sendIPCMessage(const QString& type, const QString& message, const QString& user) {
-  sendEncoded(createOperation(
-      "ipc",
-      {
-        type.toUtf8().constData(),
-        message.toUtf8().constData(),
-        user.toUtf8().constData()
-      }
-  ));
+void Client::sendIPCMessage(const QString& type, const QString& message, const QString& user)
+{
+  sendEncoded(CreateOperation(
+    "ipc",
+    {
+      type.toUtf8().constData(),
+      message.toUtf8().constData(),
+      user.toUtf8().constData()
+    }));
 }
 
 /**
@@ -782,11 +816,8 @@ void Client::sendIPCMessage(const QString& type, const QString& message, const Q
  */
 void Client::setIncomingFile(const StringVec& files)
 {
-  if (m_download_console.is_downloading())
-  {
-    qDebug() << "Client already has incoming pending. Ignoring request.";
-    return;
-  }
+  if (m_download_console.is_downloading())  
+    return KLOG("Client already has incoming pending. Ignoring request.");
 
   m_download_console.files.clear();
   m_download_console.wt_count = files.front().toUInt();
@@ -798,13 +829,13 @@ void Client::setIncomingFile(const StringVec& files)
                                                 .type    = files[4 + (4 * i)],
                                                 .buffer  = nullptr});
   m_download_console.Wait();
-  sendEncoded(createOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
+  sendEncoded(CreateOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
 }
 
 void Client::setMetadata(const StringVec& data)
 {
   if (m_download_console.SetMetadata(data))
-    sendEncoded(createOperation("FILE_READY", {std::to_string(constants::RequestType::FETCH_FILE_READY)}));
+    sendEncoded(CreateOperation("FILE_READY", {std::to_string(constants::RequestType::FETCH_FILE_READY)}));
 }
 
 void Client::handleDownload(uint8_t* data, ssize_t size)
@@ -823,4 +854,9 @@ void Client::setCommands(Commands commands)
   m_commands = commands;
   for (const auto& command : commands)
     m_command_map.insert(Pair{command.mask.toInt(), command.name.toStdString()});
+}
+
+std::string Client::CreateOperation(const char* op, std::vector<std::string> args)
+{
+  return createOperation(op, args, m_user.toUtf8().constData(), m_token.toUtf8().constData());
 }

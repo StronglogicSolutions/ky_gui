@@ -23,6 +23,9 @@
 #include <QPushButton>
 #include <QThread>
 #include <QUuid>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 
 #include <headers/kmessage_codec.hpp>
 #include <headers/instatask_generated.h>
@@ -161,6 +164,7 @@ class Client : public QDialog {
   Client(QWidget* parent = nullptr);
   Client(QWidget* parent, int count, char** arguments);
   ~Client();
+
   void           start(QString ip = "", QString port = "");
   void           closeConnection();
   void           execute();
@@ -195,6 +199,7 @@ class Client : public QDialog {
   void           setIncomingFile(const StringVec& files);
   void           setMetadata(const QVector<QString>& data);
   void           SetFetching(bool fetching = true) { m_fetching = fetching; }
+  void           SetCredentials(const QString& username, const QString& password, const QString& auth_address);
 
  signals:
   void           messageReceived(int t, QString s, QVector<QString> args);
@@ -210,7 +215,9 @@ class Client : public QDialog {
   void           handleMessages();
   void           handleEvent(std::string data);
   void           handleDownload(uint8_t* data, ssize_t size);
-  void           sendPackets(uint8_t* data, uint32_t size);
+  void           sendPackets(uint8_t* data, uint32_t size);  
+  void           GetToken();
+  std::string    CreateOperation(const char* op, std::vector<std::string> args);
 
   int                           argc;
   char**                        argv;
@@ -229,5 +236,10 @@ class Client : public QDialog {
   QString                       m_server_port;
   Kiqoder::FileHandler          m_message_decoder;
   bool                          m_fetching;
+  QString                       m_user;
+  QString                       m_password;
+  QString                       m_token;
+  QString                       m_auth_address;
+  QNetworkAccessManager         m_network_manager;
 };
 #endif // CLIENT_HPP

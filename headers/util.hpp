@@ -238,7 +238,8 @@ std::string getJsonString(std::string s) {
     return buffer.GetString();
 }
 
-std::string createMessage(const char* data, std::string args = "") {
+std::string createMessage(const char* data, std::string args = "", const char* user = nullptr, const char* token = nullptr)
+{
     StringBuffer s;
     Writer<StringBuffer> w(s);
     w.StartObject();
@@ -246,6 +247,10 @@ std::string createMessage(const char* data, std::string args = "") {
     w.String("custom");
     w.Key("message");
     w.String(data);
+    w.Key("user");
+    w.String(user);
+    w.Key("token");
+    w.String(token);
     w.Key("args");
     w.String(args.c_str());
     w.EndObject();
@@ -343,51 +348,51 @@ std::vector<std::string> ArgsToV(QVector<T> args, P arg)
 
 template std::vector<std::string> ArgsToV(QVector<QString>, uint8_t);
 
-std::string createOperation(const char* op, std::vector<std::string> args) {
-    StringBuffer s;
-    Writer<StringBuffer, Document::EncodingType, ASCII<>> w(s);
-    w.StartObject();
-    w.Key("type");
-    w.String("operation");
-    w.Key("command");
-    w.String(op);
-    w.Key("args");
-    w.StartArray();
-    if (!args.empty()) {
-        for (const auto& arg : args) {
-            w.String(arg.c_str());
-        }
-    }
-    w.EndArray();
-    w.EndObject();
-    return s.GetString();
+std::string createOperation(const char* op, std::vector<std::string> args, const char* name = nullptr, const char* token = nullptr)
+{
+  StringBuffer s;
+  Writer<StringBuffer, Document::EncodingType, ASCII<>> w(s);
+  w.StartObject();
+  w.Key("type");
+  w.String("operation");
+  w.Key("command");
+  w.String(op);
+  w.Key("user");
+  w.String(name);
+  w.Key("token");
+  w.String(token);
+  w.Key("args");
+  w.StartArray();  
+  for (const auto& arg : args)
+    w.String(arg.c_str());
+  w.EndArray();
+  w.EndObject();
+  return s.GetString();
 }
 
 std::string getOperation(const char* data) {
-    Document d;
-    d.Parse(data);
-    if (d.HasMember("command")) {
-        return d["command"].GetString();
-    }
-    return "";
+  Document d;
+  d.Parse(data);
+  if (d.HasMember("command"))
+    return d["command"].GetString();
+  return "";
 }
 
 QString getOperation(const QString& data) {
-    Document d;
-    d.Parse(data.toUtf8());
-    if (d.HasMember("command")) {
-        return d["command"].GetString();
-    }
-    return "";
+  Document d;
+  d.Parse(data.toUtf8());
+  if (d.HasMember("command"))
+      return d["command"].GetString();
+  return "";
 }
 
-QString getEvent(const char* data) {
-    Document d;
-    d.Parse(data);
-    if (d.HasMember("event")) {
-        return d["event"].GetString();
-    }
-    return "";
+QString getEvent(const char* data)
+{
+  Document d;
+  d.Parse(data);
+  if (d.HasMember("event"))
+      return d["event"].GetString();
+  return "";
 }
 
 QString getEvent(const QString& data) {
@@ -415,29 +420,6 @@ QString getMessage(const QString& data) {
       return d["message"].GetString();
   }
   return "";
-}
-
-QVector<QString> getShortArgs(const char* data) {
-  Document d;
-  d.Parse(data);
-  QVector<QString> args{};
-  if (d.HasMember("args")) {
-    if (d["args"].IsArray()) {
-      for (const auto& m : d["args"].GetArray()) {
-        if (m.GetStringLength() < 100) {
-            args.push_back(m.GetString());
-        }
-      }
-    } else {
-      for (const auto& m : d["args"].GetObject()) {
-        QString arg = m.name.GetString();
-        arg +=  ": ";
-        arg += m.value.GetString();
-        args.push_back(arg);
-      }
-    }
-  }
-  return args;
 }
 
 QVector<QString> getArgs(const char* data) {
@@ -482,77 +464,6 @@ CommandMap getArgMap(const char* data) {
     }
   }
   return cm;
-}
-
-std::string createMessage(const char*                data,
-                          std::map<int, std::string> map = {}) {
-    StringBuffer s;
-    Writer<StringBuffer> w(s);
-    w.StartObject();
-    w.Key("type");
-    w.String("custom");
-    w.Key("message");
-    w.String(data);
-    w.Key("args");
-    w.StartObject();
-    if (!map.empty()) {
-        for (const auto& [k, v] : map) {
-            w.Key(std::to_string(k).c_str());
-            w.String(v.c_str());
-        }
-    }
-    w.EndObject();
-    w.EndObject();
-    return s.GetString();
-}
-
-std::string createMessage(const char* data, std::map<int, std::vector<std::string>> map = {}) {
-    StringBuffer s;
-    Writer<StringBuffer> w(s);
-    w.StartObject();
-    w.Key("type");
-    w.String("custom");
-    w.Key("message");
-    w.String(data);
-    w.Key("args");
-    w.StartObject();
-    if (!map.empty()) {
-        for (const auto& [k, v] : map) {
-            w.Key(std::to_string(k).c_str());
-            if (!v.empty()) {
-                w.StartArray();
-                for (const auto& arg : v) {
-                    w.String(arg.c_str());
-                }
-                w.EndArray();
-            }
-        }
-    }
-    w.EndObject();
-    w.EndObject();
-    return s.GetString();
-}
-
-std::string rapidCreateMessage(const char* data,
-                               std::map<int, std::string> map = {}) {
-    StringBuffer s;
-    Writer<StringBuffer> w(s);
-    w.StartObject();
-    w.Key("type");
-    w.String("custom");
-    w.Key("message");
-    w.String(data);
-    w.Key("args");
-    w.StartObject();
-    if (!map.empty()) {
-        for (const auto& [k, v] : map) {
-            w.Key(std::to_string(k).c_str());
-            w.String(v.c_str());
-        }
-    }
-    w.EndObject();
-    w.EndObject();
-    return s.GetString();
 }
 
 bool isStartOperation(const char* data) {
