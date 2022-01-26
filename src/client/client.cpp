@@ -122,7 +122,6 @@ Client::Client(QWidget* parent, int count, char** arguments)
   m_client_socket_fd(-1),
   m_outbound_task(nullptr),
   executing(false),
-  m_commands({}),
   m_download_console(Kiqoder::FileHandler{
     [this](int32_t id, uint8_t* buffer, size_t size) -> void
     {
@@ -146,9 +145,9 @@ Client::Client(QWidget* parent, int count, char** arguments)
   m_message_decoder(Kiqoder::FileHandler{
     [this](int32_t id, uint8_t* buffer, size_t size) -> void
     {
-      if (nullptr == buffer) return;
+      if (!buffer) return;
 
-      std::string data_string{buffer, buffer + size};
+      std::string message{buffer, buffer + size};
       try
       {
         if (isPong(buffer, size))
@@ -157,22 +156,19 @@ Client::Client(QWidget* parent, int count, char** arguments)
           return KLOG("Pong");
         }
         else
-        if (!isValidJson(data_string))        
-          return KLOG("Invalid JSON: ", data_string);
+        if (!isValidJson(message))
+          return KLOG("Invalid JSON: ", message);
         else
-        if (isNewSession(data_string.c_str()))
-        {
-          StringVec s_v = getArgs(data_string.c_str());
-          emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", s_v); // Update UI
-        }
+        if (isNewSession(message.c_str()))
+          emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", getArgs(message.c_str()));
         else
-        if (serverWaitingForFile(data_string.c_str()))
+        if (serverWaitingForFile(message.c_str()))
           processFileQueue();
         else
-        if (isEvent(data_string.c_str()))
+        if (isEvent(message.c_str()))
         {
-          const QString          event = getEvent(data_string.c_str());
-          const QVector<QString> args  = getArgs(data_string.c_str());
+          const QString          event = getEvent(message.c_str());
+          const QVector<QString> args  = getArgs(message.c_str());
           emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args);
           if (isUploadCompleteEvent(event.toUtf8().constData()))
           {
@@ -189,7 +185,7 @@ Client::Client(QWidget* parent, int count, char** arguments)
             }
           }
         }
-        std::string formatted_json = getJsonString(data_string);
+        std::string formatted_json = getJsonString(message);
         emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(formatted_json.data(), formatted_json.size()), {});
       }
       catch (const std::exception& e)
@@ -218,8 +214,7 @@ void Client::GetToken()
     if (reply->error())
       return KLOG(reply->errorString());
 
-    QString response = reply->readAll();
-    QJsonObject json = loadJsonConfig(response);
+    QJsonObject json = loadJsonConfig(reply->readAll());
     if (!json.empty() && json.contains("token"))
     {
       QString token = configValue("token", json);
@@ -243,7 +238,8 @@ Client::~Client() {
  /**
  * @brief Client::handleMessages
  */
-void Client::handleMessages() {
+void Client::handleMessages()
+{
   uint8_t receive_buffer[MAX_PACKET_SIZE];
   for (;;) {
     memset(receive_buffer, 0, MAX_PACKET_SIZE);
@@ -291,13 +287,13 @@ void Client::handleEvent(std::string data)
 /**
  * @brief Client::processFileQueue
  */
-void Client::processFileQueue() {
+void Client::processFileQueue()
+{
   Scheduler::KFileData outgoing_file = outgoing_files.dequeue();
   sendFileEncoded(outgoing_file.bytes);
   sent_files.push_back(SentFile{
     .name = outgoing_file.name,
-    .type = outgoing_file.type
-  });
+    .type = outgoing_file.type});
 }
 
 static const char* DNStoIP(const QString& dns)
@@ -333,8 +329,7 @@ void Client::start(QString ip, QString port)
   const QString port_address = port.isEmpty() ? m_server_port : port;
   const QString host_address = (ip.isEmpty()) ? m_server_ip: ip;
 
-  if (host_address.isEmpty())
-    return;
+  if (host_address.isEmpty()) return;
 
   const QString ip_address   = IsIP(host_address) ? host_address : DNStoIP(host_address);
   const char*   server_ip    = ip_address.toUtf8();
@@ -403,7 +398,8 @@ void Client::sendMessage(const QString& s)
  * @brief Client::sendEncoded
  * @param [in] {std::string message} The message to send
  */
-void Client::sendEncoded(std::string message) {
+void Client::sendEncoded(std::string message)
+{
   qDebug() << "Sending: " << message.c_str();
   auto k_message = CreateMessage(builder, 69, builder.CreateVector(std::vector<uint8_t>{message.begin(), message.end()}));
 
@@ -428,12 +424,16 @@ void Client::sendEncoded(std::string message) {
  * @brief Client::sendTaskEncoded
  * @param [in] {Scheduler::Task*} task The task arguments
  */
-void Client::sendTaskEncoded(Scheduler::Task* task) {
-  if (task->getType() == Scheduler::TaskType::INSTAGRAM) {
+void Client::sendTaskEncoded(Scheduler::Task* task)
+{
+  if (task->getType() == Scheduler::TaskType::INSTAGRAM)
+  {
     flatbuffers::Offset<IGTask> ig_task =
     createIGTask(task, getSelectedApp(), sent_files);
     builder.Finish(ig_task);
-  } else {
+  }
+  else
+  {
     flatbuffers::Offset<GenericTask> generic_task =
     createGenericTask(task, getSelectedApp(), sent_files);
     builder.Finish(generic_task);
@@ -453,18 +453,19 @@ void Client::sendTaskEncoded(Scheduler::Task* task) {
 
   std::memcpy(send_buffer + 5, encoded_message_buffer, size);
   qDebug() << "Ready to send task";
-  // Send start operation
+
   ::send(m_client_socket_fd, send_buffer, size + 5, 0);
-  // Cleanup and process queue
+
   builder.Clear();
   sent_files.clear();
   m_outbound_task = nullptr;
-  if (!m_task_queue.isEmpty()) {
+  if (!m_task_queue.isEmpty())
+  {
     m_outbound_task = m_task_queue.dequeue();
-    // TODO work from here
-    if (m_outbound_task->hasFiles() && !outgoing_files.empty()) {
-      qDebug() << "There are still outgoing files left over from last "
-                  "task which were never sent. They are being deleted";
+
+    if (m_outbound_task->hasFiles() && !outgoing_files.empty())
+    {
+      KLOG("Deleting unsent files from last task");
       outgoing_files.clear();
     }
     sendFiles(m_outbound_task);
@@ -709,16 +710,13 @@ void Client::request(uint8_t request_code, T payload)
     {
       case (RequestType::REGISTER):
       case (RequestType::DELETE):
-        if constexpr (std::is_same_v<T, KApplication>)
-        {
-          std::vector<std::string> operation_args{
-              std::to_string(request_code),
-              payload.name.toUtf8().constData(),
-              payload.path.toUtf8().constData(),
-              payload.data.toUtf8().constData(),
-              payload.mask.toUtf8().constData()};
-          operation_string = CreateOperation("AppRequest", operation_args);
-        }
+        if constexpr (std::is_same_v<T, KApplication>)        
+          operation_string = CreateOperation("AppRequest", {
+            std::to_string(request_code),
+            payload.name.toUtf8().constData(),
+            payload.path.toUtf8().constData(),
+            payload.data.toUtf8().constData(),
+            payload.mask.toUtf8().constData()});
         else
           throw std::invalid_argument{"Register payload must be KApplication object"};
       break;
@@ -769,7 +767,6 @@ void Client::request(uint8_t request_code, T payload)
       qDebug() << "Client is unable to process request";
       return;
     }
-
     sendEncoded(operation_string);
   }
   catch (const std::exception& e)
@@ -801,13 +798,10 @@ void Client::request(uint8_t request_code)
  */
 void Client::sendIPCMessage(const QString& type, const QString& message, const QString& user)
 {
-  sendEncoded(CreateOperation(
-    "ipc",
-    {
-      type.toUtf8().constData(),
-      message.toUtf8().constData(),
-      user.toUtf8().constData()
-    }));
+  sendEncoded(CreateOperation("ipc", {
+    type.toUtf8().constData(),
+    message.toUtf8().constData(),
+    user.toUtf8().constData()}));
 }
 
 /**
@@ -854,6 +848,13 @@ void Client::setCommands(Commands commands)
   m_commands = commands;
   for (const auto& command : commands)
     m_command_map.insert(Pair{command.mask.toInt(), command.name.toStdString()});
+}
+
+bool Client::hasApp(KApplication application)
+{
+  for (const auto& app : m_commands)
+    if (app.name == application.name) return true;
+  return false;
 }
 
 std::string Client::CreateOperation(const char* op, std::vector<std::string> args)
