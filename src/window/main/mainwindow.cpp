@@ -127,20 +127,20 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   ui->serverIp->setText(argv[1]);
   ui->serverPort->setText(argv[2]);
 
-  m_config = loadJsonConfig(ui->kyConfig->toPlainText());
-  if (!m_config.contains("username") || !m_config.contains("password") || !m_config.contains("auth"))
+  QObject::connect(ui->fetchToken, &QPushButton::clicked, this, [this]()
   {
-    KLOG("Unable to connect to KIQ without credentials. Please modify config JSON");
-    return;
-  }
+    m_config = loadJsonConfig(ui->kyConfig->toPlainText());
+    if (!m_config.contains("username") || !m_config.contains("password") || !m_config.contains("auth"))
+      return KLOG("Unable to connect to KIQ without credentials. Please modify config JSON");
 
-  const QString username  = configValue("username", m_config);
-  const QString password  = configValue("password", m_config);
-  const QString address   = configValue("auth",     m_config);
-  const QString file_path = configValue("fileDirectory", m_config);
+    const QString username  = configValue("username", m_config);
+    const QString password  = configValue("password", m_config);
+    const QString address   = configValue("auth",     m_config);
+    const QString file_path = configValue("fileDirectory", m_config);
 
-  q_client->SetCredentials(username, password, address);
-  arg_ui->setFilePath(file_path);
+    q_client->SetCredentials(username, password, address);
+    arg_ui->setFilePath(file_path);
+  });
 }
 
 /**
@@ -177,10 +177,12 @@ void MainWindow::setConnectScreen(bool visible)
     ui->ipLabel->raise();
     ui->portLabel->activateWindow();
     ui->portLabel->raise();
-    ui->startScreen->setMaximumSize(1080, 675);
-    ui->startScreen->setMinimumSize(1080, 675);
-    ui->connect->setMaximumSize(1080, 500);
-    ui->connect->setMinimumSize(1080, 500);
+    ui->startScreen->setMaximumSize(1080, 800);
+    ui->startScreen->setMinimumSize(1080, 800);
+    ui->connect->setMaximumSize(540, 250);
+    ui->connect->setMinimumSize(540, 250);
+    ui->fetchToken->setMaximumSize(270, 250);
+    ui->fetchToken->setMinimumSize(270, 250);
     ui->kyConfig->setMaximumSize(1080, 175);
     ui->kyConfig->setMinimumSize(1080, 175);
     ui->serverIp->setMaximumSize(960, 30);
@@ -208,6 +210,7 @@ void MainWindow::setConnectScreen(bool visible)
   else
   {
     ui->connect->hide();
+    ui->fetchToken->hide();
     ui->kyConfig->hide();
     ui->ipLabel->hide();
     ui->configLabel->hide();

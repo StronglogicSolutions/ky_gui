@@ -218,6 +218,7 @@ void Client::GetToken()
     if (!json.empty() && json.contains("token"))
     {
       QString token = configValue("token", json);
+      KLOG("Fetched token: ", token);
       m_token = token.toUtf8().constData();
     }
     else
