@@ -20,6 +20,7 @@
         <file>icons/refresh.png</file>
         <file>icons/make.png</file>
         <file>icons/ml.png</file>
+        <file>icons/token.png</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/log.png</file>

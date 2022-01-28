@@ -204,24 +204,32 @@ void Client::SetCredentials(const QString& username, const QString& password, co
   m_user         = username;
   m_password     = password;
   m_auth_address = auth_address;
-  GetToken();
+  FetchToken();
 }
 
-void Client::GetToken()
+void Client::FetchToken()
 {
   QObject::connect(&m_network_manager, &QNetworkAccessManager::finished, this, [=](QNetworkReply* reply)
   {
+    bool error{false};
     if (reply->error())
-      return KLOG(reply->errorString());
-
-    QJsonObject json = loadJsonConfig(reply->readAll());
-    if (!json.empty() && json.contains("token"))
     {
-      QString token = configValue("token", json);
-      m_token = token.toUtf8().constData();
+      error = true;
+      KLOG(reply->errorString());
     }
     else
-      throw std::invalid_argument{"Failed to retrieve token"};
+    {
+      QJsonObject json = loadJsonConfig(reply->readAll());
+      if (!json.empty() && json.contains("token"))
+      {
+        QString token = configValue("token", json);
+        KLOG("Fetched token: ", token);
+        m_token = token.toUtf8().constData();
+      }
+      else
+        error = true;
+    }
+    onTokenReceived(error);
   });
 
   m_network_manager.get(QNetworkRequest(QUrl(m_auth_address + "?name=" + m_user + "&password=" + m_password)));
