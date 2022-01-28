@@ -141,6 +141,11 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
     q_client->SetCredentials(username, password, address);
     arg_ui->setFilePath(file_path);
   });
+
+  QObject::connect(q_client, &Client::onTokenReceived, this, [this](bool error)
+  {
+    ui->tokenLED->setState(!(error));
+  });
 }
 
 /**

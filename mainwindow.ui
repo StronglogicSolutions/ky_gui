@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>893</width>
-    <height>580</height>
+    <height>568</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,8 +18,8 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>996</width>
-    <height>1500</height>
+    <width>16777215</width>
+    <height>16777215</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -51,7 +51,7 @@ QPushButton::hover:
 </string>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="1">
+    <item row="0" column="0">
      <widget class="QWidget" name="outerLayer" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
@@ -901,7 +901,7 @@ padding: 4px;</string>
       </layout>
      </widget>
     </item>
-    <item row="1" column="1">
+    <item row="1" column="0">
      <widget class="QWidget" name="startScreen" native="true">
       <property name="enabled">
        <bool>true</bool>
@@ -924,25 +924,14 @@ padding: 4px;</string>
         <height>0</height>
        </size>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="2,2,0,0,0,2">
-       <property name="spacing">
-        <number>6</number>
-       </property>
-       <property name="sizeConstraint">
-        <enum>QLayout::SetMinimumSize</enum>
-       </property>
-       <property name="leftMargin">
-        <number>6</number>
-       </property>
-       <property name="topMargin">
-        <number>6</number>
-       </property>
-       <property name="rightMargin">
-        <number>6</number>
-       </property>
-       <property name="bottomMargin">
-        <number>6</number>
-       </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="ConnectionIndicator" name="tokenLED">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QPushButton" name="connect">
          <property name="sizePolicy">
@@ -953,8 +942,8 @@ padding: 4px;</string>
          </property>
          <property name="minimumSize">
           <size>
-           <width>1080</width>
-           <height>96</height>
+           <width>46</width>
+           <height>46</height>
           </size>
          </property>
          <property name="maximumSize">
@@ -1018,8 +1007,8 @@ opacity: 0.3;</string>
          </property>
          <property name="minimumSize">
           <size>
-           <width>1080</width>
-           <height>96</height>
+           <width>46</width>
+           <height>46</height>
           </size>
          </property>
          <property name="maximumSize">

@@ -198,6 +198,7 @@ void           messageReceived(int t, QString s, QVector<QString> args);
 void           eventReceived(int t, std::string event, StringVec args);
 void           clientDisconnected();
 void           onDownload(QVector<FileWrap> files);
+void           onTokenReceived(bool error = false);
 
 private:
 void           sendEncoded(std::string message);
@@ -208,7 +209,7 @@ void           handleMessages();
 void           handleEvent(std::string data);
 void           handleDownload(uint8_t* data, ssize_t size);
 void           sendPackets(uint8_t* data, uint32_t size);
-void           GetToken();
+void           FetchToken();
 std::string    CreateOperation(const char* op, std::vector<std::string> args);
 
 int                           argc;
