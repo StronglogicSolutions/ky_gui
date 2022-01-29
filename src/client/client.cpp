@@ -207,6 +207,11 @@ void Client::SetCredentials(const QString& username, const QString& password, co
   FetchToken();
 }
 
+QString Client::GetUsername() const
+{
+  return m_user;
+}
+
 void Client::FetchToken()
 {
   QObject::connect(&m_network_manager, &QNetworkAccessManager::finished, this, [=](QNetworkReply* reply)

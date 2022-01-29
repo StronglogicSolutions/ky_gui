@@ -37,7 +37,7 @@ const QString KYGUI_DEFAULT_THEME{
 "background-color: rgb(0, 43, 54);"
 "QPushButton::hover:"
 "{"
-"   opacity: 0.7;"
+"   opacity: 1;"
 "}"
 };
 
@@ -46,7 +46,7 @@ const QString KYGUI_BLACK_THEME{
 "background-color: rgb(30, 30, 30);"
 "QPushButton::hover:"
 "{"
-"   opacity: 0.7;"
+"   opacity: 1;"
 "}"
 };
 
@@ -55,7 +55,7 @@ const QString KYGUI_BLUE_THEME{
 "background-color: rgb(4, 0, 29);"
 "QPushButton::hover:"
 "{"
-"   opacity: 0.7;"
+"   opacity: 1;"
 "}"
 };
 
@@ -85,6 +85,59 @@ const QString KYGUI_BLUE_LIST_THEME{
 "padding: 4px;"
 "item { border-bottom: 1px solid black; padding: 16px;} "
 };
+
+static const QString KYGUI_FETCH_BUTTON_THEME{
+"QPushButton{"
+"font: 87 18pt \"Noto Sans\";"
+"color: rgb(0, 0, 0);"
+"background-color: rgb(255, 71, 0);"
+"font-weight: 700;"
+"padding: 4px;"
+"border-style: outset;"
+"border-width: 2px;"
+"border-radius: 6px;"
+"border-color: #00000f;"
+"min-width: 1em;"
+"min-height: 1em;"
+"padding: 4px;"
+"opacity: 1;"
+"}"
+"QPushButton:hover { background-color: #ff5607a3;}"
+"QPushButton:pressed { opacity: 0.2; }"
+};
+
+static const QString KYGUI_CONNECT_BUTTON_THEME{
+"QPushButton{"
+"font: 87 18pt \"Noto Sans\";"
+"color: rgb(0, 0, 0);"
+"background-color: rgb(2, 180, 43);"
+"font-weight: 700;"
+"padding: 4px;"
+"border-style: outset;"
+"border-width: 2px;"
+"border-radius: 6px;"
+"border-color: #00000f;"
+"min-width: 1em;"
+"min-height: 1em;"
+"padding: 4px;"
+"opacity: 1;"
+"}"
+"QPushButton:hover { background-color: #33ff00;}"
+"QPushButton:pressed { opacity: 0.2; }"
+};
+
+
+[[ maybe_unused ]]
+static QString GetFetchButtonTheme()
+{
+  return KYGUI_FETCH_BUTTON_THEME;
+}
+
+[[ maybe_unused ]]
+static QString GetConnectButtonTheme()
+{
+  return KYGUI_CONNECT_BUTTON_THEME;
+}
 
 const auto get_stylesheet = []() -> QString
 {

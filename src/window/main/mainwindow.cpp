@@ -1,4 +1,5 @@
 ﻿#include <include/ui/mainwindow.h>
+#include <QGraphicsDropShadowEffect>
 
 /**
  * Helper functions
@@ -146,6 +147,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   {
     ui->tokenLED->setState(!(error));
   });
+
+  ui->fetchToken->setStyleSheet(GetFetchButtonTheme());
+  ui->connect   ->setStyleSheet(GetConnectButtonTheme());
 }
 
 /**
@@ -182,12 +186,12 @@ void MainWindow::setConnectScreen(bool visible)
     ui->ipLabel->raise();
     ui->portLabel->activateWindow();
     ui->portLabel->raise();
-    ui->startScreen->setMaximumSize(1080, 800);
-    ui->startScreen->setMinimumSize(1080, 800);
+    ui->startScreen->setMaximumSize(1080, 675);
+    ui->startScreen->setMinimumSize(1080, 675);
     ui->connect->setMaximumSize(540, 250);
     ui->connect->setMinimumSize(540, 250);
-    ui->fetchToken->setMaximumSize(270, 250);
-    ui->fetchToken->setMinimumSize(270, 250);
+    ui->fetchToken->setMaximumSize(540, 250);
+    ui->fetchToken->setMinimumSize(540, 250);
     ui->kyConfig->setMaximumSize(1080, 175);
     ui->kyConfig->setMinimumSize(1080, 175);
     ui->serverIp->setMaximumSize(960, 30);
@@ -258,9 +262,9 @@ void MainWindow::connectClient()
     }
   );
 
-  const auto server_ip   = ui->serverIp->toPlainText();
-  const auto server_port = ui->serverPort->toPlainText();
-  setWindowTitle(windowTitle() + " kiq://" + server_ip + ":" + server_port);
+  const auto& server_ip   = ui->serverIp->toPlainText();
+  const auto& server_port = ui->serverPort->toPlainText();
+  setWindowTitle(windowTitle() + ' ' + q_client->GetUsername() + "@kiq://" + server_ip + ":" + server_port);
   q_client->start(server_ip, server_port);
 
   QObject::connect(ui->actionDefault, &QAction::triggered, this, [this]()
@@ -283,7 +287,6 @@ void MainWindow::connectClient()
     ui->processList->setStyleSheet(KYGUI_BLUE_LIST_THEME);
     ui->eventList->setStyleSheet(KYGUI_BLUE_LIST_THEME);
   });
-
 
   QPushButton* send_message_button =
       this->findChild<QPushButton*>("sendMessage");  

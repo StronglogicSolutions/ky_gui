@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>893</width>
-    <height>568</height>
+    <height>562</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -933,39 +933,41 @@ padding: 4px;</string>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="connect">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>46</width>
-           <height>46</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <family>Noto Sans</family>
-           <pointsize>18</pointsize>
-           <weight>87</weight>
-           <italic>false</italic>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">font: 87 18pt &quot;Noto Sans&quot;;
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QPushButton" name="connect">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>540</width>
+             <height>250</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Noto Sans</family>
+             <pointsize>18</pointsize>
+             <weight>87</weight>
+             <italic>false</italic>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">font: 87 18pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
 background-color: rgb(2, 180, 43);
 font-weight: 700;
@@ -978,59 +980,59 @@ min-width: 1em;
 min-height: 1em;
 padding: 4px;
 opacity: 0.3;</string>
-         </property>
-         <property name="text">
-          <string>Connect</string>
-         </property>
-         <property name="icon">
-          <iconset resource="kres.qrc">
-           <normaloff>:/icons/icons/start.png</normaloff>:/icons/icons/start.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>64</width>
-           <height>64</height>
-          </size>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="fetchToken">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>46</width>
-           <height>46</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <family>Noto Sans</family>
-           <pointsize>18</pointsize>
-           <weight>87</weight>
-           <italic>false</italic>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">font: 87 18pt &quot;Noto Sans&quot;;
+           </property>
+           <property name="text">
+            <string>Connect</string>
+           </property>
+           <property name="icon">
+            <iconset resource="kres.qrc">
+             <normaloff>:/icons/icons/start.png</normaloff>:/icons/icons/start.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>64</width>
+             <height>64</height>
+            </size>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="fetchToken">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>540</width>
+             <height>250</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Noto Sans</family>
+             <pointsize>18</pointsize>
+             <weight>87</weight>
+             <italic>false</italic>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">font: 87 18pt &quot;Noto Sans&quot;;
 color: rgb(0, 0, 0);
 background-color: rgb(255, 71, 0);
 font-weight: 700;
@@ -1043,24 +1045,26 @@ min-width: 1em;
 min-height: 1em;
 padding: 4px;
 opacity: 0.3;</string>
-         </property>
-         <property name="text">
-          <string>Fetch Token</string>
-         </property>
-         <property name="icon">
-          <iconset resource="kres.qrc">
-           <normaloff>:/icons/icons/token.png</normaloff>:/icons/icons/token.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>64</width>
-           <height>64</height>
-          </size>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-        </widget>
+           </property>
+           <property name="text">
+            <string>Fetch Token</string>
+           </property>
+           <property name="icon">
+            <iconset resource="kres.qrc">
+             <normaloff>:/icons/icons/token.png</normaloff>:/icons/icons/token.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>64</width>
+             <height>64</height>
+            </size>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="1,3">
