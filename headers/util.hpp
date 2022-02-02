@@ -522,6 +522,14 @@ QString generatePreview(QString video_path, QString video_name) {
 
   return preview_name;
 }
+
+QString padVideo(const QString& input, const QString& name, const QString& w = "1350", const QString& h = "1080")
+{
+  QString cmd{"ffmpeg -i " + input + " -vf \"scale=w=" + w + ":h=" + h + ":force_original_aspect_ratio=1,pad=" + w + ":" + h + ":(ow-iw)/2:(oh-ih)/2\" " + "./assets/previews/" + name};
+  KLOG("Running", cmd);
+  std::system(cmd.toUtf8());
+  return name;
+}
 }; // namespace FileUtils
 
 namespace UI {
