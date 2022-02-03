@@ -13,7 +13,7 @@
 
 using namespace Scheduler;
 
-static const char JPG_FORMAT[]{"JPG"};
+static const char* JPG_FORMAT = "JPG";
 
 enum class DimensionType
 {
@@ -97,6 +97,8 @@ static float ComputeRatio(int width, int height) { return static_cast<float>(wid
 
 Scheduler::KFileData ArgDialog::PrepareFile(const QString& path)
 {
+  static const QString PAD_VID_PATH = QCoreApplication::applicationDirPath() + "/assets/fmt_vids/";
+  static const QString FMT_SUFFIX   = "_padded";
   Scheduler::KFileData file_data;
 
   if (path.size())
@@ -108,11 +110,10 @@ Scheduler::KFileData ArgDialog::PrepareFile(const QString& path)
 
     if (file.open(QIODevice::ReadOnly))
     {
-      QByteArray    bytes{};
-      QMimeDatabase db{};
+      QByteArray    bytes;
+      QMimeDatabase db;
       QMimeType     mime_type = db.mimeTypeForFile(path);
-      FileType      file_type{};
-      auto          is_video  = mime_type.name().contains("video");
+      const auto    is_video  = mime_type.name().contains("video");
 
       if (!is_video)
       {
@@ -126,25 +127,39 @@ Scheduler::KFileData ArgDialog::PrepareFile(const QString& path)
         const QImage  processed_image = (is_IG) ? image.copy(Dimensions{width, height}.Get()) : image;
 
         processed_image.save(&buffer, format);
-        file_type = FileType::IMAGE;
+
+        file_data.type  = FileType::IMAGE;
+        file_data.name  = file_name;
+        file_data.path  = path;
+        file_data.bytes = bytes;
       }
       else
       {
-        file_type = FileType::VIDEO;
-        bytes = file.readAll();
-      }
+        file_data.type = FileType::VIDEO;
+        if (m_task->getType() != TaskType::INSTAGRAM)
+          file_data.bytes = file.readAll();
+        else
+        {
+          file_data.name = FileUtils::padVideo(path, file_name + FMT_SUFFIX, PAD_VID_PATH);
+          file_data.path = PAD_VID_PATH + file_data.name;
+          auto fmt_file  = QFile{file_data.path};
 
-      file_data = Scheduler::KFileData{file_name, file_type, path, bytes};
+          if (fmt_file.open(QIODevice::ReadOnly))
+            file_data.bytes = fmt_file.readAll();
+          else
+            KLOG("Unable to open padded video file");
+        }
+      }
     }
     else
     {
-      qDebug() << "Unable to open selected file";
+      KLOG("Unable to open selected file");
       QMessageBox::warning(this, tr("File Error"), tr("Unable to open selected file"));
     }
   }
   else
   {
-    qDebug() << "Could not read the file path";
+    KLOG("Could not read the file path");
     QMessageBox::warning(this, tr("File Error"), tr("Could not read the file path"));
   }
 
@@ -155,7 +170,8 @@ bool isSave(QString s) {
   return (s.compare("Save") == 0 || s.compare("&Save") == 0);
 }
 
-ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), m_task(nullptr) {
+ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), m_task(nullptr)
+{
   ui->setupUi(this);
 
   m_loader = new QMovie{":/icons/loader.gif"};
@@ -165,10 +181,12 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
 
   ui->argCommandButtons->button(QDialogButtonBox::Close)->setStyleSheet(QString("background:%1").arg("#2f535f"));
 
-  QObject::connect(ui->addFile, &QPushButton::clicked, this, [this]() {
+  QObject::connect(ui->addFile, &QPushButton::clicked, this, [this]()
+  {
+    static const QString PREVIEW_PATH = QCoreApplication::applicationDirPath() + "/assets/previews/";
     KFileDialog file_dialog{};
     auto file_path = file_dialog.openFileDialog(m_file_path);
-    qDebug() << "Selected file:" << file_path;
+    KLOG("Selected file:", file_path);
 
     Scheduler::KFileData file = PrepareFile(file_path);
 
@@ -181,37 +199,29 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
         addFile(file.path);
       else
       {
-        qDebug() << "File is video";
+        KLOG("File is video");
         m_task->setArgument("is_video", true);
-        QString preview_filename  = FileUtils::generatePreview(file.path, file.name);
-        QString preview_file_path = QCoreApplication::applicationDirPath() + "/assets/previews/" + preview_filename;
-        QFile   prev_file{preview_file_path};
+        QString preview_filename    = FileUtils::generatePreview(file.path, file.name);
+        QString preview_file_path   = PREVIEW_PATH + preview_filename;
+        Scheduler::KFileData prev_f = PrepareFile(preview_file_path);
 
-        if (prev_file.open(QIODevice::ReadOnly))
+        if (prev_f.valid())
         {
-          // TODO: create some way of verifying preview generation was successful
-          addFile("assets/previews/" + preview_filename);
-          addItem(preview_filename, "file");
-          addFile("assets/previews/" + preview_filename);
-          m_task->addArgument("files", Scheduler::KFileData{
-                                         .name  = preview_filename,
-                                         .type  = FileType::IMAGE,
-                                         .path  = preview_file_path,
-                                         .bytes = prev_file.readAll()});
+          addFile(prev_f.path);
+          addItem(prev_f.name, "file");
+          addFile(prev_f.path);
+          m_task->addArgument("files", prev_f);
         }
         else
         {
-          qDebug() << "Could not add preview image for video";
+          KLOG("Could not add preview image for video");
           QMessageBox::warning(this, tr("File Error"), tr("Could not add preview image for video"));
         }
       }
     }
   });
 
-  QObject::connect(ui->user, &QComboBox::currentTextChanged, this,
-    [this](const QString &username) {
-      m_task->setArgument("user", username);
-    });
+  QObject::connect(ui->user, &QComboBox::currentTextChanged, this, [this](const QString &username) { m_task->setArgument("user", username); });
 
   ui->argList->setColumnWidth(0, 40);
   ui->argList->setColumnWidth(1, 520);
@@ -289,7 +299,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
     addOrReplaceInArgList(arg_text, Args::RUNTIME_ARG_TYPE);
     m_task->addArgument("runtime", arg_text);
     ui->runtimeArgEdit->clear();
-    qDebug() << "Added process runtime argument: " << arg_text;
+    KLOG("Added process runtime argument: ", arg_text);
   });
 
   QObject::connect(ui->argCommandButtons, static_cast<void (QDialogButtonBox::*)(QAbstractButton *)>(&QDialogButtonBox::clicked), this,
@@ -322,7 +332,7 @@ ArgDialog::ArgDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ArgDialog), 
   QObject::connect(ui->clear, &QPushButton::clicked, this, [this]() {
     clearPost();
     ui->argList->setRowCount(0);
-    qDebug() << "Task cleared and restored to default values";
+    KLOG("Task cleared and restored to default values");
   });
 
   QObject::connect(ui->recurring, &QComboBox::currentTextChanged, this, [this](const QString& text) {
@@ -644,7 +654,7 @@ ArgDialog::~ArgDialog()
   delete ui;
 }
 
-void ArgDialog::accept() { qDebug() << "Sending request to schedule a task.."; }
+void ArgDialog::accept() { KLOG("Sending request to schedule a task.."); }
 
 void ArgDialog::setArgTypes()
 {

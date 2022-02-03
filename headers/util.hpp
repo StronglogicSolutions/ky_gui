@@ -509,23 +509,43 @@ inline size_t findNullIndex(uint8_t* data) {
 }
 
 namespace FileUtils {
-QString generatePreview(QString video_path, QString video_name) {
-  QString preview_name =
-      video_name.left(video_name.size() - 4) + "-preview.jpg";
-  QString command{
-      "ffmpeg -y -ss 0 -i '" + video_path +
-      "' -vf \"scale=w=640:h=640:force_original_aspect_ratio=decrease\" "
-      "-vframes 1 './assets/previews/" +
-      preview_name + "'"};
-
+[[ maybe_unused ]]
+static QString generatePreview(QString video_path, QString video_name)
+{
+  QString preview_name = video_name.left(video_name.size() - 4) + "-preview.jpg";
+  QString command{"ffmpeg -y -ss 0 -i '" + video_path +
+                  "' -vf \"scale=w=640:h=640:force_original_aspect_ratio=decrease\" "
+                  "-vframes 1 './assets/previews/" + preview_name + "'"};
   std::system(command.toUtf8());
-
   return preview_name;
+}
+
+/**
+ * padVideo
+ * (Uses Instagram defaults)
+ *
+ * @param [in] {QString} input
+ * @param [in] {QString} name
+ * @param [in] {QString} w
+ * @param [in] {QString} h
+ * @return
+ */
+[[ maybe_unused ]]
+static QString padVideo(const QString& input, const QString& name, const QString& path, const QString& w = "1350", const QString& h = "1080")
+{
+  static const char* base{"ffmpeg -y -i "};
+  static const char* aspect{":force_original_aspect_ratio=1,pad="};
+  static const char* ratio{":(ow-iw)/2:(oh-ih)/2\" "};
+  static const char* scale{" -vf \"scale=w="};
+  QString cmd{base + input + scale + w + ":h=" + h + aspect + w + ":" + h + ratio + path + name};
+  std::system(cmd.toUtf8());
+  return name;
 }
 }; // namespace FileUtils
 
 namespace UI {
-static void infoMessageBox(QString text, QString title = "KYGUI") {
+static void infoMessageBox(QString text, QString title = "KYGUI")
+{
   QMessageBox box;
   box.setWindowTitle(title);
   box.setText(text);
@@ -533,14 +553,10 @@ static void infoMessageBox(QString text, QString title = "KYGUI") {
   box.exec();
 }
 
-//inline void toast(QString text, QString title = "Notification") {
-
-//}
-
 } // namespace UI
 namespace TimeUtils {
-inline QString getTime() { return QDateTime::currentDateTime().toString("hh:mm:ss"); }
-inline uint unixtime() { return QDateTime::currentDateTime().toTime_t(); }
+static QString getTime()  { return QDateTime::currentDateTime().toString("hh:mm:ss"); }
+static uint    unixtime() { return QDateTime::currentDateTime().toTime_t(); }
 } // namespace TimeUtils
 
 }  // namespace
