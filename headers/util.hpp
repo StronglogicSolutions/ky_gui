@@ -537,7 +537,8 @@ static QString padVideo(const QString& input, const QString& name, const QString
   static const char* aspect{":force_original_aspect_ratio=1,pad="};
   static const char* ratio{":(ow-iw)/2:(oh-ih)/2\" "};
   static const char* scale{" -vf \"scale=w="};
-  QString cmd{base + input + scale + w + ":h=" + h + aspect + w + ":" + h + ratio + path + name};
+  const QString      file = '"' + input + '"';
+  QString cmd{base + file + scale + w + ":h=" + h + aspect + w + ":" + h + ratio + path + name};
   std::system(cmd.toUtf8());
   return name;
 }

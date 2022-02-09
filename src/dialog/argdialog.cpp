@@ -98,7 +98,7 @@ static float ComputeRatio(int width, int height) { return static_cast<float>(wid
 Scheduler::KFileData ArgDialog::PrepareFile(const QString& path)
 {
   static const QString PAD_VID_PATH = QCoreApplication::applicationDirPath() + "/assets/fmt_vids/";
-  static const QString FMT_SUFFIX   = "_padded";
+  static const QString FMT_PREFIX = "fmt_";
   Scheduler::KFileData file_data;
 
   if (path.size())
@@ -140,7 +140,7 @@ Scheduler::KFileData ArgDialog::PrepareFile(const QString& path)
           file_data.bytes = file.readAll();
         else
         {
-          file_data.name = FileUtils::padVideo(path, file_name + FMT_SUFFIX, PAD_VID_PATH);
+          file_data.name = FileUtils::padVideo(path, FMT_PREFIX + file_name, PAD_VID_PATH);
           file_data.path = PAD_VID_PATH + file_data.name;
           auto fmt_file  = QFile{file_data.path};
 
