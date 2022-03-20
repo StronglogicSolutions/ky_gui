@@ -255,7 +255,7 @@ void ScheduleDialog::InsertTasks(QVector<QString> task_arguments)
 {
   size_t           arg_num = task_arguments.size();
   QVector<QString> files;
-  for (uint16_t i = 1, j = 0; i < arg_num; i += 9)
+  for (size_t i = 1, j = 0; i < arg_num; i += 9)
   {
     ScheduledTask task{
       .id        = task_arguments.at(i + 0),
