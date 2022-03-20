@@ -158,12 +158,12 @@ ScheduleDialog::ScheduleDialog(QWidget *parent)
   /** Fetch **/
   QObject::connect(ui->fetchSchedule, &QPushButton::clicked, this, [this]()
   {
-    updateSchedule();
+    UpdateSchedule();
   });
   /** Save **/
   QObject::connect(ui->saveTask, &QPushButton::clicked, this, [this]()
   {
-    scheduleRequest(RequestType::UPDATE_SCHEDULE, readFields());
+    SchedulerRequest(RequestType::UPDATE_SCHEDULE, ReadFields());
   });
   /** Delete **/
   QObject::connect(ui->deleteTask, &QPushButton::clicked, this, [this]()
@@ -184,8 +184,8 @@ ScheduleDialog::ScheduleDialog(QWidget *parent)
     {
       if ((index > -1) && !m_tasks.empty() && !m_task_indexes.empty())
       {
-        scheduleRequest(RequestType::FETCH_SCHEDULE_TOKENS, readFields());
-        setFields(GetTask(index));
+        SchedulerRequest(RequestType::FETCH_SCHEDULE_TOKENS, ReadFields());
+        SetFields(GetTask(index));
       }
     }
   );
@@ -209,7 +209,7 @@ ScheduleDialog::ScheduleDialog(QWidget *parent)
       else
         m_mask &= ~mask;
     }
-    refreshUI();
+    RefreshUI();
   });
 }
 
@@ -228,14 +228,14 @@ ScheduleDialog::~ScheduleDialog()
  */
 void ScheduleDialog::showEvent(QShowEvent*)
 {
-  refreshUI();
+  RefreshUI();
 }
 
 /**
  * @brief ScheduleDialog::setFields
  * @param task
  */
-void ScheduleDialog::setFields(ScheduledTask task) {
+void ScheduleDialog::SetFields(ScheduledTask task) {
   ui->appText->setText(task.app);
   ui->timeText->setText(task.time.toString());
   ui->flagsText->setText(task.flags);
@@ -251,12 +251,11 @@ void ScheduleDialog::setFields(ScheduledTask task) {
  * @brief ScheduleDialog::insert_tasks
  * @param task_arguments
  */
-void ScheduleDialog::insert_tasks(QVector<QString> task_arguments)
+void ScheduleDialog::InsertTasks(QVector<QString> task_arguments)
 {
-  uint16_t         arg_num = task_arguments.size();
+  size_t           arg_num = task_arguments.size();
   QVector<QString> files;
-
-  for (uint16_t i = 1, j = 0; i < arg_num; i += 9)
+  for (size_t i = 1, j = 0; i < arg_num; i += 9)
   {
     ScheduledTask task{
       .id        = task_arguments.at(i + 0),
@@ -276,7 +275,7 @@ void ScheduleDialog::insert_tasks(QVector<QString> task_arguments)
 /**
  * @brief ScheduleDialog::clear
  */
-void ScheduleDialog::clear() {
+void ScheduleDialog::Clear() {
   m_tasks           .clear();
   m_task_indexes    .clear();
   ui->taskList     ->clear();
@@ -295,7 +294,7 @@ void ScheduleDialog::clear() {
  * @brief ScheduleDialog::readFields
  * @return
  */
-ScheduledTask ScheduleDialog::readFields() {
+ScheduledTask ScheduleDialog::ReadFields() {
   struct EnvData
   {
     QString file;
@@ -348,7 +347,7 @@ ScheduledTask ScheduleDialog::readFields() {
  * @brief ScheduleDialog::receive_response
  * @param v
  */
-void ScheduleDialog::receive_response(RequestType type, QVector<QString> v)
+void ScheduleDialog::ReceiveResponse(RequestType type, QVector<QString> v)
 {
   if (type == RequestType::UPDATE_SCHEDULE)
   {
@@ -358,7 +357,7 @@ void ScheduleDialog::receive_response(RequestType type, QVector<QString> v)
   }
   else
   if (type == RequestType::FETCH_SCHEDULE)
-    refreshUI();  
+    RefreshUI();
   else
   if (type == RequestType::FETCH_SCHEDULE_TOKENS)
   {
@@ -406,7 +405,7 @@ static QStandardItem* CreateFilterModelItem(const QString& app)
   return item;
 }
 
-void ScheduleDialog::refreshUI()
+void ScheduleDialog::RefreshUI()
 {
   m_refreshing = true;
   QTimer::singleShot(1000, Qt::TimerType::VeryCoarseTimer, this, [this]()
@@ -428,7 +427,7 @@ void ScheduleDialog::refreshUI()
       if (m_tasks.size())
       {
         std::sort(m_tasks.begin(), m_tasks.end(), [](ScheduledTask a, ScheduledTask b){ return a.id.toUInt() > b.id.toUInt(); });
-        setFields(m_tasks.front());
+        SetFields(m_tasks.front());
 
         ui->taskList->clear();
         int count{};

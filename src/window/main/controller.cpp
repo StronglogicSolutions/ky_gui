@@ -236,19 +236,19 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
       const auto details = v.at(0);
       if (details == "Schedule")
       {
-        window->schedule_ui.clear();
-        window->schedule_ui.insert_tasks(v);
+        window->schedule_ui.Clear();
+        window->schedule_ui.InsertTasks(v);
       }
       else
       if (details == "Schedule end")
-        window->schedule_ui.receive_response(RequestType::FETCH_SCHEDULE, v);
+        window->schedule_ui.ReceiveResponse(RequestType::FETCH_SCHEDULE, v);
     }
     else
     if (message == "Schedule PUT")
-      window->schedule_ui.receive_response(RequestType::UPDATE_SCHEDULE, v);
+      window->schedule_ui.ReceiveResponse(RequestType::UPDATE_SCHEDULE, v);
     else
     if (message == "Schedule Tokens")
-      window->schedule_ui.receive_response(RequestType::FETCH_SCHEDULE_TOKENS, v);
+      window->schedule_ui.ReceiveResponse(RequestType::FETCH_SCHEDULE_TOKENS, v);
     else
     if (message == "Application Flags")
     {
