@@ -195,25 +195,8 @@ Client::Client(QWidget* parent, int count, char** arguments)
     }
   })
 {
-  qRegisterMetaType<QVector<QString>>("QVector<QString>");
+  qRegisterMetaType<QVector<QString>> ("QVector<QString>");
   qRegisterMetaType<QVector<FileWrap>>("QVector<FileWrap>");
-}
-
-void Client::SetCredentials(const QString& username, const QString& password, const QString& auth_address)
-{
-  m_user         = username;
-  m_password     = password;
-  m_auth_address = auth_address;
-  FetchToken();
-}
-
-QString Client::GetUsername() const
-{
-  return m_user;
-}
-
-void Client::FetchToken()
-{
   QObject::connect(&m_network_manager, &QNetworkAccessManager::finished, this, [=](QNetworkReply* reply)
   {
     bool error{false};
@@ -236,7 +219,23 @@ void Client::FetchToken()
     }
     onTokenReceived(error);
   });
+}
 
+void Client::SetCredentials(const QString& username, const QString& password, const QString& auth_address)
+{
+  m_user         = username;
+  m_password     = password;
+  m_auth_address = auth_address;
+  FetchToken();
+}
+
+QString Client::GetUsername() const
+{
+  return m_user;
+}
+
+void Client::FetchToken()
+{
   m_network_manager.get(QNetworkRequest(QUrl(m_auth_address + "?name=" + m_user + "&password=" + m_password)));
 }
 

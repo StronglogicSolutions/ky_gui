@@ -19,23 +19,23 @@ class ScheduleDialog : public QDialog
   Q_OBJECT
  public:
   explicit ScheduleDialog(QWidget* parent = nullptr);
-  void     insert_tasks(QVector<QString> tasks);
+  void     InsertTasks(QVector<QString> tasks);
   void     SetApps(const CommandMap& map);
-  void     receive_response(RequestType type, QVector<QString> v);
+  void     ReceiveResponse(RequestType type, QVector<QString> v);
   ~ScheduleDialog();
-  void     clear();
+  void     Clear();
 
  signals:
-  void updateSchedule();
-  void scheduleRequest(constants::RequestType type, ScheduledTask task);
+  void UpdateSchedule();
+  void SchedulerRequest(constants::RequestType type, ScheduledTask task);
 
  protected:
   virtual void showEvent(QShowEvent* e)     override;
 
  private:
-  void           setFields(ScheduledTask task);
-  ScheduledTask  readFields();
-  void           refreshUI();
+  void           SetFields(ScheduledTask task);
+  ScheduledTask  ReadFields();
+  void           RefreshUI();
   ScheduledTask  GetTask(int index) const;
 
   Ui::ScheduleDialog*        ui;

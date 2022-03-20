@@ -351,12 +351,12 @@ void MainWindow::connectClient()
       q_client->request(type, application);
   });
 
-  QObject::connect(&schedule_ui, &ScheduleDialog::scheduleRequest, this, [this](RequestType type, ScheduledTask task)
+  QObject::connect(&schedule_ui, &ScheduleDialog::SchedulerRequest, this, [this](RequestType type, ScheduledTask task)
   {
       q_client->request(type, task);
   });
 
-  QObject::connect(&schedule_ui, &ScheduleDialog::updateSchedule, this, [this]()
+  QObject::connect(&schedule_ui, &ScheduleDialog::UpdateSchedule, this, [this]()
   {
       q_client->request(RequestType::FETCH_SCHEDULE);
   });
