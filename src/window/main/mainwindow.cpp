@@ -433,10 +433,8 @@ void MainWindow::connectClient()
   });
 
   connect(ping_timer, &QTimer::timeout, q_client, &Client::ping);
-
-  m_progress_timer.start(10);
-  m_pong_timer    .start();
-  ping_timer     ->start(10000);
+  ping_timer->start(10000);
+  startTimers();
 }
 
 /**
@@ -461,8 +459,13 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v)
       }
       else
       {
-        m_progress_timer.stop();
-        KLOG("Heartbeat timeout");
+        if (m_progress_timer.isActive())
+        {
+          m_progress_timer.stop();
+          KLOG("Heartbeat timeout");
+        }
+        else
+          startTimers();
       }
     }
     break;
@@ -584,4 +587,10 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
       ui->inputText->clear();
     }
   }
+}
+
+void MainWindow::startTimers()
+{
+  m_progress_timer.start(10);
+  m_pong_timer    .start();
 }

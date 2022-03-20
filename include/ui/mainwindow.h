@@ -250,6 +250,7 @@ public:
     /** Receivers */
     void connectClient();
     void onMessageReceived(int t, const QString& s, StringVec v);
+    void startTimers();
 };
 
 
