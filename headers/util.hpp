@@ -40,6 +40,9 @@ struct ScheduledTask {
   QString          runtime;
   QVector<QString> files;
   QString          envfile;
+
+bool operator==(const ScheduledTask& task){ return this->id.toUInt() == task.id.toUInt(); }
+
 };
 
 struct FileWrap

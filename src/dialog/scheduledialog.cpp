@@ -255,7 +255,7 @@ void ScheduleDialog::InsertTasks(QVector<QString> task_arguments)
 {
   size_t           arg_num = task_arguments.size();
   QVector<QString> files;
-  for (size_t i = 1, j = 0; i < arg_num; i += 9)
+  for (size_t i = 1; i < arg_num; i += 9)
   {
     ScheduledTask task{
       .id        = task_arguments.at(i + 0),
@@ -268,8 +268,9 @@ void ScheduleDialog::InsertTasks(QVector<QString> task_arguments)
       .runtime   = task_arguments.at(i + 7),
       .files     = QVector<QString>{task_arguments.at(i + 8)}};
     m_tasks.push_back(task);
-    m_task_indexes.push_back(j++);
   }
+  std::sort(m_tasks.begin(), m_tasks.end(), [](ScheduledTask a, ScheduledTask b){ return a.id.toUInt() > b.id.toUInt(); });
+  m_tasks.erase(std::unique(m_tasks.begin(), m_tasks.end()), m_tasks.end());
 }
 
 /**
@@ -426,7 +427,6 @@ void ScheduleDialog::RefreshUI()
 
       if (m_tasks.size())
       {
-        std::sort(m_tasks.begin(), m_tasks.end(), [](ScheduledTask a, ScheduledTask b){ return a.id.toUInt() > b.id.toUInt(); });
         SetFields(m_tasks.front());
 
         ui->taskList->clear();
