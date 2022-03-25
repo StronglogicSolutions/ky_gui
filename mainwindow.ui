@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>893</width>
-    <height>562</height>
+    <height>568</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -237,7 +237,7 @@ font-weight: 700;</string>
               </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="3,0,0">
+              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="3,0,0,0">
                <item>
                 <widget class="QComboBox" name="ipcList">
                  <property name="sizePolicy">
@@ -260,6 +260,11 @@ font-weight: 700;
                  </item>
                  <item>
                   <property name="text">
+                   <string>telegram:delete</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
                    <string>discord:messages</string>
                   </property>
                  </item>
@@ -273,11 +278,18 @@ font-weight: 700;
                    <string>youtube:livestream</string>
                   </property>
                  </item>
-                 <item>
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </item>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="ipcArg">
+                 <property name="styleSheet">
+                  <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+color: rgb(0, 43, 54);
+font-weight: 700;
+background-color: #2f535f;
+background-color: rgb(94, 171, 194);
+color: rgb(223, 252, 255);</string>
+                 </property>
                 </widget>
                </item>
                <item>
@@ -944,8 +956,8 @@ padding: 4px;</string>
            </property>
            <property name="minimumSize">
             <size>
-             <width>0</width>
-             <height>0</height>
+             <width>46</width>
+             <height>46</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -1009,8 +1021,8 @@ opacity: 0.3;</string>
            </property>
            <property name="minimumSize">
             <size>
-             <width>0</width>
-             <height>0</height>
+             <width>46</width>
+             <height>46</height>
             </size>
            </property>
            <property name="maximumSize">

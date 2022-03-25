@@ -409,7 +409,11 @@ void MainWindow::connectClient()
 
   QObject::connect(ui->ipc, &QPushButton::clicked, this, [this]()
   {
-    q_client->sendIPCMessage(ui->ipcList->currentText(), ui->inputText->toPlainText(), defaultConfigUser(m_config));
+    auto type = ui->ipcList->currentText();
+    auto text = ui->inputText->toPlainText();
+    auto user = defaultConfigUser(m_config);
+    auto args = QString::number(ui->ipcArg->value());
+    q_client->sendIPCMessage(type, text, user, args);
     ui->inputText->clear();
   });
 

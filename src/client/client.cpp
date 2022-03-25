@@ -808,12 +808,13 @@ void Client::request(uint8_t request_code)
 
 /**
  */
-void Client::sendIPCMessage(const QString& type, const QString& message, const QString& user)
+void Client::sendIPCMessage(const QString& type, const QString& message, const QString& user, const QString& option)
 {
   sendEncoded(CreateOperation("ipc", {
-    type.toUtf8().constData(),
+    type   .toUtf8().constData(),
     message.toUtf8().constData(),
-    user.toUtf8().constData()}));
+    user   .toUtf8().constData(),
+    option .toUtf8().constData()}));
 }
 
 /**
