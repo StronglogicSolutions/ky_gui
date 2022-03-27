@@ -160,6 +160,12 @@ void MainWindow::Controller::updateProcessResult(
 QString MainWindow::Controller::handleEventMessage(const QString&   message,
                                                    const StringVec& v)
 {
+  auto ProcessPlatformInfo = [this](auto v)
+  {
+    QString          platform = v.front();
+    QList<QString>   options  = v.at(1).split('\n');
+    window->SetPlatformOptions(platform, options);
+  };
   KLOG("Event: ", message);
 
   QString event_message = utils::timestampPrefix();
@@ -189,7 +195,7 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
           .name  = app_name,
           .state = !error ? ProcessState::SUCCEEDED : ProcessState::FAILED,
           .start = TimeUtils::getTime(),
-          .id    = "Scheduled task",
+          .id    = v.at(1),
           .error = error ? v.at(3) : "No errors reported"};
 
           if (v.count() > 2 && !v.at(2).isEmpty())
@@ -272,6 +278,9 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
     else
     if (message == "File Upload Meta")
       window->q_client->setMetadata(v);
+    else
+    if (message == "Platform Info")
+      ProcessPlatformInfo(v);
     else
     if (message == "Term Hits")
     {
