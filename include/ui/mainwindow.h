@@ -161,6 +161,7 @@ struct KListViewsStates {
   bool historyViewBottom;
 };
 
+using PlatformMap = QHash<QString, QList<QString>>;
 const QString ProcessNames[4] = { "READY", "PENDING", "SUCCEEDED", "FAILED" };
 
 struct Process {
@@ -196,12 +197,14 @@ public:
     explicit MainWindow(int argc = 0, char** argv = nullptr, QWidget* parent = nullptr);
     ~MainWindow();
 
+    void SetPlatformOptions(const QString& platform, const QList<QString>& options);
+
     class Controller {
      public:
       void init(MainWindow* window);
       void handleCommands(const StringVec& commands, const QString& default_app);
       void handleMessage(const QString& message, const StringVec& v);
-      QString handleEventMessage(const QString& message, const StringVec& v);
+      QString handleEventMessage(const QString& message, const StringVec& v);     
 
      private:
       QString parseMessage(const QString& message, const StringVec& v);
@@ -245,6 +248,7 @@ public:
     uint16_t              m_consecutive_events;
     quint64               m_client_time_remaining;
     QTimer                m_progress_timer;
+    PlatformMap           m_platform_map;
 
    private slots:
     /** Receivers */

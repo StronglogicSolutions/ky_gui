@@ -160,6 +160,12 @@ void MainWindow::Controller::updateProcessResult(
 QString MainWindow::Controller::handleEventMessage(const QString&   message,
                                                    const StringVec& v)
 {
+  auto ProcessPlatformInfo = [this](auto v)
+  {
+    QString          platform = v.front();
+    QList<QString>   options  = v.at(1).split('\n');
+    window->SetPlatformOptions(platform, options);
+  };
   KLOG("Event: ", message);
 
   QString event_message = utils::timestampPrefix();
@@ -272,6 +278,9 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
     else
     if (message == "File Upload Meta")
       window->q_client->setMetadata(v);
+    else
+    if (message == "Platform Info")
+      ProcessPlatformInfo(v);
     else
     if (message == "Term Hits")
     {

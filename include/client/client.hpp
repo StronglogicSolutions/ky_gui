@@ -187,7 +187,7 @@ CommandMap     GetCommands()                    { return m_command_map; }
 void           addCommand(KApplication command) { m_commands.append(command); }
 void           sendFiles(Scheduler::Task* task);
 void           ping();
-void           sendIPCMessage(const QString& type, const QString& message, const QString& user, const QString& option = "");
+void           sendIPCMessage(const QString& type, const QString& message, const QString& user, const QString& option = "", const QString& arg = "");
 void           setIncomingFile(const StringVec& files);
 void           setMetadata(const QVector<QString>& data);
 void           SetFetching(bool fetching = true) { m_fetching = fetching; }

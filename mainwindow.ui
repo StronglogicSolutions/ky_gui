@@ -237,9 +237,12 @@ font-weight: 700;</string>
               </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="3,0,0,0">
+              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,1,1,0,0,0">
+               <property name="spacing">
+                <number>4</number>
+               </property>
                <item>
-                <widget class="QComboBox" name="ipcList">
+                <widget class="QComboBox" name="platform">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                    <horstretch>0</horstretch>
@@ -255,33 +258,98 @@ font-weight: 700;
                  </property>
                  <item>
                   <property name="text">
-                   <string>telegram:messages</string>
+                   <string>Telegram</string>
                   </property>
                  </item>
                  <item>
                   <property name="text">
-                   <string>telegram:delete</string>
+                   <string>Mastodon</string>
                   </property>
                  </item>
                  <item>
                   <property name="text">
-                   <string>discord:messages</string>
+                   <string>Discord</string>
                   </property>
                  </item>
                  <item>
                   <property name="text">
-                   <string>mastodon:comments</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>youtube:livestream</string>
+                   <string>YouTube</string>
                   </property>
                  </item>
                 </widget>
                </item>
                <item>
+                <widget class="QComboBox" name="ipcCommand">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: #5eabc2;
+color: rgb(29, 51, 59);
+font-weight: 700;
+</string>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>messages</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>delete</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>rooms</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>info</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>comments</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>livestream</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="ipcOption">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: #5eabc2;
+color: rgb(29, 51, 59);
+font-weight: 700;
+</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QSpinBox" name="ipcArg">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
 color: rgb(0, 43, 54);
