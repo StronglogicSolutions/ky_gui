@@ -309,10 +309,7 @@ void MainWindow::connectClient()
   QObject::connect(ui->platform, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
     this, [this]()
     {
-      auto platform = ui->platform->currentText();
-      auto list     = m_platform_map.value(platform);
-      for (const auto& option : list)
-        ui->ipcOption->addItem(option.right(option.size() - (option.indexOf(',') + 1)));
+      UpdateIPCOptions();
     });
 
   QPushButton* disconnect_button = this->findChild<QPushButton*>("disconnect");
@@ -418,13 +415,14 @@ void MainWindow::connectClient()
 
   QObject::connect(ui->ipc, &QPushButton::clicked, this, [this]()
   {
+    auto HasKey = [this](auto key) { return m_platform_map.find(key) != m_platform_map.end(); };
     auto platform = ui->platform->currentText();
     auto type = ui->ipcCommand->currentText();
     auto text = ui->inputText->toPlainText();
     auto user = defaultConfigUser(m_config);
     auto cmd  = platform.toLower() + ':' + type;
     auto arg  = QString::number(ui->ipcArg->value());
-    auto opt  = ui->ipcOption->count() ? m_platform_map.value(platform).at(ui->ipcOption->currentIndex()) : "";
+    auto opt  = (ui->ipcOption->count() && HasKey(platform)) ? m_platform_map.value(platform).at(ui->ipcOption->currentIndex()) : "";
     q_client->sendIPCMessage(cmd, text, user, opt, arg);
     ui->inputText->clear();
   });
@@ -614,5 +612,15 @@ void MainWindow::startTimers()
 void MainWindow::SetPlatformOptions(const QString& platform, const QList<QString>& options)
 {
   m_platform_map[platform] = options;
+  if (ui->platform->currentText() == platform)
+    UpdateIPCOptions();
 }
 
+void MainWindow::UpdateIPCOptions()
+{ 
+  ui->ipcOption->clear();
+  auto platform = ui->platform->currentText();
+  auto list     = m_platform_map.value(platform);  
+  for (const auto& option : list)
+    ui->ipcOption->addItem(option.right(option.size() - (option.indexOf(',') + 1)));
+}
