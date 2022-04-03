@@ -219,6 +219,7 @@ public:
     /** UI & Messages */
     void connectUi();
     void setConnectScreen(bool visible = true);
+    void UpdateIPCOptions();
     QString parseTaskInfo(StringVec v);
 
     /** Process arguments */

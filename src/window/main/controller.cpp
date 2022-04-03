@@ -163,8 +163,10 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
   auto ProcessPlatformInfo = [this](auto v)
   {
     QString          platform = v.front();
-    QList<QString>   options  = v.at(1).split('\n');
-    window->SetPlatformOptions(platform, options);
+    QString          type     = v.at(1);
+    QList<QString>   options  = v.at(2).split('\n');
+    if (type == "rooms")
+      window->SetPlatformOptions(platform, options);
   };
   KLOG("Event: ", message);
 
@@ -280,7 +282,10 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
       window->q_client->setMetadata(v);
     else
     if (message == "Platform Info")
+    {
       ProcessPlatformInfo(v);
+      event_message += "\n" + v.at(1) + "\n" + v.at(2);
+    }
     else
     if (message == "Term Hits")
     {
