@@ -367,6 +367,13 @@ void MainWindow::connectClient()
       q_client->request(RequestType::FETCH_SCHEDULE);
   });
 
+
+  QObject::connect(ui->fetchPosts, &QPushButton::clicked, this, [this]()
+  {
+    q_client->request(RequestType::FETCH_POSTS);
+    posts_ui.show();
+  });
+
   QObject::connect(ui->processList, &QListView::clicked, this, [this](const QModelIndex& index)
   {
     auto process = m_processes.at(index.row());

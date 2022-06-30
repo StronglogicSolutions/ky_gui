@@ -761,6 +761,10 @@ void Client::request(uint8_t request_code, T payload)
       if constexpr (std::is_same_v<T, QVector<QString>>)
         operation_string = CreateOperation("FetchFileOperation", ArgsToV(payload, request_code));
     break;
+    case (RequestType::FETCH_POSTS):
+      if constexpr (std::is_same_v<T, std::vector<std::string>>)
+        operation_string = CreateOperation("FetchPosts", {std::to_string(request_code)});
+    break;
     case (RequestType::FETCH_TERM_HITS):
         operation_string = CreateOperation("FetchTermHits", {std::to_string(request_code)});
     break;

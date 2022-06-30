@@ -20,6 +20,7 @@
 #include <include/ui/researchwindow.hpp>
 #include <include/ui/argdialog.h>
 #include <include/ui/messagedialog.hpp>
+#include "include/ui/postdialog.hpp"
 #include <include/ui/appdialog.hpp>
 #include <include/ui/scheduledialog.hpp>
 
@@ -230,6 +231,7 @@ public:
     Ui::MainWindow*       ui;
     ArgDialog*            arg_ui;
     AppDialog             app_ui;
+    PostDialog            posts_ui;
     ScheduleDialog        schedule_ui;
     MessageDialog         message_ui;
     DocumentWindow        doc_window;

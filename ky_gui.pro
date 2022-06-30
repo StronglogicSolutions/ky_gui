@@ -43,6 +43,7 @@ SOURCES += \
         src/dialog/appdialog.cpp \
         src/dialog/argdialog.cpp \
         src/dialog/messagedialog.cpp \
+        src/dialog/postdialog.cpp \
         src/dialog/scheduledialog.cpp \
         src/component/connection_indicator.cpp \
         src/component/kfiledialog.cpp
@@ -53,6 +54,7 @@ HEADERS += \
         include/ui/appdialog.hpp \
         include/ui/argdialog.h \
         include/ui/messagedialog.hpp \
+        include/ui/postdialog.hpp \
         include/ui/scheduledialog.hpp \
         include/ui/mainwindow.h \
         include/ui/researchwindow.hpp \
@@ -82,6 +84,7 @@ FORMS += \
         documentwindow.ui \
         mainwindow.ui \
         messagedialog.ui \
+        postdialog.ui \
         researchwindow.ui \
         scheduledialog.ui
 
