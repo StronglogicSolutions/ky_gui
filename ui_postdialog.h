@@ -12,13 +12,16 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDialog>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QTableView>
 
 QT_BEGIN_NAMESPACE
 
 class Ui_Dialog
 {
 public:
+    QTableView *posts;
     QLabel *label;
 
     void setupUi(QDialog *Dialog)
@@ -26,9 +29,12 @@ public:
         if (Dialog->objectName().isEmpty())
             Dialog->setObjectName(QString::fromUtf8("Dialog"));
         Dialog->resize(640, 480);
+        posts = new QTableView(Dialog);
+        posts->setObjectName(QString::fromUtf8("posts"));
+        posts->setGeometry(QRect(0, 110, 641, 371));
         label = new QLabel(Dialog);
         label->setObjectName(QString::fromUtf8("label"));
-        label->setGeometry(QRect(180, 210, 121, 61));
+        label->setGeometry(QRect(100, 50, 58, 18));
 
         retranslateUi(Dialog);
 
@@ -38,7 +44,7 @@ public:
     void retranslateUi(QDialog *Dialog)
     {
         Dialog->setWindowTitle(QCoreApplication::translate("Dialog", "Dialog", nullptr));
-        label->setText(QCoreApplication::translate("Dialog", "Platform Posts", nullptr));
+        label->setText(QCoreApplication::translate("Dialog", "Posts", nullptr));
     } // retranslateUi
 
 };
