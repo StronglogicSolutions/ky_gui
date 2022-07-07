@@ -191,10 +191,6 @@ void MainWindow::setConnectScreen(bool visible)
     ui->portLabel->raise();
     ui->startScreen->setMaximumSize(960, 640);
     ui->startScreen->setMinimumSize(640, 480);
-//    ui->connect->setMaximumSize(180, 150);
-//    ui->connect->setMinimumSize(120, 150);
-//    ui->fetchToken->setMaximumSize(180, 150);
-//    ui->fetchToken->setMinimumSize(120, 150);
     ui->kyConfig->setMaximumSize(960, 175);
     ui->kyConfig->setMinimumSize(640, 175);
     ui->serverIp->setMaximumSize(960, 30);
@@ -230,6 +226,7 @@ void MainWindow::setConnectScreen(bool visible)
     ui->serverIp->hide();
     ui->portLabel->hide();
     ui->serverPort->hide();
+    ui->tokenLED->hide();
     ui->startScreen->setVisible(false);
     ui->outerLayer->setVisible(true);
   }
