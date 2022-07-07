@@ -27,20 +27,19 @@ public:
         };
     int i = index.row();
         if (role == Qt::DisplayRole)
-    //      return QString{"Row%1, Column%2"}.arg(index.row() + 1).arg(index.column() + 1);
           return m_posts.empty() || i >= m_posts.size() ? QString{"This is your mom"} : post_to_string(m_posts[i]);//post_to_string(m_posts[index.row()]);
         if (role == Qt::EditRole)
           return QString{"This is your mom"};
         return QVariant{};
   }
 
-  int      rowCount(const QModelIndex & parent = QModelIndex{}) const final
+  int rowCount(const QModelIndex & parent = QModelIndex{}) const final
   {
     Q_UNUSED(parent);
     return m_posts.empty() ? 1 : m_posts.size();
   }
 
-  int      columnCount(const QModelIndex &parent) const final
+  int columnCount(const QModelIndex &parent) const final
   {
     Q_UNUSED(parent);
     return 1;
@@ -91,8 +90,9 @@ public:
     return QModelIndex{};
   }
 
-  void add_data(const QVector<QString>& data)
+  void set_data(const QVector<QString>& data)
   {
+    m_posts.clear();
     auto post_count = data.size() / Platform::ARGSIZE;
     beginInsertRows(QModelIndex{}, 0, post_count - 1);
 

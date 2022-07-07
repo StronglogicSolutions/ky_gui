@@ -121,6 +121,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   setStyleSheet(get_stylesheet());
   setConnectScreen();
   connect(ui->connect, &QPushButton::clicked, this, &MainWindow::connectClient);
+  setMaximumHeight(640);
+  ui->centralWidget->setMaximumHeight(640);
   ui->progressBar->setMinimum(0);
   ui->progressBar->setMaximum(DEFAULT_TIMEOUT);
   ui->eventList->setModel(m_event_model);
@@ -172,6 +174,7 @@ void MainWindow::setConnectScreen(bool visible)
 {
   if (visible)
   {
+    ui->centralWidget->setLayout(ui->startScreen->layout());
     ui->startScreen->activateWindow();
     ui->startScreen->raise();
     ui->kyConfig->activateWindow();
@@ -186,24 +189,24 @@ void MainWindow::setConnectScreen(bool visible)
     ui->ipLabel->raise();
     ui->portLabel->activateWindow();
     ui->portLabel->raise();
-    ui->startScreen->setMaximumSize(1080, 675);
-    ui->startScreen->setMinimumSize(1080, 675);
-    ui->connect->setMaximumSize(540, 250);
-    ui->connect->setMinimumSize(540, 250);
-    ui->fetchToken->setMaximumSize(540, 250);
-    ui->fetchToken->setMinimumSize(540, 250);
-    ui->kyConfig->setMaximumSize(1080, 175);
-    ui->kyConfig->setMinimumSize(1080, 175);
+    ui->startScreen->setMaximumSize(960, 640);
+    ui->startScreen->setMinimumSize(640, 480);
+//    ui->connect->setMaximumSize(180, 150);
+//    ui->connect->setMinimumSize(120, 150);
+//    ui->fetchToken->setMaximumSize(180, 150);
+//    ui->fetchToken->setMinimumSize(120, 150);
+    ui->kyConfig->setMaximumSize(960, 175);
+    ui->kyConfig->setMinimumSize(640, 175);
     ui->serverIp->setMaximumSize(960, 30);
-    ui->serverIp->setMinimumSize(960, 30);
+    ui->serverIp->setMinimumSize(640, 30);
     ui->ipLabel->setMaximumSize(120, 30);
     ui->ipLabel->setMinimumSize(120, 30);
     ui->serverPort->setMaximumSize(960, 30);
-    ui->serverPort->setMinimumSize(960, 30);
+    ui->serverPort->setMinimumSize(640, 30);
     ui->portLabel->setMaximumSize(120, 30);
     ui->portLabel->setMinimumSize(120, 30);
-    ui->configLabel->setMinimumSize(1080, 30);
-    ui->configLabel->setMaximumSize(1080, 30);
+    ui->configLabel->setMinimumSize(640, 30);
+    ui->configLabel->setMaximumSize(960, 30);
 
     QFile file(QCoreApplication::applicationDirPath() + "/config/config.json");
     file.open(QIODevice::ReadOnly | QFile::ReadOnly);
@@ -218,6 +221,7 @@ void MainWindow::setConnectScreen(bool visible)
   }
   else
   {
+    ui->centralWidget->setLayout(ui->outerLayer->layout());
     ui->connect->hide();
     ui->fetchToken->hide();
     ui->kyConfig->hide();

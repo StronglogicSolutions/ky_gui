@@ -14,14 +14,14 @@ PostDialog::PostDialog(QWidget *parent)
   ui->setupUi(this);
   ui->posts->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
   ui->posts->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-  ui->posts->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  ui->posts->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   ui->posts->setModel(&m_post_model);
 }
 
 
 void PostDialog::ReceiveData(const QVector<QString>& data)
 {
-  m_post_model.add_data(data);
+  m_post_model.set_data(data);
 }
 /**
  * destructor
