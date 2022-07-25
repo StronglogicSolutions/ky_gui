@@ -174,6 +174,7 @@ void MainWindow::setConnectScreen(bool visible)
 {
   if (visible)
   {
+    ui->tokenLED->setState(ConnectionIndicator::State::StateWarning);
     ui->centralWidget->setLayout(ui->startScreen->layout());
     ui->startScreen->activateWindow();
     ui->startScreen->raise();

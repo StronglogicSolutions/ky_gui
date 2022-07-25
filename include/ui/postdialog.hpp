@@ -3,10 +3,7 @@
 
 #include <QDialog>
 #include <QThread>
-#include <QTableWidget>
-#include <QTableWidgetItem>
-#include <QStandardItemModel>
-#include <QAbstractListModel>
+#include <QAbstractTableModel>
 #include <unordered_map>
 #include "headers/util.hpp"
 #include "headers/kiq_types.hpp"
@@ -15,65 +12,88 @@ namespace Ui {
 class Dialog;
 } // ns Ui
 
-class PostModel : public QAbstractItemModel
+static QString index_to_string(const QModelIndex& index)
 {
+  return QString("Row: %0 | Column %1").arg(index.row()).arg(index.column());
+}
+class PostModel : public QAbstractTableModel
+{
+  Q_OBJECT
+
 public:
 
   QVariant data(const QModelIndex & index, int role) const final
   {
-    auto post_to_string = [](const Platform::Post& post)
-        {
-          return QString{"%0 - %1 - %2 - %3"}.arg(post.name).arg(post.time).arg(post.user).arg(post.uuid);
-        };
-    int i = index.row();
-        if (role == Qt::DisplayRole)
-          return m_posts.empty() || i >= m_posts.size() ? QString{"This is your mom"} : post_to_string(m_posts[i]);//post_to_string(m_posts[index.row()]);
-        if (role == Qt::EditRole)
-          return QString{"This is your mom"};
-        return QVariant{};
+//    KLOG(QString{"PostModel::data() index is %0 and role is %1"}.arg(index_to_string(index)).arg(role));
+    auto post_to_string = [this](auto row, auto col)
+    {
+      switch (col)
+      {
+        case (0): return QString{"%0"}.arg(posts().at(row).name);   break;
+        case (1): return QString{"%0"}.arg(posts().at(row).time);   break;
+        case (2): return QString{"%0"}.arg(posts().at(row).user);   break;
+        case (3): return QString{"%0"}.arg(posts().at(row).uuid);   break;
+        case (4): return QString{"%0"}.arg(posts().at(row).status); break;
+        default:  return QString{};
+      }
+    };
+    const int i = index.row();
+    const int j = index.column();
+    if (role == Qt::DisplayRole)
+      return m_posts.empty() || i >= m_posts.size() ? QString{"Loading data..."} : post_to_string(i, j);
+    if (role == Qt::EditRole)
+      return QString{"Edit this"};
+    return QVariant{};
   }
 
   int rowCount(const QModelIndex & parent = QModelIndex{}) const final
   {
     Q_UNUSED(parent);
-    return m_posts.empty() ? 1 : m_posts.size();
+    return m_posts.empty() ? 0 : m_posts.size() - 1;
   }
 
   int columnCount(const QModelIndex &parent) const final
   {
     Q_UNUSED(parent);
-    return 1;
+    return 5;
   }
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override
   {
-    Q_UNUSED(orientation)
-    if (role == Qt::DisplayRole)
+    qDebug() << "Header Data";
+    Q_UNUSED(orientation);
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole &&
+        !posts().empty())
     {
-        return QString("Header #%1").arg(section);
+      // Read the column names from the first line
+      return QString{"This header"};
     }
-    else
-    if (role == Qt::FontRole)
-    {
-        QFont serifFont("Times", 10, QFont::Bold, true);
-        return serifFont;
-    }
-    else
-    if (role == Qt::TextAlignmentRole)
-    {
-        return Qt::AlignRight;
-    }
-    else
-    if (role == Qt::BackgroundRole)
-    {
-        return QBrush(Qt::blue);
-    }
-    else
-    if (role == Qt::ForegroundRole)
-    {
-        return QBrush(Qt::red);
-    }
-    else
-      qDebug() << "THIS ROLE IS " << role;
+//    if (role == Qt::DisplayRole)
+//    {
+//      return QString("Header #%1").arg(section);
+//    }
+//    else
+//    if (role == Qt::FontRole)
+//    {
+//      QFont serifFont("Times", 10, QFont::Bold, true);
+//      return serifFont;
+//    }
+//    else
+//    if (role == Qt::TextAlignmentRole)
+//    {
+//      return Qt::AlignRight;
+//    }
+//    else
+//    if (role == Qt::BackgroundRole)
+//    {
+//      return QBrush(Qt::blue);
+//    }
+//    else
+//    if (role == Qt::ForegroundRole)
+//    {
+//      return QBrush(Qt::red);
+//    }
+//    else
+//      qDebug() << "THIS ROLE IS " << role;
     return "Unknown role";
   }
 
@@ -103,13 +123,35 @@ public:
         .user    = data[i + Platform::USER_INDEX],
         .time    = data[i + Platform::TIME_INDEX],
         .content = data[i + Platform::CONTENT_INDEX],
-        .urls    = data[i + Platform::URLS_INDEX]});
+        .urls    = data[i + Platform::URLS_INDEX],
+        .status  = data[i + Platform::STATUS_INDEX]});
 
     endInsertRows();
-    emit dataChanged(index(0, 0), index(posts().size() - 1, 0));
+    emit dataChanged(index(0, 0), index(posts().size() - 1, 3));
   }
 
-  QVector<Platform::Post>& posts() { return m_posts; }
+  const QVector<Platform::Post>& posts() const { return m_posts; }
+
+  bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value,
+                     int role = Qt::EditRole) override
+  {
+    KLOG("setHeaderData");
+    QAbstractTableModel::setHeaderData(section, orientation, value, role);
+    emit headerDataChanged(orientation, 0, 1);
+    return true;
+  }
+
+  Qt::ItemFlags flags(const QModelIndex& index) const final
+  {
+    Qt::ItemFlags flags = QAbstractTableModel::flags(index);
+    flags = flags | Qt::ItemIsEditable | Qt::ItemIsSelectable;
+    return flags;
+  }
+
+  void Update(const QModelIndex& index)
+  {
+    KLOG("Hit with index ", QString::number(index.row()), ", ",  QString::number(index.column()));
+  }
 
 private:
   QVector<Platform::Post> m_posts;
@@ -123,8 +165,9 @@ class PostDialog : public QDialog
   ~PostDialog();
 
   void     ReceiveData(const QVector<QString>& data);
-  Ui::Dialog*         ui;
-  PostModel               m_post_model;
+
+  Ui::Dialog* ui;
+  PostModel   m_post_model;
 };
 
 #endif // __POSTDIALOG_HPP

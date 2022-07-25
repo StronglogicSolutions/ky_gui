@@ -78,6 +78,9 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(posts->sizePolicy().hasHeightForWidth());
         posts->setSizePolicy(sizePolicy);
+        posts->setMouseTracking(true);
+        posts->setSelectionBehavior(QAbstractItemView::SelectRows);
+        posts->setSortingEnabled(true);
 
         verticalLayout->addWidget(posts);
 

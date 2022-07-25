@@ -20,16 +20,31 @@ static const uint8_t STATUS_INDEX  = 0x0A;
 
 static const uint8_t ARGSIZE       = 0x0B;
 
+enum class PostStatus
+{
+  pending = 0x00,
+  success = 0x01,
+  failure = 0x02
+};
+
+static PostStatus from_string(const QString& s)
+{
+  if (s == "0")
+    return PostStatus::pending;
+  if (s == "1")
+    return PostStatus::success;
+  return PostStatus::failure;
+}
+
 struct Post
 {
-QString name;
-QString uuid          ;
-QString user        ;
-QString time          ;
-QString content     ;
-QString urls          ;
-
-
+  QString name;
+  QString uuid;
+  QString user;
+  QString time;
+  QString content;
+  QString urls;
+  QString status;
 };
 
 } // ns Platform

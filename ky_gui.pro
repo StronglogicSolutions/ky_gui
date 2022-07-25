@@ -46,7 +46,8 @@ SOURCES += \
         src/dialog/postdialog.cpp \
         src/dialog/scheduledialog.cpp \
         src/component/connection_indicator.cpp \
-        src/component/kfiledialog.cpp
+        src/component/kfiledialog.cpp \
+        src/component/post_delegate.cpp
 
 
 HEADERS += \
@@ -60,6 +61,7 @@ HEADERS += \
         include/ui/researchwindow.hpp \
         include/ui/connection_indicator.h \
         include/ui/kfiledialog.h \
+        include/ui/post_delegate.hpp \
         include/client/client.hpp \
         include/task/task.hpp \
         include/task/instagram_task.hpp\
