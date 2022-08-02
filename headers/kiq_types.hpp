@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include <QString>
+#include <QVector>
+#include <QString>
 
 namespace Event {
 static const constexpr char* TASK_SCHEDULED = "Task Scheduled";
@@ -45,6 +47,13 @@ struct Post
   QString content;
   QString urls;
   QString status;
+  bool    active{false};
+  QVector<QString> payload() const
+  {
+    return QVector<QString>{
+      name, uuid, user, time, content, urls, status
+    };
+  }
 };
 
 } // ns Platform

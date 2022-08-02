@@ -118,7 +118,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   m_controller.init(this);
   ui->setupUi(this);
   this->setWindowTitle("KYGUI");
-  setStyleSheet(get_stylesheet());
+//  setStyleSheet(get_stylesheet());
   setConnectScreen();
   connect(ui->connect, &QPushButton::clicked, this, &MainWindow::connectClient);
   setMaximumHeight(640);
@@ -263,6 +263,11 @@ void MainWindow::connectClient()
       doc_window.ReceiveFiles(std::move(files));
     }
   );
+
+  QObject::connect(&posts_ui, &PostDialog::request_update, this, [this](const Platform::Post& post)
+  {
+    q_client->request(constants::RequestType::UPDATE_POST, post.payload());
+  });
 
   const auto& server_ip   = ui->serverIp->toPlainText();
   const auto& server_port = ui->serverPort->toPlainText();

@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QThread>
 #include <QAbstractTableModel>
+#include <QStandardItemModel>
 #include <unordered_map>
 #include "headers/util.hpp"
 #include "headers/kiq_types.hpp"
@@ -42,7 +43,12 @@ public:
     if (role == Qt::DisplayRole)
       return m_posts.empty() || i >= m_posts.size() ? QString{"Loading data..."} : post_to_string(i, j);
     if (role == Qt::EditRole)
-      return QString{"Edit this"};
+      return posts()[i].active;
+    else
+    if (role == 257)
+    {
+      return m_posts.at(i).active;
+    }
     return QVariant{};
   }
 
@@ -59,7 +65,7 @@ public:
   }
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override
   {
-    qDebug() << "Header Data";
+//    qDebug() << "Header Data";
     Q_UNUSED(orientation);
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole &&
         !posts().empty())
@@ -95,6 +101,21 @@ public:
 //    else
 //      qDebug() << "THIS ROLE IS " << role;
     return "Unknown role";
+  }
+
+  bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override
+  {
+    if (index.isValid() && role == Qt::EditRole)
+    {
+      if (index.column() == 4)
+      {
+        m_posts[index.row()].active = (value.toInt() == 1);
+        KLOG(QString{"Set to %0"}.arg(value.toUInt()));
+        emit dataChanged(index, index);
+        return true;
+      }
+    }
+    return QAbstractItemModel::setData(index, value, role);
   }
 
   QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex{}) const final
@@ -143,14 +164,13 @@ public:
 
   Qt::ItemFlags flags(const QModelIndex& index) const final
   {
-    Qt::ItemFlags flags = QAbstractTableModel::flags(index);
-    flags = flags | Qt::ItemIsEditable | Qt::ItemIsSelectable;
-    return flags;
+    return QAbstractTableModel::flags(index)| Qt::ItemIsEditable | Qt::ItemIsSelectable;
   }
 
   void Update(const QModelIndex& index)
   {
-    KLOG("Hit with index ", QString::number(index.row()), ", ",  QString::number(index.column()));
+    bool editable = flags(index) & Qt::ItemIsEditable;
+    KLOG(QString{"Hit with index %0, %1. Editable: %2"}.arg(index.row()).arg(index.column()).arg(editable));
   }
 
 private:
@@ -160,14 +180,21 @@ private:
 class PostDialog : public QDialog
 {
   Q_OBJECT
- public:
+public:
   explicit PostDialog(QWidget* parent = nullptr);
   ~PostDialog();
 
   void     ReceiveData(const QVector<QString>& data);
 
+signals:
+  void     request_update(const Platform::Post& post);
+
+private:
+  void set_item_data(size_t row, const Platform::Post& post);
+
   Ui::Dialog* ui;
   PostModel   m_post_model;
+  QStandardItemModel* m_standard_model;
 };
 
 #endif // __POSTDIALOG_HPP

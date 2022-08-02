@@ -73,7 +73,8 @@ FETCH_FILE_READY      = 0x0B,
 FETCH_TASK_DATA       = 0x0C,
 FETCH_TERM_HITS       = 0x13,
 EXECUTE_PROCESS       = 0x14,
-FETCH_POSTS           = 0x15
+FETCH_POSTS           = 0x15,
+UPDATE_POST           = 0x16
 };
 
 static const uint8_t SCHEDULED_TASK_ID_INDEX        = 0x00;

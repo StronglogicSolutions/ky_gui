@@ -1,8 +1,9 @@
 ﻿#include "include/ui/postdialog.hpp"
 #include "ui_postdialog.h"
 #include <QStandardItem>
-#include "include/ui/post_delegate.hpp"
-
+#include <QStandardItemModel>
+#include "include/ui/status_delegate.hpp"
+#include "include/ui/button_delegate.hpp"
 
 /**
  * constructor
@@ -12,34 +13,35 @@
  */
 PostDialog::PostDialog(QWidget *parent)
 : QDialog(parent),
-  ui(new Ui::Dialog)
+  ui(new Ui::Dialog),
+  m_standard_model(new QStandardItemModel{0, 6})
 {
   ui->setupUi(this);  
-//  m_post_model.insertColumn(0);
-//  m_post_model.insertColumn(1);
   ui->posts->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
   ui->posts->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   ui->posts->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-  ui->posts->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
-  ui->posts->setModel(&m_post_model);
-  ui->posts->setItemDelegateForColumn(4, new PostItemDelegate{parent, [this](auto index) { m_post_model.Update(index); }});
-  /*m_post_model.setHeaderData(0, Qt::Orientation::Vertical, "Platf
-   * orm", Qt::DisplayRole);
-  m_post_model.setHeaderData(1, Qt::Orientation::Vertical, "Time",     Qt::DisplayRole);
-  m_post_model.setHeaderData(2, Qt::Orientation::Vertical, "User",     Qt::DisplayRole);
-  m_post_model.setHeaderData(3, Qt::Orientation::Vertical, "UUID",     Qt::DisplayRole);*/
+  ui->posts->setModel(m_standard_model);
+  ui->posts->setEditTriggers(QAbstractItemView::AllEditTriggers);
+  ui->posts->setMouseTracking(true);
+  ui->posts->setItemDelegateForColumn(4, new StatusDelegate{parent, [this](auto index)
+  {
+    KLOG("Status Delegate Update");
+    emit request_update(m_post_model.posts().at(index.row()));
+  }});
+  ui->posts->setItemDelegateForColumn(5, new ButtonDelegate{parent, [this](auto index) { KLOG("Button Delegate Update"); }});
+  ui->posts->horizontalHeader()->setStretchLastSection(true);
 }
 
 
 void PostDialog::ReceiveData(const QVector<QString>& data)
 {
   m_post_model.set_data(data);
-  m_post_model.setHeaderData(0, Qt::Orientation::Horizontal, "Platform", Qt::DisplayRole);
-  m_post_model.setHeaderData(1, Qt::Orientation::Horizontal, "Time",     Qt::DisplayRole);
-  m_post_model.setHeaderData(2, Qt::Orientation::Horizontal, "User",     Qt::DisplayRole);
-  m_post_model.setHeaderData(3, Qt::Orientation::Horizontal, "UUID",     Qt::DisplayRole);
-  m_post_model.setHeaderData(4, Qt::Orientation::Horizontal, "Status",   Qt::DisplayRole);
-  ui->posts->horizontalHeader()->show();
+  size_t i = 0;
+  m_standard_model->clear();
+  m_standard_model->insertRows(0, m_post_model.posts().size(), QModelIndex{});
+  m_standard_model->insertColumns(0, 6);
+  for (const auto& post : m_post_model.posts())
+    set_item_data(i++, post);
 }
 /**
  * destructor
@@ -49,4 +51,13 @@ void PostDialog::ReceiveData(const QVector<QString>& data)
 PostDialog::~PostDialog()
 {
   delete ui;
+}
+
+void PostDialog::set_item_data(size_t row, const Platform::Post& post)
+{
+  m_standard_model->setData(m_standard_model->index(row, 0, QModelIndex()), QVariant(post.name));
+  m_standard_model->setData(m_standard_model->index(row, 1, QModelIndex()), QVariant(post.time));
+  m_standard_model->setData(m_standard_model->index(row, 2, QModelIndex()), QVariant(post.user));
+  m_standard_model->setData(m_standard_model->index(row, 3, QModelIndex()), QVariant(post.uuid));
+  m_standard_model->setData(m_standard_model->index(row, 4, QModelIndex()), QVariant(post.status));
 }
