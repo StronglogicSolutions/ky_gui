@@ -23,13 +23,22 @@ PostDialog::PostDialog(QWidget *parent)
   ui->posts->setModel(m_standard_model);
   ui->posts->setEditTriggers(QAbstractItemView::AllEditTriggers);
   ui->posts->setMouseTracking(true);
-  ui->posts->setItemDelegateForColumn(4, new StatusDelegate{parent, [this](auto index)
+  ui->posts->setItemDelegateForColumn(4, new StatusDelegate{parent, [this](auto index) { KLOG("Status Delegate Update"); }});
+  ui->posts->setItemDelegateForColumn(5, new ButtonDelegate{parent, [this](auto index)
   {
-    KLOG("Status Delegate Update");
-    emit request_update(m_post_model.posts().at(index.row()));
+    request_update(m_post_model.posts().at(index.row()));
+    auto display_data = m_standard_model->data(index);
+    auto edit_data =    m_standard_model->data(index, Qt::EditRole);
+    KLOG("Button Delegate Update");
   }});
-  ui->posts->setItemDelegateForColumn(5, new ButtonDelegate{parent, [this](auto index) { KLOG("Button Delegate Update"); }});
   ui->posts->horizontalHeader()->setStretchLastSection(true);
+
+  QObject::connect(m_standard_model, &QStandardItemModel::itemChanged, [this](QStandardItem* item)
+  {
+//    m_post_model.setData(item->index(), item->da
+    auto index = item->index();
+    KLOG(QString{"Index %0 with data %1"}.arg(index_to_string(index)).arg(index.data().toString()));
+  });
 }
 
 

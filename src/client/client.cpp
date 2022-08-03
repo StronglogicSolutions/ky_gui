@@ -787,6 +787,7 @@ void Client::request(uint8_t request_code, T payload)
           op_payload.push_back(arg.toUtf8().constData());
         operation_string = CreateOperation("UpdatePost", op_payload);
       }
+    break;
     default:
       qDebug() << "Client is unable to process request";
       return;

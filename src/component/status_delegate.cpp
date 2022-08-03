@@ -67,7 +67,7 @@ void StatusDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, co
   KLOG("setModelData");
   QComboBox* box   = static_cast<QComboBox*>(editor);
   QString    value = box->itemText(box->currentIndex());
-  model->setData(index, box->currentIndex(), Qt::EditRole);
+  model->setData(index, value, Qt::EditRole);
 }
 
 void StatusDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem &option, const QModelIndex&) const

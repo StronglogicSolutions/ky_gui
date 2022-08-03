@@ -145,6 +145,10 @@ public:
         .time    = data[i + Platform::TIME_INDEX],
         .content = data[i + Platform::CONTENT_INDEX],
         .urls    = data[i + Platform::URLS_INDEX],
+        .repost  = data[i + Platform::REPOST_INDEX],
+        .method  = data[i + Platform::METHOD_INDEX],
+        .args    = data[i + Platform::ARGS_INDEX],
+        .cmd     = data[i + Platform::CMD_INDEX],
         .status  = data[i + Platform::STATUS_INDEX]});
 
     endInsertRows();
