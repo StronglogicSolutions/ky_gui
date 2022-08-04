@@ -2,10 +2,31 @@
 #include <QPainter>
 #include <QTableView>
 #include <QKeyEvent>
+#include <map>
 #include "include/ui/status_delegate.hpp"
 #include "include/ui/postdialog.hpp"
 #include "headers/util.hpp"
 #include <QApplication>
+
+using status_map_t     = std::map<QString, int>;
+using status_strings_t = std::map<QString, QString>;
+static const status_map_t g_status_map{
+  {"Scheduled", 0},
+  {"Complete", 1},
+  {"Error", 2},
+  {"0", 0},
+  {"1", 1},
+  {"2", 2}
+};
+
+static const status_strings_t g_status_strings{
+  {"Scheduled", "0"},
+  {"Complete", "1"},
+  {"Error", "2"},
+  {"0", "0"},
+  {"1", "1"},
+  {"2", "2"}
+};
 
 StatusDelegate::StatusDelegate(QObject* parent, const post_item_fn_t& fn)
 : QStyledItemDelegate(parent),
@@ -45,6 +66,7 @@ QWidget* StatusDelegate::createEditor(QWidget *parent, const QStyleOptionViewIte
 
   QComboBox* box = new QComboBox{parent};
   box->addItems({"Scheduled", "Complete", "Error"});
+  box->setCurrentIndex(index.data().toInt());
   box->setGeometry(option.rect);
 
   static_cast<QTableView*>(box->view())->setEditTriggers(QAbstractItemView::AllEditTriggers);
@@ -66,7 +88,7 @@ void StatusDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, co
 {
   KLOG("setModelData");
   QComboBox* box   = static_cast<QComboBox*>(editor);
-  QString    value = box->itemText(box->currentIndex());
+  QString    value = g_status_strings.at(box->itemText(box->currentIndex()));
   model->setData(index, value, Qt::EditRole);
 }
 

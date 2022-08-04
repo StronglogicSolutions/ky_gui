@@ -21,6 +21,7 @@ PostDialog::PostDialog(QWidget *parent)
   ui->posts->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   ui->posts->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   ui->posts->setModel(m_standard_model);
+//  ui->posts->setModel(&m_post_model);
   ui->posts->setEditTriggers(QAbstractItemView::AllEditTriggers);
   ui->posts->setMouseTracking(true);
   ui->posts->setItemDelegateForColumn(4, new StatusDelegate{parent, [this](auto index) { KLOG("Status Delegate Update"); }});
@@ -35,7 +36,7 @@ PostDialog::PostDialog(QWidget *parent)
 
   QObject::connect(m_standard_model, &QStandardItemModel::itemChanged, [this](QStandardItem* item)
   {
-//    m_post_model.setData(item->index(), item->da
+    m_post_model.setData(item->index(), item->index().data());
     auto index = item->index();
     KLOG(QString{"Index %0 with data %1"}.arg(index_to_string(index)).arg(index.data().toString()));
   });

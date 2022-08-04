@@ -13,10 +13,7 @@ namespace Ui {
 class Dialog;
 } // ns Ui
 
-static QString index_to_string(const QModelIndex& index)
-{
-  return QString("Row: %0 | Column %1").arg(index.row()).arg(index.column());
-}
+
 class PostModel : public QAbstractTableModel
 {
   Q_OBJECT
@@ -25,7 +22,6 @@ public:
 
   QVariant data(const QModelIndex & index, int role) const final
   {
-//    KLOG(QString{"PostModel::data() index is %0 and role is %1"}.arg(index_to_string(index)).arg(role));
     auto post_to_string = [this](auto row, auto col)
     {
       switch (col)
@@ -49,6 +45,7 @@ public:
     {
       return m_posts.at(i).active;
     }
+
     return QVariant{};
   }
 
@@ -61,60 +58,34 @@ public:
   int columnCount(const QModelIndex &parent) const final
   {
     Q_UNUSED(parent);
-    return 5;
-  }
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const override
-  {
-//    qDebug() << "Header Data";
-    Q_UNUSED(orientation);
-    if (orientation == Qt::Horizontal && role == Qt::DisplayRole &&
-        !posts().empty())
-    {
-      // Read the column names from the first line
-      return QString{"This header"};
-    }
-//    if (role == Qt::DisplayRole)
-//    {
-//      return QString("Header #%1").arg(section);
-//    }
-//    else
-//    if (role == Qt::FontRole)
-//    {
-//      QFont serifFont("Times", 10, QFont::Bold, true);
-//      return serifFont;
-//    }
-//    else
-//    if (role == Qt::TextAlignmentRole)
-//    {
-//      return Qt::AlignRight;
-//    }
-//    else
-//    if (role == Qt::BackgroundRole)
-//    {
-//      return QBrush(Qt::blue);
-//    }
-//    else
-//    if (role == Qt::ForegroundRole)
-//    {
-//      return QBrush(Qt::red);
-//    }
-//    else
-//      qDebug() << "THIS ROLE IS " << role;
-    return "Unknown role";
+    return 6;
   }
 
-  bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override
+  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override
   {
     if (index.isValid() && role == Qt::EditRole)
     {
-      if (index.column() == 4)
+      const auto column = index.column();
+      const auto row    = index.row();
+      switch(column)
       {
-        m_posts[index.row()].active = (value.toInt() == 1);
-        KLOG(QString{"Set to %0"}.arg(value.toUInt()));
-        emit dataChanged(index, index);
-        return true;
+        case 4:
+          m_posts[row].active = value.toInt() == 1;
+          m_posts[row].status = value.toString();
+          emit dataChanged(index, index);
+          return true;
+        break;
+
+        default:
+          KLOG(QString{"Didn't handle setData for column %0"}.arg(column));
       }
     }
+    else
+    if (index.isValid() && role == Qt::DisplayRole)
+      KLOG("PostModel::setData with display role");
+    else
+      KLOG(QString{"PostModel::setData called with role %0"}.arg(role));
+
     return QAbstractItemModel::setData(index, value, role);
   }
 
