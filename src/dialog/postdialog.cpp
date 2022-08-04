@@ -37,11 +37,8 @@ PostDialog::PostDialog(QWidget *parent)
   QObject::connect(m_standard_model, &QStandardItemModel::itemChanged, [this](QStandardItem* item)
   {
     m_post_model.setData(item->index(), item->index().data());
-    auto index = item->index();
-    KLOG(QString{"Index %0 with data %1"}.arg(index_to_string(index)).arg(index.data().toString()));
   });
 }
-
 
 void PostDialog::ReceiveData(const QVector<QString>& data)
 {
