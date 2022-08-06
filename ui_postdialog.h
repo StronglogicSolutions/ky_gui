@@ -17,6 +17,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QVBoxLayout>
 
@@ -32,6 +33,9 @@ public:
     QFrame *frame;
     QLabel *label;
     QTableView *posts;
+    QHBoxLayout *horizontalLayout_2;
+    QLabel *selectionLabel;
+    QPushButton *save;
     QFrame *frame_4;
     QFrame *frame_3;
 
@@ -84,6 +88,36 @@ public:
 
         verticalLayout->addWidget(posts);
 
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        selectionLabel = new QLabel(Dialog);
+        selectionLabel->setObjectName(QString::fromUtf8("selectionLabel"));
+        selectionLabel->setMargin(8);
+
+        horizontalLayout_2->addWidget(selectionLabel);
+
+        save = new QPushButton(Dialog);
+        save->setObjectName(QString::fromUtf8("save"));
+        save->setMaximumSize(QSize(220, 16777215));
+        save->setStyleSheet(QString::fromUtf8("font: 87 18pt \"Noto Sans\";\n"
+"color: rgb(0, 0, 0);\n"
+"background-color: rgb(2, 180, 43);\n"
+"font-weight: 700;\n"
+"padding: 4px;\n"
+"border-style: outset;\n"
+"border-width: 2px;\n"
+"border-radius: 6px;\n"
+"border-color: #00000f;\n"
+"min-width: 1em;\n"
+"min-height: 1em;\n"
+"padding: 4px;\n"
+"opacity: 0.3;"));
+
+        horizontalLayout_2->addWidget(save);
+
+
+        verticalLayout->addLayout(horizontalLayout_2);
+
         frame_4 = new QFrame(Dialog);
         frame_4->setObjectName(QString::fromUtf8("frame_4"));
         frame_4->setStyleSheet(QString::fromUtf8("background-color: rgb(131, 131, 131);"));
@@ -95,7 +129,7 @@ public:
         verticalLayout->setStretch(0, 1);
         verticalLayout->setStretch(1, 1);
         verticalLayout->setStretch(2, 10);
-        verticalLayout->setStretch(3, 1);
+        verticalLayout->setStretch(4, 1);
 
         horizontalLayout->addLayout(verticalLayout);
 
@@ -123,6 +157,8 @@ public:
     {
         Dialog->setWindowTitle(QCoreApplication::translate("Dialog", "Dialog", nullptr));
         label->setText(QCoreApplication::translate("Dialog", "Platform Posts", nullptr));
+        selectionLabel->setText(QCoreApplication::translate("Dialog", "No selection", nullptr));
+        save->setText(QCoreApplication::translate("Dialog", "Save", nullptr));
     } // retranslateUi
 
 };

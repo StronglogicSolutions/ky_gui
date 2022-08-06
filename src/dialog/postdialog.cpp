@@ -1,9 +1,35 @@
 ﻿#include "include/ui/postdialog.hpp"
 #include "ui_postdialog.h"
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include "include/ui/status_delegate.hpp"
-#include "include/ui/button_delegate.hpp"
+
+static const QString save_button_style{"QPushButton{"
+  "font: 87 18pt \"Noto Sans\""
+  "color: rgb(0, 0, 0);"
+  "background-color: rgb(2, 180, 43);"
+  "font-weight: 700;"
+  "padding: 4px;"
+  "border-style: outset;"
+  "border-width: 2px;"
+  "border-radius: 6px;"
+  "border-color: #00000f;"
+  "min-width: 1em;"
+  "min-height: 1em;"
+  "padding: 4px;"
+  "opacity: 0.3;}"};
+
+static const QString request_button_style{"QPushButton{"
+  "font: 87 18pt \"Noto Sans\""
+  "color: rgb(0, 0, 0);"
+  "background-color: purple;"
+  "font-weight: 700;"
+  "padding: 4px;"
+  "border-style: outset;"
+  "border-width: 2px;"
+  "border-radius: 6px;"
+  "border-color: #00000f;"
+  "min-width: 1em;"
+  "min-height: 1em;"
+  "padding: 4px;"
+  "opacity: 0.3;}"};
 
 /**
  * constructor
@@ -13,43 +39,50 @@
  */
 PostDialog::PostDialog(QWidget *parent)
 : QDialog(parent),
-  ui(new Ui::Dialog),
-  m_standard_model(new QStandardItemModel{0, 6})
+  ui(new Ui::Dialog)
 {
   ui->setupUi(this);  
   ui->posts->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
   ui->posts->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   ui->posts->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-  ui->posts->setModel(m_standard_model);
-//  ui->posts->setModel(&m_post_model);
-  ui->posts->setEditTriggers(QAbstractItemView::AllEditTriggers);
-  ui->posts->setMouseTracking(true);
-  ui->posts->setItemDelegateForColumn(4, new StatusDelegate{parent, [this](auto index) { KLOG("Status Delegate Update"); }});
-  ui->posts->setItemDelegateForColumn(5, new ButtonDelegate{parent, [this](auto index)
-  {
-    request_update(m_post_model.posts().at(index.row()));
-    auto display_data = m_standard_model->data(index);
-    auto edit_data =    m_standard_model->data(index, Qt::EditRole);
-    KLOG("Button Delegate Update");
-  }});
   ui->posts->horizontalHeader()->setStretchLastSection(true);
-
-  QObject::connect(m_standard_model, &QStandardItemModel::itemChanged, [this](QStandardItem* item)
+  ui->posts->setModel(&m_post_model);
+  ui->posts->setItemDelegateForColumn(4, new StatusDelegate{parent, [this](auto index)
   {
-    m_post_model.setData(item->index(), item->index().data());
+    m_selected = index.row();
+    ui->selectionLabel->setText(QString{"Row %0 selected"}.arg(m_selected));}
+  });
+
+  QObject::connect(ui->save, &QPushButton::clicked, [this]
+  {
+    if (m_selected > m_post_model.posts().size())
+      return;
+
+    request_update(m_post_model.posts()[m_selected]);
+    KLOG("Request to update post");
+    ui->save->setText("Requested");
   });
 }
 
 void PostDialog::ReceiveData(const QVector<QString>& data)
 {
   m_post_model.set_data(data);
-  size_t i = 0;
-  m_standard_model->clear();
-  m_standard_model->insertRows(0, m_post_model.posts().size(), QModelIndex{});
-  m_standard_model->insertColumns(0, 6);
-  for (const auto& post : m_post_model.posts())
-    set_item_data(i++, post);
 }
+
+void PostDialog::Update(const QVector<QString>& data)
+{
+  for (int i = 0; i < m_post_model.posts().size(); i++)
+  {
+    auto& post = m_post_model.get_mutable_posts()[i];
+    if (post.uuid == data[Platform::UUID_INDEX] && post.name == data[Platform::NAME_INDEX])
+    {
+      post = Platform::Post::from_pointer(data.begin());
+      ui->save->setText("Save");
+      break;
+    }
+  }
+}
+
 /**
  * destructor
  *
@@ -58,13 +91,4 @@ void PostDialog::ReceiveData(const QVector<QString>& data)
 PostDialog::~PostDialog()
 {
   delete ui;
-}
-
-void PostDialog::set_item_data(size_t row, const Platform::Post& post)
-{
-  m_standard_model->setData(m_standard_model->index(row, 0, QModelIndex()), QVariant(post.name));
-  m_standard_model->setData(m_standard_model->index(row, 1, QModelIndex()), QVariant(post.time));
-  m_standard_model->setData(m_standard_model->index(row, 2, QModelIndex()), QVariant(post.user));
-  m_standard_model->setData(m_standard_model->index(row, 3, QModelIndex()), QVariant(post.uuid));
-  m_standard_model->setData(m_standard_model->index(row, 4, QModelIndex()), QVariant(post.status));
 }

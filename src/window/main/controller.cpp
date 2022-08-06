@@ -294,10 +294,10 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
     }
     else
     if (message == "Platform Posts")
-    {
-      (void)("display in a modal?");
       window->posts_ui.ReceiveData(v);
-    }
+    else
+    if (message == "Platform Update")
+      window->posts_ui.Update(v);
     else
     if (message == "Message Received")
       event_message += "\n" + v.at(1) + ": " + v.at(2);

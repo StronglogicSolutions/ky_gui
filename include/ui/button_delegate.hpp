@@ -6,6 +6,8 @@
 #include <functional>
 #include <map>
 
+static const int RequestRole = (Qt::DisplayRole + 1);
+
 using post_item_fn_t = std::function<void(const QModelIndex &)>;
 
 class ButtonDelegate : public QStyledItemDelegate
@@ -23,7 +25,6 @@ public:
 
 private:  
   post_item_fn_t m_callback;
-
 };
 
 #endif // __BUTTON_DELEGATE_HPP__
