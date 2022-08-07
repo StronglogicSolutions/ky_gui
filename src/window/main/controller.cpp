@@ -293,6 +293,12 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
       window->research_window.show();
     }
     else
+    if (message == "Platform Posts")
+      window->posts_ui.ReceiveData(v);
+    else
+    if (message == "Platform Update")
+      window->posts_ui.Update(v);
+    else
     if (message == "Message Received")
       event_message += "\n" + v.at(1) + ": " + v.at(2);
   }

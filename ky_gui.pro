@@ -30,60 +30,62 @@ CONFIG += static
 
 QMAKE_CXXFLAGS += "-fno-sized-deallocation"
 
-SOURCES += \
-        src/main.cpp \
-        src/window/main/mainwindow.cpp \
-        src/window/main/controller.cpp \
-        src/window/document/documentwindow.cpp \
-        src/window/document/helpers.cpp \
-        src/window/research/researchwindow.cpp \
-        src/client/client.cpp \
-        src/task/instagram_task.cpp \
-        src/task/generic_task.cpp \
-        src/dialog/appdialog.cpp \
-        src/dialog/argdialog.cpp \
-        src/dialog/messagedialog.cpp \
-        src/dialog/scheduledialog.cpp \
-        src/component/connection_indicator.cpp \
-        src/component/kfiledialog.cpp
+SOURCES += src/main.cpp \
+           src/window/main/mainwindow.cpp \
+           src/window/main/controller.cpp \
+           src/window/document/documentwindow.cpp \
+           src/window/document/helpers.cpp \
+           src/window/research/researchwindow.cpp \
+           src/client/client.cpp \
+           src/task/instagram_task.cpp \
+           src/task/generic_task.cpp \
+           src/dialog/appdialog.cpp \
+           src/dialog/argdialog.cpp \
+           src/dialog/messagedialog.cpp \
+           src/dialog/postdialog.cpp \
+           src/dialog/scheduledialog.cpp \
+           src/component/connection_indicator.cpp \
+           src/component/kfiledialog.cpp \
+           src/component/status_delegate.cpp \
+           src/component/button_delegate.cpp
 
+HEADERS += include/ui/documentwindow.hpp \
+           include/ui/appdialog.hpp \
+           include/ui/argdialog.h \
+           include/ui/messagedialog.hpp \
+           include/ui/postdialog.hpp \
+           include/ui/scheduledialog.hpp \
+           include/ui/mainwindow.h \
+           include/ui/researchwindow.hpp \
+           include/ui/connection_indicator.h \
+           include/ui/kfiledialog.h \
+           include/ui/status_delegate.hpp \
+           include/ui/button_delegate.hpp \
+           include/client/client.hpp \
+           include/task/task.hpp \
+           include/task/instagram_task.hpp\
+           include/task/generic_task.hpp\
+           src/window/document/helpers.hpp \
+           third_party/kiqoder/kiqoder.hpp \
+           third_party/kiqoder/file_iterator.hpp \
+           headers/kmessage_codec.hpp \
+           headers/instatask_generated.h \
+           headers/generictask_generated.h \
+           headers/util.hpp \
+           headers/kiq_types.hpp \
+           headers/rapidjson/writer.h \
+           headers/rapidjson/stringbuffer.h \
+           headers/rapidjson/document.h
 
-HEADERS += \
-        include/ui/documentwindow.hpp \
-        include/ui/appdialog.hpp \
-        include/ui/argdialog.h \
-        include/ui/messagedialog.hpp \
-        include/ui/scheduledialog.hpp \
-        include/ui/mainwindow.h \
-        include/ui/researchwindow.hpp \
-        include/ui/connection_indicator.h \
-        include/ui/kfiledialog.h \
-        include/client/client.hpp \
-        include/task/task.hpp \
-        include/task/instagram_task.hpp\
-        include/task/generic_task.hpp\
-        src/window/document/helpers.hpp \
-        third_party/kiqoder/kiqoder.hpp\
-        third_party/kiqoder/file_iterator.hpp\
-        headers/kmessage_codec.hpp \
-        headers/instatask_generated.h \
-        headers/generictask_generated.h \
-        headers/util.hpp \
-        headers/kiq_types.hpp \
-        headers/rapidjson/writer.h \
-        headers/rapidjson/stringbuffer.h \
-        headers/rapidjson/document.h
-
-
-FORMS += \
-        appdialog.ui \
-        argdialog.ui \
-        consoledialog.ui \
-        documentwindow.ui \
-        mainwindow.ui \
-        messagedialog.ui \
-        researchwindow.ui \
-        scheduledialog.ui
+FORMS += appdialog.ui \
+         argdialog.ui \
+         consoledialog.ui \
+         documentwindow.ui \
+         mainwindow.ui \
+         messagedialog.ui \
+         postdialog.ui \
+         researchwindow.ui \
+         scheduledialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

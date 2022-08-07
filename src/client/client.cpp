@@ -761,6 +761,10 @@ void Client::request(uint8_t request_code, T payload)
       if constexpr (std::is_same_v<T, QVector<QString>>)
         operation_string = CreateOperation("FetchFileOperation", ArgsToV(payload, request_code));
     break;
+    case (RequestType::FETCH_POSTS):
+      if constexpr (std::is_same_v<T, std::vector<std::string>>)
+        operation_string = CreateOperation("FetchPosts", {std::to_string(request_code)});
+    break;
     case (RequestType::FETCH_TERM_HITS):
         operation_string = CreateOperation("FetchTermHits", {std::to_string(request_code)});
     break;
@@ -775,6 +779,15 @@ void Client::request(uint8_t request_code, T payload)
           operation_string = CreateOperation("FetchTaskData", op_payload);
         }
       break;
+    case (RequestType::UPDATE_POST):
+      if constexpr (std::is_same_v<T, QVector<QString>>)
+      {
+        std::vector<std::string> op_payload{std::to_string(request_code)};
+        for (const auto& arg : payload)
+          op_payload.push_back(arg.toUtf8().constData());
+        operation_string = CreateOperation("UpdatePost", op_payload);
+      }
+    break;
     default:
       qDebug() << "Client is unable to process request";
       return;
