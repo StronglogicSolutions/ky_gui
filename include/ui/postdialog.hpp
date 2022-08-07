@@ -29,7 +29,13 @@ public:
         case (1): return QString{"%0"}.arg(posts().at(row).time);   break;
         case (2): return QString{"%0"}.arg(posts().at(row).user);   break;
         case (3): return QString{"%0"}.arg(posts().at(row).uuid);   break;
-        case (4): return QString{"%0"}.arg(g_status_names.at(posts().at(row).status)); break;
+        case (4):
+        {
+          auto status = posts().at(row).status;
+          return (g_status_names.find(status) != g_status_names.end()) ?
+            QString{"%0"}.arg(g_status_names.at(status)) : "";
+        }
+        break;
         default:  return QString{};
       }
     };
@@ -98,11 +104,10 @@ public:
 
   Qt::ItemFlags flags(const QModelIndex& index) const final
   {
-    return Qt::ItemIsSelectable |
-           Qt::ItemIsEnabled    |
-           Qt::ItemIsEditable   |
-           Qt::ItemIsDragEnabled|
-           Qt::ItemIsDropEnabled;
+    auto flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled| Qt::ItemIsDropEnabled;
+    if (index.column() == 4)
+      flags |= Qt::ItemIsEditable;
+    return flags;
   }
 
   void Update(const QModelIndex& index)
