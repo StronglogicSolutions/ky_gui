@@ -5,7 +5,7 @@
 #include <QPainter>
 
 static const QString save_button_style{"QPushButton{"
-  "font: 87 18pt \"Noto Sans\""
+  "font: 87 18pt \"Noto Sans\";"
   "color: rgb(0, 0, 0);"
   "background-color: rgb(2, 180, 43);"
   "font-weight: 700;"
@@ -17,12 +17,15 @@ static const QString save_button_style{"QPushButton{"
   "min-width: 1em;"
   "min-height: 1em;"
   "padding: 4px;"
-  "opacity: 0.3;}"};
+  "opacity: 0.3;}"
+  "QPushButton:hover {"
+    "background-color: #328930;"
+  "}"};
 
 static const QString request_button_style{"QPushButton{"
-  "font: 87 18pt \"Noto Sans\""
+  "font: 87 18pt \"Noto Sans\";"
   "color: rgb(0, 0, 0);"
-  "background-color: purple;"
+  "background-color: magenta;"
   "font-weight: 700;"
   "padding: 4px;"
   "border-style: outset;"
@@ -32,7 +35,10 @@ static const QString request_button_style{"QPushButton{"
   "min-width: 1em;"
   "min-height: 1em;"
   "padding: 4px;"
-  "opacity: 0.3;}"};
+  "opacity: 0.3;}"
+  "QPushButton:hover {"
+    "background-color: red;"
+  "}"};
 
 
 SaveButton::SaveButton(QWidget *parent)
@@ -51,12 +57,12 @@ void SaveButton::paintEvent(QPaintEvent* event)
   option.initFrom(this);
   if (m_pending)
   {
-    setStyleSheet("background-color: magenta;");
+    setStyleSheet(request_button_style);
     option.text = "Requested";
   }
   else
   {
-    setStyleSheet("background-color: green;");
+    setStyleSheet(save_button_style);
     option.text = "Save";
   }
 
