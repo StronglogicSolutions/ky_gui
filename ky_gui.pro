@@ -4,10 +4,10 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
-QT       += printsupport
-QT       += network
-QT       += svg
+QT += core gui
+QT += printsupport
+QT += network
+QT += svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -47,7 +47,8 @@ SOURCES += src/main.cpp \
            src/component/connection_indicator.cpp \
            src/component/kfiledialog.cpp \
            src/component/status_delegate.cpp \
-           src/component/button_delegate.cpp
+           src/component/button_delegate.cpp \
+           src/component/savebutton.cpp
 
 HEADERS += include/ui/documentwindow.hpp \
            include/ui/appdialog.hpp \
@@ -58,6 +59,7 @@ HEADERS += include/ui/documentwindow.hpp \
            include/ui/mainwindow.h \
            include/ui/researchwindow.hpp \
            include/ui/connection_indicator.h \
+           include/ui/savebutton.hpp \
            include/ui/kfiledialog.h \
            include/ui/status_delegate.hpp \
            include/ui/button_delegate.hpp \

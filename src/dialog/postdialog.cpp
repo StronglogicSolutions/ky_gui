@@ -49,13 +49,8 @@ PostDialog::PostDialog(QWidget *parent)
   ui->posts->setModel(&m_post_model);
   ui->posts->setItemDelegateForColumn(4, new StatusDelegate{parent, [this](auto index)
   {
-  auto get_selected_content = [this] { const auto text = m_post_model.posts()[m_selected].content;
-                                       return (text.size() < 60) ? text : text.left(60); };
-    if (!index.isValid())
-      return;
-    m_selected = index.row();
-    ui->selectionLabel->setText(QString{"Row %0 selected: %1"}.arg(m_selected)
-                                                              .arg(get_selected_content()));
+    if (index.isValid())
+      SelectRow(index.row());
   }});
 
   QObject::connect(ui->save, &QPushButton::clicked, [this]
@@ -65,7 +60,12 @@ PostDialog::PostDialog(QWidget *parent)
 
     request_update(m_post_model.posts()[m_selected]);
     KLOG("Request to update post");
-    ui->save->setText("Requested");
+    ui->save->OnRequest();
+  });
+
+  QObject::connect(ui->posts, &QTableView::clicked, [this](const QModelIndex& index)
+  {
+    SelectRow(index.row());
   });
 }
 
@@ -76,17 +76,30 @@ void PostDialog::ReceiveData(const QVector<QString>& data)
 
 void PostDialog::Update(const QVector<QString>& data)
 {
+  auto unselect = [this] { ui->save->OnRequest(true); ui->selectionLabel->setText("No selection"); };
   for (int i = 0; i < m_post_model.posts().size(); i++)
   {
     auto& post = m_post_model.get_mutable_posts()[i];
     if (post.uuid == data[Platform::UUID_INDEX] && post.name == data[Platform::NAME_INDEX])
     {
       post = Platform::Post::from_vector(data).front();
-      ui->save->setText("Save");
-      ui->selectionLabel->setText("No selection");
+      unselect();
       break;
     }
   }
+}
+
+void PostDialog::SelectRow(int row)
+{
+  auto get_selected_content = [this]
+  {
+    return m_post_model.posts()[m_selected].content;
+//    return (text.size() < 60) ? text : text.left(60);
+  };
+
+  m_selected = row;
+  ui->selectionLabel->setText(QString{"Row %0 selected: %1"}.arg(m_selected)
+                                                            .arg(get_selected_content()));
 }
 
 /**

@@ -129,6 +129,7 @@ public:
 
   void     ReceiveData(const QVector<QString>& data);
   void     Update(const QVector<QString>& data);
+  void     SelectRow(int row);
 
 signals:
   void     request_update(const Platform::Post& post);

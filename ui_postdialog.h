@@ -17,9 +17,9 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QPushButton>
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QVBoxLayout>
+#include "include/ui/savebutton.hpp"
 
 QT_BEGIN_NAMESPACE
 
@@ -35,7 +35,7 @@ public:
     QTableView *posts;
     QHBoxLayout *horizontalLayout_2;
     QLabel *selectionLabel;
-    QPushButton *save;
+    SaveButton *save;
     QFrame *frame_4;
     QFrame *frame_3;
 
@@ -70,8 +70,9 @@ public:
         label = new QLabel(Dialog);
         label->setObjectName(QString::fromUtf8("label"));
         label->setStyleSheet(QString::fromUtf8("font: 75 italic 16pt \"Noto Sans\";"));
-        label->setAlignment(Qt::AlignCenter);
+        label->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
         label->setWordWrap(false);
+        label->setMargin(12);
 
         verticalLayout->addWidget(label);
 
@@ -92,16 +93,28 @@ public:
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         selectionLabel = new QLabel(Dialog);
         selectionLabel->setObjectName(QString::fromUtf8("selectionLabel"));
+        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(selectionLabel->sizePolicy().hasHeightForWidth());
+        selectionLabel->setSizePolicy(sizePolicy1);
+        selectionLabel->setMinimumSize(QSize(0, 0));
+        selectionLabel->setMaximumSize(QSize(600, 500));
+        selectionLabel->setWordWrap(true);
         selectionLabel->setMargin(8);
 
         horizontalLayout_2->addWidget(selectionLabel);
 
-        save = new QPushButton(Dialog);
+        save = new SaveButton(Dialog);
         save->setObjectName(QString::fromUtf8("save"));
-        save->setMaximumSize(QSize(220, 16777215));
+        QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(save->sizePolicy().hasHeightForWidth());
+        save->setSizePolicy(sizePolicy2);
+        save->setMaximumSize(QSize(300, 16777215));
         save->setStyleSheet(QString::fromUtf8("font: 87 18pt \"Noto Sans\";\n"
 "color: rgb(0, 0, 0);\n"
-"background-color: rgb(2, 180, 43);\n"
 "font-weight: 700;\n"
 "padding: 4px;\n"
 "border-style: outset;\n"

@@ -1183,8 +1183,8 @@ item { border-bottom: 1px solid black; padding: 16px;} </string>
              </property>
              <property name="minimumSize">
               <size>
-               <width>0</width>
-               <height>0</height>
+               <width>46</width>
+               <height>46</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -1248,8 +1248,8 @@ opacity: 0.3;</string>
              </property>
              <property name="minimumSize">
               <size>
-               <width>0</width>
-               <height>0</height>
+               <width>46</width>
+               <height>46</height>
               </size>
              </property>
              <property name="maximumSize">
