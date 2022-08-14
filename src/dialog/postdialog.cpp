@@ -76,7 +76,7 @@ void PostDialog::ReceiveData(const QVector<QString>& data)
 
 void PostDialog::Update(const QVector<QString>& data)
 {
-  auto unselect = [this] { ui->save->OnRequest(true); ui->selectionLabel->setText("No selection"); };
+  auto unselect = [this] { ui->save->OnRequest(true); ui->postText->setText("No selection"); };
   for (int i = 0; i < m_post_model.posts().size(); i++)
   {
     auto& post = m_post_model.get_mutable_posts()[i];
@@ -98,7 +98,7 @@ void PostDialog::SelectRow(int row)
   };
 
   m_selected = row;
-  ui->selectionLabel->setText(QString{"Row %0 selected: %1"}.arg(m_selected)
+  ui->postText->setText(QString{"Row %0 selected: %1"}.arg(m_selected)
                                                             .arg(get_selected_content()));
 }
 
