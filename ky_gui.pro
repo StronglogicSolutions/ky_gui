@@ -28,7 +28,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++17
 CONFIG += static
 
-QMAKE_CXXFLAGS += "-fno-sized-deallocation"
+QMAKE_CXXFLAGS     += -fno-sized-deallocation
 
 SOURCES += src/main.cpp \
            src/window/main/mainwindow.cpp \
@@ -47,8 +47,7 @@ SOURCES += src/main.cpp \
            src/component/connection_indicator.cpp \
            src/component/kfiledialog.cpp \
            src/component/status_delegate.cpp \
-           src/component/button_delegate.cpp \
-           src/component/savebutton.cpp
+           src/component/button_delegate.cpp
 
 HEADERS += include/ui/documentwindow.hpp \
            include/ui/appdialog.hpp \
@@ -59,7 +58,6 @@ HEADERS += include/ui/documentwindow.hpp \
            include/ui/mainwindow.h \
            include/ui/researchwindow.hpp \
            include/ui/connection_indicator.h \
-           include/ui/savebutton.hpp \
            include/ui/kfiledialog.h \
            include/ui/status_delegate.hpp \
            include/ui/button_delegate.hpp \

@@ -17,8 +17,7 @@ void StatusDelegate::setEditorData(QWidget *editor, const QModelIndex &index) co
 {
   if (QComboBox* box = qobject_cast<QComboBox*>(editor))
   {
-    box->setCurrentIndex(index.data().toInt());
-    KLOG("setEditorData");
+    box->setCurrentIndex(index.data().toInt());    
     box->showPopup();
   }
 }
@@ -28,7 +27,6 @@ QWidget* StatusDelegate::createEditor(QWidget *parent, const QStyleOptionViewIte
   if (index.isValid())
     m_callback(index);
 
-  KLOG("StatusDelegate::createEditor");
   QComboBox* box = new QComboBox{parent};
   box->addItems({"Scheduled", "Complete", "Error"});
   box->setCurrentIndex(index.data().toInt());
@@ -49,7 +47,6 @@ QWidget* StatusDelegate::createEditor(QWidget *parent, const QStyleOptionViewIte
 
 void StatusDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-  KLOG("setModelData");
   QComboBox* box   = static_cast<QComboBox*>(editor);
   QString    value = g_status_strings.at(box->itemText(box->currentIndex()));
   model->setData(index, value, Qt::EditRole);
@@ -57,6 +54,5 @@ void StatusDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, co
 
 void StatusDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem &option, const QModelIndex&) const
 {  
-  KLOG("StatusDelegate::updateEditorGeometry");
   editor->setGeometry(option.rect);
 }

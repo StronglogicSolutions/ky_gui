@@ -111,7 +111,7 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item>
-          <widget class="SaveButton" name="save">
+          <widget class="QPushButton" name="save">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -120,7 +120,7 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="minimumSize">
             <size>
-             <width>100</width>
+             <width>46</width>
              <height>46</height>
             </size>
            </property>
@@ -183,13 +183,6 @@ opacity: 0.3;</string>
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>SaveButton</class>
-   <extends>QPushButton</extends>
-   <header>include/ui/savebutton.hpp</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

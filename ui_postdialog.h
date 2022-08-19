@@ -17,9 +17,10 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QTableView>
+#include <QtWidgets/QTextBrowser>
 #include <QtWidgets/QVBoxLayout>
-#include "include/ui/savebutton.hpp"
 
 QT_BEGIN_NAMESPACE
 
@@ -34,8 +35,8 @@ public:
     QLabel *label;
     QTableView *posts;
     QHBoxLayout *horizontalLayout_2;
-    QLabel *selectionLabel;
-    SaveButton *save;
+    QTextBrowser *postText;
+    QPushButton *save;
     QFrame *frame_4;
     QFrame *frame_3;
 
@@ -91,27 +92,21 @@ public:
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-        selectionLabel = new QLabel(Dialog);
-        selectionLabel->setObjectName(QString::fromUtf8("selectionLabel"));
-        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        postText = new QTextBrowser(Dialog);
+        postText->setObjectName(QString::fromUtf8("postText"));
+        postText->setMinimumSize(QSize(0, 0));
+        postText->setMaximumSize(QSize(600, 500));
+
+        horizontalLayout_2->addWidget(postText);
+
+        save = new QPushButton(Dialog);
+        save->setObjectName(QString::fromUtf8("save"));
+        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(selectionLabel->sizePolicy().hasHeightForWidth());
-        selectionLabel->setSizePolicy(sizePolicy1);
-        selectionLabel->setMinimumSize(QSize(0, 0));
-        selectionLabel->setMaximumSize(QSize(600, 500));
-        selectionLabel->setWordWrap(true);
-        selectionLabel->setMargin(8);
-
-        horizontalLayout_2->addWidget(selectionLabel);
-
-        save = new SaveButton(Dialog);
-        save->setObjectName(QString::fromUtf8("save"));
-        QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Fixed);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(save->sizePolicy().hasHeightForWidth());
-        save->setSizePolicy(sizePolicy2);
+        sizePolicy1.setHeightForWidth(save->sizePolicy().hasHeightForWidth());
+        save->setSizePolicy(sizePolicy1);
+        save->setMinimumSize(QSize(46, 46));
         save->setMaximumSize(QSize(300, 16777215));
         save->setStyleSheet(QString::fromUtf8("font: 87 18pt \"Noto Sans\";\n"
 "color: rgb(0, 0, 0);\n"
@@ -170,7 +165,11 @@ public:
     {
         Dialog->setWindowTitle(QCoreApplication::translate("Dialog", "Dialog", nullptr));
         label->setText(QCoreApplication::translate("Dialog", "Platform Posts", nullptr));
-        selectionLabel->setText(QCoreApplication::translate("Dialog", "No selection", nullptr));
+        postText->setHtml(QCoreApplication::translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'Noto Sans'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">No selection</p></body></html>", nullptr));
         save->setText(QCoreApplication::translate("Dialog", "Save", nullptr));
     } // retranslateUi
 

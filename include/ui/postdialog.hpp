@@ -21,34 +21,33 @@ public:
 
   QVariant data(const QModelIndex& index, int role) const final
   {
+    if (!index.isValid())
+      return QVariant{};
+
     auto post_to_string = [this](auto row, auto col)
     {
       switch (col)
       {
-        case (0): return QString{"%0"}.arg(posts().at(row).name);   break;
-        case (1): return QString{"%0"}.arg(posts().at(row).time);   break;
-        case (2): return QString{"%0"}.arg(posts().at(row).user);   break;
-        case (3): return QString{"%0"}.arg(posts().at(row).uuid);   break;
+        case (0): return posts().at(row).name;   break;
+        case (1): return posts().at(row).time;   break;
+        case (2): return posts().at(row).user;   break;
+        case (3): return posts().at(row).uuid;   break;
         case (4):
         {
-          auto status = posts().at(row).status;
-          return (g_status_names.find(status) != g_status_names.end()) ?
-            QString{"%0"}.arg(g_status_names.at(status)) : "";
+          const auto status = posts().at(row).status;
+          if (g_status_names.find(status) != g_status_names.end())
+            return g_status_names.at(status);
         }
-        break;
         default:  return QString{};
       }
     };
     const int i = index.row();
     const int j = index.column();
     if (role == Qt::DisplayRole)
-      return m_posts.empty() || i >= m_posts.size() ? QString{"Loading data..."} : post_to_string(i, j);
+      return post_to_string(i, j);
+    else
     if (role == Qt::EditRole)
       return posts()[i].active;
-    else
-    if (role == 257)    
-      return m_posts.at(i).active;   
-
     return QVariant{};
   }
 
@@ -66,24 +65,19 @@ public:
 
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override
   {
-    if (index.isValid() && (role == Qt::EditRole || role == Qt::DisplayRole))
+    if (!index.isValid() || index.column() != 4)
+      return false;
+
+    if (role == Qt::EditRole || role == Qt::DisplayRole)
     {
-      const auto column = index.column();
       const auto row    = index.row();
-      switch(column)
-      {
-        case 4:
-          m_posts[row].active = value.toInt() == 1;
-          m_posts[row].status = value.toString();
-          emit dataChanged(index, index);
-          return true;
-        break;
-        default:
-          return false;
-        break;
-      }
+      m_posts[row].active = value.toInt() == 1;
+      m_posts[row].status = value.toString();
+      emit dataChanged(index, index);
+      return true;
     }
-    KLOG(QString{"Didn't handle setData for role %0"}.arg(role));
+
+    return false;
   }
 
   void set_data(const QVector<QString>& data)
@@ -117,6 +111,7 @@ public:
   }
 
 private:
+
   QVector<Platform::Post> m_posts;
 };
 
