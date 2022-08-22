@@ -118,11 +118,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   m_controller.init(this);
   ui->setupUi(this);
   this->setWindowTitle("KYGUI");
-//  setStyleSheet(get_stylesheet());
   setConnectScreen();
   connect(ui->connect, &QPushButton::clicked, this, &MainWindow::connectClient);
-  setMaximumHeight(640);
-  ui->centralWidget->setMaximumHeight(640);
   ui->progressBar->setMinimum(0);
   ui->progressBar->setMaximum(DEFAULT_TIMEOUT);
   ui->eventList->setModel(m_event_model);
@@ -204,6 +201,8 @@ void MainWindow::setConnectScreen(bool visible)
     ui->portLabel->setMinimumSize(120, 30);
     ui->configLabel->setMinimumSize(640, 30);
     ui->configLabel->setMaximumSize(960, 30);
+    ui->centralWidget->setMaximumHeight(640);
+    setMaximumHeight(640);
 
     QFile file(QCoreApplication::applicationDirPath() + "/config/config.json");
     file.open(QIODevice::ReadOnly | QFile::ReadOnly);
@@ -230,6 +229,8 @@ void MainWindow::setConnectScreen(bool visible)
     ui->tokenLED->hide();
     ui->startScreen->setVisible(false);
     ui->outerLayer->setVisible(true);
+    ui->centralWidget->setMaximumHeight(QWIDGETSIZE_MAX);
+    setMaximumHeight(QWIDGETSIZE_MAX);
   }
 }
 
