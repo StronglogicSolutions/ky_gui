@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QThread>
 #include <QAbstractTableModel>
+#include <algorithm>
 #include "headers/util.hpp"
 #include "headers/kiq_types.hpp"
 #include "include/ui/status_delegate.hpp"
@@ -78,6 +79,80 @@ public:
     }
 
     return false;
+  }
+
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const final
+  {
+    if (role != Qt::DisplayRole)
+        return QVariant{};
+
+    if (orientation == Qt::Horizontal) {
+        switch (section) {
+        case 0:
+            return "Platform";
+        case 1:
+            return "Time";
+        case 2:
+            return "User";
+        case 3:
+          return "UUID";
+        case 4:
+          return "Status";
+        default:
+            return QVariant{};
+        }
+    }
+    return section + 1;
+  }
+
+  void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) final
+  {
+    using sort_fn = std::function<bool(const Platform::Post&, const Platform::Post&)>;
+    auto predicate = sort_fn{};
+    bool ascending = (order == Qt::AscendingOrder);
+    switch (column)
+    {
+      case 0:
+        predicate = [ascending](const auto& a, const auto& b)
+        {
+          return (ascending) ?
+                   (a.name.front() != b.name.front()) ? a.name.front().digitValue() > b.name.front().digitValue() :
+                                                        a.name.at(1)  .digitValue() > b.name.at(1)  .digitValue()   :
+                   (a.name.at(1)   != b.name.at(1))   ? a.name.front().digitValue() < b.name.front().digitValue() :
+                                                        a.name.at(1)  .digitValue() < b.name.at(1)  .digitValue();
+        };
+      break;
+      case 1:
+        predicate = [ascending](const auto& a, const auto& b) { return (ascending) ? a.time.toInt() > b.time.toInt() : a.time.toInt() < b.time.toInt(); };
+      break;
+      case 2:
+        predicate = [ascending](const auto& a, const auto& b)
+        {
+          return (ascending) ?
+                   (a.user.front() != b.user.front()) ? a.user.front().digitValue() > b.user.front().digitValue() :
+                                                        a.user.at(1)  .digitValue() > b.user.at(1)  .digitValue()   :
+                   (a.user.at(1)   != b.user.at(1))   ? a.user.front().digitValue() < b.user.front().digitValue() :
+                                                        a.user.at(1)  .digitValue() < b.user.at(1)  .digitValue();
+        };
+      break;
+      case 3:
+        predicate = [ascending](const auto& a, const auto& b)
+        {
+          return (ascending) ?
+                   (a.uuid.front() != b.uuid.front()) ? a.uuid.front().digitValue() > b.uuid.front().digitValue() :
+                                                        a.uuid.at(1)  .digitValue() > b.uuid.at(1)  .digitValue()   :
+                   (a.uuid.at(1)   != b.uuid.at(1))   ? a.uuid.front().digitValue() < b.uuid.front().digitValue() :
+                                                        a.uuid.at(1)  .digitValue() < b.uuid.at(1)  .digitValue();
+        };
+      break;
+      case 4:
+        predicate = [ascending](const auto& a, const auto& b) { return (ascending) ? a.status.toInt() > b.status.toInt() :
+                                                                                     a.status.toInt() < b.status.toInt(); };
+      break;
+      default:
+        KLOG("Can't sort with column ", std::to_string(column));
+    }
+    std::sort(m_posts.begin(), m_posts.end(), predicate);
   }
 
   void set_data(const QVector<QString>& data)

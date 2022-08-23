@@ -47,6 +47,7 @@ PostDialog::PostDialog(QWidget *parent)
   ui->posts->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   ui->posts->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   ui->posts->horizontalHeader()->setStretchLastSection(true);
+  ui->posts->horizontalHeader()->setSortIndicatorShown(true);
   ui->posts->setModel(&m_post_model);
   ui->posts->setItemDelegateForColumn(4, new StatusDelegate{parent, [this](const auto index)
   {
