@@ -89,11 +89,11 @@ public:
     if (orientation == Qt::Horizontal) {
         switch (section) {
         case 0:
-            return "Platform";
+          return "Platform";
         case 1:
-            return "Time";
+          return "Time";
         case 2:
-            return "User";
+          return "User";
         case 3:
           return "UUID";
         case 4:
@@ -123,7 +123,8 @@ public:
         };
       break;
       case 1:
-        predicate = [ascending](const auto& a, const auto& b) { return (ascending) ? a.time.toInt() > b.time.toInt() : a.time.toInt() < b.time.toInt(); };
+        predicate = [ascending](const auto& a, const auto& b) { return (ascending) ? a.time.toInt() > b.time.toInt() :
+                                                                                     a.time.toInt() < b.time.toInt(); };
       break;
       case 2:
         predicate = [ascending](const auto& a, const auto& b)
@@ -173,10 +174,8 @@ public:
 
   Qt::ItemFlags flags(const QModelIndex& index) const final
   {
-    auto flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled| Qt::ItemIsDropEnabled;
-    if (index.column() == 4)
-      flags |= Qt::ItemIsEditable;
-    return flags;
+    Q_UNUSED(index);
+    return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled| Qt::ItemIsDropEnabled | Qt::ItemIsEditable;
   }
 
   void Update(const QModelIndex& index)
@@ -200,6 +199,7 @@ public:
   void     ReceiveData(const QVector<QString>& data);
   void     Update(const QVector<QString>& data);
   void     SelectRow(int row);
+  QString  GetLastUpdated() const;
 
 signals:
   void     request_update(const Platform::Post& post);
@@ -207,6 +207,7 @@ signals:
 private:
   Ui::Dialog* ui;
   PostModel   m_post_model;
+  QString     m_last_updated;
   int         m_selected{-1};
 };
 

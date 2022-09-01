@@ -30,8 +30,8 @@
 #include <include/client/client.hpp>
 
 static const uint8_t  CLIENT_EXIT{9};
-static const uint32_t DEFAULT_TIMEOUT{1000};
-static const char* stylesheet_path{"style/style.css"};
+static const int      DEFAULT_TIMEOUT{1000};
+static const char*    stylesheet_path{"style/style.css"};
 
 const QString KYGUI_DEFAULT_THEME{
 "border-color: rgb(0, 0, 0);"
@@ -249,7 +249,7 @@ public:
     /** Misc */
     QJsonObject           m_config;
     uint16_t              m_consecutive_events;
-    quint64               m_client_time_remaining;
+    int                   m_client_time_remaining;
     QTimer                m_progress_timer;
     PlatformMap           m_platform_map;
 
