@@ -7,6 +7,6 @@ QComboBox QAbstractItemView
     selection-color: #0e191d;
     selection-background-color: rgb(29, 51, 59);
   }
-  QProgressBar::chunk {
+/*  QProgressBar::chunk {
      background-color: rgb(147, 147, 147);
- }
+ }*/

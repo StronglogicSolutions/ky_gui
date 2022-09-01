@@ -70,20 +70,26 @@ PostDialog::PostDialog(QWidget *parent)
   });
 }
 
+PostDialog::~PostDialog()
+{
+  delete ui;
+}
+
 void PostDialog::ReceiveData(const QVector<QString>& data)
 {
   m_post_model.set_data(data);
 }
 
 void PostDialog::Update(const QVector<QString>& data)
-{
+{  
   auto unselect = [this] { ui->postText->setText("No selection"); };
   for (int i = 0; i < m_post_model.posts().size(); i++)
   {
     auto& post = m_post_model.get_mutable_posts()[i];
     if (post.uuid == data[Platform::UUID_INDEX] && post.name == data[Platform::NAME_INDEX])
     {
-      post = Platform::Post::from_vector(data).front();
+      post           = Platform::Post::from_vector(data).front();
+      m_last_updated = post.to_string();
       ui->save->setStyleSheet(save_button_style);
       unselect();
       break;
@@ -97,12 +103,7 @@ void PostDialog::SelectRow(int row)
   ui->postText->setText(QString{"Row %0 selected: %1"}.arg(row).arg(m_post_model.posts()[row].content));
 }
 
-/**
- * destructor
- *
- * @brief PostDialog::~PostDialog
- */
-PostDialog::~PostDialog()
+QString PostDialog::GetLastUpdated() const
 {
-  delete ui;
+  return m_last_updated;
 }

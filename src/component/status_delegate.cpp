@@ -26,6 +26,8 @@ QWidget* StatusDelegate::createEditor(QWidget *parent, const QStyleOptionViewIte
 {
   if (index.isValid())
     m_callback(index);
+  if (index.column() != 4)
+    return parent;
 
   QComboBox* box = new QComboBox{parent};
   box->addItems({"Scheduled", "Complete", "Error"});

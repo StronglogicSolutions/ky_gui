@@ -297,7 +297,10 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
       window->posts_ui.ReceiveData(v);
     else
     if (message == "Platform Update")
+    {
       window->posts_ui.Update(v);
+      event_message += "\n" + window->posts_ui.GetLastUpdated();
+    }
     else
     if (message == "Message Received")
       event_message += "\n" + v.at(1) + ": " + v.at(2);

@@ -453,7 +453,7 @@ void MainWindow::connectClient()
   QObject::connect(&m_progress_timer, &QTimer::timeout, q_client, [this]() -> void
   {
     if (--m_client_time_remaining > 0)
-    {
+    {      
       ui->progressBar->setValue(m_client_time_remaining);
       m_progress_timer.start(10);
     }

@@ -79,7 +79,7 @@ public:
 
         posts = new QTableView(Dialog);
         posts->setObjectName(QString::fromUtf8("posts"));
-        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(posts->sizePolicy().hasHeightForWidth());
