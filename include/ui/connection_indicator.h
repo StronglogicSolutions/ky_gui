@@ -5,22 +5,22 @@
 
 class ConnectionIndicator : public QLabel
 {
-    Q_OBJECT
+  Q_OBJECT
 public:
-    explicit ConnectionIndicator(QWidget *parent = nullptr);
+  explicit ConnectionIndicator(QWidget *parent = nullptr);
 
-    enum State{
-        StateConnected,
-        StateOkBlue,
-        StateWarning,
-        StateDisconnected
-    };
+  enum State{
+      StateConnected,
+      StateOkBlue,
+      StateWarning,
+      StateDisconnected
+  };
 
-    void setState(bool state);
-    void setState(State state);
+  void setState(bool state);
+  void setState(State state);
 
-signals:
-
+private:
+    State m_state;
 };
 
 #endif // CONNECTIONINDICATOR_H

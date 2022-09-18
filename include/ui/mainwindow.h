@@ -251,6 +251,7 @@ public:
     uint16_t              m_consecutive_events;
     int                   m_client_time_remaining;
     QTimer                m_progress_timer;
+    QTimer                m_ping_timer;
     PlatformMap           m_platform_map;
 
    private slots:
@@ -258,6 +259,7 @@ public:
     void connectClient();
     void onMessageReceived(int t, const QString& s, StringVec v);
     void startTimers();
+    void exit();
 };
 
 
