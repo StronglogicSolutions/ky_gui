@@ -117,6 +117,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
     : QMainWindow(parent),
       cli_argc(argc),
       cli_argv(argv),
+      m_controller(this),
       ui(new Ui::MainWindow),
       arg_ui(new ArgDialog),
       q_client(nullptr),
@@ -125,41 +126,63 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   m_event_model = new QStandardItemModel(this);
   m_process_model = new QStandardItemModel(this);
   q_client = new Client(this, cli_argc, cli_argv);
-  m_controller.init(this);
+  auto stay_alive = [this]
+  {
+    q_client->ping();
+    if (static int timeouts{0}; m_pong_timer.elapsed() > (1000 * 60))
+    {
+      if (++timeouts == 5)
+      {
+        m_client_time_remaining = DEFAULT_TIMEOUT;
+        ui->led->setState(ConnectionIndicator::State::StateWarning);
+        connectClient();
+      }
+      m_pong_timer.restart();
+    }
+    else
+    if (timeouts == 10)
+      exit();
+  };
   ui->setupUi(this);
-  this->setWindowTitle("KYGUI");
-  setConnectScreen();
-
-  ui->progressBar->setMinimum(0);
-  ui->progressBar->setMaximum(DEFAULT_TIMEOUT);
-  ui->eventList->setModel(m_event_model);
+  setWindowTitle("KYGUI");
+  setConnectScreen();    
+  ui->inputText  ->setTabChangesFocus(true);
+  ui->kyConfig   ->setTabChangesFocus(true);
+  ui->serverIp   ->setTabChangesFocus(true);
+  ui->serverPort ->setTabChangesFocus(true);
+  ui->progressBar->setRange(0, DEFAULT_TIMEOUT);
+  ui->eventList  ->setModel(m_event_model);
   ui->processList->setModel(m_process_model);
-  ui->serverIp->setText(argv[1]);
-  ui->serverPort->setText(argv[2]);  
-  ui->fetchToken->setStyleSheet(GetFetchButtonTheme());
-  ui->connect   ->setStyleSheet(GetConnectButtonTheme());
-
-  QObject::connect(ui->fetchToken, &QPushButton::clicked, this, [this]()
+  ui->serverIp   ->setText(argv[1]);
+  ui->serverPort ->setText(argv[2]);
+  ui->fetchToken ->setStyleSheet(GetFetchButtonTheme());
+  ui->connect    ->setStyleSheet(GetConnectButtonTheme());
+  QObject::connect(&m_ping_timer,    &QTimer::timeout, stay_alive);
+  QObject::connect(&schedule_ui,     &ScheduleDialog::SchedulerRequest, this, [this](auto type, auto task) { q_client->request(type, task); });
+  QObject::connect(&posts_ui,        &PostDialog::request_update,       this, [this](const auto& post)     { q_client->request(constants::RequestType::UPDATE_POST, post.payload()); });
+  QObject::connect(ui->eventList,    &QListView::clicked,               this, [this](const auto& index)    { utils::infoMessageBox(m_event_model->item(index.row(), index.column())->text(), "Event"); });
+  QObject::connect(&schedule_ui,     &ScheduleDialog::UpdateSchedule,   this, [this] { q_client->request(RequestType::FETCH_SCHEDULE); });
+  QObject::connect(q_client,         &Client::onTokenReceived, this, [this](bool error) { ui->tokenLED->setState(!(error)); });
+  QObject::connect(q_client,         &Client::messageReceived, this, &MainWindow::onMessageReceived);
+  QObject::connect(ui->connect,      &QPushButton::clicked, this, &MainWindow::connectClient);
+  QObject::connect(ui->disconnect,   &QPushButton::clicked, this, [this] { exit(); });
+  QObject::connect(ui->execute,      &QPushButton::clicked, this, [this] { q_client->execute(); });
+  QObject::connect(ui->openMessages, &QPushButton::clicked, this, [this] { message_ui.show(); });
+  QObject::connect(ui->editApps,     &QPushButton::clicked, this, [this] { app_ui.show(); });
+  QObject::connect(ui->saveConfig,   &QPushButton::clicked, this, [this] { utils::save_config(ui->kyConfig->toPlainText()); });
+  QObject::connect(ui->fetchTerms,   &QPushButton::clicked, this, [this] { q_client->request(RequestType::FETCH_TERM_HITS); });
+  QObject::connect(ui->tasks,        &QPushButton::clicked, this, [this] { schedule_ui.show(); });
+  QObject::connect(ui->addArgs,      &QPushButton::clicked, this, [this] { arg_ui->show(); });
+  QObject::connect(ui->fetchToken,   &QPushButton::clicked, this, [this]()
   {
     m_config = loadJsonConfig(ui->kyConfig->toPlainText());
     if (!m_config.contains("username") || !m_config.contains("password") || !m_config.contains("auth"))
       return KLOG("Unable to connect to KIQ without credentials. Please modify config JSON");
 
-    const QString username  = configValue("username", m_config);
-    const QString password  = configValue("password", m_config);
-    const QString address   = configValue("auth",     m_config);
-    const QString file_path = configValue("fileDirectory", m_config);
-
-    q_client->SetCredentials(username, password, address);
-    arg_ui->setFilePath(file_path);
+    q_client->SetCredentials(configValue("username", m_config), configValue("password", m_config), configValue("auth",     m_config));
+    arg_ui->setFilePath(configValue("fileDirectory", m_config));
   });
 
-  QObject::connect(q_client, &Client::onTokenReceived, this, [this](bool error)
-  {
-    ui->tokenLED->setState(!(error));
-  });
-
-  QObject::connect(q_client, &Client::messageReceived, this, &MainWindow::onMessageReceived);
   QObject::connect(&doc_window, &DocumentWindow::RequestData, this, [this](QVector<QString> argv)
   {
     q_client->SetFetching();
@@ -178,32 +201,27 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
       q_client->SetFetching(false);
       doc_window.ReceiveFiles(std::move(files));
     }
-  );
-
-  QObject::connect(&posts_ui, &PostDialog::request_update, this, [this](const Platform::Post& post)
-  {
-    q_client->request(constants::RequestType::UPDATE_POST, post.payload());
-  });
+  );  
 
   QObject::connect(ui->actionDefault, &QAction::triggered, this, [this]()
   {
     ui->centralWidget->setStyleSheet(KYGUI_DEFAULT_THEME);
-    ui->processList->setStyleSheet(KYGUI_DEFAULT_LIST_THEME);
-    ui->eventList->setStyleSheet(KYGUI_DEFAULT_LIST_THEME);
+    ui->processList  ->setStyleSheet(KYGUI_DEFAULT_LIST_THEME);
+    ui->eventList    ->setStyleSheet(KYGUI_DEFAULT_LIST_THEME);
   });
 
   QObject::connect(ui->actionBlack, &QAction::triggered, this, [this]()
   {
     ui->centralWidget->setStyleSheet(KYGUI_BLACK_THEME);
-    ui->processList->setStyleSheet(KYGUI_BLACK_LIST_THEME);
-    ui->eventList->setStyleSheet(KYGUI_BLACK_LIST_THEME);
+    ui->processList  ->setStyleSheet(KYGUI_BLACK_LIST_THEME);
+    ui->eventList    ->setStyleSheet(KYGUI_BLACK_LIST_THEME);
   });
 
   QObject::connect(ui->actionBlue, &QAction::triggered, this, [this]()
   {
     ui->centralWidget->setStyleSheet(KYGUI_BLUE_THEME);
-    ui->processList->setStyleSheet(KYGUI_BLUE_LIST_THEME);
-    ui->eventList->setStyleSheet(KYGUI_BLUE_LIST_THEME);
+    ui->processList  ->setStyleSheet(KYGUI_BLUE_LIST_THEME);
+    ui->eventList    ->setStyleSheet(KYGUI_BLUE_LIST_THEME);
   });
 
   QObject::connect(ui->sendMessage, &QPushButton::clicked, this, [this]()
@@ -215,36 +233,18 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   QObject::connect(ui->appList, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
     this, [this]()
     {
-      QString    app_name    = ui->appList->currentText();
-      const auto json_object = configObject(app_name, m_config, true);
-      q_client->setSelectedApp(std::vector<QString>{{app_name}});
+      QString app_name = ui->appList->currentText();
+      q_client->setSelectedApp(std::vector<QString>{{app_name}});      
+      arg_ui  ->setConfig(configObject(app_name, m_config, true));
       arg_ui  ->setAppName(app_name);
-      arg_ui  ->setConfig(json_object);
     });
 
   QObject::connect(ui->platform, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-    this, [this]() { UpdateIPCOptions(); });
-
-  QObject::connect(ui->connect,      &QPushButton::clicked, this, &MainWindow::connectClient);
-  QObject::connect(ui->disconnect,   &QPushButton::clicked, this, [this] { exit(); });
-  QObject::connect(ui->execute,      &QPushButton::clicked, this, [this] { q_client->execute(); });
-  QObject::connect(ui->openMessages, &QPushButton::clicked, this, [this] { message_ui.show(); });
-  QObject::connect(ui->editApps,     &QPushButton::clicked, this, [this] { app_ui.show(); });
-  QObject::connect(ui->saveConfig,   &QPushButton::clicked, this, [this] { utils::save_config(ui->kyConfig->toPlainText()); });
-  QObject::connect(ui->fetchTerms,   &QPushButton::clicked, this, [this] { q_client->request(RequestType::FETCH_TERM_HITS); });
-  QObject::connect(ui->tasks,        &QPushButton::clicked, this, [this] { schedule_ui.show(); });
-  QObject::connect(ui->addArgs,      &QPushButton::clicked, this, [this] { arg_ui->show(); });
-  QObject::connect(&schedule_ui,     &ScheduleDialog::SchedulerRequest, this, [this](auto type, auto task) { q_client->request(type, task); });
-  QObject::connect(&m_ping_timer,    &QTimer::timeout, q_client,  &Client::ping);
-  QObject::connect(&schedule_ui,     &ScheduleDialog::UpdateSchedule, this, [this]
-  {
-    q_client->request(RequestType::FETCH_SCHEDULE);
-  });
+    this, [this]() { UpdateIPCOptions(); });  
 
   QObject::connect(arg_ui, &ArgDialog::taskRequestReady, this, [this](Task* task)
   {
-    auto mask = q_client->getSelectedApp();
-    if (mask > -1)
+    if (q_client->getSelectedApp() > -1)
       q_client->scheduleTask(task);
   });
 
@@ -267,20 +267,15 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
 
   QObject::connect(ui->processList, &QListView::clicked, this, [this](const QModelIndex& index)
   {
-    const auto process = m_processes.at(index.row());
-    QString process_info_text = m_processes.at(index.row()).name.toUtf8() + "\n";
-    process_info_text += "Execution requested at " + process.start.toUtf8() +
-                         "\nIs currently in a state of: " + ProcessNames[process.state - 1].toUtf8();
+    const auto process           = m_processes.at(index.row());
+    QString    process_info_text = m_processes.at(index.row()).name.toUtf8() + "\n";
+    process_info_text           += "Execution requested at " + process.start.toUtf8() +
+                                   "\nIs currently in a state of: " + ProcessNames[process.state - 1].toUtf8();
 
     if (process.end.size() || process.id == "Scheduled task")
       process_info_text += "\n\nResult: \n" + process.result;
     utils::infoMessageBox(process_info_text, "Process");
-  });
-
-  QObject::connect(ui->eventList, &QListView::clicked, this, [this](const QModelIndex& index)
-  {
-    utils::infoMessageBox(m_event_model->item(index.row(), index.column())->text(), "Event");
-  });
+  });  
 
   QObject::connect(m_event_model, &QAbstractItemModel::rowsAboutToBeInserted, this, [this]()
   {
@@ -317,18 +312,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
 
   QObject::connect(&m_progress_timer, &QTimer::timeout, q_client, [this]() -> void
   {
-    static int timeouts{};
     if (--m_client_time_remaining > 0)
     {
-      ui->progressBar->setValue(m_client_time_remaining);
+      ui->progressBar->setValue(500);
       m_progress_timer.start(10);
-    }
-    else
-    {
-      ui->led->setState(false);
-      connectClient();
-      if (++timeouts == 10)
-        exit();
     }
   });
 }
@@ -393,9 +380,9 @@ void MainWindow::setConnectScreen(bool visible)
   }
   else
   {
-    ui->centralWidget->setLayout(ui->outerLayer->layout());
     ui->connect->hide();
     ui->fetchToken->hide();
+    ui->saveConfig->hide();
     ui->kyConfig->hide();
     ui->ipLabel->hide();
     ui->configLabel->hide();
@@ -422,9 +409,7 @@ void MainWindow::connectClient()
   const auto& server_ip   = ui->serverIp->toPlainText();
   const auto& server_port = ui->serverPort->toPlainText();
   setWindowTitle(windowTitle() + ' ' + q_client->GetUsername() + "@kiq://" + server_ip + ":" + server_port);
-  q_client->start(server_ip, server_port);
-
-  m_ping_timer.start(10000);
+  q_client->start(server_ip, server_port);  
   startTimers();
 }
 
@@ -461,8 +446,7 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v)
   {
     case(PONG_REPLY_TYPE):
     {
-      qint64 elapsed_time = m_pong_timer.elapsed();
-      if (elapsed_time < (1000 * 60))
+      if (const auto elapsed_time = m_pong_timer.elapsed(); elapsed_time < (1000 * 60))
       {
         ui->lastPing->setText(QString::number(elapsed_time) + " ms");
         m_pong_timer.restart();
@@ -565,10 +549,6 @@ QString MainWindow::parseTaskInfo(StringVec v)
   return task_info;
 }
 
-/**
- * @brief ArgDialog::keyPressEvent
- * @param e
- */
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
   if (Qt::ControlModifier)
@@ -587,6 +567,7 @@ void MainWindow::startTimers()
 {
   m_progress_timer.start(10);
   m_pong_timer    .start();
+  m_ping_timer    .start(10000);
 }
 
 void MainWindow::SetPlatformOptions(const QString& platform, const QList<QString>& options)

@@ -18,13 +18,8 @@
  * incoming messages and updating the UI accordingly
  */
 
-/**
- * @brief MainWindow::Controller::init
- * @param window
- */
-void MainWindow::Controller::init(MainWindow* window) {
-  this->window = window;
-}
+MainWindow::Controller::Controller(MainWindow* window_)
+: window(window_) {}
 
 /**
  * @brief MainWindow::MessageParser::handleCommands

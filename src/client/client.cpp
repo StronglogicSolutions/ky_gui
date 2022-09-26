@@ -531,8 +531,6 @@ void Client::ping()
 {
   if ((outgoing_files.isEmpty() || file_was_sent) && !(m_fetching))
   {
-    KLOG("Pinging server");
-
     uint8_t send_buffer[5];
     memset(send_buffer, 0, 5);
     send_buffer[4] = (TaskCode::PINGBYTE & 0xFF);
@@ -556,8 +554,7 @@ void Client::closeConnection()
 {
   if (m_client_socket_fd != -1)
   {
-    std::string stop_operation_string = CreateOperation("stop", {});   
-    sendEncoded(stop_operation_string);
+    sendEncoded(CreateOperation("stop", {}));
     ::shutdown(m_client_socket_fd, SHUT_RDWR);
     ::close(m_client_socket_fd);
     m_client_socket_fd = -1;

@@ -202,7 +202,7 @@ public:
 
     class Controller {
      public:
-      void init(MainWindow* window);
+      explicit Controller(MainWindow* window);
       void handleCommands(const StringVec& commands, const QString& default_app);
       void handleMessage(const QString& message, const StringVec& v);
       QString handleEventMessage(const QString& message, const StringVec& v);     
