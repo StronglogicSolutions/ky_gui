@@ -205,7 +205,7 @@ public:
       explicit Controller(MainWindow* window);
       void handleCommands(const StringVec& commands, const QString& default_app);
       void handleMessage(const QString& message, const StringVec& v);
-      QString handleEventMessage(const QString& message, const StringVec& v);     
+      QString handleEventMessage(const QString& message, const StringVec& v = {});
 
      private:
       QString parseMessage(const QString& message, const StringVec& v);
@@ -256,7 +256,7 @@ public:
 
    private slots:
     /** Receivers */
-    void connectClient();
+    void connectClient(bool reconnect = false);
     void onMessageReceived(int t, const QString& s, StringVec v);
     void startTimers();
     void exit();

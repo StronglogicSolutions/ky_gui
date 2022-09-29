@@ -116,7 +116,7 @@ Client::MessageHandler Client::createMessageHandler(std::function<void()> cb) {
  * @param [in] {char**} arguments
  */
 Client::Client(QWidget* parent, int count, char** arguments)
-: QDialog(parent),
+: QObject(parent),
   argc(count),
   argv(arguments),
   m_client_socket_fd(-1),
@@ -185,8 +185,8 @@ Client::Client(QWidget* parent, int count, char** arguments)
             }
           }
         }
-        std::string formatted_json = getJsonString(message);
-        emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(formatted_json.data(), formatted_json.size()), {});
+        std::string json = getJsonString(message);
+        emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(json.data(), json.size()), {});
       }
       catch (const std::exception& e)
       {
@@ -213,6 +213,8 @@ Client::Client(QWidget* parent, int count, char** arguments)
         QString token = configValue("token", json);
         KLOG("Fetched token: ", token);
         m_token = token.toUtf8().constData();
+        if (m_reconnect)
+          start(m_server_ip, m_server_port);
       }
       else
         error = true;
@@ -223,9 +225,10 @@ Client::Client(QWidget* parent, int count, char** arguments)
 
 void Client::SetCredentials(const QString& username, const QString& password, const QString& auth_address)
 {
-  m_user         = username;
-  m_password     = password;
-  m_auth_address = auth_address;
+  m_user            = username;
+  m_password        = password;
+  m_auth_address    = auth_address + "/login";
+  m_refresh_address = auth_address + "/refresh";
   FetchToken();
 }
 
@@ -234,17 +237,22 @@ QString Client::GetUsername() const
   return m_user;
 }
 
-void Client::FetchToken()
-{
-  m_network_manager.get(QNetworkRequest(QUrl(m_auth_address + "?name=" + m_user + "&password=" + m_password)));
+void Client::FetchToken(bool reconnect)
+{  
+  if (reconnect)
+    m_network_manager.get(QNetworkRequest(QUrl(m_refresh_address + "?name=" + m_user + "&token=" + m_token)));
+  else
+    m_network_manager.get(QNetworkRequest(QUrl(m_auth_address    + "?name=" + m_user + "&password=" + m_password)));
+  m_reconnect = reconnect;
 }
 
 /**
  * @brief Client::~Client
  * @destructor
  */
-Client::~Client() {
-    closeConnection();
+Client::~Client()
+{
+  closeConnection();
 }
 
  /**
@@ -253,7 +261,8 @@ Client::~Client() {
 void Client::handleMessages()
 {
   uint8_t receive_buffer[MAX_PACKET_SIZE];
-  for (;;) {
+  for (;;)
+  {
     memset(receive_buffer, 0, MAX_PACKET_SIZE);
     ssize_t bytes_received = recv(m_client_socket_fd, receive_buffer, MAX_PACKET_SIZE, 0);
 
@@ -272,29 +281,6 @@ void Client::handleMessages()
   ::close(m_client_socket_fd);
 }
 
-
-void Client::handleEvent(std::string data)
-{
-  QString          event = getEvent(data.c_str());
-  QVector<QString> args  = getArgs (data.c_str());
-
-  emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args);
-
-  if (isUploadCompleteEvent(event))
-  {
-    if (!args.isEmpty())
-    {
-      sent_files.at(sent_files.size() - 1).timestamp = args.at(0).toInt();
-      if (outgoing_files.isEmpty())
-      {
-        sendTaskEncoded(m_outbound_task);
-        file_was_sent = false;
-      }
-      else
-        sendEncoded(CreateOperation("FileUpload", {"Subsequent file"}));
-    }
-  }
-}
 
 /**
  * @brief Client::processFileQueue
@@ -880,4 +866,9 @@ bool Client::hasApp(KApplication application)
 std::string Client::CreateOperation(const char* op, std::vector<std::string> args)
 {
   return createOperation(op, args, m_user.toUtf8().constData(), m_token.toUtf8().constData());
+}
+
+void Client::reconnect()
+{
+  FetchToken(true);
 }

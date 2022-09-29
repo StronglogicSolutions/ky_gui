@@ -18,7 +18,7 @@
  * incoming messages and updating the UI accordingly
  */
 
-MainWindow::Controller::Controller(MainWindow* window_)
+MainWindow::Controller::Controller()
 : window(window_) {}
 
 /**
@@ -147,7 +147,7 @@ void MainWindow::Controller::updateProcessResult(
 }
 
 /**
- * @brief MainWindow::MessageParser::handleEventMessage
+ * @brief MainWindow::Controller::handleEventMessage
  * @param message
  * @param v
  * @return

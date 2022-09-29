@@ -120,28 +120,36 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
       m_controller(this),
       ui(new Ui::MainWindow),
       arg_ui(new ArgDialog),
-      q_client(nullptr),
       m_client_time_remaining(DEFAULT_TIMEOUT)
 {
-  m_event_model = new QStandardItemModel(this);
+  m_event_model   = new QStandardItemModel(this);
   m_process_model = new QStandardItemModel(this);
-  q_client = new Client(this, cli_argc, cli_argv);
+  q_client        = new Client(this, cli_argc, cli_argv);
   auto stay_alive = [this]
   {
+    static const bool reconnect = true;
     q_client->ping();
     if (static int timeouts{0}; m_pong_timer.elapsed() > (1000 * 60))
     {
-      if (++timeouts == 5)
+      switch (++timeouts)
       {
-        m_client_time_remaining = DEFAULT_TIMEOUT;
-        ui->led->setState(ConnectionIndicator::State::StateWarning);
-        connectClient();
+        case (4):
+          q_client->closeConnection();
+          m_controller.handleEventMessage("Closing connection");
+        break;
+        case (5):
+          m_client_time_remaining = DEFAULT_TIMEOUT;
+          ui->led->setState(ConnectionIndicator::State::StateWarning);
+          connectClient(reconnect);
+          m_controller.handleEventMessage("Reconnecting");
+        break;
+        case (10):
+          timeouts = 0;
+          exit();
+        break;
       }
       m_pong_timer.restart();
     }
-    else
-    if (timeouts == 10)
-      exit();
   };
   ui->setupUi(this);
   setWindowTitle("KYGUI");
@@ -400,17 +408,22 @@ void MainWindow::setConnectScreen(bool visible)
 /**
  * @brief MainWindow::connectClient
  */
-void MainWindow::connectClient()
+void MainWindow::connectClient(bool reconnect)
 {
   using namespace constants;
 
-  setConnectScreen(false);
-  KLOG("Connecting to server");
-  const auto& server_ip   = ui->serverIp->toPlainText();
-  const auto& server_port = ui->serverPort->toPlainText();
-  setWindowTitle(windowTitle() + ' ' + q_client->GetUsername() + "@kiq://" + server_ip + ":" + server_port);
-  q_client->start(server_ip, server_port);  
-  startTimers();
+  if (reconnect)
+    q_client->reconnect();
+  else
+  {
+    setConnectScreen(false);
+    KLOG("Connecting to server");
+    const auto& server_ip   = ui->serverIp->toPlainText();
+    const auto& server_port = ui->serverPort->toPlainText();
+    setWindowTitle(windowTitle() + ' ' + q_client->GetUsername() + "@kiq://" + server_ip + ":" + server_port);
+    q_client->start(server_ip, server_port);
+    startTimers();
+  }
 }
 
 /**
