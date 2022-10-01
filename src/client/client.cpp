@@ -213,8 +213,12 @@ Client::Client(QWidget* parent, int count, char** arguments)
         QString token = configValue("token", json);
         KLOG("Fetched token: ", token);
         m_token = token.toUtf8().constData();
+
         if (m_reconnect)
           start(m_server_ip, m_server_port);
+        else
+        if (json.contains("refresh"))
+          m_refresh = configValue("refresh", json);
       }
       else
         error = true;
@@ -240,7 +244,7 @@ QString Client::GetUsername() const
 void Client::FetchToken(bool reconnect)
 {  
   if (reconnect)
-    m_network_manager.get(QNetworkRequest(QUrl(m_refresh_address + "?name=" + m_user + "&token=" + m_token)));
+    m_network_manager.get(QNetworkRequest(QUrl(m_refresh_address + "?name=" + m_user + "&token=" + m_refresh)));
   else
     m_network_manager.get(QNetworkRequest(QUrl(m_auth_address    + "?name=" + m_user + "&password=" + m_password)));
   m_reconnect = reconnect;

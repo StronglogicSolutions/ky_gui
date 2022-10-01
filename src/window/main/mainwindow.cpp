@@ -135,17 +135,17 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
       {
         case (4):
           q_client->closeConnection();
-          m_controller.handleEventMessage("Closing connection");
+          to_console("Closing connection");
         break;
         case (5):
           m_client_time_remaining = DEFAULT_TIMEOUT;
           ui->led->setState(ConnectionIndicator::State::StateWarning);
           connectClient(reconnect);
-          m_controller.handleEventMessage("Reconnecting");
+          to_console("Reconnecting");
         break;
-        case (10):
-          timeouts = 0;
-          exit();
+        default:
+          if (timeouts > 10)
+            to_console(QString{"Timeouts: %0"}.arg(timeouts));
         break;
       }
       m_pong_timer.restart();
@@ -434,26 +434,6 @@ void MainWindow::connectClient(bool reconnect)
  */
 void MainWindow::onMessageReceived(int t, const QString& message, StringVec v)
 {
-  auto group_event_messages = [this] (const auto& message, const auto& event_message)
-  {
-    if (m_events.size() > 1)    // Group repeating event messages
-    {
-      auto last_event = m_events[m_events.size() - 1];
-      if (utils::isSameEvent(message, last_event.remove(0, 11)))
-      {
-        m_consecutive_events++;
-        auto count = utils::getLikeEventNum(event_message, m_events);
-        auto clean_event_message = event_message + " (" + QString::number(count) + ")";
-        m_events.push_back(event_message);
-
-        m_event_model->setItem(m_event_model->rowCount() - 1,
-                               utils::createEventListItem(clean_event_message));
-        return;  // It was not a unique message, we can return
-      }
-      m_consecutive_events = 0;
-    }
-  };
-
   QString timestamp_prefix = utils::timestampPrefix();
   switch (t)
   {
@@ -516,16 +496,14 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v)
     break;
     case(EVENT_UPDATE_TYPE):
     {
-      QString event_message = m_controller.handleEventMessage(message, v);
-      group_event_messages(message, event_message);
+      QString event_message = m_controller.handleEventMessage(message, v);      
       if (isKEvent<QString>(message, Event::TASK_SCHEDULED))
       {
         event_message += ". Details:\n" + parseTaskInfo(v);
         UI::infoMessageBox(event_message, "Schedule request succeeded");
         arg_ui->notifyClientSuccess(); // Update ArgDialog accordingly
       }
-      m_events.push_back(event_message);
-      m_event_model->setItem(m_event_model->rowCount(), utils::createEventListItem(event_message));
+      to_console(message, event_message);
     }
     break;
     default:
@@ -603,4 +581,30 @@ void MainWindow::exit()
 {
   q_client->closeConnection();
   QApplication::exit(CLIENT_EXIT);
+}
+
+void MainWindow::to_console(const QString& msg, const QString& event_msg)
+{
+  auto group_event_messages = [this] (const auto& message, const auto& event_message)
+  {
+    if (m_events.size() > 1)    // Group repeating event messages
+    {
+      auto last_event = m_events[m_events.size() - 1];
+      if (utils::isSameEvent(message, last_event.remove(0, 11)))
+      {
+        auto count = utils::getLikeEventNum(event_message, m_events);
+        auto clean_event_message = event_message + " (" + QString::number(count) + ")";
+        m_events.push_back(event_message);
+
+        m_event_model->setItem(m_event_model->rowCount() - 1,
+                               utils::createEventListItem(clean_event_message));
+        return;  // It was not a unique message, we can return
+      }
+    }
+  };
+  const auto event_message = (event_msg.isEmpty()) ? msg : event_msg;
+
+  group_event_messages(msg, event_message);
+  m_events.push_back(event_message);
+  m_event_model->setItem(m_event_model->rowCount(), utils::createEventListItem(event_message));
 }

@@ -225,6 +225,7 @@ bool                          m_fetching;
 QString                       m_user;
 QString                       m_password;
 QString                       m_token;
+QString                       m_refresh;
 QString                       m_auth_address;
 QString                       m_refresh_address;
 QNetworkAccessManager         m_network_manager;

@@ -18,7 +18,7 @@
  * incoming messages and updating the UI accordingly
  */
 
-MainWindow::Controller::Controller()
+MainWindow::Controller::Controller(MainWindow* window_)
 : window(window_) {}
 
 /**
