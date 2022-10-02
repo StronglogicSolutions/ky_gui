@@ -558,7 +558,7 @@ void MainWindow::startTimers()
 {
   m_progress_timer.start(10);
   m_pong_timer    .start();
-  m_ping_timer    .start(5000);
+  m_ping_timer    .start(10000);
 }
 
 void MainWindow::SetPlatformOptions(const QString& platform, const QList<QString>& options)
