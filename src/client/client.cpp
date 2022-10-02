@@ -197,13 +197,13 @@ Client::Client(QWidget* parent, int count, char** arguments)
 {
   qRegisterMetaType<QVector<QString>> ("QVector<QString>");
   qRegisterMetaType<QVector<FileWrap>>("QVector<FileWrap>");
-  QObject::connect(&m_network_manager, &QNetworkAccessManager::finished, this, [=](QNetworkReply* reply)
+  QObject::connect(&m_network_manager, &QNetworkAccessManager::finished, this, [this](QNetworkReply* reply)
   {
     bool error{false};
     if (reply->error())
     {
       error = true;
-      KLOG(reply->errorString());
+      KLOG(QString{"Auth server returned error: %0"}.arg(reply->errorString()));
     }
     else
     {
