@@ -129,17 +129,17 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   {
     static const bool reconnect = true;
     q_client->ping();
-    if (static int timeouts{0}; m_pong_timer.elapsed() > (1000 * 60))
+    if (m_pong_timer.elapsed() > (1000 * 60))
     {
-      switch (++timeouts)
+      switch (++m_timeouts)
       {
         case (4):
           q_client->closeConnection();
           to_console("Closing connection");
         break;
         default:
-          to_console(QString{"Timeouts: %0"}.arg(timeouts));
-          if (!(timeouts % 5))
+          to_console(QString{"Timeouts: %0"}.arg(m_timeouts));
+          if (!(m_timeouts % 5))
           {
             m_client_time_remaining = DEFAULT_TIMEOUT;
             ui->led->setState(ConnectionIndicator::State::StateWarning);
@@ -150,7 +150,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
       }
       m_pong_timer.restart();
     }
-  };
+  };  
   ui->setupUi(this);
   setWindowTitle("KYGUI");
   setConnectScreen();    
@@ -170,7 +170,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   QObject::connect(&posts_ui,        &PostDialog::request_update,       this, [this](const auto& post)     { q_client->request(constants::RequestType::UPDATE_POST, post.payload()); });
   QObject::connect(ui->eventList,    &QListView::clicked,               this, [this](const auto& index)    { utils::infoMessageBox(m_event_model->item(index.row(), index.column())->text(), "Event"); });
   QObject::connect(&schedule_ui,     &ScheduleDialog::UpdateSchedule,   this, [this] { q_client->request(RequestType::FETCH_SCHEDULE); });
-  QObject::connect(q_client,         &Client::onTokenReceived, this, [this](bool error) { ui->tokenLED->setState(!(error)); });
+  QObject::connect(q_client,         &Client::onTokenReceived, this, [this](bool error) { set_connected(!error); });
   QObject::connect(q_client,         &Client::messageReceived, this, &MainWindow::onMessageReceived);
   QObject::connect(ui->connect,      &QPushButton::clicked, this, &MainWindow::connectClient);
   QObject::connect(ui->disconnect,   &QPushButton::clicked, this, [this] { exit(); });
@@ -609,4 +609,11 @@ void MainWindow::to_console(const QString& msg, const QString& event_msg)
   group_event_messages(msg, event_message);
   m_events.push_back(event_message);
   m_event_model->setItem(m_event_model->rowCount(), utils::createEventListItem(event_message));
+}
+
+void MainWindow::set_connected(bool connected)
+{
+  if (connected)
+    m_timeouts = 0;
+  ui->tokenLED->setState(connected);
 }

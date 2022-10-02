@@ -299,6 +299,9 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
     else
     if (message == "Message Received")
       event_message += "\n" + v.at(1) + ": " + v.at(2);
+    else
+    if (message == "Session Message")
+      window->set_connected();
   }
   return event_message;
 }
