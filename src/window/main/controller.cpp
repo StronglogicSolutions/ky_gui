@@ -165,7 +165,7 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
   };
   KLOG("Event: ", message);
 
-  QString event_message = utils::timestampPrefix();
+  QString event_message;
   if (v.size() == 1)
     event_message += message + "\n" + v.at(0);
   else

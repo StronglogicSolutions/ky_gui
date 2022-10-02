@@ -137,15 +137,15 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
           q_client->closeConnection();
           to_console("Closing connection");
         break;
-        case (5):
-          m_client_time_remaining = DEFAULT_TIMEOUT;
-          ui->led->setState(ConnectionIndicator::State::StateWarning);
-          connectClient(reconnect);
-          to_console("Reconnecting");
-        break;
         default:
-          if (timeouts > 10)
-            to_console(QString{"Timeouts: %0"}.arg(timeouts));
+          to_console(QString{"Timeouts: %0"}.arg(timeouts));
+          if (!(timeouts % 5))
+          {
+            m_client_time_remaining = DEFAULT_TIMEOUT;
+            ui->led->setState(ConnectionIndicator::State::StateWarning);
+            connectClient(reconnect);
+            to_console("Reconnecting");
+          }
         break;
       }
       m_pong_timer.restart();
@@ -558,7 +558,7 @@ void MainWindow::startTimers()
 {
   m_progress_timer.start(10);
   m_pong_timer    .start();
-  m_ping_timer    .start(10000);
+  m_ping_timer    .start(5000);
 }
 
 void MainWindow::SetPlatformOptions(const QString& platform, const QList<QString>& options)
@@ -602,7 +602,9 @@ void MainWindow::to_console(const QString& msg, const QString& event_msg)
       }
     }
   };
-  const auto event_message = (event_msg.isEmpty()) ? msg : event_msg;
+  const auto event_message = (event_msg.isEmpty()) ?
+    utils::timestampPrefix() + msg :
+    utils::timestampPrefix() + event_msg;
 
   group_event_messages(msg, event_message);
   m_events.push_back(event_message);
