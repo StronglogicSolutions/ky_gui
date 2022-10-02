@@ -87,6 +87,31 @@ struct Post
       posts.push_back(Post::from_pointer(data.begin() + i));
     return posts;
   }
+
+  QString to_string() const
+  {
+    return QString{"Name:    %0\n"
+                   "ID:      %1\n"
+                   "User:    %2\n"
+                   "Time:    %3\n"
+                   "Content:\n%4\n"
+                   "URLs:    %5\n"
+                   "Repost:  %6\n"
+                   "Method:  %7\n"
+                   "Args:    %8\n"
+                   "Command: %9\n"
+                   "Status:  %10"}.arg(name   )
+                                  .arg(uuid   )
+                                  .arg(user   )
+                                  .arg(time   )
+                                  .arg(content)
+                                  .arg(urls   )
+                                  .arg(repost )
+                                  .arg(method )
+                                  .arg(args   )
+                                  .arg(cmd    )
+                                  .arg(status );
+  }
 };
 
 } // ns Platform
