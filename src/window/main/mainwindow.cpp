@@ -322,7 +322,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   {
     if (--m_client_time_remaining > 0)
     {
-      ui->progressBar->setValue(500);
+      ui->progressBar->setValue(m_client_time_remaining);
       m_progress_timer.start(10);
     }
   });
