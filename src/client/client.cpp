@@ -116,7 +116,7 @@ Client::MessageHandler Client::createMessageHandler(std::function<void()> cb) {
  * @param [in] {char**} arguments
  */
 Client::Client(QWidget* parent, int count, char** arguments)
-: QDialog(parent),
+: QObject(parent),
   argc(count),
   argv(arguments),
   m_client_socket_fd(-1),
@@ -185,8 +185,8 @@ Client::Client(QWidget* parent, int count, char** arguments)
             }
           }
         }
-        std::string formatted_json = getJsonString(message);
-        emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(formatted_json.data(), formatted_json.size()), {});
+        std::string json = getJsonString(message);
+        emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(json.data(), json.size()), {});
       }
       catch (const std::exception& e)
       {
@@ -197,13 +197,13 @@ Client::Client(QWidget* parent, int count, char** arguments)
 {
   qRegisterMetaType<QVector<QString>> ("QVector<QString>");
   qRegisterMetaType<QVector<FileWrap>>("QVector<FileWrap>");
-  QObject::connect(&m_network_manager, &QNetworkAccessManager::finished, this, [=](QNetworkReply* reply)
+  QObject::connect(&m_network_manager, &QNetworkAccessManager::finished, this, [this](QNetworkReply* reply)
   {
     bool error{false};
     if (reply->error())
     {
       error = true;
-      KLOG(reply->errorString());
+      KLOG(QString{"Auth server returned error: %0"}.arg(reply->errorString()));
     }
     else
     {
@@ -213,6 +213,12 @@ Client::Client(QWidget* parent, int count, char** arguments)
         QString token = configValue("token", json);
         KLOG("Fetched token: ", token);
         m_token = token.toUtf8().constData();
+
+        if (m_reconnect)
+          start(m_server_ip, m_server_port);
+        else
+        if (json.contains("refresh"))
+          m_refresh = configValue("refresh", json);
       }
       else
         error = true;
@@ -223,9 +229,10 @@ Client::Client(QWidget* parent, int count, char** arguments)
 
 void Client::SetCredentials(const QString& username, const QString& password, const QString& auth_address)
 {
-  m_user         = username;
-  m_password     = password;
-  m_auth_address = auth_address;
+  m_user            = username;
+  m_password        = password;
+  m_auth_address    = auth_address + "/login";
+  m_refresh_address = auth_address + "/refresh";
   FetchToken();
 }
 
@@ -234,17 +241,22 @@ QString Client::GetUsername() const
   return m_user;
 }
 
-void Client::FetchToken()
-{
-  m_network_manager.get(QNetworkRequest(QUrl(m_auth_address + "?name=" + m_user + "&password=" + m_password)));
+void Client::FetchToken(bool reconnect)
+{  
+  if (reconnect)
+    m_network_manager.get(QNetworkRequest(QUrl(m_refresh_address + "?name=" + m_user + "&token=" + m_refresh)));
+  else
+    m_network_manager.get(QNetworkRequest(QUrl(m_auth_address    + "?name=" + m_user + "&password=" + m_password)));
+  m_reconnect = reconnect;
 }
 
 /**
  * @brief Client::~Client
  * @destructor
  */
-Client::~Client() {
-    closeConnection();
+Client::~Client()
+{
+  closeConnection();
 }
 
  /**
@@ -253,7 +265,8 @@ Client::~Client() {
 void Client::handleMessages()
 {
   uint8_t receive_buffer[MAX_PACKET_SIZE];
-  for (;;) {
+  for (;;)
+  {
     memset(receive_buffer, 0, MAX_PACKET_SIZE);
     ssize_t bytes_received = recv(m_client_socket_fd, receive_buffer, MAX_PACKET_SIZE, 0);
 
@@ -272,29 +285,6 @@ void Client::handleMessages()
   ::close(m_client_socket_fd);
 }
 
-
-void Client::handleEvent(std::string data)
-{
-  QString          event = getEvent(data.c_str());
-  QVector<QString> args  = getArgs (data.c_str());
-
-  emit Client::messageReceived(EVENT_UPDATE_TYPE, event, args);
-
-  if (isUploadCompleteEvent(event))
-  {
-    if (!args.isEmpty())
-    {
-      sent_files.at(sent_files.size() - 1).timestamp = args.at(0).toInt();
-      if (outgoing_files.isEmpty())
-      {
-        sendTaskEncoded(m_outbound_task);
-        file_was_sent = false;
-      }
-      else
-        sendEncoded(CreateOperation("FileUpload", {"Subsequent file"}));
-    }
-  }
-}
 
 /**
  * @brief Client::processFileQueue
@@ -347,50 +337,46 @@ void Client::start(QString ip, QString port)
   const char*   server_ip    = ip_address.toUtf8();
   const char*   server_port  = port_address.toUtf8();
 
-  if (server_ip && m_client_socket_fd == -1)
+  if (ip_address.isEmpty()) return;
+
+  m_client_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+  if (m_client_socket_fd != -1)
   {
-    m_client_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (m_client_socket_fd != -1)
+    sockaddr_in server_socket;
+    char*       end;
+    auto        port_value = strtol(server_port, &end, 10);
+
+    server_socket.sin_family = AF_INET;
+
+    if (port_value < 0 || end == server_port) return;
+
+    int socket_option = 1;
+    // Free up the port to begin listening again
+    setsockopt(m_client_socket_fd, SOL_SOCKET, SO_REUSEADDR, &socket_option, sizeof(socket_option));
+
+    server_socket.sin_port = htons(port_value);
+    inet_pton(AF_INET, server_ip, &server_socket.sin_addr.s_addr);
+
+    if (::connect(m_client_socket_fd, reinterpret_cast<sockaddr*>(&server_socket),
+                  sizeof(server_socket)) != -1)
     {
-      sockaddr_in server_socket;
-      char*       end;
-      auto        port_value = strtol(server_port, &end, 10);
-
-      server_socket.sin_family = AF_INET;
-
-      if (port_value < 0 || end == server_port) return;
-
-      int socket_option = 1;
-      // Free up the port to begin listening again
-      setsockopt(m_client_socket_fd, SOL_SOCKET, SO_REUSEADDR, &socket_option, sizeof(socket_option));
-
-      server_socket.sin_port = htons(port_value);
-      inet_pton(AF_INET, server_ip, &server_socket.sin_addr.s_addr);
-
-      if (::connect(m_client_socket_fd, reinterpret_cast<sockaddr*>(&server_socket),
-                    sizeof(server_socket)) != -1)
-      {
-        std::string start_operation_string = CreateOperation("start", {});
-        // Send operation as an encoded message
-        sendEncoded(start_operation_string);
-        // Delegate message handling to its own thread
-        std::function<void()> message_send_fn = [this]() { this->handleMessages(); };
-        MessageHandler message_handler = createMessageHandler(message_send_fn);
-        // Handle received messages on separate thread
-        std::thread (message_handler).detach();
-      }
-      else
-      {
-        qDebug() << errno;
-        ::close(m_client_socket_fd);
-      }
+      std::string start_operation_string = CreateOperation("start", {});
+      // Send operation as an encoded message
+      sendEncoded(start_operation_string);
+      // Delegate message handling to its own thread
+      std::function<void()> message_send_fn = [this]() { this->handleMessages(); };
+      MessageHandler message_handler = createMessageHandler(message_send_fn);
+      // Handle received messages on separate thread
+      std::thread (message_handler).detach();
     }
     else
-      qDebug() << "Failed to create new connection";
-
+    {
+      qDebug() << errno;
+      ::close(m_client_socket_fd);
+    }
   }
   else
-    qDebug() << "Connection already in progress";  
+    qDebug() << "Failed to create new connection";
 }
 
 /**
@@ -535,8 +521,6 @@ void Client::ping()
 {
   if ((outgoing_files.isEmpty() || file_was_sent) && !(m_fetching))
   {
-    KLOG("Pinging server");
-
     uint8_t send_buffer[5];
     memset(send_buffer, 0, 5);
     send_buffer[4] = (TaskCode::PINGBYTE & 0xFF);
@@ -560,8 +544,7 @@ void Client::closeConnection()
 {
   if (m_client_socket_fd != -1)
   {
-    std::string stop_operation_string = CreateOperation("stop", {});   
-    sendEncoded(stop_operation_string);
+    sendEncoded(CreateOperation("stop", {}));
     ::shutdown(m_client_socket_fd, SHUT_RDWR);
     ::close(m_client_socket_fd);
     m_client_socket_fd = -1;
@@ -887,4 +870,9 @@ bool Client::hasApp(KApplication application)
 std::string Client::CreateOperation(const char* op, std::vector<std::string> args)
 {
   return createOperation(op, args, m_user.toUtf8().constData(), m_token.toUtf8().constData());
+}
+
+void Client::reconnect()
+{
+  FetchToken(true);
 }

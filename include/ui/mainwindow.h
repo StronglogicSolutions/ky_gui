@@ -199,13 +199,14 @@ public:
     ~MainWindow();
 
     void SetPlatformOptions(const QString& platform, const QList<QString>& options);
+    void set_connected(bool connected = true);
 
     class Controller {
      public:
-      void init(MainWindow* window);
+      explicit Controller(MainWindow* window);
       void handleCommands(const StringVec& commands, const QString& default_app);
       void handleMessage(const QString& message, const StringVec& v);
-      QString handleEventMessage(const QString& message, const StringVec& v);     
+      QString handleEventMessage(const QString& message, const StringVec& v = {});
 
      private:
       QString parseMessage(const QString& message, const StringVec& v);
@@ -219,6 +220,7 @@ public:
    private:
     /** UI & Messages */
     void connectUi();
+    void to_console(const QString& msg, const QString& event_msg = "");
     void setConnectScreen(bool visible = true);
     void UpdateIPCOptions();
     QString parseTaskInfo(StringVec v);
@@ -250,14 +252,17 @@ public:
     QJsonObject           m_config;
     uint16_t              m_consecutive_events;
     int                   m_client_time_remaining;
+    int                   m_timeouts{0};
     QTimer                m_progress_timer;
+    QTimer                m_ping_timer;
     PlatformMap           m_platform_map;
 
    private slots:
     /** Receivers */
-    void connectClient();
+    void connectClient(bool reconnect = false);
     void onMessageReceived(int t, const QString& s, StringVec v);
     void startTimers();
+    void exit();
 };
 
 

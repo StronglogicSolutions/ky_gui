@@ -14,14 +14,6 @@
 #include <thread>
 #include <utility>
 
-#include <QComboBox>
-#include <QDialog>
-#include <QLabel>
-#include <QLineEdit>
-#include <QMessageBox>
-#include <QMetaType>
-#include <QPushButton>
-#include <QThread>
 #include <QUuid>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -146,14 +138,15 @@ void Reset()
 Q_DECLARE_METATYPE(StringVec)
 Q_DECLARE_METATYPE(QVector<QByteArray>)
 
-class Client : public QDialog {
+class Client : public QObject
+{
 Q_OBJECT
-QThread workerThread;
-
 public:
-class MessageHandler {
+class MessageHandler
+{
  public:
-  MessageHandler(std::function<void()> cb) : m_cb(cb) {}
+  MessageHandler(std::function<void()> cb)
+  : m_cb(cb) {}
 
   void operator()() { m_cb(); }
 
@@ -161,8 +154,7 @@ class MessageHandler {
   std::function<void()> m_cb;
 };
 
-Client(QWidget* parent = nullptr);
-Client(QWidget* parent, int count, char** arguments);
+explicit Client(QWidget* parent, int count, char** arguments);
 ~Client();
 
 void           start(QString ip = "", QString port = "");
@@ -175,7 +167,6 @@ void           request(uint8_t request_code, T payload);
 void           request(uint8_t request_code);
 void           appRequest(KApplication application, uint8_t request_code);
 int            getSelectedApp();
-// Move this to private after moving responsibilities to Client
 void           scheduleTask(Scheduler::Task* task);
 MessageHandler createMessageHandler(std::function<void()> cb);
 
@@ -193,6 +184,7 @@ void           setMetadata(const QVector<QString>& data);
 void           SetFetching(bool fetching = true) { m_fetching = fetching; }
 void           SetCredentials(const QString& username, const QString& password, const QString& auth_address);
 QString        GetUsername() const;
+void           reconnect();
 
 signals:
 void           messageReceived(int t, QString s, QVector<QString> args);
@@ -207,10 +199,10 @@ void           sendFileEncoded(QByteArray bytes);
 void           sendTaskEncoded(Scheduler::Task* task);
 void           processFileQueue();
 void           handleMessages();
-void           handleEvent(std::string data);
+//void           handleEvent(std::string data);
 void           handleDownload(uint8_t* data, ssize_t size);
 void           sendPackets(uint8_t* data, uint32_t size);
-void           FetchToken();
+void           FetchToken(bool reconnect = false);
 std::string    CreateOperation(const char* op, std::vector<std::string> args);
 
 int                           argc;
@@ -233,7 +225,10 @@ bool                          m_fetching;
 QString                       m_user;
 QString                       m_password;
 QString                       m_token;
+QString                       m_refresh;
 QString                       m_auth_address;
+QString                       m_refresh_address;
 QNetworkAccessManager         m_network_manager;
+bool                          m_reconnect{false};
 };
 #endif // CLIENT_HPP

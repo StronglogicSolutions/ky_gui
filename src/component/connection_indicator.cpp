@@ -17,6 +17,9 @@ ConnectionIndicator::ConnectionIndicator(QWidget *parent) : QLabel(parent)
 
 void ConnectionIndicator::setState(State state)
 {
+  if (state == m_state)
+    return;
+
   qDebug() << "setState" << state;
   switch(state)
   {
@@ -34,6 +37,7 @@ void ConnectionIndicator::setState(State state)
       setStyleSheet(blueSS);
     break;
   }
+  m_state = state;
 }
 
 void ConnectionIndicator::setState(bool state)

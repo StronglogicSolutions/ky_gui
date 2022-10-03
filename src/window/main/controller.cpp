@@ -18,13 +18,8 @@
  * incoming messages and updating the UI accordingly
  */
 
-/**
- * @brief MainWindow::Controller::init
- * @param window
- */
-void MainWindow::Controller::init(MainWindow* window) {
-  this->window = window;
-}
+MainWindow::Controller::Controller(MainWindow* window_)
+: window(window_) {}
 
 /**
  * @brief MainWindow::MessageParser::handleCommands
@@ -152,7 +147,7 @@ void MainWindow::Controller::updateProcessResult(
 }
 
 /**
- * @brief MainWindow::MessageParser::handleEventMessage
+ * @brief MainWindow::Controller::handleEventMessage
  * @param message
  * @param v
  * @return
@@ -170,7 +165,7 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
   };
   KLOG("Event: ", message);
 
-  QString event_message = utils::timestampPrefix();
+  QString event_message;
   if (v.size() == 1)
     event_message += message + "\n" + v.at(0);
   else
@@ -304,6 +299,9 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
     else
     if (message == "Message Received")
       event_message += "\n" + v.at(1) + ": " + v.at(2);
+    else
+    if (message == "Session Message")
+      window->set_connected();
   }
   return event_message;
 }
