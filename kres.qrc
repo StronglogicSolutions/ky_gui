@@ -21,6 +21,7 @@
         <file>icons/make.png</file>
         <file>icons/ml.png</file>
         <file>icons/token.png</file>
+        <file>icons/connect.png</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/log.png</file>

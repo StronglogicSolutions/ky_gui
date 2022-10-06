@@ -220,6 +220,7 @@ public:
    private:
     /** UI & Messages */
     void connectUi();
+    void reconnect();
     void to_console(const QString& msg, const QString& event_msg = "");
     void setConnectScreen(bool visible = true);
     void UpdateIPCOptions();
