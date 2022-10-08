@@ -126,30 +126,15 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   m_process_model = new QStandardItemModel(this);
   q_client        = new Client(this, cli_argc, cli_argv);
   auto stay_alive = [this]
-  {
-    static const bool reconnect = true;
-    q_client->ping();
-    if (m_pong_timer.elapsed() > (1000 * 60))
-    {
-      switch (++m_timeouts)
-      {
-        case (4):
-          q_client->closeConnection();
-          to_console("Closing connection");
-        break;
-        default:
-          to_console(QString{"Timeouts: %0"}.arg(m_timeouts));
-          if (!(m_timeouts % 5))
-          {
-            m_client_time_remaining = DEFAULT_TIMEOUT;
-            ui->led->setState(ConnectionIndicator::State::StateWarning);
-            connectClient(reconnect);
-            to_console("Reconnecting");
-          }
-        break;
-      }
+  {    
+    if (m_pong_timer.elapsed() > (1000 * 20))
+    {      
       m_pong_timer.restart();
+      to_console(QString{"Timeouts: %0"}.arg(++m_timeouts));
+      if (!(m_timeouts % 5))
+        reconnect();
     }
+    q_client->ping();
   };  
   ui->setupUi(this);
   setWindowTitle("KYGUI");
@@ -173,6 +158,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   QObject::connect(q_client,         &Client::onTokenReceived, this, [this](bool error) { set_connected(!error); });
   QObject::connect(q_client,         &Client::messageReceived, this, &MainWindow::onMessageReceived);
   QObject::connect(ui->connect,      &QPushButton::clicked, this, &MainWindow::connectClient);
+  QObject::connect(ui->reconnect,    &QPushButton::clicked, this, [this] { reconnect(); });
   QObject::connect(ui->disconnect,   &QPushButton::clicked, this, [this] { exit(); });
   QObject::connect(ui->execute,      &QPushButton::clicked, this, [this] { q_client->execute(); });
   QObject::connect(ui->openMessages, &QPushButton::clicked, this, [this] { message_ui.show(); });
@@ -616,4 +602,18 @@ void MainWindow::set_connected(bool connected)
   if (connected)
     m_timeouts = 0;
   ui->tokenLED->setState(connected);
+}
+
+void MainWindow::reconnect()
+{
+  static const bool reconnect = true;
+
+  to_console("Closing connection");
+  q_client->closeConnection();
+
+  m_client_time_remaining = DEFAULT_TIMEOUT;
+  ui->led->setState(ConnectionIndicator::State::StateWarning);
+
+  to_console("Reconnecting");
+  connectClient(reconnect);
 }
