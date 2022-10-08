@@ -32,6 +32,7 @@
 static const uint8_t  CLIENT_EXIT{9};
 static const int      DEFAULT_TIMEOUT{1000};
 static const char*    stylesheet_path{"style/style.css"};
+static const QString  nonce_event = "";
 
 const QString KYGUI_DEFAULT_THEME{
 "border-color: rgb(0, 0, 0);"
@@ -221,7 +222,7 @@ public:
     /** UI & Messages */
     void connectUi();
     void reconnect();
-    void to_console(const QString& msg, const QString& event_msg = "");
+    void to_console(const QString& msg, const QStringRef event_msg = &nonce_event);
     void setConnectScreen(bool visible = true);
     void UpdateIPCOptions();
     QString parseTaskInfo(StringVec v);

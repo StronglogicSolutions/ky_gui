@@ -195,11 +195,6 @@ void DocumentWindow::SetListeners()
         widget->setText(flag.right(flag.size() - flag.indexOf('=') - 1));
         ui->rowContent->setItem(row, col, widget);
         ui->rowContent->item(row, col)->setBackground(GetBrushForType(m_row_types.at(row)));
-        for (auto item : ui->rowContent->selectedItems())
-        {
-          auto row = item->row();
-          auto col = item->column();
-        }
       }
       SetInserting(false);
     });

@@ -1,10 +1,6 @@
 ﻿#include <include/ui/mainwindow.h>
 #include <QGraphicsDropShadowEffect>
 
-/**
- * Helper functions
- */
-
 namespace utils {
 void save_config(const QString& config)
 {
@@ -24,32 +20,37 @@ void infoMessageBox(QString text, QString title = "KYGUI") {
   box.exec();
 }
 
-bool isSameEvent(QString event1, QString event2) {
-  auto event_size =
-      event1.size() > event2.size() ? event2.size() : event1.size();
-  auto similarity_standard = event_size * 0.67;
-  auto similarity_index = 0;
-  for (auto i = 0; i < event_size; i++) {
-    if (event1[i] == event2[i]) {
-      similarity_index++;
-    }
-  }
+auto isSameEvent = [](const auto& event1, const auto& event2)
+{
+  const auto event_size = event1.size() > event2.size() ? event2.size() : event1.size();
+  const auto similarity_standard = event_size * 0.67;
+        auto similarity_index    = 0;
+  for (auto i = 0; i < event_size; i++)
+    if (event1[i] == event2[i])
+      similarity_index++;      
   return similarity_index > similarity_standard;
-}
+};
 
-int getLikeEventNum(QString event, QList<QString> events) {
-  auto i = events.size() - 1;
-  auto hits = 0;
-  bool is_same_event = false;
-  auto incoming_event = event.remove(0, 11);
-  do {
-    auto existing_event = events[i];
-    if ((is_same_event =
-             isSameEvent(incoming_event, existing_event.remove(0, 11)))) {
+int getLikeEventNum(const QStringRef event, const QList<QString>& events)
+{
+ auto get_substr = [](const auto& s)
+ {
+   const auto size = s.size();
+   return (size > 10) ? s.right(size - 10) : s;
+ };
+        auto i              = events.size() - 1;
+        auto hits           = 0;
+        bool is_same_event  = false;
+  const auto incoming_event = get_substr(event);
+  do
+  {
+    if ((is_same_event = isSameEvent(incoming_event, get_substr(events[i]))))
+    {
       i--;
       hits++;
     }
-  } while (is_same_event && i > -1);
+  }
+  while (is_same_event && i > -1);
   return hits;
 }
 
@@ -130,7 +131,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
     if (m_pong_timer.elapsed() > (1000 * 20))
     {      
       m_pong_timer.restart();
-      to_console(QString{"Timeouts: %0"}.arg(++m_timeouts));
+      const auto timeout_s = QString{"Timeouts: %0"}.arg(++m_timeouts);
+      to_console(timeout_s);
       if (!(m_timeouts % 5))
         reconnect();
     }
@@ -489,7 +491,7 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v)
         UI::infoMessageBox(event_message, "Schedule request succeeded");
         arg_ui->notifyClientSuccess(); // Update ArgDialog accordingly
       }
-      to_console(message, event_message);
+      to_console(message, &event_message);
     }
     break;
     default:
@@ -569,9 +571,9 @@ void MainWindow::exit()
   QApplication::exit(CLIENT_EXIT);
 }
 
-void MainWindow::to_console(const QString& msg, const QString& event_msg)
+void MainWindow::to_console(const QString& msg, const QStringRef event_msg)
 {
-  auto group_event_messages = [this] (const auto& message, const auto& event_message)
+  auto group_event_messages = [this] (const auto& message, const QStringRef event_message)
   {
     if (m_events.size() > 1)    // Group repeating event messages
     {
@@ -580,19 +582,19 @@ void MainWindow::to_console(const QString& msg, const QString& event_msg)
       {
         auto count = utils::getLikeEventNum(event_message, m_events);
         auto clean_event_message = event_message + " (" + QString::number(count) + ")";
-        m_events.push_back(event_message);
+        m_events.push_back(*event_message.string());
 
         m_event_model->setItem(m_event_model->rowCount() - 1,
                                utils::createEventListItem(clean_event_message));
-        return;  // It was not a unique message, we can return
-      }
+        return true;
+      }      
     }
+    return false;
   };
-  const auto event_message = (event_msg.isEmpty()) ?
-    utils::timestampPrefix() + msg :
-    utils::timestampPrefix() + event_msg;
-
-  group_event_messages(msg, event_message);
+  const auto event_message = (event_msg.isEmpty()) ? utils::timestampPrefix() + msg :
+                                                     utils::timestampPrefix() + event_msg;
+  if (group_event_messages(msg, &event_message))
+    return;
   m_events.push_back(event_message);
   m_event_model->setItem(m_event_model->rowCount(), utils::createEventListItem(event_message));
 }
