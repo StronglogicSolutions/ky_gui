@@ -20,50 +20,37 @@ void infoMessageBox(QString text, QString title = "KYGUI") {
   box.exec();
 }
 
-auto isSameEvent = [](const auto& event1, const auto& event2)
+auto is_same = [](const auto& ev1, const auto& ev2)
 {
-  const auto event_size = event1.size() > event2.size() ? event2.size() : event1.size();
-  const auto similarity_standard = event_size * 0.67;
-        auto similarity_index    = 0;
-  for (auto i = 0; i < event_size; i++)
-    if (event1[i] == event2[i])
-      similarity_index++;      
-  return similarity_index > similarity_standard;
+  const auto size   = ev1.size() > ev2.size() ? ev2.size() : ev1.size();
+  const auto target = size * 0.85;
+        auto same   = 0;
+  for (auto i = 0; i < size; i++)
+    if (ev1[i] == ev2[i])
+      same++;
+  return same > target;
 };
 
-int getLikeEventNum(const QStringRef event, const QList<QString>& events)
+int count_similar(const QStringRef event, const QList<QString>& events)
 {
- auto get_substr = [](const auto& s)
- {
-   const auto size = s.size();
-   return (size > 10) ? s.right(size - 10) : s;
- };
+ auto get_substr = [](const auto& s) { const auto size = s.size(); return (size > 10) ? s.right(size - 10) : s; };
         auto i              = events.size() - 1;
         auto hits           = 0;
-        bool is_same_event  = false;
   const auto incoming_event = get_substr(event);
-  do
-  {
-    if ((is_same_event = isSameEvent(incoming_event, get_substr(events[i]))))
-    {
-      i--;
-      hits++;
-    }
-  }
-  while (is_same_event && i > -1);
+
+  while (bool is_same_event = is_same(incoming_event, get_substr(events[i])) && --i > -1)
+    hits++;
   return hits;
 }
 
-QString timestampPrefix() {
-  return TimeUtils::getTime() + " - ";
-}
+QString timestampPrefix() { return TimeUtils::getTime() + " - "; }
 
 /**
  * @brief createProcessListItem
  * @param process
  * @return
  */
-QStandardItem* createProcessListItem(Process process) {
+QStandardItem* create_process_item(Process process) {
 
   QString processResultText{
     "%0 requested for execution. "
@@ -102,7 +89,8 @@ QStandardItem* createProcessListItem(Process process) {
  * @param event
  * @return
  */
-QStandardItem* createEventListItem(QString event) {
+QStandardItem* create_event_item(const QString& event)
+{
   return new QStandardItem(event);
 }
 }  // namespace utils
@@ -115,13 +103,13 @@ QStandardItem* createEventListItem(QString event) {
  * @param parent
  */
 MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
-    : QMainWindow(parent),
-      cli_argc(argc),
-      cli_argv(argv),
-      m_controller(this),
-      ui(new Ui::MainWindow),
-      arg_ui(new ArgDialog),
-      m_client_time_remaining(DEFAULT_TIMEOUT)
+: QMainWindow(parent),
+  cli_argc(argc),
+  cli_argv(argv),
+  m_controller(this),
+  ui(new Ui::MainWindow),
+  arg_ui(new ArgDialog),
+  m_client_time_remaining(DEFAULT_TIMEOUT)
 {
   m_event_model   = new QStandardItemModel(this);
   m_process_model = new QStandardItemModel(this);
@@ -477,7 +465,7 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v)
       int row = 0;
       for (const auto& process : m_processes)
       {
-        m_process_model->setItem(row, utils::createProcessListItem(process));
+        m_process_model->setItem(row, utils::create_process_item(process));
         row++;
       }
     }
@@ -571,32 +559,30 @@ void MainWindow::exit()
   QApplication::exit(CLIENT_EXIT);
 }
 
-void MainWindow::to_console(const QString& msg, const QStringRef event_msg)
+void MainWindow::to_console(const QString& msg, const QStringRef evt_msg)
 {
-  auto group_event_messages = [this] (const auto& message, const QStringRef event_message)
+  auto group_event_messages = [this] (const QStringRef evt_msg)
   {
-    if (m_events.size() > 1)    // Group repeating event messages
+    using namespace utils;
+    if (m_events.size() > 1)
     {
-      auto last_event = m_events[m_events.size() - 1];
-      if (utils::isSameEvent(message, last_event.remove(0, 11)))
-      {
-        auto count = utils::getLikeEventNum(event_message, m_events);
-        auto clean_event_message = event_message + " (" + QString::number(count) + ")";
-        m_events.push_back(*event_message.string());
-
-        m_event_model->setItem(m_event_model->rowCount() - 1,
-                               utils::createEventListItem(clean_event_message));
+      const auto& last_evt = m_events[m_events.size() - 1];
+      if (utils::is_same(evt_msg.right(evt_msg.size() - 11), last_evt.right(last_evt.size() - 11)))
+      {        
+        m_events.push_back(*evt_msg.string());
+        m_event_model->setItem(m_event_model->rowCount() - 1, create_event_item(QString{evt_msg + " (%0)"}
+                                                              .arg(count_similar(evt_msg, m_events))));
         return true;
       }      
     }
     return false;
   };
-  const auto event_message = (event_msg.isEmpty()) ? utils::timestampPrefix() + msg :
-                                                     utils::timestampPrefix() + event_msg;
-  if (group_event_messages(msg, &event_message))
+  const auto event_message = (evt_msg.isEmpty()) ? utils::timestampPrefix() + msg :
+                                                   utils::timestampPrefix() + evt_msg;
+  if (group_event_messages(&event_message))
     return;
   m_events.push_back(event_message);
-  m_event_model->setItem(m_event_model->rowCount(), utils::createEventListItem(event_message));
+  m_event_model->setItem(m_event_model->rowCount(), utils::create_event_item(event_message));
 }
 
 void MainWindow::set_connected(bool connected)

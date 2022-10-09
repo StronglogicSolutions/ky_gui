@@ -140,7 +140,7 @@ void MainWindow::Controller::updateProcessResult(
                                            ProcessState::SUCCEEDED :
                                            ProcessState::FAILED;
       window->m_processes.at(i).result = result;
-      window->m_process_model->setItem(i, 0, utils::createProcessListItem(window->m_processes.at(i)));
+      window->m_process_model->setItem(i, 0, utils::create_process_item(window->m_processes.at(i)));
       return;
     }
   }
@@ -203,7 +203,7 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
 
         window->m_processes.push_back(new_process);
         window->m_process_model->setItem(window->m_process_model->rowCount(),
-                                         utils::createProcessListItem(new_process));
+                                         utils::create_process_item(new_process));
       }
 
       if (error)

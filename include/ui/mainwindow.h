@@ -183,8 +183,8 @@ struct Process {
 namespace utils {
 QString getTime();
 QString timestampPrefix();
-QStandardItem* createProcessListItem(Process process);
-QStandardItem* createEventListItem(QString event);
+QStandardItem* create_process_item(Process process);
+QStandardItem* create_event_item(const QString& event);
 } // namespace utils
 
 namespace Ui {
