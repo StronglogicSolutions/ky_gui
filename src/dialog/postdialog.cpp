@@ -64,6 +64,17 @@ PostDialog::PostDialog(QWidget *parent)
     ui->save->setStyleSheet(request_button_style);
   });
 
+  QObject::connect(ui->refresh, &QPushButton::clicked, [this]
+  {
+//    if (m_selected > m_post_model.posts().size())
+//      return;
+
+//    request_update(m_post_model.posts()[m_selected]);
+    auto count = m_post_model.posts().size();
+    m_post_model.removeRows(0, count);
+    ui->save->setStyleSheet(request_button_style);
+  });
+
   QObject::connect(ui->posts, &QTableView::clicked, [this](const QModelIndex& index)
   {
     SelectRow(index.row());

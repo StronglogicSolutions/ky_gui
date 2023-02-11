@@ -152,6 +152,7 @@ public:
       break;
       default:
         KLOG("Can't sort with column ", std::to_string(column));
+        return;
     }
     std::sort(m_posts.begin(), m_posts.end(), predicate);
   }
@@ -160,6 +161,8 @@ public:
   {
     if (data.empty())
       return;
+
+    removeRows(0, m_posts.size());
 
     const size_t count = (data.size() / Platform::ARGSIZE);
     beginInsertRows(QModelIndex{}, 0, count - 1);
@@ -170,6 +173,15 @@ public:
 
   const QVector<Platform::Post>& posts() const       { return m_posts; }
         QVector<Platform::Post>& get_mutable_posts() { return m_posts; }
+
+  bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) final
+  {
+    auto last_row = (row + count) - 1;
+    QAbstractItemModel::beginRemoveRows(parent, row, last_row);
+    m_posts.erase((m_posts.begin() + row), m_posts.begin() + last_row);
+    QAbstractItemModel::endRemoveRows();
+    return true;
+  }
 
 
   Qt::ItemFlags flags(const QModelIndex& index) const final
