@@ -125,16 +125,19 @@ Client::Client(QWidget* parent, int count, char** arguments)
   m_download_console(Kiqoder::FileHandler{
     [this](int32_t id, uint8_t* buffer, size_t size) -> void
     {
+      KLOG("Download Console received a file. Writing to buffer");
       m_download_console.Write(QString::number(id), buffer, size);
       m_download_console.rx_count++;
 
       if (--m_download_console.wt_count)
       {
+        KLOG("Download Console Requesting next file. Setting Console to WAIT and sending FILE_ACK up the wire");
         m_download_console.Wait();
         sendEncoded(CreateOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
       }
       else
       {
+        KLOG("Download Console received ALL files. Passing files to callback");
         onDownload(std::move(m_download_console.GetData()));
         m_download_console.Reset();
       }

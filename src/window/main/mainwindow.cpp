@@ -182,6 +182,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   QObject::connect(q_client, &Client::onDownload, this,
     [this](DownloadConsole::Files files) -> void
     {
+      KLOG("MainWindow receiving files from Client::onDownload(). Passing to Document Window");
       q_client->SetFetching(false);
       doc_window.ReceiveFiles(std::move(files));
     }
