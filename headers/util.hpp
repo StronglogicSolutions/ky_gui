@@ -107,8 +107,6 @@ typedef std::vector<std::pair<std::string, std::string>> TupVec;
 typedef std::vector<std::map<int, std::string>> MapVec;
 typedef std::map<int, std::string> CommandMap;
 
-
-
 struct KSession {
     int id;
     int fd;
@@ -131,25 +129,6 @@ static QString escapeMessage(QString s) {
 
 static QString escapeTextToRaw(QString s) {
     return escapeText(s).toUtf8().constData();
-}
-
-template <typename... T, typename O = QString>
-static O BuildLogMessage(T... args)
-{
-  if constexpr((std::is_same_v<T, QString> || ...))
-    return (O{} + ... + args);
-  else
-  {
-    std::stringstream ss{};
-    (ss << ... << std::forward<T>(args));
-    return QString::fromStdString(ss.str());
-  }
-}
-
-template <typename... T>
-static void KLOG(T... args)
-{
-  qDebug().noquote() << BuildLogMessage(args...);
 }
 
 /**
@@ -561,9 +540,31 @@ static void infoMessageBox(QString text, QString title = "KYGUI")
 
 } // namespace UI
 namespace TimeUtils {
+[[maybe_unused]]
 static QString getTime()  { return QDateTime::currentDateTime().toString("hh:mm:ss"); }
+[[maybe_unused]]
 static uint    unixtime() { return QDateTime::currentDateTime().toTime_t(); }
 } // namespace TimeUtils
+
+template <typename... T, typename O = QString>
+static O BuildLogMessage(T... args)
+{
+  if constexpr((std::is_same_v<T, QString> || ...))
+    return (O{} + ... + args);
+  else
+  {
+    std::stringstream ss{};
+    ss << TimeUtils::getTime().toUtf8().constData() << " - ";
+    (ss << ... << std::forward<T>(args));
+    return QString::fromStdString(ss.str());
+  }
+}
+
+template <typename... T>
+static void KLOG(T... args)
+{
+  qDebug().noquote() << BuildLogMessage(args...);
+}
 
 }  // namespace
 #endif  // UTIL_HPP
