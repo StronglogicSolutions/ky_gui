@@ -160,7 +160,6 @@ public:
     beginInsertRows(QModelIndex{}, 0, count - 1);
     m_posts = Platform::Post::from_vector(data);
     endInsertRows();
-    KLOG("set data and posts size is ", std::to_string(m_posts.size()));
     emit dataChanged(index(0, 0), index(posts().size() - 1, 3));
   }
 
@@ -173,7 +172,6 @@ public:
     QAbstractItemModel::beginRemoveRows(parent, row, last_row);
     m_posts.erase((m_posts.begin() + row), m_posts.begin() + last_row - 1);
     QAbstractItemModel::endRemoveRows();
-    KLOG("removedRows() posts size is ", std::to_string(m_posts.size()));
     emit dataChanged(index(0, 0), index(m_posts.size() - 1, 3));
     return true;
   }
