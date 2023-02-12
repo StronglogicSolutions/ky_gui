@@ -28,7 +28,6 @@ class Ui_Dialog
 {
 public:
     QGridLayout *gridLayout;
-    QHBoxLayout *horizontalLayout;
     QFrame *frame_2;
     QVBoxLayout *verticalLayout;
     QFrame *frame;
@@ -36,7 +35,9 @@ public:
     QTableView *posts;
     QHBoxLayout *horizontalLayout_2;
     QTextBrowser *postText;
+    QVBoxLayout *verticalLayout_2;
     QPushButton *save;
+    QPushButton *refresh;
     QFrame *frame_4;
     QFrame *frame_3;
 
@@ -47,16 +48,13 @@ public:
         Dialog->resize(960, 640);
         gridLayout = new QGridLayout(Dialog);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setSpacing(0);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         frame_2 = new QFrame(Dialog);
         frame_2->setObjectName(QString::fromUtf8("frame_2"));
         frame_2->setStyleSheet(QString::fromUtf8("background-color: rgb(131, 131, 131);"));
         frame_2->setFrameShape(QFrame::StyledPanel);
         frame_2->setFrameShadow(QFrame::Raised);
 
-        horizontalLayout->addWidget(frame_2);
+        gridLayout->addWidget(frame_2, 0, 0, 1, 1);
 
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
@@ -99,6 +97,8 @@ public:
 
         horizontalLayout_2->addWidget(postText);
 
+        verticalLayout_2 = new QVBoxLayout();
+        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         save = new QPushButton(Dialog);
         save->setObjectName(QString::fromUtf8("save"));
         QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -121,7 +121,31 @@ public:
 "padding: 4px;\n"
 "opacity: 0.3;"));
 
-        horizontalLayout_2->addWidget(save);
+        verticalLayout_2->addWidget(save);
+
+        refresh = new QPushButton(Dialog);
+        refresh->setObjectName(QString::fromUtf8("refresh"));
+        sizePolicy1.setHeightForWidth(refresh->sizePolicy().hasHeightForWidth());
+        refresh->setSizePolicy(sizePolicy1);
+        refresh->setMinimumSize(QSize(46, 46));
+        refresh->setMaximumSize(QSize(300, 16777215));
+        refresh->setStyleSheet(QString::fromUtf8("font: 87 18pt \"Noto Sans\";\n"
+"color: rgb(0, 0, 0);\n"
+"font-weight: 700;\n"
+"padding: 4px;\n"
+"border-style: outset;\n"
+"border-width: 2px;\n"
+"border-radius: 6px;\n"
+"border-color: #00000f;\n"
+"min-width: 1em;\n"
+"min-height: 1em;\n"
+"padding: 4px;\n"
+"opacity: 0.3;"));
+
+        verticalLayout_2->addWidget(refresh);
+
+
+        horizontalLayout_2->addLayout(verticalLayout_2);
 
 
         verticalLayout->addLayout(horizontalLayout_2);
@@ -139,7 +163,7 @@ public:
         verticalLayout->setStretch(2, 10);
         verticalLayout->setStretch(4, 1);
 
-        horizontalLayout->addLayout(verticalLayout);
+        gridLayout->addLayout(verticalLayout, 0, 1, 1, 1);
 
         frame_3 = new QFrame(Dialog);
         frame_3->setObjectName(QString::fromUtf8("frame_3"));
@@ -147,13 +171,7 @@ public:
         frame_3->setFrameShape(QFrame::StyledPanel);
         frame_3->setFrameShadow(QFrame::Raised);
 
-        horizontalLayout->addWidget(frame_3);
-
-        horizontalLayout->setStretch(0, 1);
-        horizontalLayout->setStretch(1, 20);
-        horizontalLayout->setStretch(2, 1);
-
-        gridLayout->addLayout(horizontalLayout, 0, 0, 1, 1);
+        gridLayout->addWidget(frame_3, 0, 2, 1, 1);
 
 
         retranslateUi(Dialog);
@@ -171,6 +189,7 @@ public:
 "</style></head><body style=\" font-family:'Noto Sans'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">No selection</p></body></html>", nullptr));
         save->setText(QCoreApplication::translate("Dialog", "Save", nullptr));
+        refresh->setText(QCoreApplication::translate("Dialog", "Refresh", nullptr));
     } // retranslateUi
 
 };

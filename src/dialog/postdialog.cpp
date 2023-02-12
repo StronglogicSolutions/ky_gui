@@ -15,8 +15,26 @@ static const QString save_button_style{"QPushButton{"
   "min-height: 1em;"
   "padding: 4px;"
   "opacity: 0.3;}"
-  "QPushButton:hover {"
+  "QPushButton: {"
     "background-color: #328930;"
+  "}"};
+
+static const QString refresh_button_style{"QPushButton{"
+  "font: 87 18pt \"Noto Sans\";"
+  "color: rgb(0, 0, 0);"
+  "background-color: rgb(94 138 239);"
+  "font-weight: 700;"
+  "padding: 4px;"
+  "border-style: outset;"
+  "border-width: 2px;"
+  "border-radius: 6px;"
+  "border-color: #00000f;"
+  "min-width: 1em;"
+  "min-height: 1em;"
+  "padding: 4px;"
+  "opacity: 0.3;}"
+  "QPushButton: {"
+    "background-color: blue;"
   "}"};
 
 static const QString request_button_style{"QPushButton{"
@@ -33,7 +51,7 @@ static const QString request_button_style{"QPushButton{"
   "min-height: 1em;"
   "padding: 4px;"
   "opacity: 0.3;}"
-  "QPushButton:hover {"
+  "QPushButton: {"
     "background-color: red;"
   "}"};
 
@@ -41,8 +59,9 @@ PostDialog::PostDialog(QWidget *parent)
 : QDialog(parent),
   ui(new Ui::Dialog)
 {
-  ui->setupUi(this);  
-  ui->save->setStyleSheet(save_button_style);
+  ui->setupUi(this);
+  ui->save->   setStyleSheet(save_button_style);
+  ui->refresh->setStyleSheet(refresh_button_style);
   ui->posts->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
   ui->posts->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   ui->posts->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -64,6 +83,15 @@ PostDialog::PostDialog(QWidget *parent)
     ui->save->setStyleSheet(request_button_style);
   });
 
+  QObject::connect(ui->refresh, &QPushButton::clicked, [this]
+  {
+    auto count = m_post_model.posts().size();
+    m_post_model.removeRows(0, count);
+    ui->posts->reset();
+    ui->refresh->setStyleSheet(request_button_style);
+    refresh();
+  });
+
   QObject::connect(ui->posts, &QTableView::clicked, [this](const QModelIndex& index)
   {
     SelectRow(index.row());
@@ -75,13 +103,19 @@ PostDialog::~PostDialog()
   delete ui;
 }
 
+void PostDialog::showEvent(QShowEvent *)
+{
+  refresh();
+  ui->posts->reset();
+}
+
 void PostDialog::ReceiveData(const QVector<QString>& data)
 {
   m_post_model.set_data(data);
 }
 
 void PostDialog::Update(const QVector<QString>& data)
-{  
+{
   auto unselect = [this] { ui->postText->setText("No selection"); };
   for (int i = 0; i < m_post_model.posts().size(); i++)
   {

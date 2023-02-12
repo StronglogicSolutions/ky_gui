@@ -1,5 +1,4 @@
-﻿#ifndef __POSTDIALOG_HPP__
-#define __POSTDIALOG_HPP__
+﻿#pragma once
 
 #include <QDialog>
 #include <QThread>
@@ -71,7 +70,7 @@ public:
 
     if (role == Qt::EditRole || role == Qt::DisplayRole)
     {
-      const auto row    = index.row();
+      const auto row      = index.row();
       m_posts[row].active = value.toInt() == 1;
       m_posts[row].status = value.toString();
       emit dataChanged(index, index);
@@ -86,21 +85,14 @@ public:
     if (role != Qt::DisplayRole)
         return QVariant{};
 
-    if (orientation == Qt::Horizontal) {
-        switch (section) {
-        case 0:
-          return "Platform";
-        case 1:
-          return "Time";
-        case 2:
-          return "User";
-        case 3:
-          return "UUID";
-        case 4:
-          return "Status";
-        default:
-            return QVariant{};
-        }
+    if (orientation == Qt::Horizontal)
+    {
+      switch (section)
+      {
+        case 0: return "Platform"; case 1:  return "Time";
+        case 2: return "User";     case 3:  return "UUID";
+        case 4: return "Status";   default: return QVariant{};
+      }
     }
     return section + 1;
   }
@@ -152,6 +144,7 @@ public:
       break;
       default:
         KLOG("Can't sort with column ", std::to_string(column));
+        return;
     }
     std::sort(m_posts.begin(), m_posts.end(), predicate);
   }
@@ -160,6 +153,8 @@ public:
   {
     if (data.empty())
       return;
+
+    removeRows(0, m_posts.size());
 
     const size_t count = (data.size() / Platform::ARGSIZE);
     beginInsertRows(QModelIndex{}, 0, count - 1);
@@ -171,6 +166,15 @@ public:
   const QVector<Platform::Post>& posts() const       { return m_posts; }
         QVector<Platform::Post>& get_mutable_posts() { return m_posts; }
 
+  bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) final
+  {
+    const auto last_row = (row + count) + 1;
+    QAbstractItemModel::beginRemoveRows(parent, row, last_row);
+    m_posts.erase((m_posts.begin() + row), m_posts.begin() + last_row - 1);
+    QAbstractItemModel::endRemoveRows();
+    emit dataChanged(index(0, 0), index(m_posts.size() - 1, 3));
+    return true;
+  }
 
   Qt::ItemFlags flags(const QModelIndex& index) const final
   {
@@ -202,13 +206,14 @@ public:
   QString  GetLastUpdated() const;
 
 signals:
-  void     request_update(const Platform::Post& post);
+  void     request_update(const Platform::Post& post) const;
+  void     refresh() const;
 
+protected:
+  void     showEvent(QShowEvent *) final;
 private:
   Ui::Dialog* ui;
   PostModel   m_post_model;
   QString     m_last_updated;
   int         m_selected{-1};
 };
-
-#endif // __POSTDIALOG_HPP
