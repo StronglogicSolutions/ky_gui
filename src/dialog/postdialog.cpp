@@ -87,6 +87,7 @@ PostDialog::PostDialog(QWidget *parent)
   {
     auto count = m_post_model.posts().size();
     m_post_model.removeRows(0, count);
+    ui->posts->reset();
     ui->refresh->setStyleSheet(request_button_style);
     refresh();
   });
@@ -105,6 +106,7 @@ PostDialog::~PostDialog()
 void PostDialog::showEvent(QShowEvent *)
 {
   refresh();
+  ui->posts->reset();
 }
 
 void PostDialog::ReceiveData(const QVector<QString>& data)
