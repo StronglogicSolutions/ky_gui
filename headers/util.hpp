@@ -246,54 +246,60 @@ bool isOperation(const char* data)
     return false;
 }
 
-bool isUploadCompleteEvent(const char* event) 
+bool isUploadCompleteEvent(const char* event)
 {
   return strcmp(event, "File Transfer Complete") == 0;
 }
 
-bool isUploadCompleteEvent(const QString& s) 
+bool isUploadCompleteEvent(const QString& s)
 {
   return s == "File Transfer Complete";
 }
 
-bool isValidJson(const QString& s) 
+bool isValidJson(const QString& s)
 {
   return !(Document{}.Parse(s.toUtf8().constData()).HasParseError());
 }
 
-bool isValidJson(const std::string& s) 
+bool isValidJson(const std::string& s)
 {
   return !(Document{}.Parse(s.c_str()).HasParseError());
 }
 
-bool isEvent(const char* data) 
-{  
-  if (Document d; !d.Parse(data).HasParseError() && d.HasMember("type"))
-    return strcmp(d["type"].GetString(), "event") == 0;
+bool isEvent(const char* data)
+{
+  Document d;
+  if (!d.Parse(data).HasParseError()) {
+    if (d.HasMember("type")); {
+      return strcmp(d["type"].GetString(), "event") == 0;
+    }
+  }
   return false;
 }
 
-bool isSchedule(const char* data) 
-{
-  if (Document d; !d.Parse(data).HasParseError() && d.HasMember("type"))
-    return strcmp(d["type"].GetString(), "schedule") == 0;
+bool isSchedule(const char* data) {
+  Document d;
+  if (!d.Parse(data).HasParseError()) {
+    if (d.HasMember("type")); {
+      return strcmp(d["type"].GetString(), "schedule") == 0;
+    }
+  }
   return false;
 }
 
 template <typename T>
-bool isKEvent(T event, const char* kEvent)
-{
-  if constexpr (std::is_same_v<T, std::string>)
+bool isKEvent(T event, const char* kEvent) {
+  if constexpr (std::is_same_v<T, std::string>) {
     return strcmp(event.c_str(), kEvent) == 0;
-  else if constexpr (std::is_same_v<T, QString>)
+  } else if constexpr (std::is_same_v<T, QString>) {
     return strcmp(event.toUtf8(), kEvent) == 0;
-  else
-    return strcmp(event, kEvent) == 0;  
+  } else {
+    return strcmp(event, kEvent) == 0;
+  }
 }
 
-bool isPong(const char* data)
-{
-  return strcmp(data, "PONG") == 0;
+bool isPong(const char* data) {
+    return strcmp(data, "PONG") == 0;
 }
 
 bool isPong(const uint8_t* bytes, size_t size)
@@ -305,10 +311,11 @@ bool isPong(const uint8_t* bytes, size_t size)
           bytes[3] == 0x47    );
 }
 // TODO: This should be "message", no?
-bool isMessage(const char* data)
-{
-  if (Document d; !(d.Parse(data).HasParseError()))
+bool isMessage(const char* data) {
+  Document d;
+  if (!(d.Parse(data).HasParseError())) {
     return (d.HasMember("message"));
+  }
   return false;
 }
 
