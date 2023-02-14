@@ -1,5 +1,4 @@
 ﻿#include <include/ui/mainwindow.h>
-#include <QGraphicsDropShadowEffect>
 
 namespace utils {
 void save_config(const QString& config)

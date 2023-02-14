@@ -16,7 +16,7 @@ class Dialog;
 class PostModel : public QAbstractTableModel
 {
   Q_OBJECT
-
+using posts_t = QVector<Platform::Post>;
 public:
 
   QVariant data(const QModelIndex& index, int role) const final
@@ -163,8 +163,8 @@ public:
     emit dataChanged(index(0, 0), index(posts().size() - 1, 3));
   }
 
-  const QVector<Platform::Post>& posts() const       { return m_posts; }
-        QVector<Platform::Post>& get_mutable_posts() { return m_posts; }
+  const posts_t& posts()             const { return m_posts; }
+        posts_t& get_mutable_posts()       { return m_posts; }
 
   bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) final
   {
