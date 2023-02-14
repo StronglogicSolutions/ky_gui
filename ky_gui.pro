@@ -28,7 +28,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++17
 CONFIG += static
 
-QMAKE_CXXFLAGS     += -fno-sized-deallocation
+QMAKE_CXXFLAGS += -fno-sized-deallocation
 
 SOURCES += src/main.cpp \
            src/window/main/mainwindow.cpp \
