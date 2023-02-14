@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __UTIL_HPP__
+#define __UTIL_HPP__
 
 #include <QDebug>
 #include <QJsonDocument>
@@ -548,3 +549,5 @@ static uint    unixtime() { return QDateTime::currentDateTime().toTime_t(); }
 } // namespace TimeUtils
 
 }  // namespace
+
+#endif // __UTIL_HPP__
