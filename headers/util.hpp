@@ -142,6 +142,19 @@ static QString escapeTextToRaw(QString s) {
     return escapeText(s).toUtf8().constData();
 }
 
+/**
+ * @brief configValue
+ * @param [in] {QString}    key          The key whose corresponding value is to be sought from the
+ *                                       ConfigJson param
+ * @param [in] {QJsonObject}config       JSON Config object
+ * @param [in] {bool}       use_default  Indicates that the default key will be sought if no value
+ *                                       matching the key parameter is found
+ * @return {QString} The value which corresonds to the key, or an empty string
+ *
+ * TODO: ConfigJson should probably be called something else, like
+ * ConfigJsonObject
+ */
+
 QString configValue(QString key, QJsonObject config, bool use_default = false) {
   if (!config.contains(key) && use_default) {
     if (config.contains("default")) {
@@ -154,23 +167,29 @@ QString configValue(QString key, QJsonObject config, bool use_default = false) {
 }
 
 QList<QString> configValueToQList(QString key, QJsonObject config) {
-  QList<QString> list;
-  if (config.contains(key)) {    
-    if (const auto value = config.value(key); value.isArray())
-      for (auto && item : value.toArray())
-        list.append(item.toString());          
+  QList<QString> list{};
+  if (config.contains(key)) {
+    auto value = config.value(key);
+    if (value.isArray()) {
+      for (auto && item : value.toArray()) {
+        list.append(item.toString());
+      }
+    }
   }
   return list;
 }
 
 QList<QString> configUsers(QString section, QJsonObject config)
 {
-  QList<QString> list;
+  QList<QString> list{};
   if (config.contains(section))
-  {    
-    if (const auto sub_object = config.value(section).toObject(); sub_object.contains("users"))
+  {
+    QJsonObject sub_object = config.value(section).toObject();
+    if (sub_object.contains("users"))
+    {
       for (auto&& item : sub_object.value("users").toArray())
-        list.append(item.toString());    
+        list.append(item.toString());
+    }
   }
   return list;
 }
@@ -181,8 +200,7 @@ QString defaultConfigUser(QJsonObject config)
   return users.isEmpty() ? "" : users.front();
 }
 
-QJsonObject configObject(QString key, QJsonObject config, bool use_default = false)
-{
+QJsonObject configObject(QString key, QJsonObject config, bool use_default = false) {
   auto key_value = key.toLower();
   if (!config.contains(key_value) && use_default) {
     if (config.contains("default")) {
@@ -195,21 +213,18 @@ QJsonObject configObject(QString key, QJsonObject config, bool use_default = fal
   return QJsonObject{};
 }
 
-QJsonObject loadJsonConfig(QString json_string)
-{
+QJsonObject loadJsonConfig(QString json_string) {
   return QJsonDocument::fromJson(json_string.toUtf8()).object();
 }
 
-bool configBoolValue(QString key, QJsonObject config)
-{
+bool configBoolValue(QString key, QJsonObject config) {
   if (config.contains(key)) {
     return bool{config.value(key).toString().compare("true") == 0};
   }
   return false;
 }
 
-std::string getJsonString(std::string s)
-{
+std::string getJsonString(std::string s) {
     Document d;
     d.Parse(s.c_str());
     StringBuffer buffer;
@@ -237,37 +252,32 @@ std::string createMessage(const char* data, std::string args = "", const char* u
     return s.GetString();
 }
 
-bool isOperation(const char* data)
-{
+bool isOperation(const char* data) {
     Document d;
     d.Parse(data);
-    if (!d.Parse(data).HasParseError())
+    if (!d.Parse(data).HasParseError()) {
       return strcmp(d["type"].GetString(), "operation") == 0;
+    }
     return false;
 }
 
-bool isUploadCompleteEvent(const char* event)
-{
+bool isUploadCompleteEvent(const char* event) {
   return strcmp(event, "File Transfer Complete") == 0;
 }
 
-bool isUploadCompleteEvent(const QString& s)
-{
+bool isUploadCompleteEvent(const QString& s) {
   return s == "File Transfer Complete";
 }
 
-bool isValidJson(const QString& s)
-{
+bool isValidJson(const QString& s) {
   return !(Document{}.Parse(s.toUtf8().constData()).HasParseError());
 }
 
-bool isValidJson(const std::string& s)
-{
+bool isValidJson(const std::string& s) {
   return !(Document{}.Parse(s.c_str()).HasParseError());
 }
 
-bool isEvent(const char* data)
-{
+bool isEvent(const char* data) {
   Document d;
   if (!d.Parse(data).HasParseError()) {
     if (d.HasMember("type")); {
