@@ -278,38 +278,31 @@ bool isValidJson(const std::string& s) {
 }
 
 bool isEvent(const char* data) {
-  Document d;
-  if (!d.Parse(data).HasParseError()) {
-    if (d.HasMember("type")); {
-      return strcmp(d["type"].GetString(), "event") == 0;
-    }
-  }
+  if (Document d; !d.Parse(data).HasParseError() && d.HasMember("type"))
+    return strcmp(d["type"].GetString(), "event") == 0;
   return false;
 }
 
 bool isSchedule(const char* data) {
-  Document d;
-  if (!d.Parse(data).HasParseError()) {
-    if (d.HasMember("type")); {
-      return strcmp(d["type"].GetString(), "schedule") == 0;
-    }
-  }
+  if (Document d; !d.Parse(data).HasParseError() && d.HasMember("type"))
+    return strcmp(d["type"].GetString(), "schedule") == 0;
   return false;
 }
 
 template <typename T>
-bool isKEvent(T event, const char* kEvent) {
-  if constexpr (std::is_same_v<T, std::string>) {
+bool isKEvent(T event, const char* kEvent)
+{
+  if constexpr      (std::is_same_v<T, std::string>)
     return strcmp(event.c_str(), kEvent) == 0;
-  } else if constexpr (std::is_same_v<T, QString>) {
+  else if constexpr (std::is_same_v<T, QString>)
     return strcmp(event.toUtf8(), kEvent) == 0;
-  } else {
-    return strcmp(event, kEvent) == 0;
-  }
+  else
+    return strcmp(event, kEvent) == 0;  
 }
 
-bool isPong(const char* data) {
-    return strcmp(data, "PONG") == 0;
+bool isPong(const char* data)
+{
+  return strcmp(data, "PONG") == 0;
 }
 
 bool isPong(const uint8_t* bytes, size_t size)
@@ -323,10 +316,7 @@ bool isPong(const uint8_t* bytes, size_t size)
 // TODO: This should be "message", no?
 bool isMessage(const char* data) {
   Document d;
-  if (!(d.Parse(data).HasParseError())) {
-    return (d.HasMember("message"));
-  }
-  return false;
+  return !(d.Parse(data).HasParseError()) && d.HasMember("message");
 }
 
 template <typename T, typename P>
