@@ -38,6 +38,7 @@ SOURCES += src/main.cpp \
            src/window/research/researchwindow.cpp \
            src/util/util.cpp \
            src/client/client.cpp \
+           src/client/console.cpp \
            src/task/instagram_task.cpp \
            src/task/generic_task.cpp \
            src/dialog/appdialog.cpp \
@@ -45,6 +46,7 @@ SOURCES += src/main.cpp \
            src/dialog/messagedialog.cpp \
            src/dialog/postdialog.cpp \
            src/dialog/scheduledialog.cpp \
+           src/dialog/postmodel.cpp \
            src/component/connection_indicator.cpp \
            src/component/kfiledialog.cpp \
            src/component/status_delegate.cpp \
@@ -64,6 +66,7 @@ HEADERS += include/ui/documentwindow.hpp \
            include/ui/status_delegate.hpp \
            include/ui/button_delegate.hpp \
            include/client/client.hpp \
+           include/client/console.hpp \
            include/task/task.hpp \
            include/task/instagram_task.hpp\
            include/task/generic_task.hpp\
