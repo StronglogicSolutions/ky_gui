@@ -108,7 +108,6 @@ static const uint8_t TASK_FILES_INDEX    {0x07};
 
 }
 
-namespace {
 using namespace rapidjson;
 
 typedef std::string KOperation;
@@ -130,7 +129,7 @@ extern QString escapeTextToRaw(QString s);
 QString configValue(const QString& key, const QJsonObject& config, bool use_default = false);
 QList<QString> configValueToQList(const QString& key, const QJsonObject& config);
 QList<QString> configUsers(const QString& section, const QJsonObject& config);
-QString defaultConfigUser(QJsonObject config);
+QString defaultConfigUser(const QJsonObject& config);
 QJsonObject configObject(QString key, QJsonObject config, bool use_default = false);
 QJsonObject loadJsonConfig(QString json_string);
 
@@ -153,7 +152,15 @@ bool isEvent(const char* data);
 bool isSchedule(const char* data);
 
 template <typename T>
-bool isKEvent(T event, const char* kEvent);
+bool isKEvent(T event, const char* kEvent)
+{
+  if constexpr      (std::is_same_v<T, std::string>)
+    return strcmp(event.c_str(), kEvent) == 0;
+  else if constexpr (std::is_same_v<T, QString>)
+    return strcmp(event.toUtf8(), kEvent) == 0;
+  else
+    return strcmp(event, kEvent) == 0;
+}
 
 bool isPong(const char* data);
 
@@ -213,5 +220,3 @@ extern QString getTime();
 [[maybe_unused]]
 extern uint    unixtime();
 } // namespace TimeUtils
-
-}  // namespace

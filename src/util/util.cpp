@@ -1,7 +1,6 @@
 #include "util.hpp"
 
-namespace {
-using namespace rapidjson;
+bool FileWrap::HasID() const { return !(id.isEmpty()); }
 
 QString escapeText(QString s)
 {
@@ -159,17 +158,6 @@ bool isSchedule(const char* data) {
   if (Document d; !d.Parse(data).HasParseError() && d.HasMember("type"))
     return strcmp(d["type"].GetString(), "schedule") == 0;
   return false;
-}
-
-template <typename T>
-bool isKEvent(T event, const char* kEvent)
-{
-  if constexpr      (std::is_same_v<T, std::string>)
-    return strcmp(event.c_str(), kEvent) == 0;
-  else if constexpr (std::is_same_v<T, QString>)
-    return strcmp(event.toUtf8(), kEvent) == 0;
-  else
-    return strcmp(event, kEvent) == 0;
 }
 
 bool isPong(const char* data)
@@ -419,6 +407,3 @@ QString getTime()  { return QDateTime::currentDateTime().toString("hh:mm:ss"); }
 [[maybe_unused]]
 uint    unixtime() { return QDateTime::currentDateTime().toTime_t(); }
 } // namespace TimeUtils
-
-}  // namespace
-
