@@ -7,7 +7,7 @@
 #include <QTableWidgetItem>
 #include <QStandardItemModel>
 #include <unordered_map>
-#include "headers/util.hpp"
+#include <util/util.hpp>
 
 namespace Ui {
 class ScheduleDialog;

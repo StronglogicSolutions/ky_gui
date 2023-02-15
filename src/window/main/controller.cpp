@@ -7,7 +7,7 @@
 #include <QString>
 #include <QTextEdit>
 #include <QTextStream>
-#include <headers/util.hpp>
+#include <util/util.hpp>
 #include <vector>
 
 

@@ -36,6 +36,7 @@ SOURCES += src/main.cpp \
            src/window/document/documentwindow.cpp \
            src/window/document/helpers.cpp \
            src/window/research/researchwindow.cpp \
+           src/util/util.cpp \
            src/client/client.cpp \
            src/task/instagram_task.cpp \
            src/task/generic_task.cpp \
@@ -74,11 +75,11 @@ HEADERS += include/ui/documentwindow.hpp \
            headers/kmessage_codec.hpp \
            headers/instatask_generated.h \
            headers/generictask_generated.h \
-           headers/util.hpp \
+           src/util/util.hpp \
            headers/kiq_types.hpp \
-           headers/rapidjson/writer.h \
-           headers/rapidjson/stringbuffer.h \
-           headers/rapidjson/document.h
+           src/util/rapidjson/writer.h \
+           src/util/rapidjson/stringbuffer.h \
+           src/util/rapidjson/document.h
 
 FORMS += appdialog.ui \
          argdialog.ui \
@@ -90,7 +91,7 @@ FORMS += appdialog.ui \
          researchwindow.ui \
          scheduledialog.ui
 
-INCLUDEPATH += third_party/klogger/src
+INCLUDEPATH += third_party/klogger/src src
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

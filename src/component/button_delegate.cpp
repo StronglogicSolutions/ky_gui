@@ -3,7 +3,7 @@
 #include <QPainter>
 #include <QStandardItemModel>
 #include "include/ui/button_delegate.hpp"
-#include "headers/util.hpp"
+#include <util/util.hpp>
 
 ButtonDelegate::ButtonDelegate(QObject* parent, const post_item_fn_t& fn)
 : QStyledItemDelegate(parent),

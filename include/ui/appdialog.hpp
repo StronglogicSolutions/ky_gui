@@ -2,7 +2,7 @@
 #define APPDIALOG_HPP
 
 #include <QDialog>
-#include "headers/util.hpp"
+#include <util/util.hpp>
 
 namespace Ui {
 class AppDialog;

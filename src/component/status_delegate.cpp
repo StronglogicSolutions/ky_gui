@@ -5,7 +5,7 @@
 #include <map>
 #include "include/ui/status_delegate.hpp"
 #include "include/ui/postdialog.hpp"
-#include "headers/util.hpp"
+#include <util/util.hpp>
 #include <QApplication>
 
 StatusDelegate::StatusDelegate(QObject* parent, const post_item_fn_t& fn)

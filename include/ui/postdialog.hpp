@@ -4,7 +4,7 @@
 #include <QThread>
 #include <QAbstractTableModel>
 #include <algorithm>
-#include "headers/util.hpp"
+#include <util/util.hpp>
 #include "headers/kiq_types.hpp"
 #include "include/ui/status_delegate.hpp"
 

@@ -13,7 +13,7 @@
 #include <QPair>
 #include "src/window/document/helpers.hpp"
 #include <include/ui/kfiledialog.h>
-#include <headers/util.hpp>
+#include <util/util.hpp>
 
 using TaskFlags  = QHash<QString, QString>;
 using Coord      = QPair<qint32, qint32>;
