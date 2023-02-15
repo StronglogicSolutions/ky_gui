@@ -1,26 +1,38 @@
-﻿#ifndef UTIL_HPP
-#define UTIL_HPP
+﻿#ifndef __UTIL_HPP__
+#define __UTIL_HPP__
 
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include <QQueue>
-#include <QTimer>
 #include <QString>
 #include <QMessageBox>
 #include <QDateTime>
 #include <QVector>
-#include <charconv>
 #include <string>
-#include <utility>
 #include <vector>
-#include <sstream>
 #include "rapidjson/document.h"
 #include "rapidjson/pointer.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
+#include "logger.hpp"
+
+template <>
+struct fmt::formatter<QString>
+{
+  constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin())
+  {
+    return ctx.begin();
+  }
+
+  template <typename FormatContext>
+  auto format(const QString& s, FormatContext& ctx) const -> decltype(ctx.out())
+  {
+    return fmt::format_to(ctx.out(), "{}", s);
+  }
+};
+
 
 struct KApplication {  
   QString name;
@@ -41,7 +53,7 @@ struct ScheduledTask {
   QVector<QString> files;
   QString          envfile;
 
-bool operator==(const ScheduledTask& task){ return this->id.toUInt() == task.id.toUInt(); }
+  bool operator==(const ScheduledTask& task){ return this->id.toUInt() == task.id.toUInt(); }
 
 };
 
@@ -267,38 +279,31 @@ bool isValidJson(const std::string& s) {
 }
 
 bool isEvent(const char* data) {
-  Document d;
-  if (!d.Parse(data).HasParseError()) {
-    if (d.HasMember("type")); {
-      return strcmp(d["type"].GetString(), "event") == 0;
-    }
-  }
+  if (Document d; !d.Parse(data).HasParseError() && d.HasMember("type"))
+    return strcmp(d["type"].GetString(), "event") == 0;
   return false;
 }
 
 bool isSchedule(const char* data) {
-  Document d;
-  if (!d.Parse(data).HasParseError()) {
-    if (d.HasMember("type")); {
-      return strcmp(d["type"].GetString(), "schedule") == 0;
-    }
-  }
+  if (Document d; !d.Parse(data).HasParseError() && d.HasMember("type"))
+    return strcmp(d["type"].GetString(), "schedule") == 0;
   return false;
 }
 
 template <typename T>
-bool isKEvent(T event, const char* kEvent) {
-  if constexpr (std::is_same_v<T, std::string>) {
+bool isKEvent(T event, const char* kEvent)
+{
+  if constexpr      (std::is_same_v<T, std::string>)
     return strcmp(event.c_str(), kEvent) == 0;
-  } else if constexpr (std::is_same_v<T, QString>) {
+  else if constexpr (std::is_same_v<T, QString>)
     return strcmp(event.toUtf8(), kEvent) == 0;
-  } else {
-    return strcmp(event, kEvent) == 0;
-  }
+  else
+    return strcmp(event, kEvent) == 0;  
 }
 
-bool isPong(const char* data) {
-    return strcmp(data, "PONG") == 0;
+bool isPong(const char* data)
+{
+  return strcmp(data, "PONG") == 0;
 }
 
 bool isPong(const uint8_t* bytes, size_t size)
@@ -312,10 +317,7 @@ bool isPong(const uint8_t* bytes, size_t size)
 // TODO: This should be "message", no?
 bool isMessage(const char* data) {
   Document d;
-  if (!(d.Parse(data).HasParseError())) {
-    return (d.HasMember("message"));
-  }
-  return false;
+  return !(d.Parse(data).HasParseError()) && d.HasMember("message");
 }
 
 template <typename T, typename P>
@@ -546,25 +548,6 @@ static QString getTime()  { return QDateTime::currentDateTime().toString("hh:mm:
 static uint    unixtime() { return QDateTime::currentDateTime().toTime_t(); }
 } // namespace TimeUtils
 
-template <typename... T, typename O = QString>
-static O BuildLogMessage(T... args)
-{
-  if constexpr((std::is_same_v<T, QString> || ...))
-    return (O{} + ... + args);
-  else
-  {
-    std::stringstream ss{};
-    ss << TimeUtils::getTime().toUtf8().constData() << " - ";
-    (ss << ... << std::forward<T>(args));
-    return QString::fromStdString(ss.str());
-  }
-}
-
-template <typename... T>
-static void KLOG(T... args)
-{
-  qDebug().noquote() << BuildLogMessage(args...);
-}
-
 }  // namespace
-#endif  // UTIL_HPP
+
+#endif // __UTIL_HPP__

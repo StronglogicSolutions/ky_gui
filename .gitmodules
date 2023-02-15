@@ -2,3 +2,6 @@
 	path = third_party/kiqoder
 	url = https://github.com/stronglogicsolutions/kiqoder
 
+[submodule "third_party/klogger"]
+	path = third_party/klogger
+	url = https://github.com/StronglogicSolutions/klogger

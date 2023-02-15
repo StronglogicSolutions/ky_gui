@@ -28,7 +28,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++17
 CONFIG += static
 
-QMAKE_CXXFLAGS     += -fno-sized-deallocation
+QMAKE_CXXFLAGS += -fno-sized-deallocation
 
 SOURCES += src/main.cpp \
            src/window/main/mainwindow.cpp \
@@ -47,7 +47,8 @@ SOURCES += src/main.cpp \
            src/component/connection_indicator.cpp \
            src/component/kfiledialog.cpp \
            src/component/status_delegate.cpp \
-           src/component/button_delegate.cpp
+           src/component/button_delegate.cpp \
+           third_party/klogger/src/logger.cpp
 
 HEADERS += include/ui/documentwindow.hpp \
            include/ui/appdialog.hpp \
@@ -68,6 +69,8 @@ HEADERS += include/ui/documentwindow.hpp \
            src/window/document/helpers.hpp \
            third_party/kiqoder/kiqoder.hpp \
            third_party/kiqoder/file_iterator.hpp \
+           third_party/klogger/src/logger.hpp \
+           third_party/klogger/src/spdlog/spdlog.h \
            headers/kmessage_codec.hpp \
            headers/instatask_generated.h \
            headers/generictask_generated.h \
@@ -86,6 +89,8 @@ FORMS += appdialog.ui \
          postdialog.ui \
          researchwindow.ui \
          scheduledialog.ui
+
+INCLUDEPATH += third_party/klogger/src
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
