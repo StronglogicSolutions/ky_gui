@@ -6,10 +6,9 @@
 #include <functional>
 
 using post_item_fn_t = std::function<void(const QModelIndex &)>;
-
-
 using status_map_t     = std::map<QString, int>;
 using status_strings_t = std::map<QString, QString>;
+
 static const status_map_t g_status_map{
   {"Scheduled", 0},
   {"Complete", 1},
@@ -33,6 +32,7 @@ static const status_strings_t g_status_names{
   {"1", "Complete"},
   {"2", "Error"}
 };
+
 
 class StatusDelegate : public QStyledItemDelegate
 {

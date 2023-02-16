@@ -8,7 +8,7 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QPushButton>
-#include <headers/util.hpp>
+#include <util/util.hpp>
 #include <include/task/instagram_task.hpp>
 #include <include/task/generic_task.hpp>
 #include <include/task/task.hpp>
@@ -20,19 +20,6 @@
 #include <QMovie>
 
 using namespace Scheduler;
-
-inline Task* createTask(QString task_name = GENERIC_NAME) {
-  Task* task;
-  if (task_name == INSTAGRAM_NAME) {
-     task = new InstagramTask{};
-  } else {
-    task = new GenericTask{};
-  }
-  task->defineTaskArguments();
-  task->setDefaultValues();
-
-  return task;
-}
 
 namespace Ui {
 class ArgDialog;

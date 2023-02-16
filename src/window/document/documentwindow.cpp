@@ -6,11 +6,12 @@
 #include <QPrintDialog>
 #include <QTextDecoder>
 #include <QTextTable>
+#include <QPainter>
 #include <QScreen>
 #include <QTimer>
 #include <QCalendarWidget>
 #include <QAbstractTextDocumentLayout>
-#include "headers/util.hpp"
+#include <util/util.hpp>
 
 static const uint32_t DEFAULT_HEIGHT{240};
 

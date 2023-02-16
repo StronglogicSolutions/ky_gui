@@ -2,7 +2,7 @@
 #include "ui_researchwindow.h"
 #include <QTableView>
 #include <QKeyEvent>
-#include "headers/util.hpp"
+#include <util/util.hpp>
 
 ResearchWindow::ResearchWindow(QWidget *parent) :
   QMainWindow(parent),

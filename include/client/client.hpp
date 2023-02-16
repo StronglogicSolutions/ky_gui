@@ -22,9 +22,7 @@
 #include <headers/kmessage_codec.hpp>
 #include <headers/instatask_generated.h>
 #include <headers/generictask_generated.h>
-#include <headers/util.hpp>
-#include <third_party/kiqoder/kiqoder.hpp>
-
+#include "console.hpp"
 #include <include/task/task.hpp>
 
 static constexpr int MESSAGE_UPDATE_TYPE  = 1;
@@ -50,89 +48,6 @@ struct SentFile {
 int                 timestamp;
 QString             name;
 Scheduler::FileType type;
-};
-
-struct DownloadConsole
-{
-using Files = QVector<FileWrap>;
-Kiqoder::FileHandler handler;
-int32_t              wt_count;
-int32_t              rx_count;
-Files                files;
-bool                 wt_for_metadata;
-
-DownloadConsole(Kiqoder::FileHandler f_handler)
-: handler(f_handler)
-{
-  Reset();
-}
-
-FileWrap* GetFile (const QString& id)
-{
-  for (auto it = files.begin(); it != files.end(); it++)
-    if (it->id == id)
-      return it;
-  return nullptr;
-};
-
-bool WaitingForFile(const QString& id)
-{
-  FileWrap* file = GetFile(id);
-  return (file != nullptr && file->buffer == nullptr);
-}
-
-bool is_downloading()
-{
-  return wt_count;
-}
-
-void Write(const QString& id, uint8_t* data, const size_t size)
-{
-  FileWrap* file = GetFile(id);
-  if (file != nullptr && file->HasID())
-    file->buffer = QByteArray(reinterpret_cast<char*>(data), size);
-  else
-    KLOG("Failed to write incoming data");
-}
-
-void Receive(uint8_t* data, const size_t size)
-{
-  handler.processPacket(data, size);
-}
-
-Files&& GetData()
-{
-  return std::move(files);
-}
-
-void Wait(const bool wait = true)
-{
-  wt_for_metadata = wait;
-}
-
-bool SetMetadata(const QVector<QString>& data)
-{
-  static const int32_t FILE_ID_INDEX{1};
-  const  auto&         id = data[FILE_ID_INDEX];
-  if (WaitingForFile(id))
-  {
-    Wait(false);
-    handler.setID(id.toUInt());
-    KLOG("Set metadata");
-    return true;
-  }
-  KLOG("Failed to set metadata");
-  return false;
-}
-
-bool Waiting() { return wt_for_metadata; }
-
-void Reset()
-{
-  wt_count        = 0;
-  rx_count        = 0;
-  wt_for_metadata = false;
-}
 };
 
 Q_DECLARE_METATYPE(StringVec)

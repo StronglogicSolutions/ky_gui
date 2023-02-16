@@ -20,13 +20,12 @@
 #include <include/ui/researchwindow.hpp>
 #include <include/ui/argdialog.h>
 #include <include/ui/messagedialog.hpp>
-#include "include/ui/postdialog.hpp"
+#include <include/ui/postdialog.hpp>
 #include <include/ui/appdialog.hpp>
 #include <include/ui/scheduledialog.hpp>
 
 #include "ui_mainwindow.h"
 
-#include <headers/kiq_types.hpp>
 #include <include/client/client.hpp>
 
 static const uint8_t  CLIENT_EXIT{9};
