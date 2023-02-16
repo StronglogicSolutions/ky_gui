@@ -19,28 +19,18 @@ class PostModel : public QAbstractTableModel
 
 public:
 
-  QVariant data(const QModelIndex& index, int role) const final;
-
-  int rowCount(const QModelIndex & parent = QModelIndex{}) const final;
-
-  int columnCount(const QModelIndex &parent) const final;
-
-  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
-
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const final;
-
-  void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) final;
-
-  void set_data(const QVector<QString>& data);
-
-  const posts_t& posts()             const;
+  QVariant       data       (const QModelIndex& index, int role)                                       const final;
+  int            rowCount   (const QModelIndex & parent = QModelIndex{})                               const final;
+  int            columnCount(const QModelIndex &parent)                                                const final;
+  bool           setData    (const QModelIndex& index, const QVariant& value, int role = Qt::EditRole)       final;
+  QVariant       headerData (int section, Qt::Orientation orientation, int role)                       const final;
+  void           sort       (int column, Qt::SortOrder order = Qt::AscendingOrder)                           final;
+  void           set_data   (const QVector<QString>& data);
+  bool           removeRows (int row, int count, const QModelIndex& parent = QModelIndex())                  final;
+  Qt::ItemFlags  flags      (const QModelIndex& index)                                                 const final;
+  void           Update     (const QModelIndex& index);
+  const posts_t& posts()                                                                               const;
         posts_t& get_mutable_posts();
-
-  bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) final;
-
-  Qt::ItemFlags flags(const QModelIndex& index) const final;
-
-  void Update(const QModelIndex& index);
 
 private:
 
@@ -54,17 +44,18 @@ public:
   explicit PostDialog(QWidget* parent = nullptr);
   ~PostDialog();
 
-  void     ReceiveData(const QVector<QString>& data);
-  void     Update(const QVector<QString>& data);
-  void     SelectRow(int row);
-  QString  GetLastUpdated() const;
+  void     ReceiveData   (const QVector<QString>& data);
+  void     Update        (const QVector<QString>& data);
+  void     SelectRow     (int row);
+  QString  GetLastUpdated()                             const;
 
 signals:
-  void     request_update(const Platform::Post& post) const;
-  void     refresh() const;
+  void     request_update(const Platform::Post& post)   const;
+  void     refresh()                                    const;
 
 protected:
-  void     showEvent(QShowEvent *) final;
+  void     showEvent(QShowEvent *)                            final;
+
 private:
   Ui::Dialog* ui;
   PostModel   m_post_model;
