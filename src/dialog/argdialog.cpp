@@ -11,6 +11,20 @@
 #include <vector>
 #include <cmath>
 
+static Task* createTask(QString task_name = GENERIC_NAME)
+{
+  Task* task;
+  if (task_name == INSTAGRAM_NAME) {
+     task = new InstagramTask{};
+  } else {
+    task = new GenericTask{};
+  }
+  task->defineTaskArguments();
+  task->setDefaultValues();
+
+  return task;
+}
+
 using namespace Scheduler;
 
 static const char* JPG_FORMAT = "JPG";

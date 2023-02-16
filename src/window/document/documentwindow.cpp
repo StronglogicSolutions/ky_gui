@@ -6,6 +6,7 @@
 #include <QPrintDialog>
 #include <QTextDecoder>
 #include <QTextTable>
+#include <QPainter>
 #include <QScreen>
 #include <QTimer>
 #include <QCalendarWidget>
