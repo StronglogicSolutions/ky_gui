@@ -54,7 +54,7 @@ static const QString request_button_style{"QPushButton{"
   "QPushButton: {"
     "background-color: red;"
   "}"};
-
+//---------------------------------------------------------------------------------------
 PostDialog::PostDialog(QWidget *parent)
 : QDialog(parent),
   ui(new Ui::Dialog)
@@ -73,7 +73,7 @@ PostDialog::PostDialog(QWidget *parent)
     if (index.isValid())
       SelectRow(index.row());
   }});
-
+  //----------------------------------------------------------
   QObject::connect(ui->save, &QPushButton::clicked, [this]
   {
     if (m_selected > m_post_model.posts().size())
@@ -82,7 +82,7 @@ PostDialog::PostDialog(QWidget *parent)
     request_update(m_post_model.posts()[m_selected]);
     ui->save->setStyleSheet(request_button_style);
   });
-
+  //----------------------------------------------------------
   QObject::connect(ui->refresh, &QPushButton::clicked, [this]
   {
     auto count = m_post_model.posts().size();
@@ -91,29 +91,30 @@ PostDialog::PostDialog(QWidget *parent)
     ui->refresh->setStyleSheet(request_button_style);
     refresh();
   });
-
+  //----------------------------------------------------------
   QObject::connect(ui->posts, &QTableView::clicked, [this](const QModelIndex& index)
   {
     SelectRow(index.row());
   });
 }
-
+//---------------------------------------------------------------------------------------
 PostDialog::~PostDialog()
 {
   delete ui;
 }
-
+//---------------------------------------------------------------------------------------
 void PostDialog::showEvent(QShowEvent *)
 {
   refresh();
   ui->posts->reset();
 }
-
+//---------------------------------------------------------------------------------------
 void PostDialog::ReceiveData(const QVector<QString>& data)
 {
   m_post_model.set_data(data);
+  ui->refresh->setStyleSheet(refresh_button_style);
 }
-
+//---------------------------------------------------------------------------------------
 void PostDialog::Update(const QVector<QString>& data)
 {
   auto unselect = [this] { ui->postText->setText("No selection"); };
@@ -130,13 +131,13 @@ void PostDialog::Update(const QVector<QString>& data)
     }
   }
 }
-
+//---------------------------------------------------------------------------------------
 void PostDialog::SelectRow(int row)
 {
   m_selected = row;
   ui->postText->setText(QString{"Row %0 selected: %1"}.arg(row).arg(m_post_model.posts()[row].content));
 }
-
+//---------------------------------------------------------------------------------------
 QString PostDialog::GetLastUpdated() const
 {
   return m_last_updated;

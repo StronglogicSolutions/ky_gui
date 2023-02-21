@@ -36,7 +36,7 @@ QWidget* StatusDelegate::createEditor(QWidget *parent, const QStyleOptionViewIte
 
   QObject::connect(box, QOverload<int>::of(&QComboBox::currentIndexChanged), [](int index)
   {
-    KLOG(QString{"Combobox value %0"}.arg(index));
+    KLOG("Combobox value {}", index);
   });
 
   QObject::connect(box, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [box]

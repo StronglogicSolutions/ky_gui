@@ -166,6 +166,6 @@ Qt::ItemFlags PostModel::flags(const QModelIndex& index) const
 void PostModel::Update(const QModelIndex& index)
 {
   bool editable = flags(index) & Qt::ItemIsEditable;
-  KLOG(QString{"Hit with index %0, %1. Editable: %2"}.arg(index.row()).arg(index.column()).arg(editable));
+  KLOG("Hit with index {}, {}. Editable: {}", index.row(), index.column(), editable);
 }
 

@@ -206,7 +206,7 @@ Client::Client(QWidget* parent, int count, char** arguments)
     if (reply->error())
     {
       error = true;
-      KLOG(QString{"Auth server returned error: %0"}.arg(reply->errorString()));
+      KLOG("Auth server returned error: {}",reply->errorString());
     }
     else
     {
