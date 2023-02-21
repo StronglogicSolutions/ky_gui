@@ -73,7 +73,7 @@ void ButtonDelegate::setModelData(QWidget*, QAbstractItemModel* model, const QMo
   KLOG("setModelData");
 
   const auto request_pending = index.data(RequestRole).toBool();
-  KLOG(QString{"Request pending was %0 and will become %1 for %3 : %4"}.arg(request_pending).arg(!request_pending).arg(index.row()).arg(index.column()));
+  KLOG("Request pending was {} and will become {} for {} : {}", request_pending, !request_pending, index.row(), index.column());
   model->setData(index, !request_pending, RequestRole);
 }
 
