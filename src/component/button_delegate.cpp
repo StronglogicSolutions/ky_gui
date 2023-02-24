@@ -14,24 +14,14 @@ bool has_been_purple = false;
 void ButtonDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
   QPushButton button{};
-//  auto item_data = qobject_cast<QStandardItemModel*>(const_cast<QAbstractItemModel*>(index.model()))->item(index.row(), index.column());
-  if (bool request_pending = index.data(RequestRole).toBool())
+  if (index.data(RequestRole).toBool())
   {
     button.setStyleSheet("background-color: purple");
     button.setText("Requested");
-    if (index.row() == 165)
-      KLOG("paint() 165 is pending");
   }
   else
-  {
-    auto row = index.row();
-    if (row == 165)
-    {
-      KLOG("paint() 165 is NOT pending");
-      button.setText("This one will save");
-    }
-    else
-      button.setText("Save");
+  {        
+    button.setText("Save");
     button.setStyleSheet("background-color: green");
   }
 
@@ -42,7 +32,7 @@ void ButtonDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
   painter->restore();
 }
 
-void ButtonDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+void ButtonDelegate::setEditorData(QWidget *editor, const QModelIndex&) const
 {
   QPushButton* button = qobject_cast<QPushButton*>(editor);
   KLOG("setEditorData");

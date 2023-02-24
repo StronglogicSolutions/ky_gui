@@ -66,27 +66,8 @@ struct FileWrap
   bool HasID() const;
 };
 
-namespace constants {
-enum RequestType {
-REGISTER              = 0x00,
-UPDATE                = 0x01,
-DELETE                = 0x02,
-GET                   = 0x03,
-FETCH_SCHEDULE        = 0x04,
-UPDATE_SCHEDULE       = 0x05,
-FETCH_SCHEDULE_TOKENS = 0x06,
-TRIGGER_CREATE        = 0x07,
-FETCH_TASK_FLAGS      = 0x08,
-FETCH_FILE            = 0x09,
-FETCH_FILE_ACK        = 0x0A,
-FETCH_FILE_READY      = 0x0B,
-FETCH_TASK_DATA       = 0x0C,
-FETCH_TERM_HITS       = 0x13,
-EXECUTE_PROCESS       = 0x14,
-FETCH_POSTS           = 0x15,
-UPDATE_POST           = 0x16
-};
-
+namespace constants
+{
 static const uint8_t SCHEDULED_TASK_ID_INDEX        = 0x00;
 static const uint8_t SCHEDULED_TASK_NAME_INDEX      = 0x01;
 static const uint8_t SCHEDULED_TASK_TIME_INDEX      = 0x02;

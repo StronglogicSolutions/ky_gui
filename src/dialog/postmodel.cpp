@@ -18,6 +18,7 @@ QVariant PostModel::data(const QModelIndex& index, int role) const
         const auto status = posts().at(row).status;
         if (g_status_names.find(status) != g_status_names.end())
           return g_status_names.at(status);
+        [[ fallthrough ]];
       }
       default:  return QString{};
     }

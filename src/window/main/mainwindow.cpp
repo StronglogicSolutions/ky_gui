@@ -110,6 +110,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   arg_ui(new ArgDialog),
   m_client_time_remaining(DEFAULT_TIMEOUT)
 {
+  using namespace kiq::Request;
   m_event_model   = new QStandardItemModel(this);
   m_process_model = new QStandardItemModel(this);
   q_client        = new Client(this, cli_argc, cli_argv);
@@ -142,9 +143,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   QObject::connect(&m_ping_timer,    &QTimer::timeout, stay_alive);
   QObject::connect(&posts_ui,        &PostDialog::refresh,              this, [this]                       { q_client->request(RequestType::FETCH_POSTS); });
   QObject::connect(&schedule_ui,     &ScheduleDialog::SchedulerRequest, this, [this](auto type, auto task) { q_client->request(type, task); });
-  QObject::connect(&posts_ui,        &PostDialog::request_update,       this, [this](const auto& post)     { q_client->request(constants::RequestType::UPDATE_POST, post.payload()); });
+  QObject::connect(&posts_ui,        &PostDialog::request_update,       this, [this](const auto& post)     { q_client->request(RequestType::UPDATE_POST, post.payload()); });
   QObject::connect(ui->eventList,    &QListView::clicked,               this, [this](const auto& index)    { utils::infoMessageBox(m_event_model->item(index.row(), index.column())->text(), "Event"); });
-  QObject::connect(&schedule_ui,     &ScheduleDialog::UpdateSchedule,   this, [this] { q_client->request(RequestType::FETCH_SCHEDULE); });
+  QObject::connect(&schedule_ui,     &ScheduleDialog::UpdateSchedule,   this, [this]                       { q_client->request(RequestType::FETCH_SCHEDULE); });
   QObject::connect(q_client,         &Client::onTokenReceived, this, [this](bool error) { set_connected(!error); });
   QObject::connect(q_client,         &Client::messageReceived, this, &MainWindow::onMessageReceived);
   QObject::connect(ui->connect,      &QPushButton::clicked, this, &MainWindow::connectClient);
@@ -235,7 +236,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
 
   QObject::connect(&app_ui, &AppDialog::appRequest, this, [this](KApplication application, RequestType type)
   {
-      if (type == REGISTER && q_client->hasApp(application))
+      if (type == kiq::Request::RequestType::REGISTER_APPLICATION && q_client->hasApp(application))
       {
         QMessageBox::warning(this, tr("Application request"),
                             tr("An application with that name already exists"));
@@ -290,7 +291,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
 
   QObject::connect(ui->makeDoc, &QPushButton::clicked, this, [this]()
   {
-    q_client->request(RequestType::FETCH_TASK_FLAGS);
+    q_client->request(kiq::Request::RequestType::TASK_FLAGS);
     doc_window.show();
   });
 
@@ -451,7 +452,7 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v)
           arg_ui->show();
 
         if (configBoolValue("fetchSchedule", m_config))
-          q_client->request(RequestType::FETCH_SCHEDULE);
+          q_client->request(kiq::Request::RequestType::FETCH_SCHEDULE);
       }
     break;
 

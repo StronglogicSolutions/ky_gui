@@ -1,5 +1,4 @@
-﻿#ifndef SCHEDULEDIALOG_HPP
-#define SCHEDULEDIALOG_HPP
+﻿#pragma once
 
 #include <QDialog>
 #include <QThread>
@@ -8,6 +7,7 @@
 #include <QStandardItemModel>
 #include <unordered_map>
 #include <util/util.hpp>
+#include <kproto/types.hpp>
 
 namespace Ui {
 class ScheduleDialog;
@@ -21,13 +21,13 @@ class ScheduleDialog : public QDialog
   explicit ScheduleDialog(QWidget* parent = nullptr);
   void     InsertTasks(QVector<QString> tasks);
   void     SetApps(const CommandMap& map);
-  void     ReceiveResponse(RequestType type, QVector<QString> v);
+  void     ReceiveResponse(kiq::Request::RequestType type, QVector<QString> v);
   ~ScheduleDialog();
   void     Clear();
 
  signals:
   void UpdateSchedule();
-  void SchedulerRequest(constants::RequestType type, ScheduledTask task);
+  void SchedulerRequest(kiq::Request::RequestType type, ScheduledTask task);
 
  protected:
   virtual void showEvent(QShowEvent* e)     override;
@@ -47,5 +47,3 @@ class ScheduleDialog : public QDialog
   int32_t                m_mask;
   bool                   m_refreshing;
 };
-
-#endif // SCHEDULEDIALOG_HPP

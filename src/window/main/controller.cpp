@@ -9,7 +9,7 @@
 #include <QTextStream>
 #include <util/util.hpp>
 #include <vector>
-
+#include <kproto/types.hpp>
 
 /**
  * Controller
@@ -244,14 +244,14 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
       }
       else
       if (details == "Schedule end")
-        window->schedule_ui.ReceiveResponse(RequestType::FETCH_SCHEDULE, v);
+        window->schedule_ui.ReceiveResponse(kiq::Request::RequestType::FETCH_SCHEDULE, v);
     }
     else
     if (message == "Schedule PUT")
-      window->schedule_ui.ReceiveResponse(RequestType::UPDATE_SCHEDULE, v);
+      window->schedule_ui.ReceiveResponse(kiq::Request::RequestType::UPDATE_SCHEDULE, v);
     else
     if (message == "Schedule Tokens")
-      window->schedule_ui.ReceiveResponse(RequestType::FETCH_SCHEDULE_TOKENS, v);
+      window->schedule_ui.ReceiveResponse(kiq::Request::RequestType::FETCH_SCHEDULE_TOKENS, v);
     else
     if (message == "Application Flags")
     {
