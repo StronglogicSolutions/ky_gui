@@ -29,10 +29,10 @@ MainWindow::Controller::Controller(MainWindow* window_)
 void MainWindow::Controller::handleCommands(const StringVec& args,
                                             const QString&   default_command)
 {
-  uint8_t MASK_INDEX = 0;
-  uint8_t NAME_INDEX = 1;
-  uint8_t PATH_INDEX = 2;
-  uint8_t DATA_INDEX = 3;
+  static const uint8_t MASK_INDEX = 0;
+  static const uint8_t NAME_INDEX = 1;
+  static const uint8_t PATH_INDEX = 2;
+  static const uint8_t DATA_INDEX = 3;
 
   QComboBox* app_list = window->ui->appList;
   app_list->clear();

@@ -451,6 +451,8 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v)
         if (configBoolValue("schedulerMode", std::ref(m_config)))
           arg_ui->show();
 
+        q_client->request(kiq::Request::RequestType::KIQ_STATUS);
+
         if (configBoolValue("fetchSchedule", m_config))
           q_client->request(kiq::Request::RequestType::FETCH_SCHEDULE);
       }

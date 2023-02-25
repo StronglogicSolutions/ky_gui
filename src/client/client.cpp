@@ -363,15 +363,9 @@ void Client::start(QString ip, QString port)
 
     if (::connect(m_client_socket_fd, reinterpret_cast<sockaddr*>(&server_socket),
                   sizeof(server_socket)) != -1)
-    {
-      std::string start_operation_string = CreateOperation("start", {});
-      // Send operation as an encoded message
-      sendEncoded(start_operation_string);
-      // Delegate message handling to its own thread
-      std::function<void()> message_send_fn = [this]() { this->handleMessages(); };
-      MessageHandler message_handler = createMessageHandler(message_send_fn);
-      // Handle received messages on separate thread
-      std::thread (message_handler).detach();
+    {      
+      sendEncoded(CreateOperation("start", {}));
+      std::thread(createMessageHandler([this]() { this->handleMessages(); })).detach(); // TODO: use modern solution
     }
     else
     {
@@ -775,6 +769,9 @@ void Client::request(uint8_t request_code, T payload)
           op_payload.push_back(arg.toUtf8().constData());
         operation_string = CreateOperation("UpdatePost", op_payload);
       }
+    break;
+    case (RequestType::KIQ_STATUS):
+      operation_string = CreateOperation("StatusReport", {std::to_string(request_code)});
     break;
     default:
       qDebug() << "Client is unable to process request";

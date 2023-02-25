@@ -39,7 +39,7 @@ QWidget* StatusDelegate::createEditor(QWidget *parent, const QStyleOptionViewIte
     KLOG("Combobox value {}", index);
   });
 
-  QObject::connect(box, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [box]
+  QObject::connect(box, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [&box]
   {
     QApplication::sendEvent(box, new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier));
   });
