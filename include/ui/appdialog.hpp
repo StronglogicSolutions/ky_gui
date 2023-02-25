@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <util/util.hpp>
+#include <kproto/types.hpp>
 
 namespace Ui {
 class AppDialog;
@@ -20,7 +21,7 @@ class AppDialog : public QDialog
   ~AppDialog();
 
  signals:
-  void appRequest(KApplication application, constants::RequestType type);
+  void appRequest(KApplication application, kiq::Request::RequestType type);
 
  protected:
   virtual void showEvent(QShowEvent *) override;

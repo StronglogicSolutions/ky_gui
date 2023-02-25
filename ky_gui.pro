@@ -87,7 +87,7 @@ FORMS += appdialog.ui \
 
 LIBS += third_party/klogger/src/libspdlog.a
 
-INCLUDEPATH += third_party/klogger/src src
+INCLUDEPATH += third_party/klogger/src src third_party/kproto/include
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

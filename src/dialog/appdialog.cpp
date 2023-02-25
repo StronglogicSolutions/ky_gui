@@ -17,11 +17,11 @@ AppDialog::AppDialog(QWidget *parent) :
   });
 
   QObject::connect(ui->save, &QPushButton::clicked, this, [this]() {
-    emit appRequest(readFields(), constants::RequestType::REGISTER);
+    emit appRequest(readFields(), kiq::Request::REGISTER_APPLICATION);
   });
 
   QObject::connect(ui->deleteApp, &QPushButton::clicked, this, [this]() {
-    emit appRequest(readFields(), constants::RequestType::DELETE);
+    emit appRequest(readFields(), kiq::Request::REMOVE_APPLICATION);
   });
 
   QObject::connect(ui->appList, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),

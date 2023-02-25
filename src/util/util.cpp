@@ -95,36 +95,38 @@ bool configBoolValue(QString key, QJsonObject config)
 
 std::string getJsonString(std::string s)
 {
-    Document d;
-    d.Parse(s.c_str());
-    StringBuffer buffer;
-    PrettyWriter<StringBuffer> writer(buffer);
-    d.Accept(writer);
-    return buffer.GetString();
+  using namespace rapidjson;
+  Document d;
+  d.Parse(s.c_str());
+  StringBuffer buffer;
+  PrettyWriter<StringBuffer> writer(buffer);
+  d.Accept(writer);
+  return buffer.GetString();
 }
 
 std::string createMessage(const char* data, std::string args, const char* user, const char* token)
 {
-    StringBuffer s;
-    Writer<StringBuffer> w(s);
-    w.StartObject();
-    w.Key("type");
-    w.String("custom");
-    w.Key("message");
-    w.String(data);
-    w.Key("user");
-    w.String(user);
-    w.Key("token");
-    w.String(token);
-    w.Key("args");
-    w.String(args.c_str());
-    w.EndObject();
-    return s.GetString();
+  using namespace rapidjson;
+  StringBuffer s;
+  Writer<StringBuffer> w(s);
+  w.StartObject();
+  w.Key("type");
+  w.String("custom");
+  w.Key("message");
+  w.String(data);
+  w.Key("user");
+  w.String(user);
+  w.Key("token");
+  w.String(token);
+  w.Key("args");
+  w.String(args.c_str());
+  w.EndObject();
+  return s.GetString();
 }
 
 bool isOperation(const char* data)
 {
-    Document d;
+    rapidjson::Document d;
     d.Parse(data);
     if (!d.Parse(data).HasParseError()) {
       return strcmp(d["type"].GetString(), "operation") == 0;
@@ -141,21 +143,21 @@ bool isUploadCompleteEvent(const QString& s) {
 }
 
 bool isValidJson(const QString& s) {
-  return !(Document{}.Parse(s.toUtf8().constData()).HasParseError());
+  return !(rapidjson::Document{}.Parse(s.toUtf8().constData()).HasParseError());
 }
 
 bool isValidJson(const std::string& s) {
-  return !(Document{}.Parse(s.c_str()).HasParseError());
+  return !(rapidjson::Document{}.Parse(s.c_str()).HasParseError());
 }
 
 bool isEvent(const char* data) {
-  if (Document d; !d.Parse(data).HasParseError() && d.HasMember("type"))
+  if (rapidjson::Document d; !d.Parse(data).HasParseError() && d.HasMember("type"))
     return strcmp(d["type"].GetString(), "event") == 0;
   return false;
 }
 
 bool isSchedule(const char* data) {
-  if (Document d; !d.Parse(data).HasParseError() && d.HasMember("type"))
+  if (rapidjson::Document d; !d.Parse(data).HasParseError() && d.HasMember("type"))
     return strcmp(d["type"].GetString(), "schedule") == 0;
   return false;
 }
@@ -175,7 +177,7 @@ bool isPong(const uint8_t* bytes, size_t size)
 }
 // TODO: This should be "message", no?
 bool isMessage(const char* data) {
-  Document d;
+  rapidjson::Document d;
   return !(d.Parse(data).HasParseError()) && d.HasMember("message");
 }
 
@@ -195,6 +197,7 @@ template std::vector<std::string> ArgsToV(QVector<QString>, uint8_t);
 
 std::string createOperation(const char* op, std::vector<std::string> args, const char* name, const char* token)
 {
+  using namespace rapidjson;
   StringBuffer s;
   Writer<StringBuffer, Document::EncodingType, ASCII<>> w(s);
   w.StartObject();
@@ -217,7 +220,7 @@ std::string createOperation(const char* op, std::vector<std::string> args, const
 
 std::string getOperation(const char* data)
 {
-  Document d;
+  rapidjson::Document d;
   d.Parse(data);
   if (d.HasMember("command"))
     return d["command"].GetString();
@@ -226,7 +229,7 @@ std::string getOperation(const char* data)
 
 QString getOperation(const QString& data)
 {
-  Document d;
+  rapidjson::Document d;
   d.Parse(data.toUtf8());
   if (d.HasMember("command"))
       return d["command"].GetString();
@@ -235,7 +238,7 @@ QString getOperation(const QString& data)
 
 QString getEvent(const char* data)
 {
-  Document d;
+  rapidjson::Document d;
   d.Parse(data);
   if (d.HasMember("event"))
       return d["event"].GetString();
@@ -244,7 +247,7 @@ QString getEvent(const char* data)
 
 QString getEvent(const QString& data)
 {
-    Document d;
+    rapidjson::Document d;
     d.Parse(data.toUtf8());
     if (d.HasMember("event")) {
         return d["event"].GetString();
@@ -254,7 +257,7 @@ QString getEvent(const QString& data)
 
 QString getMessage(const char* data)
 {
-    Document d;
+    rapidjson::Document d;
     d.Parse(data);
     if (d.HasMember("message")) {
         return d["message"].GetString();
@@ -264,7 +267,7 @@ QString getMessage(const char* data)
 
 QString getMessage(const QString& data)
 {
-  Document d;
+  rapidjson::Document d;
   d.Parse(data.toUtf8());
   if (d.HasMember("message")) {
       return d["message"].GetString();
@@ -274,7 +277,7 @@ QString getMessage(const QString& data)
 
 QVector<QString> getArgs(const char* data)
 {
-  Document d;
+  rapidjson::Document d;
   d.Parse(data);
   QVector<QString> args{};
   if (d.HasMember("args")) {
@@ -288,7 +291,7 @@ QVector<QString> getArgs(const char* data)
 QList<QString> getValueArgs(const char* data, QString key)
 {
   auto key_value = key.toUtf8();
-  Document d;
+  rapidjson::Document d;
   d.Parse(data);
   QList<QString> args{};
   if (d.IsObject()) {
@@ -308,7 +311,7 @@ QList<QString> getValueArgs(const char* data, QString key)
 
 CommandMap getArgMap(const char* data)
 {
-  Document d;
+  rapidjson::Document d;
   d.Parse(data);
   CommandMap cm{};
   if (d.HasMember("args")) {
@@ -321,21 +324,21 @@ CommandMap getArgMap(const char* data)
 
 bool isStartOperation(const char* data)
 {
-    Document d;
+    rapidjson::Document d;
     d.Parse(data);
     return strcmp(d["command"].GetString(), "start") == 0;
 }
 
 bool isStopOperation(const char* data)
 {
-    Document d;
+    rapidjson::Document d;
     d.Parse(data);
     return strcmp(d["command"].GetString(), "stop") == 0;
 }
 
 bool isNewSession(const char* data)
 {
-    Document d;
+    rapidjson::Document d;
     d.Parse(data);
     if (d.IsObject() && d.HasMember("message"))
     {
@@ -346,7 +349,7 @@ bool isNewSession(const char* data)
 
 bool serverWaitingForFile(const char* data)
 {
-    Document d;
+    rapidjson::Document d;
     d.Parse(data);
     if (d.IsObject() && d.HasMember("message")) {
         return strcmp(d["message"].GetString(), "File Ready") == 0;

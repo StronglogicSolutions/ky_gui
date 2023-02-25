@@ -1,6 +1,7 @@
 ﻿#define FLATBUFFERS_DEBUG_VERIFICATION_FAILURE
 
 #include <include/client/client.hpp>
+#include <kproto/types.hpp>
 
 
 using namespace KData;
@@ -133,7 +134,7 @@ Client::Client(QWidget* parent, int count, char** arguments)
       {
         KLOG("Download Console Requesting next file. Setting Console to WAIT and sending FILE_ACK up the wire");
         m_download_console.Wait();
-        sendEncoded(CreateOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
+        sendEncoded(CreateOperation("FILE_ACK", {std::to_string(kiq::Request::RequestType::FETCH_FILE_ACK)}));
       }
       else
       {
@@ -146,7 +147,7 @@ Client::Client(QWidget* parent, int count, char** arguments)
   m_server_ip(arguments[1]),
   m_server_port((arguments[2])),
   m_message_decoder(Kiqoder::FileHandler{
-    [this](int32_t id, uint8_t* buffer, size_t size) -> void
+    [this](int32_t, uint8_t* buffer, size_t size) -> void
     {
       if (!buffer) return;
 
@@ -313,7 +314,7 @@ static const char* DNStoIP(const QString& dns)
   return nullptr;
 }
 
-static const bool IsIP(const QString& address)
+static bool IsIP(const QString& address)
 {
   if (address.isEmpty())         return false;
   if (address.front().isDigit()) return true;
@@ -607,7 +608,7 @@ void Client::execute()
 {
   using Payload = std::vector<std::string>;
   auto MakeUUID = []() { return QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces); };
-  static const auto request = std::to_string(constants::RequestType::EXECUTE_PROCESS);
+  static const auto request = std::to_string(kiq::Request::RequestType::EXECUTE_PROCESS);
 
   if (!selected_commands.empty())
   {
@@ -700,14 +701,15 @@ template <typename T>
 void Client::request(uint8_t request_code, T payload)
 {
   using namespace constants;
+  using namespace kiq::Request;
   try
   {
     std::string operation_string{};
 
     switch (request_code)
     {
-      case (RequestType::REGISTER):
-      case (RequestType::DELETE):
+      case (RequestType::REGISTER_APPLICATION):
+      case (RequestType::REMOVE_APPLICATION):
         if constexpr (std::is_same_v<T, KApplication>)        
           operation_string = CreateOperation("AppRequest", {
             std::to_string(request_code),
@@ -739,7 +741,7 @@ void Client::request(uint8_t request_code, T payload)
                                            payload.files.front().toUtf8().constData(),
                payload.envfile.toUtf8().constData()});
       break;
-      case (RequestType::FETCH_TASK_FLAGS):
+      case (RequestType::TASK_FLAGS):
         operation_string = CreateOperation("TaskOperation",
           std::vector<std::string>{std::to_string(request_code), std::to_string(getSelectedApp())});
       break;
@@ -836,13 +838,13 @@ void Client::setIncomingFile(const StringVec& files)
                                                 .type    = files[4 + (4 * i)],
                                                 .buffer  = nullptr});
   m_download_console.Wait();
-  sendEncoded(CreateOperation("FILE_ACK", {std::to_string(constants::RequestType::FETCH_FILE_ACK)}));
+  sendEncoded(CreateOperation("FILE_ACK", {std::to_string(kiq::Request::RequestType::FETCH_FILE_ACK)}));
 }
 
 void Client::setMetadata(const StringVec& data)
 {
   if (m_download_console.SetMetadata(data))
-    sendEncoded(CreateOperation("FILE_READY", {std::to_string(constants::RequestType::FETCH_FILE_READY)}));
+    sendEncoded(CreateOperation("FILE_READY", {std::to_string(kiq::Request::RequestType::FETCH_FILE_READY)}));
 }
 
 void Client::handleDownload(uint8_t* data, ssize_t size)

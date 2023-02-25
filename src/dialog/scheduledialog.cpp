@@ -163,7 +163,7 @@ ScheduleDialog::ScheduleDialog(QWidget *parent)
   /** Save **/
   QObject::connect(ui->saveTask, &QPushButton::clicked, this, [this]()
   {
-    SchedulerRequest(RequestType::UPDATE_SCHEDULE, ReadFields());
+    SchedulerRequest(kiq::Request::RequestType::UPDATE_SCHEDULE, ReadFields());
   });
   /** Delete **/
   QObject::connect(ui->deleteTask, &QPushButton::clicked, this, [this]()
@@ -184,7 +184,7 @@ ScheduleDialog::ScheduleDialog(QWidget *parent)
     {
       if ((index > -1) && !m_tasks.empty() && !m_task_indexes.empty())
       {
-        SchedulerRequest(RequestType::FETCH_SCHEDULE_TOKENS, ReadFields());
+        SchedulerRequest(kiq::Request::RequestType::FETCH_SCHEDULE_TOKENS, ReadFields());
         SetFields(GetTask(index));
       }
     }
@@ -348,19 +348,19 @@ ScheduledTask ScheduleDialog::ReadFields() {
  * @brief ScheduleDialog::receive_response
  * @param v
  */
-void ScheduleDialog::ReceiveResponse(RequestType type, QVector<QString> v)
+void ScheduleDialog::ReceiveResponse(kiq::Request::RequestType type, QVector<QString> v)
 {
-  if (type == RequestType::UPDATE_SCHEDULE)
+  if (type == kiq::Request::RequestType::UPDATE_SCHEDULE)
   {
     QString display_s{};
     for (const auto& e : v) display_s += e + "\n";
     UI::infoMessageBox(display_s, "Schedule Response");
   }
   else
-  if (type == RequestType::FETCH_SCHEDULE)
+  if (type == kiq::Request::RequestType::FETCH_SCHEDULE)
     RefreshUI();
   else
-  if (type == RequestType::FETCH_SCHEDULE_TOKENS)
+  if (type == kiq::Request::RequestType::FETCH_SCHEDULE_TOKENS)
   {
     const auto&    task = GetTask(ui->taskList->currentIndex());
     QList<QString> keys = task.flags.split(' ');

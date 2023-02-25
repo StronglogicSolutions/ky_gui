@@ -1,5 +1,4 @@
-﻿#ifndef CLIENT_HPP
-#define CLIENT_HPP
+﻿#pragma once
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -146,4 +145,3 @@ QString                       m_refresh_address;
 QNetworkAccessManager         m_network_manager;
 bool                          m_reconnect{false};
 };
-#endif // CLIENT_HPP
