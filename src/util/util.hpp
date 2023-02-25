@@ -68,39 +68,34 @@ struct FileWrap
 
 namespace constants
 {
-static const uint8_t SCHEDULED_TASK_ID_INDEX        = 0x00;
-static const uint8_t SCHEDULED_TASK_NAME_INDEX      = 0x01;
-static const uint8_t SCHEDULED_TASK_TIME_INDEX      = 0x02;
-static const uint8_t SCHEDULED_TASK_FLAGS_INDEX     = 0x03;
-static const uint8_t SCHEDULED_TASK_COMPLETED_INDEX = 0x04;
-static const uint8_t SCHEDULED_TASK_RECURRING_INDEX = 0x05;
-static const uint8_t SCHEDULED_TASK_NOTIFY_INDEX    = 0x06;
-static const uint8_t SCHEDULED_TASK_RUNTIME_INDEX   = 0x07;
-static const uint8_t SCHEDULED_TASK_FILES_INDEX     = 0x08;
+  static const uint8_t SCHEDULED_TASK_ID_INDEX        = 0x00;
+  static const uint8_t SCHEDULED_TASK_NAME_INDEX      = 0x01;
+  static const uint8_t SCHEDULED_TASK_TIME_INDEX      = 0x02;
+  static const uint8_t SCHEDULED_TASK_FLAGS_INDEX     = 0x03;
+  static const uint8_t SCHEDULED_TASK_COMPLETED_INDEX = 0x04;
+  static const uint8_t SCHEDULED_TASK_RECURRING_INDEX = 0x05;
+  static const uint8_t SCHEDULED_TASK_NOTIFY_INDEX    = 0x06;
+  static const uint8_t SCHEDULED_TASK_RUNTIME_INDEX   = 0x07;
+  static const uint8_t SCHEDULED_TASK_FILES_INDEX     = 0x08;
 
-static const uint8_t TASK_ID_INDEX       {0x00};
-static const uint8_t TASK_TIME_INDEX     {0x01};
-static const uint8_t TASK_FLAGS_INDEX    {0x02};
-static const uint8_t TASK_COMPLETED_INDEX{0x03};
-static const uint8_t TASK_RECURRING_INDEX{0x04};
-static const uint8_t TASK_NOTIFY_INDEX   {0x05};
-static const uint8_t TASK_RUNTIME_INDEX  {0x06};
-static const uint8_t TASK_FILES_INDEX    {0x07};
-
+  static const uint8_t TASK_ID_INDEX       {0x00};
+  static const uint8_t TASK_TIME_INDEX     {0x01};
+  static const uint8_t TASK_FLAGS_INDEX    {0x02};
+  static const uint8_t TASK_COMPLETED_INDEX{0x03};
+  static const uint8_t TASK_RECURRING_INDEX{0x04};
+  static const uint8_t TASK_FILES_INDEX    {0x07};
+  static const uint8_t TASK_NOTIFY_INDEX   {0x05};
+  static const uint8_t TASK_RUNTIME_INDEX  {0x06};
 }
 
-using namespace rapidjson;
+//using namespace rapidjson;
 
-typedef std::string KOperation;
-
-typedef std::vector<std::pair<std::string, std::string>> TupVec;
-typedef std::vector<std::map<int, std::string>> MapVec;
-typedef std::map<int, std::string> CommandMap;
+using CommandMap = std::map<int, std::string>;
 
 struct KSession {
-    int id;
-    int fd;
-    int status;
+  int id;
+  int fd;
+  int status;
 };
 
 extern QString escapeText(QString s);
@@ -151,8 +146,6 @@ bool isMessage(const char* data);
 
 template <typename T, typename P>
 std::vector<std::string> ArgsToV(QVector<T> args, P arg);
-
-//template std::vector<std::string> ArgsToV(QVector<QString>, uint8_t);
 
 std::string createOperation(const char* op, std::vector<std::string> args, const char* name = nullptr, const char* token = nullptr);
 
