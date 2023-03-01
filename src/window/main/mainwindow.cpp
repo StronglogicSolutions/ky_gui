@@ -156,6 +156,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   QObject::connect(ui->editApps,     &QPushButton::clicked, this, [this] { app_ui.show(); });
   QObject::connect(ui->saveConfig,   &QPushButton::clicked, this, [this] { utils::save_config(ui->kyConfig->toPlainText()); });
   QObject::connect(ui->fetchTerms,   &QPushButton::clicked, this, [this] { q_client->request(RequestType::FETCH_TERM_HITS); });
+  QObject::connect(ui->status,       &QPushButton::clicked, this, [this] { q_client->request(RequestType::KIQ_STATUS);      });
   QObject::connect(ui->tasks,        &QPushButton::clicked, this, [this] { schedule_ui.show(); });
   QObject::connect(ui->addArgs,      &QPushButton::clicked, this, [this] { arg_ui->show(); });
   QObject::connect(ui->fetchToken,   &QPushButton::clicked, this, [this]()
@@ -450,6 +451,8 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v)
         ui->led->setState(true);
         if (configBoolValue("schedulerMode", std::ref(m_config)))
           arg_ui->show();
+
+        q_client->request(kiq::Request::RequestType::KIQ_STATUS);
 
         if (configBoolValue("fetchSchedule", m_config))
           q_client->request(kiq::Request::RequestType::FETCH_SCHEDULE);
