@@ -141,25 +141,25 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   ui->fetchToken ->setStyleSheet(GetFetchButtonTheme());
   ui->connect    ->setStyleSheet(GetConnectButtonTheme());
   QObject::connect(&m_ping_timer,    &QTimer::timeout, stay_alive);
+  QObject::connect(q_client,         &Client::messageReceived,          this, &MainWindow::onMessageReceived);
+  QObject::connect(ui->connect,      &QPushButton::clicked,             this, &MainWindow::connectClient);
   QObject::connect(&posts_ui,        &PostDialog::refresh,              this, [this]                       { q_client->request(RequestType::FETCH_POSTS); });
   QObject::connect(&schedule_ui,     &ScheduleDialog::SchedulerRequest, this, [this](auto type, auto task) { q_client->request(type, task); });
   QObject::connect(&posts_ui,        &PostDialog::request_update,       this, [this](const auto& post)     { q_client->request(RequestType::UPDATE_POST, post.payload()); });
   QObject::connect(ui->eventList,    &QListView::clicked,               this, [this](const auto& index)    { utils::infoMessageBox(m_event_model->item(index.row(), index.column())->text(), "Event"); });
   QObject::connect(&schedule_ui,     &ScheduleDialog::UpdateSchedule,   this, [this]                       { q_client->request(RequestType::FETCH_SCHEDULE); });
-  QObject::connect(q_client,         &Client::onTokenReceived, this, [this](bool error) { set_connected(!error); });
-  QObject::connect(q_client,         &Client::messageReceived, this, &MainWindow::onMessageReceived);
-  QObject::connect(ui->connect,      &QPushButton::clicked, this, &MainWindow::connectClient);
-  QObject::connect(ui->reconnect,    &QPushButton::clicked, this, [this] { reconnect(); });
-  QObject::connect(ui->disconnect,   &QPushButton::clicked, this, [this] { exit(); });
-  QObject::connect(ui->execute,      &QPushButton::clicked, this, [this] { q_client->execute(); });
-  QObject::connect(ui->openMessages, &QPushButton::clicked, this, [this] { message_ui.show(); });
-  QObject::connect(ui->editApps,     &QPushButton::clicked, this, [this] { app_ui.show(); });
-  QObject::connect(ui->saveConfig,   &QPushButton::clicked, this, [this] { utils::save_config(ui->kyConfig->toPlainText()); });
-  QObject::connect(ui->fetchTerms,   &QPushButton::clicked, this, [this] { q_client->request(RequestType::FETCH_TERM_HITS); });
-  QObject::connect(ui->status,       &QPushButton::clicked, this, [this] { q_client->request(RequestType::KIQ_STATUS);      });
-  QObject::connect(ui->tasks,        &QPushButton::clicked, this, [this] { schedule_ui.show(); });
-  QObject::connect(ui->addArgs,      &QPushButton::clicked, this, [this] { arg_ui->show(); });
-  QObject::connect(ui->fetchToken,   &QPushButton::clicked, this, [this]()
+  QObject::connect(q_client,         &Client::onTokenReceived,          this, [this](bool error)           { set_connected(!error); });
+  QObject::connect(ui->reconnect,    &QPushButton::clicked,             this, [this]                       { reconnect(); });
+  QObject::connect(ui->disconnect,   &QPushButton::clicked,             this, [this]                       { exit(); });
+  QObject::connect(ui->execute,      &QPushButton::clicked,             this, [this]                       { q_client->execute(); });
+  QObject::connect(ui->openMessages, &QPushButton::clicked,             this, [this]                       { message_ui.show(); });
+  QObject::connect(ui->editApps,     &QPushButton::clicked,             this, [this]                       { app_ui.show(); });
+  QObject::connect(ui->saveConfig,   &QPushButton::clicked,             this, [this]                       { utils::save_config(ui->kyConfig->toPlainText()); });
+  QObject::connect(ui->fetchTerms,   &QPushButton::clicked,             this, [this]                       { q_client->request(RequestType::FETCH_TERM_HITS); });
+  QObject::connect(ui->status,       &QPushButton::clicked,             this, [this]                       { q_client->request(RequestType::KIQ_STATUS);      });
+  QObject::connect(ui->tasks,        &QPushButton::clicked,             this, [this]                       { schedule_ui.show(); });
+  QObject::connect(ui->addArgs,      &QPushButton::clicked,             this, [this]                       { arg_ui->show(); });
+  QObject::connect(ui->fetchToken,   &QPushButton::clicked,             this, [this]()
   {
     m_config = loadJsonConfig(ui->kyConfig->toPlainText());
     if (!m_config.contains("username") || !m_config.contains("password") || !m_config.contains("auth"))
@@ -451,8 +451,6 @@ void MainWindow::onMessageReceived(int t, const QString& message, StringVec v)
         ui->led->setState(true);
         if (configBoolValue("schedulerMode", std::ref(m_config)))
           arg_ui->show();
-
-        q_client->request(kiq::Request::RequestType::KIQ_STATUS);
 
         if (configBoolValue("fetchSchedule", m_config))
           q_client->request(kiq::Request::RequestType::FETCH_SCHEDULE);
