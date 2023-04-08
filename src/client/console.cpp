@@ -84,4 +84,5 @@ DownloadConsole::Reset()
   wt_count        = 0;
   rx_count        = 0;
   wt_for_metadata = false;
+  handler.reset();
 }

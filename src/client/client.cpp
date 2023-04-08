@@ -876,5 +876,7 @@ std::string Client::CreateOperation(const char* op, std::vector<std::string> arg
 
 void Client::reconnect()
 {
+  m_message_decoder.reset();
+  m_download_console.Reset();
   FetchToken(true);
 }
