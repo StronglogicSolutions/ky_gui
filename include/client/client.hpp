@@ -134,7 +134,7 @@ std::vector<SentFile>         sent_files;
 Scheduler::TaskQueue          m_task_queue;
 QString                       m_server_ip;
 QString                       m_server_port;
-Kiqoder::FileHandler          m_message_decoder;
+kiqoder::FileHandler          m_message_decoder;
 bool                          m_fetching;
 QString                       m_user;
 QString                       m_password;

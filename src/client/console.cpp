@@ -1,6 +1,6 @@
 #include <include/client/console.hpp>
 
-DownloadConsole::DownloadConsole(Kiqoder::FileHandler f_handler)
+DownloadConsole::DownloadConsole(kiqoder::FileHandler f_handler)
 : handler(f_handler)
 {
   Reset();

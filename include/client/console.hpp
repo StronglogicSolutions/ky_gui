@@ -4,13 +4,13 @@
 struct DownloadConsole
 {
 using Files = QVector<FileWrap>;
-Kiqoder::FileHandler handler;
+kiqoder::FileHandler handler;
 int32_t              wt_count;
 int32_t              rx_count;
 Files                files;
 bool                 wt_for_metadata;
 
-DownloadConsole(Kiqoder::FileHandler f_handler);
+DownloadConsole(kiqoder::FileHandler f_handler);
 
 FileWrap* GetFile       (const QString& id);
 Files&&   GetData       ();
