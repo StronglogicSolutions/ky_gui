@@ -123,7 +123,7 @@ Client::Client(QWidget* parent, int count, char** arguments)
   m_client_socket_fd(-1),
   m_outbound_task(nullptr),
   executing(false),
-  m_download_console(Kiqoder::FileHandler{
+  m_download_console(kiqoder::FileHandler{
     [this](int32_t id, uint8_t* buffer, size_t size) -> void
     {
       KLOG("Download Console received a file. Writing to buffer");
@@ -146,7 +146,7 @@ Client::Client(QWidget* parent, int count, char** arguments)
   }),
   m_server_ip(arguments[1]),
   m_server_port((arguments[2])),
-  m_message_decoder(Kiqoder::FileHandler{
+  m_message_decoder(kiqoder::FileHandler{
     [this](int32_t, uint8_t* buffer, size_t size) -> void
     {
       if (!buffer) return;
@@ -876,5 +876,7 @@ std::string Client::CreateOperation(const char* op, std::vector<std::string> arg
 
 void Client::reconnect()
 {
+  m_message_decoder.reset();
+  m_download_console.Reset();
   FetchToken(true);
 }

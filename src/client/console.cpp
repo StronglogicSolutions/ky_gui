@@ -1,6 +1,6 @@
 #include <include/client/console.hpp>
 
-DownloadConsole::DownloadConsole(Kiqoder::FileHandler f_handler)
+DownloadConsole::DownloadConsole(kiqoder::FileHandler f_handler)
 : handler(f_handler)
 {
   Reset();
@@ -84,4 +84,5 @@ DownloadConsole::Reset()
   wt_count        = 0;
   rx_count        = 0;
   wt_for_metadata = false;
+  handler.reset();
 }
