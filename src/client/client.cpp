@@ -155,7 +155,7 @@ Client::Client(QWidget* parent, int count, char** arguments)
       try
       {
         if (isPong(buffer, size))
-          [this] { emit Client::messageReceived(PONG_REPLY_TYPE, "Pong"); VLOG("Pong"); }();
+          return [this] { emit Client::messageReceived(PONG_REPLY_TYPE, "Pong"); VLOG("Pong"); }();
         else
         if (!isValidJson(message))
           ELOG("Invalid JSON: ", message);
