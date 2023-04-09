@@ -1,4 +1,5 @@
 ﻿#include <include/ui/mainwindow.h>
+#include <kutils.hpp>
 
 namespace utils {
 void save_config(const QString& config)
@@ -112,8 +113,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   m_client_time_remaining(DEFAULT_TIMEOUT)
 {
   using namespace kiq::Request;
+  const auto loglevel = kutils::kargs(argc, argv).get("loglevel");
+  kiq::log::klogger::init(loglevel.empty() ? g_log_level : loglevel);
 
-  kiq::log::klogger::init(g_log_level);
   m_event_model   = new QStandardItemModel(this);
   m_process_model = new QStandardItemModel(this);
   q_client        = new Client(this, cli_argc, cli_argv);
