@@ -155,13 +155,10 @@ Client::Client(QWidget* parent, int count, char** arguments)
       try
       {
         if (isPong(buffer, size))
-        {
-          emit Client::messageReceived(PONG_REPLY_TYPE, "Pong", {});
-          return KLOG("Pong");
-        }
+          return [this] { emit Client::messageReceived(PONG_REPLY_TYPE, "Pong"); VLOG("Pong"); }();
         else
         if (!isValidJson(message))
-          return KLOG("Invalid JSON: ", message);
+          ELOG("Invalid JSON: ", message);
         else
         if (isNewSession(message.c_str()))
           emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", getArgs(message.c_str()));
@@ -194,7 +191,7 @@ Client::Client(QWidget* parent, int count, char** arguments)
       }
       catch (const std::exception& e)
       {
-        KLOG("Exception caught decoding message: ", e.what());
+        ELOG("Exception caught decoding message: ", e.what());
       }
     }
   })
@@ -207,7 +204,7 @@ Client::Client(QWidget* parent, int count, char** arguments)
     if (reply->error())
     {
       error = true;
-      KLOG("Auth server returned error: {}", reply->errorString().toUtf8().constData());
+      ELOG("Auth server returned error: {}", reply->errorString().toUtf8().constData());
     }
     else
     {
@@ -215,7 +212,7 @@ Client::Client(QWidget* parent, int count, char** arguments)
       if (!json.empty() && json.contains("token"))
       {
         QString token = configValue("token", json);
-        KLOG("Fetched token: ", token);
+        DLOG("Fetched token: ", token);
         m_token = token.toUtf8().constData();
 
         if (m_reconnect)
@@ -297,9 +294,7 @@ void Client::processFileQueue()
 {
   Scheduler::KFileData outgoing_file = outgoing_files.dequeue();
   sendFileEncoded(outgoing_file.bytes);
-  sent_files.push_back(SentFile{
-    .name = outgoing_file.name,
-    .type = outgoing_file.type});
+  sent_files.push_back({.name = outgoing_file.name, .type = outgoing_file.type});
 }
 
 static const char* DNStoIP(const QString& dns)
@@ -369,12 +364,12 @@ void Client::start(QString ip, QString port)
     }
     else
     {
-      qDebug() << errno;
+      ELOG("Client failed to connect. Errno {}", errno);
       ::close(m_client_socket_fd);
     }
   }
   else
-    qDebug() << "Failed to create new connection";
+    ELOG("Close connection before attempting new");
 }
 
 /**
@@ -386,7 +381,7 @@ void Client::sendMessage(const QString& s)
   if (m_client_socket_fd != -1)
     sendEncoded(createMessage(s.toUtf8(), "", m_user.toUtf8().constData(), m_token.toUtf8().constData()));
   else
-    KLOG("You must first open a connection");
+    ELOG("You must first open a connection");
 
 }
 
@@ -396,7 +391,7 @@ void Client::sendMessage(const QString& s)
  */
 void Client::sendEncoded(std::string message)
 {
-  qDebug() << "Sending: " << message.c_str();
+  VLOG("Sending: {}", message);
   auto k_message = CreateMessage(builder, 69, builder.CreateVector(std::vector<uint8_t>{message.begin(), message.end()}));
 
   builder.Finish(k_message);
@@ -448,7 +443,7 @@ void Client::sendTaskEncoded(Scheduler::Task* task)
   send_buffer[4] = (task->getTaskCode() & 0xFF);
 
   std::memcpy(send_buffer + 5, encoded_message_buffer, size);
-  qDebug() << "Ready to send task";
+  VLOG("Ready to send task");
 
   ::send(m_client_socket_fd, send_buffer, size + 5, 0);
 
@@ -461,7 +456,7 @@ void Client::sendTaskEncoded(Scheduler::Task* task)
 
     if (m_outbound_task->hasFiles() && !outgoing_files.empty())
     {
-      KLOG("Deleting unsent files from last task");
+      DLOG("Deleting unsent files from last task");
       outgoing_files.clear();
     }
     sendFiles(m_outbound_task);
@@ -555,7 +550,7 @@ void Client::closeConnection()
  * @brief Client::setSelectedApp
  * @param [in] TYPE SHOULD CHANGE app_names
  */
-void Client::setSelectedApp(std::vector<QString> app_names)
+void Client::setSelectedApp(const std::vector<QString>& app_names)
 {
   selected_commands.clear();
   for (const auto& name : app_names)
@@ -569,7 +564,7 @@ void Client::setSelectedApp(std::vector<QString> app_names)
  * @brief Client::getSelectedApp
  * @returns {int} The mask representing the selected application
  */
-int Client::getSelectedApp()
+int Client::getSelectedApp() const
 {
   if (selected_commands.size() == 1)
     return selected_commands.at(0);

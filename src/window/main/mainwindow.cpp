@@ -1,4 +1,5 @@
 ﻿#include <include/ui/mainwindow.h>
+#include <kutils.hpp>
 
 namespace utils {
 void save_config(const QString& config)
@@ -94,6 +95,7 @@ QStandardItem* create_event_item(const QString& event)
 }
 }  // namespace utils
 
+static const char* const g_log_level = "debug";
 /**
  *\mainpage The KYGUI application interface begins with the MainWindow
  * @brief MainWindow::MainWindow
@@ -111,6 +113,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   m_client_time_remaining(DEFAULT_TIMEOUT)
 {
   using namespace kiq::Request;
+  const auto loglevel = kutils::kargs(argc, argv).get("loglevel");
+  kiq::log::klogger::init(loglevel.empty() ? g_log_level : loglevel);
+
   m_event_model   = new QStandardItemModel(this);
   m_process_model = new QStandardItemModel(this);
   q_client        = new Client(this, cli_argc, cli_argv);
