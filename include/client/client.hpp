@@ -80,13 +80,13 @@ template <typename T>
 void           request(uint8_t request_code, T payload);
 void           request(uint8_t request_code);
 void           appRequest(KApplication application, uint8_t request_code);
-int            getSelectedApp();
+int            getSelectedApp() const;
 void           scheduleTask(Scheduler::Task* task);
 MessageHandler createMessageHandler(std::function<void()> cb);
 
 public slots:
 void           sendMessage(const QString& s);
-void           setSelectedApp(std::vector<QString> app_names);
+void           setSelectedApp(const std::vector<QString>& app_names);
 void           setCommands(Commands commands);
 CommandMap     GetCommands()                    { return m_command_map; }
 void           addCommand(KApplication command) { m_commands.append(command); }
@@ -101,7 +101,7 @@ QString        GetUsername() const;
 void           reconnect();
 
 signals:
-void           messageReceived(int t, QString s, QVector<QString> args);
+void           messageReceived(int t, QString s, QVector<QString> args = {});
 void           eventReceived(int t, std::string event, StringVec args);
 void           clientDisconnected();
 void           onDownload(QVector<FileWrap> files);
