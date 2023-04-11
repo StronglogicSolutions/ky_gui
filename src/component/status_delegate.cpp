@@ -39,18 +39,18 @@ QWidget* StatusDelegate::createEditor(QWidget *parent, const QStyleOptionViewIte
     KLOG("Combobox value {}", index);
   });
 
-  QObject::connect(box, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [&box]
-  {
-    QApplication::sendEvent(box, new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier));
-  });
-
   return box;
 }
 
 void StatusDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
   QComboBox* box   = static_cast<QComboBox*>(editor);
-  QString    value = g_status_strings.at(box->itemText(box->currentIndex()));
+  if (!box || !index.isValid())
+  {
+    ELOG("Failed to set model data.");
+    return;
+  }
+  QString value = g_status_strings.at(box->itemText(box->currentIndex()));
   model->setData(index, value, Qt::EditRole);
 }
 
