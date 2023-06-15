@@ -487,7 +487,7 @@ font-weight: 700;</string>
        <item row="0" column="0">
         <layout class="QGridLayout" name="gridLayout_4">
          <item row="1" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,0,0">
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
             <widget class="QProgressBar" name="progressBar">
              <property name="sizePolicy">
@@ -504,9 +504,6 @@ font-weight: 700;</string>
              </property>
              <property name="value">
               <number>0</number>
-             </property>
-             <property name="invertedAppearance">
-              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -1186,6 +1183,11 @@ font-weight: 700;
                  </item>
                  <item>
                   <property name="text">
+                   <string>Instagram</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
                    <string>Matrix</string>
                   </property>
                  </item>
@@ -1224,6 +1226,11 @@ font-weight: 700;
                  <item>
                   <property name="text">
                    <string>messages</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>query</string>
                   </property>
                  </item>
                  <item>
