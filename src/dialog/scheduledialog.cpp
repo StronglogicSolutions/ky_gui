@@ -266,7 +266,7 @@ void ScheduleDialog::InsertTasks(QVector<QString> task_arguments)
       .recurring = task_arguments.at(i + 5),
       .notify    = task_arguments.at(i + 6),
       .runtime   = task_arguments.at(i + 7),
-      .files     = QVector<QString>{task_arguments.at(i + 8)}};
+      .files     = QVector<QString>{task_arguments.at(i + 8)}}; // TODO: this can be a bug
     m_tasks.push_back(task);
   }
   std::sort(m_tasks.begin(), m_tasks.end(), [](ScheduledTask a, ScheduledTask b){ return a.id.toUInt() > b.id.toUInt(); });

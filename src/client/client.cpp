@@ -26,11 +26,11 @@ std::string getTaskFileInfo(std::vector<SentFile> files)
   {
     info += std::to_string(f.timestamp);
     info += f.name.toUtf8().constData();
-    info += "|";    
+    info += "|";
     if (f.type == Scheduler::FileType::VIDEO)
       info += "video";
     else
-      info += "image";    
+      info += "image";
     info += ":";
   }
   KLOG("File Info: ", info.c_str());
@@ -243,7 +243,7 @@ QString Client::GetUsername() const
 }
 
 void Client::FetchToken(bool reconnect)
-{  
+{
   if (reconnect)
     m_network_manager.get(QNetworkRequest(QUrl(m_refresh_address + "?name=" + m_user + "&token=" + m_refresh)));
   else
@@ -273,6 +273,18 @@ void Client::handleMessages()
 
     if (bytes_received < 1)
       break;
+
+    if (isPong(receive_buffer, bytes_received) && m_message_decoder.isPending())
+    {
+      static auto bad_pongs = 0;
+      WLOG("Received PONG but message decoder isn't finished. Ignoring");
+      if (++bad_pongs > 10)
+      {
+        ELOG("Client is in a failed state. {} Bad pongs. Resetting decoder");
+        m_message_decoder.reset();
+        bad_pongs = 0;
+      }
+    }
 
     if (m_download_console.is_downloading())
     {
@@ -326,7 +338,7 @@ static bool IsIP(const QString& address)
  * @brief Client::start
  */
 void Client::start(QString ip, QString port)
-{    
+{
   const QString port_address = port.isEmpty() ? m_server_port : port;
   const QString host_address = (ip.isEmpty()) ? m_server_ip: ip;
 
@@ -358,7 +370,7 @@ void Client::start(QString ip, QString port)
 
     if (::connect(m_client_socket_fd, reinterpret_cast<sockaddr*>(&server_socket),
                   sizeof(server_socket)) != -1)
-    {      
+    {
       sendEncoded(CreateOperation("start", {}));
       std::thread(createMessageHandler([this]() { this->handleMessages(); })).detach(); // TODO: use modern solution
     }
@@ -406,7 +418,7 @@ void Client::sendEncoded(std::string message)
   send_buffer[2] = (size >> 8)           & 0xFF;
   send_buffer[3] = size                  & 0xFF;
   send_buffer[4] = (TaskCode::GENMSGBYTE & 0xFF);
-  std::memcpy(send_buffer + 5, encoded_message_buffer, size);  
+  std::memcpy(send_buffer + 5, encoded_message_buffer, size);
   ::send(m_client_socket_fd, send_buffer, size + 5, 0);
   builder.Clear();
 }
@@ -556,7 +568,7 @@ void Client::setSelectedApp(const std::vector<QString>& app_names)
   for (const auto& name : app_names)
     for (const auto& command : m_commands)
       if (command.name == name)
-        selected_commands.push_back(command.mask.toInt());           
+        selected_commands.push_back(command.mask.toInt());
 }
 
 
@@ -586,7 +598,7 @@ QString Client::getAppName(int mask)
 {
   for (const auto& command : m_commands)
     if (command.mask.toInt() == mask)
-      return command.name;      
+      return command.name;
   return "";
 }
 
@@ -650,7 +662,7 @@ void Client::sendFiles(Scheduler::Task* task)
   {
     file_was_sent = false;
     for (const auto& file : task->getFiles())
-      outgoing_files.enqueue(std::move(file));    
+      outgoing_files.enqueue(std::move(file));
     std::string send_file_operation = CreateOperation("FileUpload", {});
     sendEncoded(send_file_operation);
   }
@@ -699,7 +711,7 @@ void Client::request(uint8_t request_code, T payload)
     {
       case (RequestType::REGISTER_APPLICATION):
       case (RequestType::REMOVE_APPLICATION):
-        if constexpr (std::is_same_v<T, KApplication>)        
+        if constexpr (std::is_same_v<T, KApplication>)
           operation_string = CreateOperation("AppRequest", {
             std::to_string(request_code),
             payload.name.toUtf8().constData(),
@@ -817,7 +829,7 @@ void Client::sendIPCMessage(const QString& type, const QString& message, const Q
  */
 void Client::setIncomingFile(const StringVec& files)
 {
-  if (m_download_console.is_downloading())  
+  if (m_download_console.is_downloading())
     return KLOG("Client already has incoming pending. Ignoring request.");
 
   m_download_console.files.clear();
