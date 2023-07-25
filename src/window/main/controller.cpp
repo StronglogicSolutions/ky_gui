@@ -160,7 +160,7 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
     QString          platform = v.front();
     QString          type     = v.at(1);
     QList<QString>   options  = v.at(2).split('\n');
-    if (type == "rooms")
+    if (type.contains("rooms"))
       window->SetPlatformOptions(platform, options);
   };
   KLOG("Event: ", message);
