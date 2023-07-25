@@ -557,7 +557,8 @@ void MainWindow::UpdateIPCOptions()
   auto platform = ui->platform->currentText();
   auto list     = m_platform_map.value(platform);  
   for (const auto& option : list)
-    ui->ipcOption->addItem(option.right(option.size() - (option.indexOf(',') + 1)));
+    if (!option.isEmpty())
+      ui->ipcOption->addItem(option.right(option.size() - (option.indexOf(',') + 1)));
 }
 
 void MainWindow::exit()
