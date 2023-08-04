@@ -780,6 +780,15 @@ void Client::request(uint8_t request_code, T payload)
     case (RequestType::KIQ_STATUS):
       operation_string = CreateOperation("StatusReport", {std::to_string(request_code)});
     break;
+    case (RequestType::CONVERT_TASK):
+      if constexpr (std::is_same_v<T, std::pair<std::string, std::string>>)
+      {
+        std::vector<std::string> op_payload{std::to_string(request_code)};
+        op_payload.push_back(payload->first);
+        op_payload.push_back(payload->second);
+        operation_string = CreateOperation("Convert Task", op_payload);
+      }
+    break;
     default:
       qDebug() << "Client is unable to process request";
       return;

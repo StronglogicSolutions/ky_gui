@@ -12,7 +12,7 @@
 namespace Ui {
 class ScheduleDialog;
 }
-using AppMap = std::unordered_map<std::string, uint32_t>;
+using AppMap = std::unordered_map<QString, uint32_t>;
 using namespace constants;
 class ScheduleDialog : public QDialog
 {
@@ -28,6 +28,7 @@ class ScheduleDialog : public QDialog
  signals:
   void UpdateSchedule();
   void SchedulerRequest(kiq::Request::RequestType type, ScheduledTask task);
+  void PostRequest(std::string mask, std::string id);
 
  protected:
   virtual void showEvent(QShowEvent* e)     override;

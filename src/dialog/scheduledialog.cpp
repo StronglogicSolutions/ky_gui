@@ -194,13 +194,20 @@ ScheduleDialog::ScheduleDialog(QWidget *parent)
   {
     ui->timeText->setText(ui->dateTime->dateTime().toString());
   });
+  /** Make Post **/
+  QObject::connect(ui->makePost, &QPushButton::clicked, this, [this]()
+  {
+    const auto mask = m_apps.at(ui->appList->currentText());
+    PostRequest(std::to_string(mask), ReadFields().id.toStdString());
+
+  });
   /** Task Filter **/
   QObject::connect(&m_task_filter_model, &QStandardItemModel::itemChanged, this, [this](QStandardItem* item)
   {
                m_refreshing = false;
     const bool checked      = item->checkState() == Qt::CheckState::Checked;
     const auto text         = item->text();
-    const auto it           = m_apps.find(text.toStdString());
+    const auto it           = m_apps.find(text);
     if (it != m_apps.end())
     {
       int mask = it->second;
@@ -433,7 +440,7 @@ void ScheduleDialog::RefreshUI()
         int count{};
         for (auto i = 0; i < m_tasks.size(); i++)
         {
-          const auto mask = m_apps.at(m_tasks[i].app.toStdString());
+          const auto mask = m_apps.at(m_tasks[i].app);
           if ((mask & bitmask) == mask)
           {
             m_task_model.setItem(count++, CreateTaskModelItem(m_tasks[i]));
@@ -452,7 +459,7 @@ void ScheduleDialog::SetApps(const CommandMap& map)
   int32_t i{};
   for (const auto& [mask, name] : map)
   {
-    m_apps.insert({name, mask});
+    m_apps.insert({QString::fromStdString(name), mask});
     m_task_filter_model.setItem(i++, CreateFilterModelItem(name.c_str()));
   }
   ui->appList->setCurrentIndex(0);
