@@ -297,6 +297,10 @@ QString MainWindow::Controller::handleEventMessage(const QString&   message,
       event_message += "\n" + window->posts_ui.GetLastUpdated();
     }
     else
+    if (message == "Platform post created")
+      for (auto i = 1; i < v.size(); i++)
+        event_message += "\n" + v.at(i);
+    else
     if (message == "Message Received")
       event_message += "\n" + v.at(1) + ": " + v.at(2);
     else
