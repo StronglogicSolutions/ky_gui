@@ -784,8 +784,8 @@ void Client::request(uint8_t request_code, T payload)
       if constexpr (std::is_same_v<T, std::pair<std::string, std::string>>)
       {
         std::vector<std::string> op_payload{std::to_string(request_code)};
-        op_payload.push_back(payload->first);
-        op_payload.push_back(payload->second);
+        op_payload.push_back(payload.first);
+        op_payload.push_back(payload.second);
         operation_string = CreateOperation("Convert Task", op_payload);
       }
     break;
@@ -806,6 +806,7 @@ template void Client::request(uint8_t request_code, KApplication     payload);
 template void Client::request(uint8_t request_code, uint32_t         payload);
 template void Client::request(uint8_t request_code, QVector<QString> payload);
 template void Client::request(uint8_t request_code, QString          payload);
+template void Client::request(uint8_t request_code, std::pair<std::string, std::string> payload);
 
 
 /**

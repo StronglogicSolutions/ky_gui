@@ -260,9 +260,8 @@ void ScheduleDialog::SetFields(ScheduledTask task) {
  */
 void ScheduleDialog::InsertTasks(QVector<QString> task_arguments)
 {
-  size_t           arg_num = task_arguments.size();
-  QVector<QString> files;
-  for (size_t i = 1; i < arg_num; i += 9)
+  const auto arg_num = task_arguments.size();
+  for (auto i = 1; i < arg_num; i += 9)
   {
     ScheduledTask task{
       .id        = task_arguments.at(i + 0),

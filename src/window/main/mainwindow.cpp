@@ -150,7 +150,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   QObject::connect(ui->connect,      &QPushButton::clicked,             this, &MainWindow::connectClient);
   QObject::connect(&posts_ui,        &PostDialog::refresh,              this, [this]                       { q_client->request(RequestType::FETCH_POSTS); });
   QObject::connect(&schedule_ui,     &ScheduleDialog::SchedulerRequest, this, [this](auto type, auto task) { q_client->request(type, task); });
-  QObject::connect(&schedule_ui,     &ScheduleDialog::SchedulerRequest, this, [this](auto mask, auto id)   { q_client->request(RequestType::CONVERT_TASK, std::make_pair<std::string, std::string>(mask, id)); });
+  QObject::connect(&schedule_ui,     &ScheduleDialog::PostRequest,      this, [this](auto mask, auto id)   { q_client->request(RequestType::CONVERT_TASK, std::make_pair(mask, id)); });
   QObject::connect(&posts_ui,        &PostDialog::request_update,       this, [this](const auto& post)     { q_client->request(RequestType::UPDATE_POST, post.payload()); });
   QObject::connect(ui->eventList,    &QListView::clicked,               this, [this](const auto& index)    { utils::infoMessageBox(m_event_model->item(index.row(), index.column())->text(), "Event"); });
   QObject::connect(&schedule_ui,     &ScheduleDialog::UpdateSchedule,   this, [this]                       { q_client->request(RequestType::FETCH_SCHEDULE); });
