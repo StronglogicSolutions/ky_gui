@@ -1230,6 +1230,11 @@ font-weight: 700;
                  </item>
                  <item>
                   <property name="text">
+                   <string>status</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
                    <string>query</string>
                   </property>
                  </item>
