@@ -21,7 +21,7 @@ flatbuffers::FlatBufferBuilder builder(1024);
  */
 std::string getTaskFileInfo(std::vector<SentFile> files)
 {
-  std::string info{};
+  std::string info;
   for (const auto& f : files)
   {
     info += std::to_string(f.timestamp);
@@ -158,7 +158,10 @@ Client::Client(QWidget* parent, int count, char** arguments)
           return [this] { emit Client::messageReceived(PONG_REPLY_TYPE, "Pong"); VLOG("Pong"); }();
         else
         if (!isValidJson(message))
+        {
           ELOG("Invalid JSON: ", message);
+          return;
+        }
         else
         if (isNewSession(message.c_str()))
           emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", getArgs(message.c_str()));
