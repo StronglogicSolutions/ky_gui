@@ -164,16 +164,20 @@ bool isSchedule(const char* data) {
 
 bool isPong(const char* data)
 {
-  return strcmp(data, "PONG") == 0;
+  return  data[0] == 'P' &&
+          data[1] == 'O' &&
+          data[2] == 'N' &&
+          data[3] == 'G';
 }
 
-bool isPong(const uint8_t* bytes, size_t size)
+bool isPong(const uint8_t* bytes, size_t size) // size 4 and 8
 {
-  return (size     >  3    &&
-          bytes[0] == 0x50 &&
-          bytes[1] == 0x4f &&
-          bytes[2] == 0x4e &&
-          bytes[3] == 0x47    );
+  return (size == 4) ? isPong(reinterpret_cast<const char*>(bytes)) :
+         (size     ==  8   &&
+          bytes[4] == 0x50 &&
+          bytes[5] == 0x4f &&
+          bytes[6] == 0x4e &&
+          bytes[7] == 0x47    );
 }
 // TODO: This should be "message", no?
 bool isMessage(const char* data) {
