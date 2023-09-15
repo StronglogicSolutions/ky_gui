@@ -155,14 +155,19 @@ Client::Client(QWidget* parent, int count, char** arguments)
       try
       {
         if (isPong(buffer, size))
-          return [this] { emit Client::messageReceived(PONG_REPLY_TYPE, "Pong"); VLOG("Pong"); }();
-        else
-        if (!isValidJson(message))
         {
-          ELOG("Invalid JSON: ", message);
+          emit Client::messageReceived(PONG_REPLY_TYPE, "Pong");
+          VLOG("Pong");
           return;
         }
-        else
+
+        if (!isValidJson(message))
+        {
+          ELOG("Invalid JSON: {}", message);
+          return;
+        }
+
+
         if (isNewSession(message.c_str()))
           emit Client::messageReceived(COMMANDS_UPDATE_TYPE, "New Session", getArgs(message.c_str()));
         else
@@ -188,9 +193,8 @@ Client::Client(QWidget* parent, int count, char** arguments)
                 sendEncoded(CreateOperation("FileUpload", {"Subsequent file"}));
             }
           }
-        }
-        std::string json = getJsonString(message);
-        emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromUtf8(json.data(), json.size()), {});
+        }        
+        emit Client::messageReceived(MESSAGE_UPDATE_TYPE, QString::fromStdString(getJsonString(message)));
       }
       catch (const std::exception& e)
       {
@@ -277,6 +281,7 @@ void Client::handleMessages()
     if (bytes_received < 1)
       break;
 
+#ifdef DEBUG_CLIENT
     if (isPong(receive_buffer, bytes_received) && m_message_decoder.isPending())
     {
       static auto bad_pongs = 0;
@@ -288,14 +293,12 @@ void Client::handleMessages()
         bad_pongs = 0;
       }
     }
+#endif
 
     if (m_download_console.is_downloading())
-    {
       handleDownload(receive_buffer, bytes_received);
-      continue;
-    }
-
-    m_message_decoder.processPacket(receive_buffer, bytes_received);
+    else
+      m_message_decoder.processPacket(receive_buffer, bytes_received);
   }
   memset(receive_buffer, 0, MAX_PACKET_SIZE);
   ::close(m_client_socket_fd);
