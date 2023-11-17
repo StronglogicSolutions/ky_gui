@@ -405,6 +405,7 @@ void MainWindow::connectClient(bool reconnect)
     const auto& server_ip   = ui->serverIp->toPlainText();
     const auto& server_port = ui->serverPort->toPlainText();
     setWindowTitle(windowTitle() + ' ' + q_client->GetUsername() + "@kiq://" + server_ip + ":" + server_port);
+    q_client->SetCredentials(configValue("username", m_config), configValue("password", m_config), configValue("auth", m_config));
     q_client->start(server_ip, server_port);
     startTimers();
   }
