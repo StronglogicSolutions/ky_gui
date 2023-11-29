@@ -215,11 +215,13 @@ Client::Client(QWidget* parent, int count, char** arguments)
     }
     else
     {
-      QJsonObject json = loadJsonConfig(reply->readAll());
+      QString auth_data = reply->readAll();
+      QJsonObject json = loadJsonConfig(auth_data);
+      DLOG("Received data from auth server:\n{}", auth_data.toStdString());
       if (!json.empty() && json.contains("token"))
       {
         QString token = configValue("token", json);
-        DLOG("Fetched token: ", token);
+        DLOG("Fetched token: {}", token.toStdString());
         m_token = token.toUtf8().constData();
 
         if (m_reconnect)
@@ -240,8 +242,7 @@ void Client::SetCredentials(const QString& username, const QString& password, co
   m_user            = username;
   m_password        = password;
   m_auth_address    = auth_address + "/login";
-  m_refresh_address = auth_address + "/refresh";
-  FetchToken();
+  m_refresh_address = auth_address + "/refresh";  
 }
 
 QString Client::GetUsername() const
@@ -251,6 +252,7 @@ QString Client::GetUsername() const
 
 void Client::FetchToken(bool reconnect)
 {
+  KLOG("Fetching token. Reconnect {}", reconnect);
   if (reconnect)
     m_network_manager.get(QNetworkRequest(QUrl(m_refresh_address + "?name=" + m_user + "&token=" + m_refresh)));
   else
@@ -415,7 +417,7 @@ void Client::sendEncoded(std::string message)
   builder.Finish(k_message);
 
   uint8_t* encoded_message_buffer = builder.GetBufferPointer();
-  uint32_t size = builder.GetSize();
+  uint32_t size                   = builder.GetSize();
 
   uint8_t send_buffer[MAX_PACKET_SIZE];
   memset(send_buffer, 0, MAX_PACKET_SIZE);
@@ -899,6 +901,7 @@ std::string Client::CreateOperation(const char* op, std::vector<std::string> arg
 
 void Client::reconnect()
 {
+  DLOG("Client::reconnect()");
   m_message_decoder.reset();
   m_download_console.Reset();
   FetchToken(true);
