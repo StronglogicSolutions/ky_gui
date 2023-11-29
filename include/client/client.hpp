@@ -99,6 +99,7 @@ void           SetFetching(bool fetching = true) { m_fetching = fetching; }
 void           SetCredentials(const QString& username, const QString& password, const QString& auth_address);
 QString        GetUsername() const;
 void           reconnect();
+void           FetchToken(bool reconnect = false);
 
 signals:
 void           messageReceived(int t, QString s, QVector<QString> args = {});
@@ -116,7 +117,6 @@ void           handleMessages();
 //void           handleEvent(std::string data);
 void           handleDownload(uint8_t* data, ssize_t size);
 void           sendPackets(uint8_t* data, uint32_t size);
-void           FetchToken(bool reconnect = false);
 std::string    CreateOperation(const char* op, std::vector<std::string> args);
 
 int                           argc;
