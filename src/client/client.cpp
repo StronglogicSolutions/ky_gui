@@ -356,6 +356,9 @@ void Client::start(QString ip, QString port)
 
   if (ip_address.isEmpty()) return;
 
+  m_server_ip   = server_ip;
+  m_server_port = server_port;
+
   m_client_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (m_client_socket_fd != -1)
   {
