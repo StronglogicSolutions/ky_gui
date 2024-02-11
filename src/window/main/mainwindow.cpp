@@ -171,8 +171,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
     if (!m_config.contains("username") || !m_config.contains("password") || !m_config.contains("auth"))
       return KLOG("Unable to connect to KIQ without credentials. Please modify config JSON");
 
-    q_client->SetCredentials(configValue("username", m_config), configValue("password", m_config), configValue("auth",     m_config));
+    q_client->SetCredentials(configValue("username", m_config), configValue("password", m_config), configValue("auth", m_config));
     arg_ui->setFilePath(configValue("fileDirectory", m_config));
+
+    q_client->FetchToken();
   });
 
   QObject::connect(&doc_window, &DocumentWindow::RequestData, this, [this](QVector<QString> argv)
