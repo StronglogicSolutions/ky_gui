@@ -345,19 +345,19 @@ static bool IsIP(const QString& address)
  */
 void Client::start(QString ip, QString port)
 {
-  const QString port_address = port.isEmpty() ? m_server_port : port;
+  const QString port_number  = port.isEmpty() ? m_server_port : port;
   const QString host_address = (ip.isEmpty()) ? m_server_ip: ip;
 
   if (host_address.isEmpty()) return;
 
   const QString ip_address   = IsIP(host_address) ? host_address : DNStoIP(host_address);
   const char*   server_ip    = ip_address.toUtf8();
-  const char*   server_port  = port_address.toUtf8();
+  const char*   server_port  = port_number.toUtf8();
 
   if (ip_address.isEmpty()) return;
 
-  m_server_ip   = server_ip;
-  m_server_port = server_port;
+  m_server_ip   = host_address;
+  m_server_port = port_number;
 
   m_client_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (m_client_socket_fd != -1)
