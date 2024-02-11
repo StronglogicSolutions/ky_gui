@@ -219,10 +219,8 @@ Client::Client(QWidget* parent, int count, char** arguments)
       QJsonObject json = loadJsonConfig(auth_data);
       DLOG("Received data from auth server:\n{}", auth_data.toStdString());
       if (!json.empty() && json.contains("token"))
-      {
-        QString token = configValue("token", json);
-        DLOG("Fetched token: {}", token.toStdString());
-        m_token = token.toUtf8().constData();
+      {        
+        m_token = configValue("token", json).toUtf8().constData();
 
         if (m_reconnect)
           start(m_server_ip, m_server_port);
