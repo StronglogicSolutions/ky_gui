@@ -211,13 +211,11 @@ Client::Client(QWidget* parent, int count, char** arguments)
     if (reply->error())
     {
       error = true;
-      ELOG("Auth server returned error: {}", reply->errorString().toUtf8().constData());
+      ELOG("Auth server returned error: {}", reply->errorString().toStdString());
     }
     else
-    {
-      QString auth_data = reply->readAll();
-      QJsonObject json = loadJsonConfig(auth_data);
-      DLOG("Received data from auth server:\n{}", auth_data.toStdString());
+    {     
+      const auto json = loadJsonConfig(reply->readAll());
       if (!json.empty() && json.contains("token"))
       {        
         m_token = configValue("token", json).toUtf8().constData();
@@ -345,6 +343,8 @@ static bool IsIP(const QString& address)
  */
 void Client::start(QString ip, QString port)
 {
+  DLOG("start called with address {} and port {}", ip.toStdString(), port.toStdString());
+
   const QString port_number  = port.isEmpty() ? m_server_port : port;
   const QString host_address = (ip.isEmpty()) ? m_server_ip: ip;
 
