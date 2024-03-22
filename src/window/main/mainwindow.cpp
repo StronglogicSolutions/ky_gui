@@ -145,6 +145,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   ui->serverPort ->setText(argv[2]);
   ui->fetchToken ->setStyleSheet(GetFetchButtonTheme());
   ui->connect    ->setStyleSheet(GetConnectButtonTheme());
+  ui->ipcTime    ->setDateTime(QDateTime::currentDateTime());
   QObject::connect(&m_ping_timer,    &QTimer::timeout, stay_alive);
   QObject::connect(q_client,         &Client::messageReceived,          this, &MainWindow::onMessageReceived);
   QObject::connect(ui->connect,      &QPushButton::clicked,             this, &MainWindow::connectClient);
@@ -287,16 +288,21 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   QObject::connect(ui->ipc, &QPushButton::clicked, this, [this]()
   {
     auto HasKey = [this](auto key) { return m_platform_map.find(key) != m_platform_map.end(); };
-    auto platform = ui->platform->currentText();
-    auto type = ui->ipcCommand->currentText();
-    auto text = ui->inputText->toPlainText();
-    auto user = defaultConfigUser(m_config);
-    auto cmd  = platform.toLower() + ':' + type;
-    auto arg  = QString::number(ui->ipcArg->value());
-    auto opt  = (ui->ipcOption->count() && HasKey(platform)) ? m_platform_map.value(platform).at(ui->ipcOption->currentIndex()) : "";
-    q_client->sendIPCMessage(cmd, text, user, opt, arg);
+    auto platform = ui->platform->currentText();    
+    auto data     = ui->inputText->toPlainText();
+    auto user     = defaultConfigUser(m_config);
+    auto cmd      = ui->ipcCommand->currentText();
+    auto arg      = QString::number(ui->ipcArg->value());
+    auto param    = (ui->ipcOption->count() && HasKey(platform)) ? m_platform_map.value(platform).at(ui->ipcOption->currentIndex()) : "";
+    auto type     = "IPC_" + ui->ipcType->currentText();
+    auto recur    = ui->recurring->isChecked();
+    auto time     = QString::number(ui->ipcTime->dateTime().currentSecsSinceEpoch());
+    q_client->sendIPCMessage(type, platform, data, cmd, time, recur);
     ui->inputText->clear();
+
+    // type, platform, data, command, time, recurring, status, id, p_uuid
   });
+
 
   QObject::connect(ui->makeDoc, &QPushButton::clicked, this, [this]()
   {
