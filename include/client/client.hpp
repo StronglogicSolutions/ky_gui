@@ -92,7 +92,7 @@ CommandMap     GetCommands()                    { return m_command_map; }
 void           addCommand(KApplication command) { m_commands.append(command); }
 void           sendFiles(Scheduler::Task* task);
 void           ping();
-void           sendIPCMessage(const QString& type, const QString& platform, const QString& data, const QString& cmd, const QString& time, bool recurring);
+void           sendIPCMessage(const QString&, const QString&, const QString&, const QString&, const QString&, const QString&);
 void           setIncomingFile(const StringVec& files);
 void           setMetadata(const QVector<QString>& data);
 void           SetFetching(bool fetching = true) { m_fetching = fetching; }

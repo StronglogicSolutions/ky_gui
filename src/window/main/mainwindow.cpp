@@ -286,7 +286,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
   });
 
   QObject::connect(ui->ipc, &QPushButton::clicked, this, [this]()
-  {
+  {    
     auto HasKey = [this](auto key) { return m_platform_map.find(key) != m_platform_map.end(); };
     auto platform = ui->platform->currentText();    
     auto data     = ui->inputText->toPlainText();
@@ -295,12 +295,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
     auto arg      = QString::number(ui->ipcArg->value());
     auto param    = (ui->ipcOption->count() && HasKey(platform)) ? m_platform_map.value(platform).at(ui->ipcOption->currentIndex()) : "";
     auto type     = "IPC_" + ui->ipcType->currentText();
-    auto recur    = ui->recurring->isChecked();
+    auto recur    = QString::number(ui->recurring->currentIndex());
     auto time     = QString::number(ui->ipcTime->dateTime().currentSecsSinceEpoch());
     q_client->sendIPCMessage(type, platform, data, cmd, time, recur);
-    ui->inputText->clear();
-
-    // type, platform, data, command, time, recurring, status, id, p_uuid
+    ui->inputText->clear();    
   });
 
 

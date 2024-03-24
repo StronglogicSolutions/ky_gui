@@ -928,6 +928,13 @@ color: rgb(223, 252, 255);</string>
                </item>
                <item>
                 <widget class="QDateTimeEdit" name="ipcTime">
+                 <property name="styleSheet">
+                  <string notr="true">font: 87 10pt &quot;Noto Sans&quot;;
+background-color: #5eabc2;
+color: rgb(29, 51, 59);
+font-weight: 700;
+</string>
+                 </property>
                  <property name="dateTime">
                   <datetime>
                    <hour>0</hour>
@@ -957,10 +964,44 @@ color: rgb(223, 252, 255);</string>
                 </spacer>
                </item>
                <item>
-                <widget class="QCheckBox" name="recurring">
-                 <property name="text">
-                  <string>Recur</string>
+                <widget class="QComboBox" name="recurring">
+                 <property name="styleSheet">
+                  <string notr="true">font: 87 11pt &quot;Noto Sans&quot;;
+background-color: #5eabc2;
+color: rgb(29, 51, 59);
+font-weight: 700;
+</string>
                  </property>
+                 <item>
+                  <property name="text">
+                   <string>No</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Hourly</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Daily</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Weekly</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Monthly</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Yearly</string>
+                  </property>
+                 </item>
                 </widget>
                </item>
               </layout>
