@@ -297,7 +297,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget* parent)
     auto type     = "IPC_" + ui->ipcType->currentText();
     auto recur    = QString::number(ui->recurring->currentIndex());
     auto time     = QString::number(ui->ipcTime->dateTime().currentSecsSinceEpoch());
-    q_client->sendIPCMessage(type, platform, data, cmd, time, recur);
+    q_client->sendIPCMessage(type, platform, data, cmd, time, recur, param);
     ui->inputText->clear();    
   });
 

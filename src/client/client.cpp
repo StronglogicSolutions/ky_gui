@@ -832,7 +832,7 @@ void Client::request(uint8_t request_code)
 
 /**
  */
-void Client::sendIPCMessage(const QString& type, const QString& platform, const QString& data, const QString& cmd, const QString& time, const QString& recur)
+void Client::sendIPCMessage(const QString& type, const QString& platform, const QString& data, const QString& cmd, const QString& time, const QString& recur, const QString& param)
 {
   sendEncoded(CreateOperation("ipc", {
     QString::number(kiq::Request::RequestType::IPC_REQUEST).toUtf8().constData(),
@@ -841,7 +841,11 @@ void Client::sendIPCMessage(const QString& type, const QString& platform, const 
     data.toUtf8().constData(),
     cmd.toUtf8().constData(),
     time.toUtf8().constData(),
-    recur.toUtf8().constData()
+    recur.toUtf8().constData(),
+    "0",
+    "",
+    "",
+    param.toUtf8().constData()
   }));
 }
 
